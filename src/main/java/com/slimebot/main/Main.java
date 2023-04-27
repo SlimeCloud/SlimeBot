@@ -55,6 +55,11 @@ public class Main {
                 .addOptions(new OptionData(OptionType.STRING, "value", "Welcher Wert soll bei dem Feld gesetzt werden?")
                         .setRequired(true))
         ).queue();
+        jdaInstance.upsertCommand(Commands.slash("ping", "ping pong")).queue();
+        jdaInstance.upsertCommand(Commands.slash("role_check", "[Team Befehl] Geht ALLE Mitglieder durch und gibt ihnen eine Rolle")
+                .addOption(OptionType.ROLE, "rolle", "Auf welche Rolle sollen die User überprüft werden?", true)
+                .addOption(OptionType.BOOLEAN, "bots", "Sollen Bots mit überprüft werden?", true)
+        ).queue();
 
         jdaInstance.updateCommands();
 
