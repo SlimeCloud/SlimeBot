@@ -1,6 +1,9 @@
 package com.slimebot.main;
 
 import com.slimebot.commands.Bug;
+import com.slimebot.commands.BulkAddRole;
+import com.slimebot.commands.Ping;
+import com.slimebot.events.ReadyEvent;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.TimeScheduler;
 import net.dv8tion.jda.api.JDA;
@@ -29,8 +32,16 @@ public class Main {
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
 
+                // Commands
                 .addEventListeners(new Bug())
                 .addEventListeners(new com.slimebot.commands.Config())
+                .addEventListeners(new BulkAddRole())
+                .addEventListeners(new Ping())
+
+
+                //Events
+                .addEventListeners(new ReadyEvent())
+
 
                 .build();
 
