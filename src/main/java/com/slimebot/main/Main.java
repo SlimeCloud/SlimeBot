@@ -4,6 +4,7 @@ import com.slimebot.commands.Bug;
 import com.slimebot.commands.BulkAddRole;
 import com.slimebot.commands.Ping;
 import com.slimebot.events.ReadyEvent;
+import com.slimebot.report.commands.Blockreport;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.TimeScheduler;
 import net.dv8tion.jda.api.JDA;
@@ -11,10 +12,8 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.io.IOException;
@@ -37,6 +36,7 @@ public class Main {
                 .addEventListeners(new com.slimebot.commands.Config())
                 .addEventListeners(new BulkAddRole())
                 .addEventListeners(new Ping())
+                .addEventListeners(new Blockreport())
 
 
                 //Events
@@ -59,6 +59,16 @@ public class Main {
         jdaInstance.upsertCommand(Commands.slash("role_check", "[Team Befehl] Geht ALLE Mitglieder durch und gibt ihnen eine Rolle")
                 .addOption(OptionType.ROLE, "rolle", "Auf welche Rolle sollen die User überprüft werden?", true)
                 .addOption(OptionType.BOOLEAN, "bots", "Sollen Bots mit überprüft werden?", true)
+        ).queue();
+        jdaInstance.upsertCommand(Commands.slash("Blockreport", "Blocke eine Person das sie keine Reports mehr erstellen kann")
+                .addOptions(new OptionData(OptionType.USER, "user", "Wähle einen User aus")
+                        .setRequired(true))
+                .addOptions(new OptionData(OptionType.STRING, "action", "Wähle aus was du machen möchtest")
+                        .setRequired(true)
+                        .addChoice("add", "add")
+                        .addChoice("remove", "remove")
+                        .addChoice("list", "list")
+                )
         ).queue();
 
         jdaInstance.updateCommands();
