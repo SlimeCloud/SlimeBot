@@ -1,6 +1,7 @@
 package com.slimebot.commands;
 
 
+import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -18,14 +19,7 @@ public class BulkAddRole extends ListenerAdapter {
 
         if (!(event.getName().equals("role_check"))){return;}
 
-        Member cmdRunner = (Member) event.getGuild().retrieveMemberById(event.getMember().getId());
-
-        Role staffRole = event.getGuild().getRoleById("1081650648124248124"); //ToDo get ID from a Config eg. Settings
-
-
-
-        assert cmdRunner != null;
-        if (!(cmdRunner.getRoles().contains(staffRole))) {
+        if (!Checks.hasTeamRole(event.getMember(), event.getGuild())){
             event.reply("kein Teammitglied!").queue();
             return;
         }
