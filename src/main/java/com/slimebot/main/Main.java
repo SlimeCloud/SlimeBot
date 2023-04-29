@@ -46,6 +46,7 @@ public class Main {
                 .build();
 
         jdaInstance.upsertCommand(Commands.slash("bug", Config.getLocalProperty("bug.properties", "bug.commandDesc"))).queue();
+
         jdaInstance.upsertCommand(Commands.slash("config", Config.getLocalProperty("config.properties", "config.commandDesc"))
                 .addOptions(new OptionData(OptionType.STRING, "type", "Welcher Config-Bereich?")
                         .setRequired(true)
@@ -55,12 +56,15 @@ public class Main {
                 .addOptions(new OptionData(OptionType.STRING, "value", "Welcher Wert soll bei dem Feld gesetzt werden?")
                         .setRequired(true))
         ).queue();
+
         jdaInstance.upsertCommand(Commands.slash("ping", "ping pong")).queue();
+
         jdaInstance.upsertCommand(Commands.slash("role_check", "[Team Befehl] Geht ALLE Mitglieder durch und gibt ihnen eine Rolle")
                 .addOption(OptionType.ROLE, "rolle", "Auf welche Rolle sollen die User überprüft werden?", true)
                 .addOption(OptionType.BOOLEAN, "bots", "Sollen Bots mit überprüft werden?", true)
         ).queue();
-        jdaInstance.upsertCommand(Commands.slash("Blockreport", "Blocke eine Person das sie keine Reports mehr erstellen kann")
+
+        jdaInstance.upsertCommand(Commands.slash("blockreport", "Blocke eine Person das sie keine Reports mehr erstellen kann")
                 .addOptions(new OptionData(OptionType.USER, "user", "Wähle einen User aus")
                         .setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, "action", "Wähle aus was du machen möchtest")
@@ -70,6 +74,8 @@ public class Main {
                         .addChoice("list", "list")
                 )
         ).queue();
+
+        jdaInstance.upsertCommand(Commands.slash("report"))
 
         jdaInstance.updateCommands();
 

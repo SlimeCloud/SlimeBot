@@ -13,7 +13,7 @@ public class Blockreport extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         super.onSlashCommandInteraction(event);
 
-        if (!(event.getName().equals("Blockreport"))) {
+        if (!(event.getName().equals("blockreport"))) {
             return;
         }
 
