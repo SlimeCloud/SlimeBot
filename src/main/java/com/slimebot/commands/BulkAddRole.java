@@ -18,7 +18,7 @@ public class BulkAddRole extends ListenerAdapter {
 
         if (!(event.getName().equals("role_check"))){return;}
 
-        Member cmdRunner = Objects.requireNonNull(event.getGuild()).getMemberById(event.getUser().getId());
+        Member cmdRunner = (Member) event.getGuild().retrieveMemberById(event.getMember().getId());
 
         Role staffRole = event.getGuild().getRoleById("1081650648124248124"); //ToDo get ID from a Config eg. Settings
 
