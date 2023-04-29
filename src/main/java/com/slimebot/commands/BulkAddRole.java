@@ -19,7 +19,7 @@ public class BulkAddRole extends ListenerAdapter {
 
         if (!(event.getName().equals("role_check"))){return;}
 
-        if (!Checks.hasTeamRole(event.getMember(), event.getGuild())){
+        if (Checks.hasTeamRole(event.getMember(), event.getGuild())){
             event.reply("kein Teammitglied!").queue();
             return;
         }

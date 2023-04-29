@@ -1,58 +1,65 @@
 package com.slimebot.report.commands;
 
 import com.slimebot.utils.Checks;
+import com.slimebot.main.Main;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Blockreport extends ListenerAdapter {
 
+
+
     @Override
-    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         super.onSlashCommandInteraction(event);
+
 
         if (!(event.getName().equals("blockreport"))) {
             return;
         }
 
-        if (!Checks.hasTeamRole(event.getMember(), event.getGuild())) {
+
+        if (Checks.hasTeamRole(event.getMember(), event.getGuild())) {
             event.reply("kein Teammitglied!").queue();
             return;
         }
 
-        ArrayList<Member> blocklist = new ArrayList<>(); //ToDo get From Config or DataBase
+
 
 
         switch (event.getOption("action").getAsString()) {
             case "add":
 
-                if (blocklist.contains((Member) event.getOption("user"))) {
+                if (Main.blocklist.contains(event.getOption("user").getAsMember())) {
                     event.reply("Ist bereits geblocked").setEphemeral(true).queue();
                     return;
                 }
 
-                blocklist.add((Member) event.getOption("user"));
+                Main.blocklist.add(event.getOption("user").getAsMember());
 
-                event.reply((Member) event.getOption("user") + " wurde geblockt und kann nun keine Reports mehr erstellen").queue();
+                event.reply(event.getOption("user").getAsMentionable().getAsMention() + " wurde geblockt und kann nun keine Reports mehr erstellen").queue();
                 break;
 
             case "remove":
-                if (!(blocklist.contains((Member) event.getOption("user")))) {
+                if (!(Main.blocklist.contains(event.getOption("user").getAsMember()))) {
                     event.reply("Ist nicht geblocked").setEphemeral(true).queue();
                     return;
                 }
 
-                blocklist.remove((Member) event.getOption("user"));
+                Main.blocklist.remove(event.getOption("user").getAsMember());
 
-                event.reply((Member) event.getOption("user") + " kann nun wieder Reports erstellen").queue();
+                event.reply(event.getOption("user").getAsMentionable().getAsMention() + " kann nun wieder Reports erstellen").queue();
                 break;
 
             case "list":
                 StringBuilder msg = new StringBuilder();
 
-                for (Member member: blocklist){
+                for (Member member: Main.blocklist){
                     msg.append(member.getAsMention()).append("\n");
                 }
 
