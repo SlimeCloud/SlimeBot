@@ -5,24 +5,36 @@ import com.slimebot.commands.BulkAddRole;
 import com.slimebot.commands.Ping;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.report.commands.Blockreport;
+import com.slimebot.report.commands.ReportCmd;
+import com.slimebot.report.commands.GetReportDetail;
+import com.slimebot.report.contextmenus.MsgReport;
+import com.slimebot.report.contextmenus.UserReport;
+import com.slimebot.report.modals.ReportModal;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.TimeScheduler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
+import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.TimerTask;
 
 public class Main {
     public static JDA jdaInstance;
     private static String activityText = Config.getLocalProperty("config.properties", "main.activity.text");
     private static String activityType = Config.getLocalProperty("config.properties", "main.activity");
+    public static ArrayList<Member> blocklist = new ArrayList<>(); //todo get From Config or DataBase
+    public static ArrayList<com.slimebot.report.assets.Report> reports = new ArrayList<>(); //ToDo get From Config or DataBase
+    public static Color embedColor = new Color(86,157,60); //ToDo get From Config or DataBase so you can Change the Color via cmd
 
     public static void main(String[] args) {
         jdaInstance = JDABuilder.createDefault(Config.getLocalProperty("config.properties", "main.token"))
@@ -37,14 +49,25 @@ public class Main {
                 .addEventListeners(new BulkAddRole())
                 .addEventListeners(new Ping())
                 .addEventListeners(new Blockreport())
+                .addEventListeners(new ReportCmd())
+                .addEventListeners(new GetReportDetail())
 
 
                 //Events
                 .addEventListeners(new ReadyEvent())
 
+                //Context Menus
+                .addEventListeners(new MsgReport())
+                .addEventListeners(new UserReport())
+
+
+                //Modals
+                .addEventListeners(new ReportModal())
+
 
                 .build();
 
+        //Register Commands
         jdaInstance.upsertCommand(Commands.slash("bug", Config.getLocalProperty("bug.properties", "bug.commandDesc"))).queue();
 
         jdaInstance.upsertCommand(Commands.slash("config", Config.getLocalProperty("config.properties", "config.commandDesc"))
@@ -75,12 +98,32 @@ public class Main {
                 )
         ).queue();
 
-        jdaInstance.upsertCommand(Commands.slash("report"))
+        jdaInstance.upsertCommand(Commands.slash("report", "Reporte eine Person")
+                .addOption(OptionType.USER, "user", "Wähle aus wen du melden möchtest", true)
+                .addOption(OptionType.STRING, "beschreibung", "Warum möchtest du den User reporten?", true)
+        ).queue();
+
+        jdaInstance.upsertCommand(Commands.slash("getReport", "Lasse dir die Details zu einem Report anzeigen")
+                .addOptions(new OptionData(OptionType.STRING, "status", "Setze einen Filter für die Reports")
+                        .setRequired(true)
+                        .addChoice("Alle", "all")
+                        .addChoice("Geschlossen", "closed")
+                        .addChoice("Offen", "open")
+
+                )
+
+        ).queue();
+
+
+        //Register Context Menus
+        jdaInstance.upsertCommand(Commands.context(Command.Type.USER, "Report User")).queue();
+        jdaInstance.upsertCommand(Commands.context(Command.Type.MESSAGE, "Report Message")).queue();
 
         jdaInstance.updateCommands();
 
         checkForGuilds();
     }
+
 
     public static void checkForGuilds() {
         new TimeScheduler(300).startTimer(new TimerTask() {
