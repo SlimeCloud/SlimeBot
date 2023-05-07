@@ -30,48 +30,31 @@ public class Blockreport extends ListenerAdapter {
         }
 
 
-
-
         switch (event.getOption("action").getAsString()) {
-            case "add":
-
+            case "add" -> {
                 if (Main.blocklist.contains(event.getOption("user").getAsMember())) {
                     event.reply("Ist bereits geblocked").setEphemeral(true).queue();
                     return;
                 }
-
                 Main.blocklist.add(event.getOption("user").getAsMember());
-
                 event.reply(event.getOption("user").getAsMentionable().getAsMention() + " wurde geblockt und kann nun keine Reports mehr erstellen").queue();
-                break;
-
-            case "remove":
+            }
+            case "remove" -> {
                 if (!(Main.blocklist.contains(event.getOption("user").getAsMember()))) {
                     event.reply("Ist nicht geblocked").setEphemeral(true).queue();
                     return;
                 }
-
                 Main.blocklist.remove(event.getOption("user").getAsMember());
-
                 event.reply(event.getOption("user").getAsMentionable().getAsMention() + " kann nun wieder Reports erstellen").queue();
-                break;
-
-            case "list":
+            }
+            case "list" -> {
                 StringBuilder msg = new StringBuilder();
-
-                for (Member member: Main.blocklist){
+                for (Member member : Main.blocklist) {
                     msg.append(member.getAsMention()).append("\n");
                 }
-
                 event.reply("Blocked: \n" + msg).queue();
-
-                break;
-
-            default:
-                event.reply("Etwas ist schief gelaufen bitte kontaktiere einen Netrunner").queue();
-                break;
-
-
+            }
+            default -> event.reply("Etwas ist schief gelaufen bitte kontaktiere einen Netrunner").queue();
         }
 
 
