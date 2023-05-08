@@ -38,6 +38,7 @@ public class ReportModal extends ListenerAdapter {
 
 
         event.reply(currentReport.getUser().getAsMention() + " wurde Reportet").setEphemeral(true).queue();
+        //ToDo add log msg with Close btn
 
     }
 }

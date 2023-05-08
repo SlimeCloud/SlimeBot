@@ -69,7 +69,7 @@ public class GetReportDetail extends ListenerAdapter {
             MessageEmbed eb = embed.build();
 
 
-            event.replyEmbeds(eb).queue();
+            event.replyEmbeds(eb).queue(); //ToDo Add Close button
 
         }
 

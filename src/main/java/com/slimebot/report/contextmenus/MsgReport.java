@@ -31,6 +31,7 @@ public class MsgReport extends ListenerAdapter {
 
 
         event.reply(event.getTarget().getAuthor().getAsMention() + " wurde Reportet").setEphemeral(true).queue();
+        //ToDo add log msg with Close btn
 
 
     }
