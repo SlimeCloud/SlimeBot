@@ -37,7 +37,7 @@ public class ReportModal extends ListenerAdapter {
         currentReport.setMsgContent(description.getAsString());
 
 
-        event.reply(event.getInteraction().getUser().getAsMention() + " wurde Reportet").setEphemeral(true).queue();
+        event.reply(currentReport.getUser().getAsMention() + " wurde Reportet").setEphemeral(true).queue();
 
     }
 }

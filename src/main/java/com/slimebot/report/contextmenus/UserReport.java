@@ -32,7 +32,7 @@ public class UserReport extends ListenerAdapter {
 
         TextInput saveId = TextInput.create("id", "Bitte die Report ID nicht ändern!", TextInputStyle.SHORT)
                 .setRequired(true)
-                .setValue(event.getTargetMember().getId())
+                .setValue(String.valueOf(reportID))
                 .setPlaceholder("Diese feld wird automatisch ausgefüllt!")
                 .build();
 

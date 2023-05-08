@@ -1,11 +1,8 @@
 package com.slimebot.report.assets;
 
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
-
-import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class Report {
     public Integer id;
@@ -25,7 +22,7 @@ public class Report {
         report.by = by;
         report.closeReason = "None";
         report.status = Status.OPEN;
-        report.time = LocalDateTime.now();
+        report.time = LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime();
         report.msgContent = msgContent;
 
         return report;

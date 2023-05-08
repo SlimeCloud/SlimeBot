@@ -32,7 +32,6 @@ public class MsgReport extends ListenerAdapter {
 
         event.reply(event.getTarget().getAuthor().getAsMention() + " wurde Reportet").setEphemeral(true).queue();
 
-        System.out.println(Main.reports.get(Main.reports.size() -1).getMsgContent());
 
     }
 }

@@ -23,7 +23,7 @@ public class ReportCmd extends ListenerAdapter {
 
         Main.reports.add(Report.newReport(reportID, Type.USER, user.getAsMember(), event.getMember(), description.getAsString()));
 
-        event.reply(event.getInteraction().getUser().getAsMention() + " wurde Reportet").setEphemeral(true).queue();
+        event.reply(user.getAsMentionable().getAsMention() + " wurde Reportet").setEphemeral(true).queue();
 
 
 
