@@ -7,6 +7,7 @@ import com.slimebot.events.ReadyEvent;
 import com.slimebot.report.commands.Blockreport;
 import com.slimebot.report.commands.ReportCmd;
 import com.slimebot.report.commands.GetReportDetail;
+import com.slimebot.report.commands.ReportList;
 import com.slimebot.report.contextmenus.MsgReport;
 import com.slimebot.report.contextmenus.UserReport;
 import com.slimebot.report.modals.ReportModal;
@@ -51,6 +52,7 @@ public class Main {
                 .addEventListeners(new Blockreport())
                 .addEventListeners(new ReportCmd())
                 .addEventListeners(new GetReportDetail())
+                .addEventListeners(new ReportList())
 
 
                 //Events
@@ -103,15 +105,17 @@ public class Main {
                 .addOption(OptionType.STRING, "beschreibung", "Warum möchtest du den User reporten?", true)
         ).queue();
 
-        jdaInstance.upsertCommand(Commands.slash("getReport", "Lasse dir die Details zu einem Report anzeigen")
+        jdaInstance.upsertCommand(Commands.slash("report_list", "Lasse dir Reports sortiert nach ihrem Status anzeigen")
                 .addOptions(new OptionData(OptionType.STRING, "status", "Setze einen Filter für die Reports")
                         .setRequired(true)
                         .addChoice("Alle", "all")
                         .addChoice("Geschlossen", "closed")
                         .addChoice("Offen", "open")
-
                 )
+        ).queue();
 
+        jdaInstance.upsertCommand(Commands.slash("report_detail", "Lasse dir die Details zu einem Report anzeigen")
+                .addOption(OptionType.INTEGER, "id", "ID des Reports den du genauer ansehen willst", true)
         ).queue();
 
 
