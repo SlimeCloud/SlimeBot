@@ -21,4 +21,5 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    systemProperty "file.encoding", "utf-8"
 }
