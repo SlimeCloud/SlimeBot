@@ -7,9 +7,11 @@ import com.slimebot.report.assets.Type;
 import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -44,8 +46,6 @@ public class GetReportDetail extends ListenerAdapter {
                 case OPEN -> StatusStr = "Offen";
             }
 
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy hh:mm:ss");
-
             EmbedBuilder embed = new EmbedBuilder()
                     .setColor(Main.embedColor)
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
@@ -53,7 +53,7 @@ public class GetReportDetail extends ListenerAdapter {
                     .addField("Report Typ:", TypeStr, true)
                     .addField("Gemeldeter User:", report.getUser().getAsMention(), true)
                     .addField("Gemeldet von:", report.getBy().getAsMention(), true)
-                    .addField("Gemeldet am:", report.getTime().format(dtf) + "Uhr", true)
+                    .addField("Gemeldet am:", report.getTime().format(Main.dtf) + "Uhr", true)
                     .addField("Status:", StatusStr, true);
             
             if (report.getType() == Type.MSG){
@@ -68,8 +68,9 @@ public class GetReportDetail extends ListenerAdapter {
 
             MessageEmbed eb = embed.build();
 
+            Button closeBtn = Button.danger("close", "Close").withEmoji(Emoji.fromFormatted("🔒"));
 
-            event.replyEmbeds(eb).queue(); //ToDo Add Close button
+            event.replyEmbeds(eb).setActionRow(closeBtn).queue();
 
         }
 
