@@ -4,6 +4,7 @@ import com.slimebot.commands.Bug;
 import com.slimebot.commands.BulkAddRole;
 import com.slimebot.commands.Ping;
 import com.slimebot.events.ReadyEvent;
+import com.slimebot.report.assets.Report;
 import com.slimebot.report.commands.Blockreport;
 import com.slimebot.report.commands.ReportCmd;
 import com.slimebot.report.commands.GetReportDetail;
@@ -26,6 +27,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.awt.*;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.TimerTask;
 
@@ -34,8 +36,9 @@ public class Main {
     private static String activityText = Config.getLocalProperty("config.properties", "main.activity.text");
     private static String activityType = Config.getLocalProperty("config.properties", "main.activity");
     public static ArrayList<Member> blocklist = new ArrayList<>(); //todo get From Config or DataBase
-    public static ArrayList<com.slimebot.report.assets.Report> reports = new ArrayList<>(); //ToDo get From Config or DataBase
+    public static ArrayList<Report> reports = new ArrayList<>(); //ToDo get From Config or DataBase
     public static Color embedColor = new Color(86,157,60); //ToDo get From Config or DataBase so you can Change the Color via cmd
+    public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy hh:mm:ss");
 
     public static void main(String[] args) {
         jdaInstance = JDABuilder.createDefault(Config.getLocalProperty("config.properties", "main.token"))
