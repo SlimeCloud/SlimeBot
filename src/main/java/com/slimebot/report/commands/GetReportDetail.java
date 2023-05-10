@@ -25,50 +25,24 @@ public class GetReportDetail extends ListenerAdapter {
 
         if (!(event.getName().equals("report_detail"))) {return;}
         if (Checks.hasTeamRole(event.getMember(), event.getGuild())){
-            event.reply("kein Teammitglied!").queue();
+            EmbedBuilder noTeam = new EmbedBuilder()
+                    .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+                    .setColor(Main.embedColor)
+                    .setTitle(":exclamation: Error")
+                    .setDescription("Der Befehl kann nur von einem Teammitglied ausgeführt werden!");
+            event.replyEmbeds(noTeam.build()).queue();
             return;
         }
 
         OptionMapping id = event.getOption("id");
+        MessageEmbed eb;
 
         for (Report report: Main.reports) {
             if (!(report.getId() == id.getAsInt())){continue;}
 
-            String TypeStr = "";
-            switch (report.getType()) {
-                case MSG -> TypeStr = "Nachricht";
-                case USER -> TypeStr = "User";
-            }
+            eb = Report.getReportAsEmbed(report);
 
-            String StatusStr = "";
-            switch (report.getStatus()) {
-                case CLOSED -> StatusStr = "Geschlossen";
-                case OPEN -> StatusStr = "Offen";
-            }
-
-            EmbedBuilder embed = new EmbedBuilder()
-                    .setColor(Main.embedColor)
-                    .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                    .setTitle(":exclamation:  Details zu Report #" + id.getAsString())
-                    .addField("Report Typ:", TypeStr, true)
-                    .addField("Gemeldeter User:", report.getUser().getAsMention(), true)
-                    .addField("Gemeldet von:", report.getBy().getAsMention(), true)
-                    .addField("Gemeldet am:", report.getTime().format(Main.dtf) + "Uhr", true)
-                    .addField("Status:", StatusStr, true);
-            
-            if (report.getType() == Type.MSG){
-                embed.addField("Gemeldete Nachricht:", report.getMsgContent(), false);
-            } else if (report.getType() == Type.USER) {
-                embed.addField("Meldegrund:", report.getMsgContent(), true);
-            }
-
-            if (report.getStatus() == Status.CLOSED) {
-                embed.addField("Verfahren:", report.getCloseReason(), true);
-            }
-
-            MessageEmbed eb = embed.build();
-
-            Button closeBtn = Button.danger("close_report", "Close #" + report.getId().toString()); //ToDo Java is wierd pls add 🔒 emoji
+            Button closeBtn = Report.closeBtn(report.getId().toString());
 
             if (report.getStatus() == Status.CLOSED){
                 event.replyEmbeds(eb).queue();
