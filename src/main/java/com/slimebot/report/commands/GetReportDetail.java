@@ -68,7 +68,7 @@ public class GetReportDetail extends ListenerAdapter {
 
             MessageEmbed eb = embed.build();
 
-            Button closeBtn = Button.danger("close", "Close").withEmoji(Emoji.fromFormatted("🔒"));
+            Button closeBtn = Button.danger("close", "Close #" + report.getId().toString()).withEmoji(Emoji.fromFormatted("🔒"));
 
             event.replyEmbeds(eb).setActionRow(closeBtn).queue();
 

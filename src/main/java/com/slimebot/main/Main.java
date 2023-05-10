@@ -5,6 +5,7 @@ import com.slimebot.commands.BulkAddRole;
 import com.slimebot.commands.Ping;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.report.assets.Report;
+import com.slimebot.report.buttons.Close;
 import com.slimebot.report.commands.Blockreport;
 import com.slimebot.report.commands.ReportCmd;
 import com.slimebot.report.commands.GetReportDetail;
@@ -57,7 +58,6 @@ public class Main {
                 .addEventListeners(new GetReportDetail())
                 .addEventListeners(new ReportList())
 
-
                 //Events
                 .addEventListeners(new ReadyEvent())
 
@@ -65,9 +65,11 @@ public class Main {
                 .addEventListeners(new MsgReport())
                 .addEventListeners(new UserReport())
 
-
                 //Modals
                 .addEventListeners(new ReportModal())
+
+                //Buttons
+                .addEventListeners(new Close())
 
 
                 .build();
