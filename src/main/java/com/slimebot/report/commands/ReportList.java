@@ -6,8 +6,11 @@ import com.slimebot.report.assets.Status;
 import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -20,7 +23,12 @@ public class ReportList extends ListenerAdapter {
 
         if (!(event.getName().equals("report_list"))) {return;}
         if (Checks.hasTeamRole(event.getMember(), event.getGuild())){
-            event.reply("kein Teammitglied!").queue();
+            EmbedBuilder noTeam = new EmbedBuilder()
+                    .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+                    .setColor(Main.embedColor)
+                    .setTitle(":exclamation: Error")
+                    .setDescription("Der Befehl kann nur von einem Teammitglied ausgeführt werden!");
+            event.replyEmbeds(noTeam.build()).queue();
             return;
         }
 
@@ -64,9 +72,20 @@ public class ReportList extends ListenerAdapter {
 
         }
 
+        if (ReportIdList.size() == 0){
+
+            EmbedBuilder embedBuilder = new EmbedBuilder()
+                    .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+                    .setColor(Main.embedColor)
+                    .setTitle(":exclamation: Error: No Reports Found")
+                    .setDescription("Es wurden keine Reports zu der Ausgewählten option gefunden!");
+            event.replyEmbeds(embedBuilder.build()).queue();
+            return;
+        }
+
         MessageEmbed ed = embed.build();
 
-        event.replyEmbeds(ed).queue();
+        event.replyEmbeds(ed).addActionRow(DetailDropdownButton(ReportIdList)).queue();
 
 
 
@@ -77,6 +96,21 @@ public class ReportList extends ListenerAdapter {
                 report.getUser().getAsMention() + " wurde am `" + report.getTime().format(Main.dtf) + "` von " + report.getBy().getAsMention() + " gemeldet",
                 false);
     }
+
+    private StringSelectMenu DetailDropdownButton(ArrayList<Integer> reportList){
+        StringSelectMenu.Builder btnBuilder = StringSelectMenu.create("detail_btn")
+                .setPlaceholder("Details zu einem Report")
+                .setMaxValues(1);
+
+        for (Integer reportID:reportList) {
+            btnBuilder.addOption("Report #" + reportID, reportID.toString(), "Details zum Report #" + reportID);
+        }
+
+        return btnBuilder.build();
+
+    }
+
+
 
 
 
