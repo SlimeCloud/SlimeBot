@@ -18,7 +18,15 @@ public class MsgReport extends ListenerAdapter {
     public void onMessageContextInteraction(MessageContextInteractionEvent event) {
         super.onMessageContextInteraction(event);
         if (!(event.getName().equals("Report Message"))) {return;}
-        if (Checks.isReportBlocked(event.getMember(), (TextChannel) event.getChannel())) {return;}
+        if (Main.blocklist.contains(event.getMember())) {
+            EmbedBuilder embedBuilder = new EmbedBuilder()
+                    .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+                    .setColor(Main.embedColor)
+                    .setTitle(":exclamation: Error: Blocked")
+                    .setDescription("Du wurdest gesperrt, so dass du keine Reports mehr erstellen kannst");
+            event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
+            return;
+        }
 
         int reportID = Main.reports.size() + 1;
 
