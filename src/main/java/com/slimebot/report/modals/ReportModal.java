@@ -5,6 +5,7 @@ import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Status;
 import com.slimebot.report.assets.Type;
 import com.slimebot.report.commands.ReportCmd;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
 public class ReportModal extends ListenerAdapter {
@@ -20,6 +22,7 @@ public class ReportModal extends ListenerAdapter {
     @Override
     public void onModalInteraction(@NotNull ModalInteractionEvent event) {
         super.onModalInteraction(event);
+
         if (!(event.getModalId().equals("userReport"))){return;}
 
         Report currentReport = null;
@@ -36,7 +39,12 @@ public class ReportModal extends ListenerAdapter {
 
         currentReport.setMsgContent(description.getAsString());
 
-
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+                .setColor(Main.embedColor)
+                .setTitle(":white_check_mark: Report Erfolgreich")
+                .setDescription(currentReport.getUser().getAsMention() + " wurde erfolgreich gemeldet");
+        event.replyEmbeds(embedBuilder.build()).queue();
         event.reply(currentReport.getUser().getAsMention() + " wurde Reportet").setEphemeral(true).queue();
         //ToDo add log msg with Close btn
 

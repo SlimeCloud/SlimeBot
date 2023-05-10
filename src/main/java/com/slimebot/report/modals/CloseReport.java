@@ -31,7 +31,12 @@ public class CloseReport extends ListenerAdapter {
         }
 
         if (!reportFound){
-            event.reply("**Error:** Report #" + reportID + " not found!").queue();
+            EmbedBuilder noReport = new EmbedBuilder()
+                    .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+                    .setColor(Main.embedColor)
+                    .setTitle(":exclamation: Error: Report not Found")
+                    .setDescription("Der Report #" + reportID + " konnte nicht gefunden werden!");
+            event.replyEmbeds(noReport.build()).queue();
             return;
         }
 

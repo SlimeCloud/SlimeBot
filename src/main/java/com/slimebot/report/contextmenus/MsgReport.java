@@ -3,8 +3,12 @@ package com.slimebot.report.contextmenus;
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Type;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class MsgReport extends ListenerAdapter {
 
@@ -29,8 +33,12 @@ public class MsgReport extends ListenerAdapter {
 
         Main.reports.add(Report.newReport(reportID, Type.MSG, event.getTarget().getMember(), event.getMember(), msgWithLink));
 
-
-        event.reply(event.getTarget().getAuthor().getAsMention() + " wurde Reportet").setEphemeral(true).queue();
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+                .setColor(Main.embedColor)
+                .setTitle(":white_check_mark: Report Erfolgreich")
+                .setDescription(event.getTarget().getAuthor().getAsMention() + " wurde erfolgreich gemeldet");
+        event.replyEmbeds(embedBuilder.build()).queue();
         //ToDo add log msg with Close btn
 
 
