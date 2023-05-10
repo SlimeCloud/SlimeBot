@@ -3,7 +3,9 @@ package com.slimebot.report.contextmenus;
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Type;
+import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -16,6 +18,7 @@ public class MsgReport extends ListenerAdapter {
     public void onMessageContextInteraction(MessageContextInteractionEvent event) {
         super.onMessageContextInteraction(event);
         if (!(event.getName().equals("Report Message"))) {return;}
+        if (Checks.isReportBlocked(event.getMember(), (TextChannel) event.getChannel())) {return;}
 
         int reportID = Main.reports.size() + 1;
 

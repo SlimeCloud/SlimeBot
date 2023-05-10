@@ -3,7 +3,9 @@ package com.slimebot.report.commands;
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Type;
+import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -19,6 +21,7 @@ public class ReportCmd extends ListenerAdapter {
         super.onSlashCommandInteraction(event);
 
         if (!(event.getName().equals("report"))) {return;}
+        if (Checks.isReportBlocked(event.getMember(), (TextChannel) event.getChannel())) {return;}
 
         int reportID = Main.reports.size() + 1;
 
