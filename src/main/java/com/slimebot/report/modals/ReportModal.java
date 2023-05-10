@@ -45,8 +45,7 @@ public class ReportModal extends ListenerAdapter {
                 .setTitle(":white_check_mark: Report Erfolgreich")
                 .setDescription(currentReport.getUser().getAsMention() + " wurde erfolgreich gemeldet");
         event.replyEmbeds(embedBuilder.build()).queue();
-        event.reply(currentReport.getUser().getAsMention() + " wurde Reportet").setEphemeral(true).queue();
-        //ToDo add log msg with Close btn
+        Report.log(currentReport.getId());
 
     }
 }

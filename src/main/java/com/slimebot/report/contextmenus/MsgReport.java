@@ -39,7 +39,7 @@ public class MsgReport extends ListenerAdapter {
                 .setTitle(":white_check_mark: Report Erfolgreich")
                 .setDescription(event.getTarget().getAuthor().getAsMention() + " wurde erfolgreich gemeldet");
         event.replyEmbeds(embedBuilder.build()).queue();
-        //ToDo add log msg with Close btn
+        Report.log(reportID);
 
 
     }

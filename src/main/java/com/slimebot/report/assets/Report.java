@@ -2,12 +2,15 @@ package com.slimebot.report.assets;
 
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Objects;
 
 public class Report {
     public Integer id;
@@ -35,6 +38,38 @@ public class Report {
 
     public static Button closeBtn(String reportID){
         return Button.danger("close_report", "Close #" + reportID); //ToDo Java is wierd pls add 🔒 emoji
+    }
+
+    public static void log(Integer reportID){
+
+        Report newReport = null;
+        for (Report report: Main.reports) {
+            if (!(Objects.equals(report.id, reportID))) {
+                continue;
+            }
+            newReport = report;
+        }
+
+        TextChannel logChannel = Main.jdaInstance.getTextChannelById("1080912327693574275");//todo from a config/db
+                                                                      //Test: 1080912327693574275
+                                                                      //Main: 1077259307621548092
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+                .setColor(Main.embedColor)
+                .setTitle(":exclamation: Neuer Report!")
+                .addField("Report von:", newReport.by.getAsMention(), true)
+                .addField("Gemeldet:", newReport.user.getAsMention(), true);
+
+        if (newReport.type == Type.MSG){
+            embedBuilder.setDescription("Es wurde eine Nachricht gemeldet!")
+                    .addField("Nachricht:", newReport.msgContent, false);
+        } else {
+            embedBuilder.setDescription("Es wurde eine Person gemeldet!")
+                    .addField("Begründung:", newReport.msgContent, false);
+        }
+
+
+        logChannel.sendMessageEmbeds(embedBuilder.build()).addActionRow(closeBtn(reportID.toString())).queue();
     }
 
     public static MessageEmbed getReportAsEmbed(Report report){
