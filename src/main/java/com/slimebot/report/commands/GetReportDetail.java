@@ -57,7 +57,7 @@ public class GetReportDetail extends ListenerAdapter {
                     .addField("Status:", StatusStr, true);
             
             if (report.getType() == Type.MSG){
-                embed.addField("Gemeldete Nachricht:", report.getMsgContent(), true);
+                embed.addField("Gemeldete Nachricht:", report.getMsgContent(), false);
             } else if (report.getType() == Type.USER) {
                 embed.addField("Meldegrund:", report.getMsgContent(), true);
             }
@@ -68,9 +68,14 @@ public class GetReportDetail extends ListenerAdapter {
 
             MessageEmbed eb = embed.build();
 
-            Button closeBtn = Button.danger("close", "Close #" + report.getId().toString()).withEmoji(Emoji.fromFormatted("🔒"));
+            Button closeBtn = Button.danger("close_report", "Close #" + report.getId().toString()); //ToDo Java is wierd pls add 🔒 emoji
 
-            event.replyEmbeds(eb).setActionRow(closeBtn).queue();
+            if (report.getStatus() == Status.CLOSED){
+                event.replyEmbeds(eb).queue();
+            } else {
+                event.replyEmbeds(eb).setActionRow(closeBtn).queue();
+            }
+
 
         }
 

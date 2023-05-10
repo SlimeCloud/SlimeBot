@@ -31,7 +31,7 @@ public class Bug extends ListenerAdapter {
             textInput.isRequired();
 
             Modal modal = Modal
-                    .create("bug:" + event.getInteraction().getMember().getId(), Config.getLocalProperty("bug.properties", "bug.title"))
+                    .create("bug" + event.getInteraction().getMember().getId(), Config.getLocalProperty("bug.properties", "bug.title"))
                     .addActionRow(textInput)
                     .build();
             event.replyModal(modal).queue();
@@ -41,6 +41,9 @@ public class Bug extends ListenerAdapter {
     @Override
     public void onModalInteraction(ModalInteractionEvent event) {
         super.onModalInteraction(event);
+
+        if (!(event.getModalId().equals("bug"))){return;}
+
         ModalMapping modalMapping = event.getInteraction().getValues().get(0);
         String label = Config.getLocalProperty("bug.properties", "bug.embedTitle");
         EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -56,7 +59,7 @@ public class Bug extends ListenerAdapter {
             event.getGuild()
                     .getTextChannelById(Config.getProperty(Config.botPath + event.getGuild().getId() + "/config.yml", "logChannel"))
                     .sendMessageEmbeds(embedBuilder.build())
-                    .setActionRow(Button.secondary("close", "Bug schließen")).queue();
+                    .setActionRow(Button.secondary("close_bug", "Bug schließen")).queue();
         }
     }
 
@@ -64,7 +67,7 @@ public class Bug extends ListenerAdapter {
     public void onButtonInteraction(ButtonInteractionEvent event) {
         super.onButtonInteraction(event);
 
-        if (event.getButton().getId().equalsIgnoreCase("close")) {
+        if (event.getButton().getId().equalsIgnoreCase("close_bug")) {
             event.getMessage().delete().queue();
             event.reply(Config.getLocalProperty("bug.properties", "bug.closed")).setEphemeral(true).queue();
         }

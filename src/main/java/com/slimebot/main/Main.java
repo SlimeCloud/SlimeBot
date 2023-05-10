@@ -6,12 +6,14 @@ import com.slimebot.commands.Ping;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.buttons.Close;
+import com.slimebot.report.buttons.DetailDropdown;
 import com.slimebot.report.commands.Blockreport;
 import com.slimebot.report.commands.ReportCmd;
 import com.slimebot.report.commands.GetReportDetail;
 import com.slimebot.report.commands.ReportList;
 import com.slimebot.report.contextmenus.MsgReport;
 import com.slimebot.report.contextmenus.UserReport;
+import com.slimebot.report.modals.CloseReport;
 import com.slimebot.report.modals.ReportModal;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.TimeScheduler;
@@ -30,6 +32,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.TimerTask;
 
 public class Main {
@@ -39,14 +42,13 @@ public class Main {
     public static ArrayList<Member> blocklist = new ArrayList<>(); //todo get From Config or DataBase
     public static ArrayList<Report> reports = new ArrayList<>(); //ToDo get From Config or DataBase
     public static Color embedColor = new Color(86,157,60); //ToDo get From Config or DataBase so you can Change the Color via cmd
-    public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy hh:mm:ss");
+    public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy hh:mm:ss"); //FixMe format to 24h not 6pm
 
     public static void main(String[] args) {
         jdaInstance = JDABuilder.createDefault(Config.getLocalProperty("config.properties", "main.token"))
                 .setActivity(Activity.of(getActivityType(activityType), activityText))
 
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                .enableIntents(EnumSet.allOf(GatewayIntent.class))
 
                 // Commands
                 .addEventListeners(new Bug())
@@ -67,10 +69,11 @@ public class Main {
 
                 //Modals
                 .addEventListeners(new ReportModal())
+                .addEventListeners(new CloseReport())
 
                 //Buttons
                 .addEventListeners(new Close())
-
+                .addEventListeners(new DetailDropdown())
 
                 .build();
 
