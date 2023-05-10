@@ -4,6 +4,7 @@ import com.slimebot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
@@ -28,7 +29,7 @@ public class Checks {
                     .setColor(Main.embedColor)
                     .setTitle(":exclamation: Error: Blocked")
                     .setDescription("Du wurdest gesperrt, so dass du keine Reports mehr erstellen kannst");
-            channel.sendMessageEmbeds(embedBuilder.build()).queue();
+            channel.sendMessageEmbeds(embedBuilder.build()).queue(); //ToDo Ephemeral
             return true;
         }else {
             return false;

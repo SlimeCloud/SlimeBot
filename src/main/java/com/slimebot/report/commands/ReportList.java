@@ -28,7 +28,7 @@ public class ReportList extends ListenerAdapter {
                     .setColor(Main.embedColor)
                     .setTitle(":exclamation: Error")
                     .setDescription("Der Befehl kann nur von einem Teammitglied ausgeführt werden!");
-            event.replyEmbeds(noTeam.build()).queue();
+            event.replyEmbeds(noTeam.build()).setEphemeral(true).queue();
             return;
         }
 
@@ -79,7 +79,7 @@ public class ReportList extends ListenerAdapter {
                     .setColor(Main.embedColor)
                     .setTitle(":exclamation: Error: No Reports Found")
                     .setDescription("Es wurden keine Reports zu der Ausgewählten option gefunden!");
-            event.replyEmbeds(embedBuilder.build()).queue();
+            event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
             return;
         }
 

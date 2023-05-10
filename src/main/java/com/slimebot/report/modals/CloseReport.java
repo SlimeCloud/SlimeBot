@@ -36,7 +36,7 @@ public class CloseReport extends ListenerAdapter {
                     .setColor(Main.embedColor)
                     .setTitle(":exclamation: Error: Report not Found")
                     .setDescription("Der Report #" + reportID + " konnte nicht gefunden werden!");
-            event.replyEmbeds(noReport.build()).queue();
+            event.replyEmbeds(noReport.build()).setEphemeral(true).queue();
             return;
         }
 

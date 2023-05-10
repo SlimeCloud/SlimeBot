@@ -33,7 +33,7 @@ public class Blockreport extends ListenerAdapter {
                     .setColor(Main.embedColor)
                     .setTitle(":exclamation: Error")
                     .setDescription("Der Befehl kann nur von einem Teammitglied ausgeführt werden!");
-            event.replyEmbeds(noTeam.build()).queue();
+            event.replyEmbeds(noTeam.build()).setEphemeral(true).queue();
             return;
         }
 
@@ -46,7 +46,7 @@ public class Blockreport extends ListenerAdapter {
                             .setColor(Main.embedColor)
                             .setTitle(":exclamation: Error: Already blocked!")
                             .setDescription(event.getOption("user").getAsMember().getAsMention() + " ist bereits blockiert");
-                    event.replyEmbeds(embedBuilder.build()).queue();
+                    event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
                     return;
                 }
                 Main.blocklist.add(event.getOption("user").getAsMember());
@@ -64,7 +64,7 @@ public class Blockreport extends ListenerAdapter {
                             .setColor(Main.embedColor)
                             .setTitle(":exclamation: Error: Not Found")
                             .setDescription(event.getOption("user").getAsMember() + " konnte nicht in der Blockliste gefunden werden!");
-                    event.replyEmbeds(embedBuilder.build()).queue();
+                    event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
                     return;
                 }
                 Main.blocklist.remove(event.getOption("user").getAsMember());
