@@ -4,6 +4,7 @@ import com.slimebot.commands.Bug;
 import com.slimebot.commands.BulkAddRole;
 import com.slimebot.commands.Ping;
 import com.slimebot.events.ReadyEvent;
+import com.slimebot.events.Timeout;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.buttons.Close;
 import com.slimebot.report.buttons.DetailDropdown;
@@ -27,6 +28,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import java.awt.*;
 import java.io.IOException;
@@ -49,6 +51,8 @@ public class Main {
                 .setActivity(Activity.of(getActivityType(activityType), activityText))
 
                 .enableIntents(EnumSet.allOf(GatewayIntent.class))
+                .setEventPassthrough(true)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
 
                 // Commands
                 .addEventListeners(new Bug())
@@ -62,6 +66,7 @@ public class Main {
 
                 //Events
                 .addEventListeners(new ReadyEvent())
+                .addEventListeners(new Timeout())
 
                 //Context Menus
                 .addEventListeners(new MsgReport())
