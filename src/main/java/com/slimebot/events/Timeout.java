@@ -31,10 +31,15 @@ public class Timeout extends ListenerAdapter {
 
                 event.getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(embedBuilder.build())).queue();
 
-                embedBuilder.setTitle("\"" + event.getMember().getEffectiveName() + "\"" + " wurde getimeouted")
-                                .setDescription("")
-                                .addField("Wer: ", event.getMember().getAsMention(), true);
-                event.getGuild().getTextChannelById("1080912327693574275").sendMessageEmbeds(embedBuilder.build()).queue();
+
+                EmbedBuilder embedBuilderLog = new EmbedBuilder()
+                        .setTitle("\"" + event.getMember().getEffectiveName() + "\"" + " wurde getimeouted")
+                        .setColor(Main.embedColor)
+                        .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+                        .addField("Grund:", entry.getReason(), true)
+                        .addField("Wer: ", event.getMember().getAsMention(), true);
+
+                event.getGuild().getTextChannelById("1080912327693574275").sendMessageEmbeds(embedBuilderLog.build()).queue();
                 break;
             }
         }
