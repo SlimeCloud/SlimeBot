@@ -2,6 +2,7 @@ package com.slimebot.main;
 
 import com.slimebot.commands.Bug;
 import com.slimebot.commands.BulkAddRole;
+import com.slimebot.commands.Info;
 import com.slimebot.commands.Ping;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.events.Timeout;
@@ -63,6 +64,7 @@ public class Main {
                 .addEventListeners(new ReportCmd())
                 .addEventListeners(new GetReportDetail())
                 .addEventListeners(new ReportList())
+                .addEventListeners(new Info())
 
                 //Events
                 .addEventListeners(new ReadyEvent())
@@ -130,6 +132,8 @@ public class Main {
         jdaInstance.upsertCommand(Commands.slash("report_detail", "Lasse dir die Details zu einem Report anzeigen")
                 .addOption(OptionType.INTEGER, "id", "ID des Reports den du genauer ansehen willst", true)
         ).queue();
+
+        jdaInstance.upsertCommand(Commands.slash("info", "Bekomme genauere Informationen über den Bot")).queue();
 
 
         //Register Context Menus
