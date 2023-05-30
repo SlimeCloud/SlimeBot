@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.time.LocalDateTime;
@@ -37,7 +38,7 @@ public class Report {
     }
 
     public static Button closeBtn(String reportID){
-        return Button.danger("close_report", "Close #" + reportID); //ToDo Java is wierd pls add 🔒 emoji
+        return Button.danger("close_report", "Close #" + reportID).withEmoji(Emoji.fromUnicode("\uD83D\uDD12"));
     }
 
     public static void log(Integer reportID){
