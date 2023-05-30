@@ -21,7 +21,7 @@ public class DetailDropdown extends ListenerAdapter {
     public void onStringSelectInteraction(StringSelectInteractionEvent event) {
         super.onStringSelectInteraction(event);
         System.out.println("select menu");
-        if (!(event.getComponentId().equals("detail_btn"))) {System.out.println("not detail_btn sonder " +event.getId());return;}
+        if (!(event.getComponentId().equals("detail_btn"))) {return;}
 
         String id = event.getValues().get(0);
         System.out.println("id = " + id);
