@@ -45,7 +45,7 @@ public class Main {
     public static ArrayList<Member> blocklist = new ArrayList<>(); //todo get From Config or DataBase
     public static ArrayList<Report> reports = new ArrayList<>(); //ToDo get From Config or DataBase
     public static Color embedColor = new Color(86,157,60); //ToDo get From Config or DataBase so you can Change the Color via cmd
-    public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy hh:mm:ss"); //FixMe format to 24h not 6pm
+    public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
 
     public static void main(String[] args) {
         jdaInstance = JDABuilder.createDefault(Config.getLocalProperty("config.properties", "main.token"))
