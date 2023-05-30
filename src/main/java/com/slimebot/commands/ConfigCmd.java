@@ -1,14 +1,12 @@
 package com.slimebot.commands;
 
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
 
-public class Config extends ListenerAdapter {
+public class ConfigCmd extends ListenerAdapter {
 
 
     @Override
@@ -24,7 +22,7 @@ public class Config extends ListenerAdapter {
 
                     switch (type.getAsString()) {
                         case "config":
-                            com.slimebot.utils.Config.changeProperty(com.slimebot.utils.Config.botPath + event.getGuild().getId() + "/config.yml", field.getAsString(), value.getAsString());
+                            Config.changeProperty(Config.botPath + event.getGuild().getId() + "/config.yml", field.getAsString(), value.getAsString());
                             break;
                     }
 
