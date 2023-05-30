@@ -32,9 +32,7 @@ public class BulkAddRole extends ListenerAdapter {
 
 
         for (Member member: event.getGuild().getMembers()) {
-            assert botsOption != null;
-            User memberAsUser = (User) member;
-            if (!botsOption.getAsBoolean() && memberAsUser.isBot()){ //ToDo add check if member is a Bot
+            if (!botsOption.getAsBoolean() && member.getUser().isBot()){
                 continue;
             }
 
