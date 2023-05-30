@@ -9,15 +9,23 @@ public class Config {
 
     public static String botPath = Config.getLocalProperty("config.properties", "main.path") + "/" + Config.getLocalProperty("config.properties", "main.name") + "/";
 
-    public static void createFileWithDir(String directory, String filename, boolean init) throws IOException {
-        File dir = new File(directory);
+    public static void createFileWithDir(String configName, String botID, boolean init) throws IOException {
+        String directory = botPath;
+        File dir = new File(directory + botID);
         if (!dir.exists()) dir.mkdirs();
 
-        File config = new File(directory + filename);
+        File config = new File(directory + botID + "/" + configName + ".yml");
         if (!config.exists()) {
             config.createNewFile();
             if (init) {
                 changeProperty(config.getAbsolutePath(), "logChannel", "0");
+                changeProperty(config.getAbsolutePath(), "blocklist", "[]");
+                changeProperty(config.getAbsolutePath(), "staffRoleId", "0");
+                changeProperty(config.getAbsolutePath(), "verifyRoleID", "0");
+                changeProperty(config.getAbsolutePath(), "punishmentChannelID", "0");
+                changeProperty(config.getAbsolutePath(), "embedColor.rgb.red", "86");
+                changeProperty(config.getAbsolutePath(), "embedColor.rgb.green", "157");
+                changeProperty(config.getAbsolutePath(), "embedColor.rgb.blue", "60");
             }
         }
     }

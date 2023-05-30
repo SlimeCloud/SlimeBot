@@ -1,9 +1,6 @@
 package com.slimebot.main;
 
-import com.slimebot.commands.Bug;
-import com.slimebot.commands.BulkAddRole;
-import com.slimebot.commands.Info;
-import com.slimebot.commands.Ping;
+import com.slimebot.commands.*;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.events.Timeout;
 import com.slimebot.report.assets.Report;
@@ -42,9 +39,15 @@ public class Main {
     public static JDA jdaInstance;
     private static String activityText = Config.getLocalProperty("config.properties", "main.activity.text");
     private static String activityType = Config.getLocalProperty("config.properties", "main.activity");
-    public static ArrayList<Member> blocklist = new ArrayList<>(); //todo get From Config or DataBase
+    public static ArrayList<Member> blocklist = new ArrayList<>();//todo get From Config or DataBase
+    public static Color embedColor(String guildID) {
+        return new Color(
+            Integer.parseInt(Config.getProperty(Config.botPath + guildID + "/config.yml", "embedColor.rgb.red")),
+            Integer.parseInt(Config.getProperty(Config.botPath + guildID + "/config.yml", "embedColor.rgb.green")),
+            Integer.parseInt(Config.getProperty(Config.botPath + guildID + "/config.yml", "embedColor.rgb.blue"))
+            );
+    }
     public static ArrayList<Report> reports = new ArrayList<>(); //ToDo get From Config or DataBase
-    public static Color embedColor = new Color(86,157,60); //ToDo get From Config or DataBase so you can Change the Color via cmd
     public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
 
     public static void main(String[] args) {
@@ -57,7 +60,7 @@ public class Main {
 
                 // Commands
                 .addEventListeners(new Bug())
-                .addEventListeners(new com.slimebot.commands.Config())
+                .addEventListeners(new ConfigCmd())
                 .addEventListeners(new BulkAddRole())
                 .addEventListeners(new Ping())
                 .addEventListeners(new Blockreport())
@@ -92,6 +95,14 @@ public class Main {
                         .setRequired(true)
                         .addChoice("Allgemeine Konfiguration", "config"))
                 .addOptions(new OptionData(OptionType.STRING, "field", "Welches Feld soll angepasst werden?")
+                        .addChoice("Log Channel (ID)","logChannel")
+                        .addChoice("Blockliste","blocklist")
+                        .addChoice("Team Rolle (ID)","staffRoleID")
+                        .addChoice("Verification Rolle (ID)","verifyRoleID")
+                        .addChoice("Warning Channel (ID)","punishmentChannelID")
+                        .addChoice("Embed Color (RGB) Rot","embedColor.rgb.red")
+                        .addChoice("Embed Color (RGB) Grün","embedColor.rgb.green")
+                        .addChoice("Embed Color (RGB) Blau","embedColor.rgb.blue")
                         .setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, "value", "Welcher Wert soll bei dem Feld gesetzt werden?")
                         .setRequired(true))
@@ -153,7 +164,7 @@ public class Main {
                 System.out.println("Check for new Guilds");
                 for (Guild guild : getJDAInstance().getGuilds()) {
                     try {
-                        Config.createFileWithDir(Config.botPath + guild.getId(), "/config.yml", true);
+                        Config.createFileWithDir("config", guild.getId(), true);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
