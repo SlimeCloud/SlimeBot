@@ -41,11 +41,11 @@ public class ReportModal extends ListenerAdapter {
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                .setColor(Main.embedColor)
+                .setColor(Main.embedColor(event.getGuild().getId()))
                 .setTitle(":white_check_mark: Report Erfolgreich")
                 .setDescription(currentReport.getUser().getAsMention() + " wurde erfolgreich gemeldet");
         event.replyEmbeds(embedBuilder.build()).queue();
-        Report.log(currentReport.getId());
+        Report.log(currentReport.getId(), event.getGuild().getId());
 
     }
 }

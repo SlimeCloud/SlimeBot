@@ -1,6 +1,7 @@
 package com.slimebot.report.assets;
 
 import com.slimebot.main.Main;
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -41,7 +42,7 @@ public class Report {
         return Button.danger("close_report", "Close #" + reportID).withEmoji(Emoji.fromUnicode("\uD83D\uDD12"));
     }
 
-    public static void log(Integer reportID){
+    public static void log(Integer reportID, String guildID){
 
         Report newReport = null;
         for (Report report: Main.reports) {
@@ -51,12 +52,11 @@ public class Report {
             newReport = report;
         }
 
-        TextChannel logChannel = Main.jdaInstance.getTextChannelById("1080912327693574275");//todo from a config/db
-                                                                      //Test: 1080912327693574275
-                                                                      //Main: 1077259307621548092
+        TextChannel logChannel = Main.jdaInstance.getTextChannelById(Config.getProperty("config.yml", "punishmentChannelID"));
+
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                .setColor(Main.embedColor)
+                .setColor(Main.embedColor(guildID))
                 .setTitle(":exclamation: Neuer Report!")
                 .addField("Report von:", newReport.by.getAsMention(), true)
                 .addField("Gemeldet:", newReport.user.getAsMention(), true);
@@ -73,7 +73,7 @@ public class Report {
         logChannel.sendMessageEmbeds(embedBuilder.build()).addActionRow(closeBtn(reportID.toString())).queue();
     }
 
-    public static MessageEmbed getReportAsEmbed(Report report){
+    public static MessageEmbed getReportAsEmbed(Report report, String guildID){
 
         String TypeStr = "";
         switch (report.getType()) {
@@ -88,7 +88,7 @@ public class Report {
         }
 
         EmbedBuilder embed = new EmbedBuilder()
-                .setColor(Main.embedColor)
+                .setColor(Main.embedColor(guildID))
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                 .setTitle(":exclamation:  Details zu Report #" + report.getId().toString())
                 .addField("Report Typ:", TypeStr, true)

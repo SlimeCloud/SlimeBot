@@ -25,7 +25,7 @@ public class UserReport extends ListenerAdapter {
         if (Main.blocklist.contains(event.getMember())){
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                    .setColor(Main.embedColor)
+                    .setColor(Main.embedColor(event.getGuild().getId()))
                     .setTitle(":exclamation: Error: Blocked")
                     .setDescription("Du wurdest gesperrt, so dass du keine Reports mehr erstellen kannst");
             event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();

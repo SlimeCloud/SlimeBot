@@ -19,7 +19,7 @@ public class Info extends ListenerAdapter {
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTitle("Informationen über den SlimeBall bot")
-                .setColor(Main.embedColor)
+                .setColor(Main.embedColor(event.getGuild().getId()))
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                 .setDescription("Dieser Bot ist ein Custom bot des SlimeCloud Discords und stellt Features bereit die so von keinem anderen Bot gelöst werden können.")
                 .addField("Gecodet von:", "[SlimeCloud DevTeam](https://github.com/SlimeCloud)", true)

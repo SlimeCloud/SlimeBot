@@ -30,7 +30,7 @@ public class DetailDropdown extends ListenerAdapter {
         for (Report report: Main.reports) {
             if (!(Objects.equals(report.getId(), Integer.valueOf(id)))){continue;}
 
-            eb = Report.getReportAsEmbed(report);
+            eb = Report.getReportAsEmbed(report, event.getGuild().getId());
 
 
             if (report.getStatus() == Status.CLOSED){

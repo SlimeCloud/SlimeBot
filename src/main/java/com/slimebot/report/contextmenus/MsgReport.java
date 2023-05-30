@@ -3,9 +3,7 @@ package com.slimebot.report.contextmenus;
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Type;
-import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -21,7 +19,7 @@ public class MsgReport extends ListenerAdapter {
         if (Main.blocklist.contains(event.getMember())) {
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                    .setColor(Main.embedColor)
+                    .setColor(Main.embedColor(event.getGuild().getId()))
                     .setTitle(":exclamation: Error: Blocked")
                     .setDescription("Du wurdest gesperrt, so dass du keine Reports mehr erstellen kannst");
             event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
@@ -46,11 +44,11 @@ public class MsgReport extends ListenerAdapter {
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                .setColor(Main.embedColor)
+                .setColor(Main.embedColor(event.getGuild().getId()))
                 .setTitle(":white_check_mark: Report Erfolgreich")
                 .setDescription(event.getTarget().getAuthor().getAsMention() + " wurde erfolgreich gemeldet");
         event.replyEmbeds(embedBuilder.build()).queue();
-        Report.log(reportID);
+        Report.log(reportID, event.getGuild().getId());
 
 
     }

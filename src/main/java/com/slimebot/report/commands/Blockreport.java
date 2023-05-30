@@ -30,7 +30,7 @@ public class Blockreport extends ListenerAdapter {
         if (Checks.hasTeamRole(event.getMember(), event.getGuild())) {
             EmbedBuilder noTeam = new EmbedBuilder()
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                    .setColor(Main.embedColor)
+                    .setColor(Main.embedColor(event.getGuild().getId()))
                     .setTitle(":exclamation: Error")
                     .setDescription("Der Befehl kann nur von einem Teammitglied ausgeführt werden!");
             event.replyEmbeds(noTeam.build()).setEphemeral(true).queue();
@@ -43,7 +43,7 @@ public class Blockreport extends ListenerAdapter {
                 if (Main.blocklist.contains(event.getOption("user").getAsMember())) {
                     EmbedBuilder embedBuilder = new EmbedBuilder()
                             .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                            .setColor(Main.embedColor)
+                            .setColor(Main.embedColor(event.getGuild().getId()))
                             .setTitle(":exclamation: Error: Already blocked!")
                             .setDescription(event.getOption("user").getAsMember().getAsMention() + " ist bereits blockiert");
                     event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
@@ -52,7 +52,7 @@ public class Blockreport extends ListenerAdapter {
                 Main.blocklist.add(event.getOption("user").getAsMember());
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                        .setColor(Main.embedColor)
+                        .setColor(Main.embedColor(event.getGuild().getId()))
                         .setTitle(":white_check_mark: Erfolgreich Blockiert")
                         .setDescription(event.getOption("user").getAsMentionable().getAsMention() + " wurde blockiert und kann nun keine Reports mehr erstellen");
                 event.replyEmbeds(embedBuilder.build()).queue();
@@ -61,7 +61,7 @@ public class Blockreport extends ListenerAdapter {
                 if (!(Main.blocklist.contains(event.getOption("user").getAsMember()))) {
                     EmbedBuilder embedBuilder = new EmbedBuilder()
                             .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                            .setColor(Main.embedColor)
+                            .setColor(Main.embedColor(event.getGuild().getId()))
                             .setTitle(":exclamation: Error: Not Found")
                             .setDescription(event.getOption("user").getAsMember() + " konnte nicht in der Blockliste gefunden werden!");
                     event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
@@ -70,7 +70,7 @@ public class Blockreport extends ListenerAdapter {
                 Main.blocklist.remove(event.getOption("user").getAsMember());
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                        .setColor(Main.embedColor)
+                        .setColor(Main.embedColor(event.getGuild().getId()))
                         .setTitle(":white_check_mark: Entblockt")
                         .setDescription(event.getOption("user").getAsMentionable().getAsMention() + " kann nun wieder Reports erstellen");
                 event.replyEmbeds(embedBuilder.build()).queue();
@@ -82,7 +82,7 @@ public class Blockreport extends ListenerAdapter {
                 }
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                        .setColor(Main.embedColor)
+                        .setColor(Main.embedColor(event.getGuild().getId()))
                         .setTitle("Geblockte User:")
                         .setDescription("Folgende Member sind blockiert und können keine Reports mehr erstellen:\n" + msg);
                 event.replyEmbeds(embedBuilder.build()).queue();

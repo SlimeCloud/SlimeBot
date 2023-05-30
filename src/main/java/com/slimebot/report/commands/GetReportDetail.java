@@ -27,7 +27,7 @@ public class GetReportDetail extends ListenerAdapter {
         if (Checks.hasTeamRole(event.getMember(), event.getGuild())){
             EmbedBuilder noTeam = new EmbedBuilder()
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                    .setColor(Main.embedColor)
+                    .setColor(Main.embedColor(event.getGuild().getId()))
                     .setTitle(":exclamation: Error")
                     .setDescription("Der Befehl kann nur von einem Teammitglied ausgeführt werden!");
             event.replyEmbeds(noTeam.build()).queue();
@@ -40,7 +40,7 @@ public class GetReportDetail extends ListenerAdapter {
         for (Report report: Main.reports) {
             if (!(report.getId() == id.getAsInt())){continue;}
 
-            eb = Report.getReportAsEmbed(report);
+            eb = Report.getReportAsEmbed(report, event.getGuild().getId());
 
             Button closeBtn = Report.closeBtn(report.getId().toString());
 

@@ -25,7 +25,7 @@ public class ReportList extends ListenerAdapter {
         if (Checks.hasTeamRole(event.getMember(), event.getGuild())){
             EmbedBuilder noTeam = new EmbedBuilder()
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                    .setColor(Main.embedColor)
+                    .setColor(Main.embedColor(event.getGuild().getId()))
                     .setTitle(":exclamation: Error")
                     .setDescription("Der Befehl kann nur von einem Teammitglied ausgeführt werden!");
             event.replyEmbeds(noTeam.build()).setEphemeral(true).queue();
@@ -35,7 +35,7 @@ public class ReportList extends ListenerAdapter {
         EmbedBuilder embed = new EmbedBuilder()
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                 .setDescription("Nutze /report_detail oder das Dropdown menu um mehr infos zu einem Report zu bekommen.")
-                .setColor(Main.embedColor);
+                .setColor(Main.embedColor(event.getGuild().getId()));
 
         ArrayList<Integer> ReportIdList = new ArrayList<>();
         int fieldSize = 0;
@@ -76,7 +76,7 @@ public class ReportList extends ListenerAdapter {
 
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                    .setColor(Main.embedColor)
+                    .setColor(Main.embedColor(event.getGuild().getId()))
                     .setTitle(":exclamation: Error: No Reports Found")
                     .setDescription("Es wurden keine Reports zu der Ausgewählten option gefunden!");
             event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();

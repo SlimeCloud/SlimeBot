@@ -47,7 +47,7 @@ public class Bug extends ListenerAdapter {
         ModalMapping modalMapping = event.getInteraction().getValues().get(0);
         String label = Config.getLocalProperty("bug.properties", "bug.embedTitle");
         EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.setColor(Color.green);
+        embedBuilder.setColor(Main.embedColor(event.getGuild().getId()));
         embedBuilder.setTitle(label);
 
         if (modalMapping.getId().contains("bug")) {
