@@ -33,7 +33,7 @@ public class CloseReport extends ListenerAdapter {
         if (!reportFound){
             EmbedBuilder noReport = new EmbedBuilder()
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                    .setColor(Main.embedColor)
+                    .setColor(Main.embedColor(event.getGuild().getId()))
                     .setTitle(":exclamation: Error: Report not Found")
                     .setDescription("Der Report #" + reportID + " konnte nicht gefunden werden!");
             event.replyEmbeds(noReport.build()).setEphemeral(true).queue();
@@ -41,7 +41,7 @@ public class CloseReport extends ListenerAdapter {
         }
 
         EmbedBuilder embed = new EmbedBuilder()
-                .setColor(Main.embedColor)
+                .setColor(Main.embedColor(event.getGuild().getId()))
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                 .setTitle("Report **#" +reportID + "** closed")
                 .setDescription("Der Report mit der ID **#" + reportID + "** wurde erfolgreich geschlossen");

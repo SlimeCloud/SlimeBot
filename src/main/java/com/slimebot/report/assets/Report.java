@@ -52,7 +52,8 @@ public class Report {
             newReport = report;
         }
 
-        TextChannel logChannel = Main.jdaInstance.getTextChannelById(Config.getProperty("config.yml", "punishmentChannelID"));
+        TextChannel logChannel = Main.jdaInstance.getTextChannelById(Config.getProperty(Config.botPath + guildID + "/config.yml", "punishmentChannelID"));
+        System.out.println(Config.getProperty(Config.botPath + guildID + "/config.yml", "punishmentChannelID"));
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))

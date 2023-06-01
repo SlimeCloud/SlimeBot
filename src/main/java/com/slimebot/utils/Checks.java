@@ -18,7 +18,7 @@ import java.time.ZoneId;
 public class Checks {
 
     public static Boolean hasTeamRole(Member member, Guild guild){
-        Role staffRole = guild.getRoleById(Config.getProperty("config.yml", "staffRoleId"));
+        Role staffRole = guild.getRoleById(Config.getProperty(Config.botPath + guild.getId() + "/config.yml", "staffRoleId"));
         return !(member.getRoles().contains(staffRole));
     }
 
