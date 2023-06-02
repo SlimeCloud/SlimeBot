@@ -38,3 +38,4 @@ bin/
 !.idea/encodings.xml
 !.idea/runConfigurations
 !.idea/codeStyleSettings.xml
+src/main/resources/botConfig.yml
