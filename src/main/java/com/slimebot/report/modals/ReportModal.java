@@ -2,14 +2,9 @@ package com.slimebot.report.modals;
 
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
-import com.slimebot.report.assets.Status;
-import com.slimebot.report.assets.Type;
-import com.slimebot.report.commands.ReportCmd;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import org.jetbrains.annotations.NotNull;
 

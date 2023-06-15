@@ -20,7 +20,7 @@ public class CloseReport extends ListenerAdapter {
         if (!(event.getModalId().equals("close"))) {return;}
 
         String reasonInput = event.getValue("reason").getAsString();
-        int reportID = Integer.valueOf(event.getValue("id").getAsString());
+        int reportID = Integer.parseInt(event.getValue("id").getAsString());
         boolean reportFound = false;
 
         for (Report report: Main.reports) {
