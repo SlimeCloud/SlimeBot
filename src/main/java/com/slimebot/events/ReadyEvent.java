@@ -4,12 +4,12 @@ package com.slimebot.events;
 import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.IOException;
 import java.util.Date;
@@ -20,16 +20,21 @@ public class ReadyEvent extends ListenerAdapter {
     public void onReady(@NotNull net.dv8tion.jda.api.events.session.ReadyEvent event) {
         super.onReady(event);
 
+
         for (Guild guild : Main.getJDAInstance().getGuilds()) {
+            YamlFile config = Config.getConfig(guild.getId(), "mainConfig");
             try {
-                Config.createFileWithDir("config", guild.getId(), true);
+                config.load();
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            }
+            if (!(config.exists())){
+                Config.createMain(guild.getId());
             }
         }
 
 
-        Class<? extends TextChannel> TextChannel;
+
         TextChannel DEVlogChannel = event.getJDA().getTextChannelById("1080912327693574275");//Channel only for dev not for each Discord
 
         EmbedBuilder embed = new EmbedBuilder();

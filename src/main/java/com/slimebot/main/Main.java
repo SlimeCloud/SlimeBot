@@ -1,6 +1,7 @@
 package com.slimebot.main;
 
 import com.slimebot.commands.*;
+import com.slimebot.events.OnJoin;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.events.Timeout;
 import com.slimebot.report.assets.Report;
@@ -20,13 +21,13 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.simpleyaml.configuration.file.YamlFile;
 
 import java.awt.*;
 import java.io.IOException;
@@ -37,21 +38,38 @@ import java.util.TimerTask;
 
 public class Main {
     public static JDA jdaInstance;
-    private static String activityText = Config.getLocalProperty("config.properties", "main.activity.text");
-    private static String activityType = Config.getLocalProperty("config.properties", "main.activity");
-    public static ArrayList<Member> blocklist = new ArrayList<>();//todo get From Config or DataBase
-    public static Color embedColor(String guildID) {
+    private static final String activityText;
+    static {activityText = Config.getBotInfo("activity.text");}
+    private static final String activityType;
+    static { activityType = Config.getBotInfo("activity.type");}
+    public static ArrayList<String> blocklist(String guildID) {
+        YamlFile config = Config.getConfig(guildID, "mainConfig");
+        try {
+            config.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return (ArrayList<String>) config.getStringList("blocklist");
+    }
+    public static Color embedColor(String guildID){
+        YamlFile config = Config.getConfig(guildID, "mainConfig");
+        try {
+            config.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return new Color(
-            Integer.parseInt(Config.getProperty(Config.botPath + guildID + "/config.yml", "embedColor.rgb.red")),
-            Integer.parseInt(Config.getProperty(Config.botPath + guildID + "/config.yml", "embedColor.rgb.green")),
-            Integer.parseInt(Config.getProperty(Config.botPath + guildID + "/config.yml", "embedColor.rgb.blue"))
+                config.getInt("embedColor.red"),
+                config.getInt("embedColor.green"),
+                config.getInt("embedColor.blue")
             );
     }
-    public static ArrayList<Report> reports = new ArrayList<>(); //ToDo get From Config or DataBase
+    public static ArrayList<Report> reports = new ArrayList<>(); ///ToDo get From Config or DataBase
     public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
 
-    public static void main(String[] args) {
-        jdaInstance = JDABuilder.createDefault(Config.getLocalProperty("config.properties", "main.token"))
+    public static void main(String[] args) throws IOException {
+        System.out.println(Config.getBotInfo("version"));
+        jdaInstance = JDABuilder.createDefault(Config.getBotInfo("token.test"))
                 .setActivity(Activity.of(getActivityType(activityType), activityText))
 
                 .enableIntents(EnumSet.allOf(GatewayIntent.class))
@@ -72,6 +90,7 @@ public class Main {
                 //Events
                 .addEventListeners(new ReadyEvent())
                 .addEventListeners(new Timeout())
+                .addEventListeners(new OnJoin())
 
                 //Context Menus
                 .addEventListeners(new MsgReport())
@@ -88,9 +107,9 @@ public class Main {
                 .build();
 
         //Register Commands
-        jdaInstance.upsertCommand(Commands.slash("bug", Config.getLocalProperty("bug.properties", "bug.commandDesc"))).queue();
+        jdaInstance.upsertCommand(Commands.slash("bug", "Melde einen Bug")).queue();
 
-        jdaInstance.upsertCommand(Commands.slash("config", Config.getLocalProperty("config.properties", "config.commandDesc"))
+        jdaInstance.upsertCommand(Commands.slash("config", "Nehme Änderungen an der Konfiguration vor")
                 .addOptions(new OptionData(OptionType.STRING, "type", "Welcher Config-Bereich?")
                         .setRequired(true)
                         .addChoice("Allgemeine Konfiguration", "config"))
@@ -156,18 +175,13 @@ public class Main {
         checkForGuilds();
     }
 
-
     public static void checkForGuilds() {
         new TimeScheduler(300).startTimer(new TimerTask() {
             @Override
             public void run() {
                 System.out.println("Check for new Guilds");
                 for (Guild guild : getJDAInstance().getGuilds()) {
-                    try {
-                        Config.createFileWithDir("config", guild.getId(), true);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    Config.createMain(guild.getId());
                 }
             }
         });
@@ -178,28 +192,14 @@ public class Main {
     }
 
     private static Activity.ActivityType getActivityType(String type) {
-        Activity.ActivityType activityType;
 
-        switch (type) {
-            case "WATCHING":
-                activityType = Activity.ActivityType.WATCHING;
-                break;
-            case "STREAMING":
-                activityType = Activity.ActivityType.STREAMING;
-                break;
-            case "LISTENING":
-                activityType = Activity.ActivityType.LISTENING;
-                break;
-            case "PLAYING":
-                activityType = Activity.ActivityType.PLAYING;
-                break;
-            case "COMPETING":
-                activityType = Activity.ActivityType.COMPETING;
-                break;
-            default:
-                activityType = Activity.ActivityType.CUSTOM_STATUS;
-        }
-        return activityType;
+        return switch (type) {
+            case "WATCHING" -> Activity.ActivityType.WATCHING;
+            case "STREAMING" -> Activity.ActivityType.STREAMING;
+            case "LISTENING" -> Activity.ActivityType.LISTENING;
+            case "PLAYING" -> Activity.ActivityType.PLAYING;
+            case "COMPETING" -> Activity.ActivityType.COMPETING;
+            default -> Activity.ActivityType.CUSTOM_STATUS;
+        };
     }
-
 }

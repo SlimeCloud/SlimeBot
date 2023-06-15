@@ -23,7 +23,7 @@ public class Info extends ListenerAdapter {
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                 .setDescription("Dieser Bot ist ein Custom bot des SlimeCloud Discords und stellt Features bereit die so von keinem anderen Bot gelöst werden können.")
                 .addField("Gecodet von:", "[SlimeCloud DevTeam](https://github.com/SlimeCloud)", true)
-                .addField("Version:", Config.getLocalProperty("config.properties", "main.version"), true)//ToDo get Version form build.gradle
+                .addField("Version:", Config.getBotInfo("version"), true)//ToDo get Version form build.gradle
                 .addField("Support:", "Bei Fragen, Verbesserungen, Bugs öffne ein Ticket", true)
                 .addField("Prefix:", "Dieser Bot nutzt Slash Commands", true)
                 .setFooter("SlimeBall", "https://media.discordapp.net/attachments/1098639892608712714/1098639949592539166/SlimeBall.png");

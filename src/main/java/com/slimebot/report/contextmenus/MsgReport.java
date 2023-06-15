@@ -16,7 +16,7 @@ public class MsgReport extends ListenerAdapter {
     public void onMessageContextInteraction(MessageContextInteractionEvent event) {
         super.onMessageContextInteraction(event);
         if (!(event.getName().equals("Report Message"))) {return;}
-        if (Main.blocklist.contains(event.getMember())) {
+        if (Main.blocklist(event.getGuild().getId()).contains(event.getMember().getId())) {
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                     .setColor(Main.embedColor(event.getGuild().getId()))

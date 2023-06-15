@@ -3,9 +3,7 @@ package com.slimebot.report.commands;
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Type;
-import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -21,7 +19,7 @@ public class ReportCmd extends ListenerAdapter {
         super.onSlashCommandInteraction(event);
 
         if (!(event.getName().equals("report"))) {return;}
-        if (Main.blocklist.contains(event.getMember())) {
+        if (Main.blocklist(event.getGuild().getId()).contains(event.getMember().getId())) {
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                     .setColor(Main.embedColor(event.getGuild().getId()))
@@ -43,7 +41,7 @@ public class ReportCmd extends ListenerAdapter {
                 .setColor(Main.embedColor(event.getGuild().getId()))
                 .setTitle(":white_check_mark: Report Erfolgreich")
                 .setDescription(user.getAsMentionable().getAsMention() + " wurde erfolgreich gemeldet");
-        event.replyEmbeds(embedBuilder.build()).queue();
+        event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
         Report.log(reportID, event.getGuild().getId());
 
 

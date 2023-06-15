@@ -1,91 +1,95 @@
 package com.slimebot.utils;
 
-import com.slimebot.main.Main;
+import org.simpleyaml.configuration.file.YamlFile;
 
-import java.io.*;
-import java.util.Properties;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class Config {
 
-    public static String botPath = Config.getLocalProperty("config.properties", "main.path") + "/" + Config.getLocalProperty("config.properties", "main.name") + "/";
+    public static YamlFile getConfig(String guildID, String configName){
+        return new YamlFile("Slimebot/"+guildID+"/"+configName+".yml");
+    }
 
-    public static void createFileWithDir(String configName, String botID, boolean init) throws IOException {
-        String directory = botPath;
-        File dir = new File(directory + botID);
-        if (!dir.exists()) dir.mkdirs();
 
-        File config = new File(directory + botID + "/" + configName + ".yml");
-        if (!config.exists()) {
-            config.createNewFile();
-            if (init) {
-                changeProperty(config.getAbsolutePath(), "logChannel", "0");
-                changeProperty(config.getAbsolutePath(), "blocklist", "[]");
-                changeProperty(config.getAbsolutePath(), "staffRoleId", "0");
-                changeProperty(config.getAbsolutePath(), "verifyRoleID", "0");
-                changeProperty(config.getAbsolutePath(), "punishmentChannelID", "0");
-                changeProperty(config.getAbsolutePath(), "embedColor.rgb.red", "86");
-                changeProperty(config.getAbsolutePath(), "embedColor.rgb.green", "157");
-                changeProperty(config.getAbsolutePath(), "embedColor.rgb.blue", "60");
+
+
+
+    public static void addNewConfig(String configName, String guildID){
+        YamlFile newConfig = getConfig(guildID, configName);
+
+        if (newConfig.exists()){
+            System.out.println("\n[ERROR] Can't create Config!\n"+newConfig.getFilePath() + " exists already!\n");
+        } else {
+            try {
+                newConfig.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+            System.out.println("[SUCCESS] New Config created at "+newConfig.getFilePath());
+
         }
     }
 
-    public static void changeProperty(String filename, String key, String value) {
-        Properties prop = new Properties();
-        try {
-            prop.load(new FileInputStream(filename));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        prop.setProperty(key, value);
-        try {
-            prop.store(new FileOutputStream(filename), null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public static void createMain(String guildID){
 
-    public static void removeProperty(String filename, String key) {
-        Properties prop = new Properties();
-        try {
-            prop.load(new FileInputStream(filename));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        prop.remove(key);
-        try {
-            prop.store(new FileOutputStream(filename), null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    public static String getProperty(String filename, String key) {
-        Properties prop = new Properties();
+        YamlFile mainConfig = getConfig(guildID, "mainConfig");
+
         try {
-            prop.load(new FileInputStream(filename));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return prop.getProperty(key);
-    }
-
-    public static String getLocalProperty(String filename, String key) {
-        String property = "error";
-        try (InputStream input = Config.class.getClassLoader().getResourceAsStream(filename)) {
-            Properties prop = new Properties();
-
-            if (input == null) {
-                System.out.println("Sorry, unable to find config.properties");
-                return property;
+            if (!mainConfig.exists()) {
+                mainConfig.createNewFile();
+                System.out.println("New file has been created: " + mainConfig.getFilePath() + "\nGenerate default property...");
+            } else {
+                System.out.println(mainConfig.getFilePath() + " already exists, loading configurations...\n");
+                return;
             }
+            mainConfig.load();
+        } catch (final Exception e) {
 
-            prop.load(input);
-            property = prop.getProperty(key);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            e.printStackTrace();
         }
-        return property;
+
+        mainConfig.set("logChannel", 0);
+        mainConfig.set("blocklist", Arrays.asList("123456", "7891021"));
+        mainConfig.set("staffRoleID", 0);
+        mainConfig.set("punishmentChannelID", 0);
+        mainConfig.set("embedColor.red", "86");
+        mainConfig.set("embedColor.green", "157");
+        mainConfig.set("embedColor.blue", "60");
+
+        mainConfig.options().headerFormatter()
+                .prefixFirst("######################")
+                .commentPrefix("##  ")
+                .commentSuffix("  ##")
+                .suffixLast("######################");
+        mainConfig.setHeader("SlimeBot Config");
+
+        mainConfig.setComment("logChannel", "Default logging Channel ID e.g. 2309845209845202");
+        mainConfig.setComment("blocklist", "Users who a blocked from creating Reports");
+        mainConfig.setComment("staffRoleID", "ID From the Staff Role");
+        mainConfig.setComment("punishmentChannelID", "Channel ID from where things like the Timeouts were logged");
+        mainConfig.setComment("embedColor", "Default RGB-Color code from Embeds");
+
+
+        try {
+            mainConfig.save();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Main Config for " + guildID + " successfully created");
+
     }
+
+    public static String getBotInfo(String probPath){
+        YamlFile botConfig = new YamlFile("src/main/resources/botConfig.yml");
+        try {
+            botConfig.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return botConfig.getString(probPath);
+    }
+
 
 }

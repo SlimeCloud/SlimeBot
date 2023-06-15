@@ -2,16 +2,20 @@ package com.slimebot.report.commands;
 
 import com.slimebot.utils.Checks;
 import com.slimebot.main.Main;
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.simpleyaml.configuration.file.YamlFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.List;
 
 public class Blockreport extends ListenerAdapter {
 
@@ -40,7 +44,7 @@ public class Blockreport extends ListenerAdapter {
 
         switch (event.getOption("action").getAsString()) {
             case "add" -> {
-                if (Main.blocklist.contains(event.getOption("user").getAsMember())) {
+                if (Main.blocklist(event.getGuild().getId()).contains(event.getOption("user").getAsMember().getId())) {
                     EmbedBuilder embedBuilder = new EmbedBuilder()
                             .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                             .setColor(Main.embedColor(event.getGuild().getId()))
@@ -49,7 +53,17 @@ public class Blockreport extends ListenerAdapter {
                     event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
                     return;
                 }
-                Main.blocklist.add(event.getOption("user").getAsMember());
+                List<String> updatedList = Main.blocklist(event.getGuild().getId());
+                updatedList.add(event.getOption("user").getAsMember().getId());
+                YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
+
+                try {
+                    config.load();
+                    config.set("blocklist", updatedList);
+                    config.save();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                         .setColor(Main.embedColor(event.getGuild().getId()))
@@ -58,7 +72,7 @@ public class Blockreport extends ListenerAdapter {
                 event.replyEmbeds(embedBuilder.build()).queue();
             }
             case "remove" -> {
-                if (!(Main.blocklist.contains(event.getOption("user").getAsMember()))) {
+                if (!(Main.blocklist(event.getGuild().getId()).contains(event.getOption("user").getAsMember().getId()))) {
                     EmbedBuilder embedBuilder = new EmbedBuilder()
                             .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                             .setColor(Main.embedColor(event.getGuild().getId()))
@@ -67,8 +81,18 @@ public class Blockreport extends ListenerAdapter {
                     event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
                     return;
                 }
-                Main.blocklist.remove(event.getOption("user").getAsMember());
-                EmbedBuilder embedBuilder = new EmbedBuilder()
+                ArrayList<String> updatedList;
+                updatedList = Main.blocklist(event.getGuild().getId());
+                updatedList.remove(event.getOption("user").getAsMember().getId());
+                YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
+
+                try {
+                    config.load();
+                    config.set("blocklist", updatedList);
+                    config.save();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }                EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                         .setColor(Main.embedColor(event.getGuild().getId()))
                         .setTitle(":white_check_mark: Entblockt")
@@ -77,7 +101,9 @@ public class Blockreport extends ListenerAdapter {
             }
             case "list" -> {
                 StringBuilder msg = new StringBuilder();
-                for (Member member : Main.blocklist) {
+                for (String memberID : Main.blocklist(event.getGuild().getId())) {
+                    Member member = event.getGuild().getMemberById(memberID);
+                    if (member == null){continue;}
                     msg.append(member.getAsMention()).append("\n");
                 }
                 EmbedBuilder embedBuilder = new EmbedBuilder()

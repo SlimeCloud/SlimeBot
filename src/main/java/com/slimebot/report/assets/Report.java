@@ -3,13 +3,14 @@ package com.slimebot.report.assets;
 import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.simpleyaml.configuration.file.YamlFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Objects;
@@ -51,9 +52,13 @@ public class Report {
             }
             newReport = report;
         }
-
-        TextChannel logChannel = Main.jdaInstance.getTextChannelById(Config.getProperty(Config.botPath + guildID + "/config.yml", "punishmentChannelID"));
-        System.out.println(Config.getProperty(Config.botPath + guildID + "/config.yml", "punishmentChannelID"));
+        YamlFile config = Config.getConfig(guildID, "mainConfig");
+        try {
+            config.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        TextChannel logChannel = Main.jdaInstance.getTextChannelById(config.getString("punishmentChannelID"));
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
@@ -108,11 +113,7 @@ public class Report {
             embed.addField("Verfahren:", report.getCloseReason(), true);
         }
 
-        MessageEmbed eb = embed.build();
-
-
-
-        return eb;
+        return embed.build();
 
 
     }

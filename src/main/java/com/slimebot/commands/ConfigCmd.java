@@ -5,6 +5,10 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.simpleyaml.configuration.file.YamlFile;
+
+import java.io.IOException;
+
 
 public class ConfigCmd extends ListenerAdapter {
 
@@ -13,6 +17,7 @@ public class ConfigCmd extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         super.onSlashCommandInteraction(event);
 
+        YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
         if (event.getName().equalsIgnoreCase("config")) {
             if (event.getInteraction().getMember().hasPermission(Permission.ADMINISTRATOR)) {
                 try {
@@ -22,7 +27,9 @@ public class ConfigCmd extends ListenerAdapter {
 
                     switch (type.getAsString()) {
                         case "config":
-                            Config.changeProperty(Config.botPath + event.getGuild().getId() + "/config.yml", field.getAsString(), value.getAsString());
+                            config.load();
+                            config.set(field.getAsString(), value.getAsString());
+                            config.save();
                             break;
                     }
 

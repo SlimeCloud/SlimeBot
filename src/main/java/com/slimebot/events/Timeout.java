@@ -1,6 +1,7 @@
 package com.slimebot.events;
 
 import com.slimebot.main.Main;
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogChange;
@@ -8,7 +9,9 @@ import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.simpleyaml.configuration.file.YamlFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -39,7 +42,14 @@ public class Timeout extends ListenerAdapter {
                         .addField("Grund:", entry.getReason(), true)
                         .addField("Wer: ", event.getMember().getAsMention(), true);
 
-                event.getGuild().getTextChannelById("1080912327693574275").sendMessageEmbeds(embedBuilderLog.build()).queue();
+
+                YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
+                try {
+                    config.load();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                event.getGuild().getTextChannelById(config.getString("punishmentChannelID")).sendMessageEmbeds(embedBuilderLog.build()).queue();
                 break;
             }
         }
