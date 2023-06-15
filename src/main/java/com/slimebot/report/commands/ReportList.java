@@ -6,10 +6,8 @@ import com.slimebot.report.assets.Status;
 import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 import java.time.LocalDateTime;
@@ -39,14 +37,15 @@ public class ReportList extends ListenerAdapter {
 
         ArrayList<Integer> ReportIdList = new ArrayList<>();
         int fieldSize = 0;
+        boolean maxFieldSize = false;
         switch (event.getOption("status").getAsString()){
             case "all" -> {
                 embed.setTitle("Eine Liste aller Reports");
                 for (Report report:Main.reports) {
                     ReportIdList.add(report.getId());
-                    if (fieldSize > 24){break;}
+                    if (fieldSize > 24){maxFieldSize = true; break;}
                     addReportField(report, embed);
-                    fieldSize =+1;
+                    fieldSize ++;
                 }
             }
             case "closed" -> {
@@ -54,9 +53,9 @@ public class ReportList extends ListenerAdapter {
                 for (Report report:Main.reports) {
                     if (!(report.status == Status.CLOSED)){continue; }
                     ReportIdList.add(report.getId());
-                    if (fieldSize > 24){break;}
+                    if (fieldSize > 24){maxFieldSize = true;break;}
                     addReportField(report, embed);
-                    fieldSize =+1;
+                    fieldSize ++;
                 }
             }
             case "open" -> {
@@ -64,9 +63,9 @@ public class ReportList extends ListenerAdapter {
                 for (Report report:Main.reports) {
                     if (!(report.status == Status.OPEN)){continue; }
                     ReportIdList.add(report.getId());
-                    if (fieldSize > 24){break;}
+                    if (fieldSize > 24){maxFieldSize = true;break;}
                     addReportField(report, embed);
-                    fieldSize =+1;
+                    fieldSize ++;
                 }
             }
 
@@ -81,6 +80,10 @@ public class ReportList extends ListenerAdapter {
                     .setDescription("Es wurden keine Reports zu der Ausgewählten option gefunden!");
             event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
             return;
+        }
+
+        if (maxFieldSize){
+            embed.setFooter("ERROR Weitere Reports gefunden - Fehler beim laden - com.slimebot.report.commands.ReportList:86");
         }
 
         MessageEmbed ed = embed.build();
