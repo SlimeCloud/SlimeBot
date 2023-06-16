@@ -64,15 +64,15 @@ public class Report {
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                 .setColor(Main.embedColor(guildID))
                 .setTitle(":exclamation: Neuer Report!")
-                .addField("Report von:", newReport.by.getAsMention(), true)
-                .addField("Gemeldet:", newReport.user.getAsMention(), true);
+                .addField("Report von:", newReport.getBy().getAsMention(), true)
+                .addField("Gemeldet:", newReport.getUser().getAsMention(), true);
 
         if (newReport.type == Type.MSG){
             embedBuilder.setDescription("Es wurde eine Nachricht gemeldet!")
-                    .addField("Nachricht:", newReport.msgContent, false);
+                    .addField("Nachricht:", newReport.getMsgContent(), false);
         } else {
             embedBuilder.setDescription("Es wurde eine Person gemeldet!")
-                    .addField("Begründung:", newReport.msgContent, false);
+                    .addField("Begründung:", newReport.getMsgContent(), false);
         }
 
 
