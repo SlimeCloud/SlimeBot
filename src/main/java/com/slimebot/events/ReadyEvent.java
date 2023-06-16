@@ -23,13 +23,13 @@ public class ReadyEvent extends ListenerAdapter {
 
         for (Guild guild : Main.getJDAInstance().getGuilds()) {
             YamlFile config = Config.getConfig(guild.getId(), "mainConfig");
+            if (!(config.exists())){
+                Config.createMain(guild.getId());
+            }
             try {
                 config.load();
             } catch (IOException e) {
                 throw new RuntimeException(e);
-            }
-            if (!(config.exists())){
-                Config.createMain(guild.getId());
             }
         }
 
