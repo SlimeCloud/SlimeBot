@@ -22,6 +22,7 @@ Solltet ihr einen Issue bearbeitet haben könnt ihr einen Pull request (PR) erst
 ### Commits
 
 Ein Commit sollte einen kurzen aber verständlichen Titel tragen (fixed a bug ist kein aussagekräftiger Titel). In der Beschreibung könnt ihr dann z.B. den Bug genauer beschreiben, wie er entstanden ist und was der fix dafür war.
+Beachtet dass ihr keine Commits doppelt erstellt.
 
 ### Sprache
 
