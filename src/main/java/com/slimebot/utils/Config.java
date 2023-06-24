@@ -41,7 +41,6 @@ public class Config {
                 mainConfig.createNewFile();
                 System.out.println("New file has been created: " + mainConfig.getFilePath() + "\nGenerate default property...");
             } else {
-                System.out.println(mainConfig.getFilePath() + " already exists, loading configurations...\n");
                 return;
             }
             mainConfig.load();
