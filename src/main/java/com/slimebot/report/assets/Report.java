@@ -3,6 +3,7 @@ package com.slimebot.report.assets;
 import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -27,14 +28,14 @@ public class Report {
 
     public static Report newReport(Integer id, Type type, Member user, Member by, String msgContent){
         Report report = new Report();
-        report.id = id;
-        report.type = type;
-        report.user = user;
-        report.by = by;
-        report.closeReason = "None";
-        report.status = Status.OPEN;
-        report.time = LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        report.msgContent = msgContent;
+        report.setId(id);
+        report.setType(type);
+        report.setUser(user);
+        report.setBy(by);
+        report.setTime(LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        report.setStatus(Status.OPEN);
+        report.setMsgContent(msgContent);
+        report.setCloseReason("None");
 
         return report;
     }
@@ -44,15 +45,10 @@ public class Report {
     }
 
     public static void log(Integer reportID, String guildID){
-
-        Report newReport = null;
-        for (Report report: Main.reports) {
-            if (!(Objects.equals(report.id, reportID))) {
-                continue;
-            }
-            newReport = report;
-        }
         YamlFile config = Config.getConfig(guildID, "mainConfig");
+
+        Report newReport = get(guildID, reportID);
+
         try {
             config.load();
         } catch (IOException e) {
@@ -67,7 +63,7 @@ public class Report {
                 .addField("Report von:", newReport.getBy().getAsMention(), true)
                 .addField("Gemeldet:", newReport.getUser().getAsMention(), true);
 
-        if (newReport.type == Type.MSG){
+        if (newReport.getType() == Type.MSG){
             embedBuilder.setDescription("Es wurde eine Nachricht gemeldet!")
                     .addField("Nachricht:", newReport.getMsgContent(), false);
         } else {
@@ -77,6 +73,83 @@ public class Report {
 
 
         logChannel.sendMessageEmbeds(embedBuilder.build()).addActionRow(closeBtn(reportID.toString())).queue();
+    }
+
+    public static void save(String guildID, Report report){
+        YamlFile reportFile = Config.getConfig(guildID, "reports");
+
+        if (!reportFile.exists()){
+            try {
+                reportFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        try {
+            reportFile.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String rID = String.valueOf(report.getId());
+
+        reportFile.set("reports."+ rID +".id", report.getId());
+        reportFile.set("reports."+ rID +".type", report.getType().toString());
+        reportFile.set("reports."+ rID +".user", report.getUser().getId());
+        reportFile.set("reports."+ rID +".by", report.getBy().getId());
+        reportFile.set("reports."+ rID +".time", report.getTime().toString());
+        reportFile.set("reports."+ rID +".status", report.getStatus().toString());
+        reportFile.set("reports."+ rID +".msgContent", String.valueOf(report.getMsgContent()));
+        reportFile.set("reports."+ rID +".closeReason", report.getCloseReason().toString());
+
+        try {
+            reportFile.save();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(reportFile.getString("reports."+ rID +".msgContent"));
+
+    }
+
+    public static Report get(String guildID, Integer reportID){
+        YamlFile reportFile = Config.getConfig(guildID, "reports");
+        Report report = new Report();
+        Guild guild = Main.getJDAInstance().getGuildById(guildID);
+
+        try {
+            reportFile.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        report.setId(reportFile.getInt("reports."+ reportID+".id"));
+        String rID = reportID.toString();
+
+        if (Objects.equals(reportFile.getString("reports." + rID + ".type"), "MSG")){
+            report.setType(Type.MSG);
+        } else {
+            report.setType(Type.USER);
+        }
+
+        report.setUser(guild.getMemberById(reportFile.getString("reports."+ rID+".user")));
+        report.setBy(guild.getMemberById(reportFile.getString("reports."+ rID+".by")));
+        report.setTime(LocalDateTime.parse(reportFile.getString("reports."+ rID+".time")));
+
+        if (Objects.equals(reportFile.getString("reports." + rID + ".status"), "OPEN")){
+            report.setStatus(Status.OPEN);
+        } else {
+            report.setStatus(Status.CLOSED);
+        }
+
+
+        String msgC = reportFile.getString("reports."+ rID +".msgContent");
+        String clR = reportFile.getString("reports."+ rID +".closeReason");
+        report.setCloseReason(clR);
+        report.setMsgContent(msgC);
+
+        return report;
     }
 
     public static MessageEmbed getReportAsEmbed(Report report, String guildID){

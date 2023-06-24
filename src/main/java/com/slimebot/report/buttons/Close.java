@@ -16,8 +16,7 @@ public class Close extends ListenerAdapter {
         if (!(event.getButton().getId().equals("close_report"))) {return;}
 
         String[] nameSplit = event.getButton().getLabel().split(" ");
-        String[] reportSplit = nameSplit[1].split("");
-        String reportID = reportSplit[1];
+        String reportID = nameSplit[1].substring(1);
 
 
         TextInput reason = TextInput.create("reason", "Wie Wurde mit dem Report Verfahren?", TextInputStyle.SHORT)

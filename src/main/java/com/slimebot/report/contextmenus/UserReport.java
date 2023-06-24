@@ -3,13 +3,16 @@ package com.slimebot.report.contextmenus;
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Type;
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
+import org.simpleyaml.configuration.file.YamlFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -29,11 +32,16 @@ public class UserReport extends ListenerAdapter {
             event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
             return;}
 
+        YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
+        try {
+            reportFile.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        int reportID = reportFile.getConfigurationSection("reports").size() + 1;
 
-        int reportID = Main.reports.size() + 1;
 
-
-        Main.reports.add(Report.newReport(reportID, Type.USER, event.getTargetMember(), event.getMember(), "None"));
+        Report.save(event.getGuild().getId(), Report.newReport(reportID, Type.USER, event.getTargetMember(), event.getMember(), "None"));
 
 
         TextInput userReportDescription = TextInput.create("usrDescr", "Warum möchtest du diese Person Reporten?", TextInputStyle.SHORT)

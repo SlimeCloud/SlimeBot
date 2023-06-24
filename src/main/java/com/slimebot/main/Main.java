@@ -64,7 +64,6 @@ public class Main {
                 config.getInt("embedColor.blue")
             );
     }
-    public static ArrayList<Report> reports = new ArrayList<>(); ///ToDo get From Config or DataBase
     public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
 
     public static void main(String[] args) throws IOException {
@@ -179,9 +178,9 @@ public class Main {
         new TimeScheduler(300).startTimer(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("Check for new Guilds");
                 for (Guild guild : getJDAInstance().getGuilds()) {
                     Config.createMain(guild.getId());
+
                 }
             }
         });

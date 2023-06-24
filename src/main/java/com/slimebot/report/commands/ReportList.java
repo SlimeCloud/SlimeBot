@@ -4,12 +4,16 @@ import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Status;
 import com.slimebot.utils.Checks;
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import org.simpleyaml.configuration.ConfigurationSection;
+import org.simpleyaml.configuration.file.YamlFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -38,10 +42,23 @@ public class ReportList extends ListenerAdapter {
         ArrayList<Integer> ReportIdList = new ArrayList<>();
         int fieldSize = 0;
         boolean maxFieldSize = false;
+
+        YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
+        try {
+            reportFile.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        ConfigurationSection reportSection = reportFile.getConfigurationSection("reports");
+        ArrayList<Report> allReports = new ArrayList<>();
+        for (int id = 2; id <= reportSection.size() ; id++) {
+            allReports.add(Report.get(event.getGuild().getId(), id));
+        }
+
         switch (event.getOption("status").getAsString()){
             case "all" -> {
                 embed.setTitle("Eine Liste aller Reports");
-                for (Report report:Main.reports) {
+                for (Report report:allReports) {
                     ReportIdList.add(report.getId());
                     if (fieldSize > 24){maxFieldSize = true; break;}
                     addReportField(report, embed);
@@ -50,7 +67,7 @@ public class ReportList extends ListenerAdapter {
             }
             case "closed" -> {
                 embed.setTitle("Eine Liste aller geschlossenen Reports");
-                for (Report report:Main.reports) {
+                for (Report report:allReports) {
                     if (!(report.status == Status.CLOSED)){continue; }
                     ReportIdList.add(report.getId());
                     if (fieldSize > 24){maxFieldSize = true;break;}
@@ -60,7 +77,7 @@ public class ReportList extends ListenerAdapter {
             }
             case "open" -> {
                 embed.setTitle("Eine Liste aller offenen Reports");
-                for (Report report:Main.reports) {
+                for (Report report:allReports) {
                     if (!(report.status == Status.OPEN)){continue; }
                     ReportIdList.add(report.getId());
                     if (fieldSize > 24){maxFieldSize = true;break;}
@@ -77,7 +94,7 @@ public class ReportList extends ListenerAdapter {
                     .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
                     .setColor(Main.embedColor(event.getGuild().getId()))
                     .setTitle(":exclamation: Error: No Reports Found")
-                    .setDescription("Es wurden keine Reports zu der Ausgewählten option gefunden!");
+                    .setDescription("Es wurden keine Reports zu der Ausgewählten option (" + event.getOption("status").getAsString() + ") gefunden!");
             event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
             return;
         }
@@ -96,7 +113,7 @@ public class ReportList extends ListenerAdapter {
 
     private void addReportField(Report report, EmbedBuilder embed){
         embed.addField("Report #" + report.getId().toString(),
-                report.getUser().getAsMention() + " wurde am `" + report.getTime().format(Main.dtf) + "` von " + report.getBy().getAsMention() + " gemeldet",
+                report.getUser().getAsMention() + " wurde am ` " + report.getTime().format(Main.dtf) + "` von " + report.getBy().getAsMention() + " gemeldet.",
                 false);
     }
 

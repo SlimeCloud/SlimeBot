@@ -3,10 +3,13 @@ package com.slimebot.report.contextmenus;
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Type;
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.simpleyaml.configuration.file.YamlFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -26,7 +29,13 @@ public class MsgReport extends ListenerAdapter {
             return;
         }
 
-        int reportID = Main.reports.size() + 1;
+        YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
+        try {
+            reportFile.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        int reportID = reportFile.getConfigurationSection("reports").size() + 1;
 
         String msg = event.getTarget().getContentRaw();
 
@@ -40,7 +49,7 @@ public class MsgReport extends ListenerAdapter {
 
         String msgWithLink = "[" + msg + "](https://discord.com/channels/"+GuildId+"/"+ChannelId+"/"+MessageId+")";
 
-        Main.reports.add(Report.newReport(reportID, Type.MSG, event.getTarget().getMember(), event.getMember(), msgWithLink));
+        Report.save(event.getGuild().getId(), Report.newReport(reportID, Type.MSG, event.getTarget().getMember(), event.getMember(), msgWithLink));
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))

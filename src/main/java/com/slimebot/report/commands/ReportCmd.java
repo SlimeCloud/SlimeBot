@@ -3,12 +3,16 @@ package com.slimebot.report.commands;
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Type;
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
+import org.simpleyaml.configuration.ConfigurationSection;
+import org.simpleyaml.configuration.file.YamlFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -29,12 +33,19 @@ public class ReportCmd extends ListenerAdapter {
             return;
         }
 
-        int reportID = Main.reports.size() + 1;
+        YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
+        try {
+            reportFile.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(reportFile.getConfigurationSection("reports").getName());
+        int reportID = reportFile.getConfigurationSection("reports").size() + 1;
 
         OptionMapping user = event.getOption("user");
         OptionMapping description = event.getOption("beschreibung");
 
-        Main.reports.add(Report.newReport(reportID, Type.USER, user.getAsMember(), event.getMember(), description.getAsString()));
+        Report.save(event.getGuild().getId(), Report.newReport(reportID, Type.USER, user.getAsMember(), event.getMember(), description.getAsString()));
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))

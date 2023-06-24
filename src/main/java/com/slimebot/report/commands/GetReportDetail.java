@@ -4,12 +4,14 @@ import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Status;
 import com.slimebot.utils.Checks;
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.simpleyaml.configuration.file.YamlFile;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -33,22 +35,16 @@ public class GetReportDetail extends ListenerAdapter {
 
         OptionMapping id = event.getOption("id");
         MessageEmbed eb;
+        Report report = Report.get(event.getGuild().getId(), id.getAsInt());
 
-        for (Report report: Main.reports) {
-            if (!(report.getId() == id.getAsInt())){continue;}
-
-            eb = Report.getReportAsEmbed(report, event.getGuild().getId());
-
-            Button closeBtn = Report.closeBtn(report.getId().toString());
-
-            if (report.getStatus() == Status.CLOSED){
-                event.replyEmbeds(eb).queue();
-            } else {
-                event.replyEmbeds(eb).setActionRow(closeBtn).queue();
-            }
-
-
+        eb = Report.getReportAsEmbed(report, event.getGuild().getId());
+        Button closeBtn = Report.closeBtn(report.getId().toString());
+        if (report.getStatus() == Status.CLOSED){
+            event.replyEmbeds(eb).queue();
+        } else {
+            event.replyEmbeds(eb).setActionRow(closeBtn).queue();
         }
+
 
 
     }
