@@ -7,18 +7,21 @@ plugins {
 mainClassName = "com.slimebot.main.Main"
 
 group 'com.slimebot'
-version '1.0-SNAPSHOT'
+version '2.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation 'net.dv8tion:JDA:5.0.0-beta.8'
+    implementation 'me.carleslc.Simple-YAML:Simple-Yaml:1.8.4'
 }
 
 test {
     useJUnitPlatform()
+    systemProperty "file.encoding", "utf-8"
 }

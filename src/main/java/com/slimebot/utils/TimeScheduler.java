@@ -1,6 +1,5 @@
 package com.slimebot.utils;
 
-import java.sql.Time;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -14,6 +13,6 @@ public class TimeScheduler {
     }
 
     public void startTimer(TimerTask timerTask){
-        timer.scheduleAtFixedRate(timerTask, 0, seconds * 1000);
+        timer.scheduleAtFixedRate(timerTask, 0, seconds * 1000L);
     }
 }

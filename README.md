@@ -39,5 +39,3 @@ Ihr könnt ToDos auch gerne im Code mit `///ToDo` oder `///FixMe` notieren. Beac
 ## Fragen
 
 Bei Fragen wendet euch gerne auf dem Discord im Channel *#👾│tüftlerecke* an die Community oder in einem Ticket direkt an das Team.
-
-

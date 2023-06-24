@@ -1,20 +1,23 @@
 package com.slimebot.commands;
 
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import org.simpleyaml.configuration.file.YamlFile;
 
-public class Config extends ListenerAdapter {
+import java.io.IOException;
+
+
+public class ConfigCmd extends ListenerAdapter {
 
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         super.onSlashCommandInteraction(event);
 
+        YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
         if (event.getName().equalsIgnoreCase("config")) {
             if (event.getInteraction().getMember().hasPermission(Permission.ADMINISTRATOR)) {
                 try {
@@ -24,7 +27,9 @@ public class Config extends ListenerAdapter {
 
                     switch (type.getAsString()) {
                         case "config":
-                            com.slimebot.utils.Config.changeProperty(com.slimebot.utils.Config.botPath + event.getGuild().getId() + "/config.yml", field.getAsString(), value.getAsString());
+                            config.load();
+                            config.set(field.getAsString(), value.getAsString());
+                            config.save();
                             break;
                     }
 
