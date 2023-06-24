@@ -6,6 +6,7 @@
 ### Der Discord Bot für den SlimeCloud Discord Server
 
 Dieser Discord bot gehört zu dem deutschen Discord "[SlimeCloud](https://discord.gg/slimecloud)". Beachte das dies Projekt unter der [GNU Affero General Public License v3.0](https://github.com/SlimeCloud/java-SlimeBot/blob/master/LICENSE) läuft.
+**Bitte beachtet, dass dieser Bot bzw. dieses Projekt noch sehr am Anfang steht, weshalb noch wenig dokumentiert ist und ggf. komplizierter ist als nötig. Aber lasst uns das doch zusammen ändern!**
 
 Der Bot läuft mit der jdk version 17.
 
@@ -35,6 +36,16 @@ Beachtet dass ihr keine Commits doppelt erstellt.
 **Benennung**: Variablen, IDs, Funktionen schreiben wir im camelCase; Klassen werden mit einem Großbuchstaben am Anfang geschrieben.
 
 Ihr könnt ToDos auch gerne im Code mit `///ToDo` oder `///FixMe` notieren. Beachtet aber bitte das sowas schnell untergeht, wenn zusätzlich kein Issue erstellt wurde.
+
+### Config
+
+Wir nutzen zum speichern von bspw. UserIDs YAML-Files. Um dies einfacher zu gestallten benuzten wir die [Simple-YAML](https://github.com/Carleslc/Simple-YAML/) Lib.
+Es gibt zudem eine [Config Class](https://github.com/SlimeCloud/java-SlimeBot/blob/master/src/main/java/com/slimebot/utils/Config.java) in der einige Methoden sind die man häufiger braucht.
+
+Häufige fehler:
+- **Das Value ist None**: Vergesst nich die Config zuerst mit `ymlconfig.load()` zu laden.
+- **Das Value ist None**: `ymlconfig.get(PATH)` funktioniert nicht immer, nutzt stattdessen `ymlconfig.getString(PATH)` oder `ymlconfig.getInt(PATH)` etc..
+- **.set() geht nicht**: Vergesst nicht eure änderungen mit `ymlconfig.save()` zu speichern
 
 ## Fragen
 
