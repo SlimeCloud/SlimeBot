@@ -32,10 +32,7 @@ import org.simpleyaml.configuration.file.YamlFile;
 import java.awt.*;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.Objects;
-import java.util.TimerTask;
+import java.util.*;
 
 public class Main {
     public static JDA jdaInstance;
@@ -64,10 +61,13 @@ public class Main {
             );
     }
     public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
-    private static final String token = Config.getBotInfo("token.test");
 
     public static void main(String[] args) throws IOException {
         System.out.println("Bot Version: "+ Config.getBotInfo("version"));
+        System.out.println("Welcher Bot soll gestartet werden? 'main' oder 'test'");
+        Scanner in = new Scanner(System.in);
+        String inToken = in.nextLine();
+        String token = Config.getBotInfo("token."+inToken.toLowerCase());
         if (Objects.equals(token, "")){missingToken();}
         jdaInstance = JDABuilder.createDefault(token)
                 .setActivity(Activity.of(getActivityType(activityType), activityText))
