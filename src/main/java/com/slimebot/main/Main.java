@@ -64,11 +64,13 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Bot Version: "+ Config.getBotInfo("version"));
+
         System.out.println("Welcher Bot soll gestartet werden? 'main' oder 'test'");
         Scanner in = new Scanner(System.in);
         String inToken = in.nextLine();
         String token = Config.getBotInfo("token."+inToken.toLowerCase());
         if (Objects.equals(token, "")){missingToken();}
+
         jdaInstance = JDABuilder.createDefault(token)
                 .setActivity(Activity.of(getActivityType(activityType), activityText))
 
