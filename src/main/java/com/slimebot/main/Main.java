@@ -129,14 +129,14 @@ public class Main {
                         .setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, "value", "Welcher Wert soll bei dem Feld gesetzt werden?")
                         .setRequired(true))
-        ).queue();
+        ).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
 
         jdaInstance.upsertCommand(Commands.slash("ping", "ping pong")).queue();
 
         jdaInstance.upsertCommand(Commands.slash("role_check", "[Team Befehl] Geht ALLE Mitglieder durch und gibt ihnen eine Rolle")
                 .addOption(OptionType.ROLE, "rolle", "Auf welche Rolle sollen die User überprüft werden?", true)
                 .addOption(OptionType.BOOLEAN, "bots", "Sollen Bots mit überprüft werden?", true)
-        ).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
+        ).queue();
 
         jdaInstance.upsertCommand(Commands.slash("blockreport", "Blocke eine Person das sie keine Reports mehr erstellen kann")
                 .addOptions(new OptionData(OptionType.USER, "user", "Wähle einen User aus")
