@@ -25,3 +25,5 @@ test {
     useJUnitPlatform()
     systemProperty "file.encoding", "utf-8"
 }
+
+compileJava.options.encoding = 'UTF-8'
