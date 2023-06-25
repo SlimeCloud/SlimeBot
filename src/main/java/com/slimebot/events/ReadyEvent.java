@@ -49,7 +49,7 @@ public class ReadyEvent extends ListenerAdapter {
 
 
 
-        TextChannel DEVlogChannel = event.getJDA().getTextChannelById("1080912327693574275");//Channel only for dev not for each Discord
+        TextChannel DEVlogChannel = event.getJDA().getTextChannelById("1122526257721131108");//Channel only for dev not for each Discord
 
         EmbedBuilder embed = new EmbedBuilder();
 
