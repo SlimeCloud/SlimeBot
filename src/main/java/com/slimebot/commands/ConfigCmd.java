@@ -19,7 +19,6 @@ public class ConfigCmd extends ListenerAdapter {
 
         YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
         if (event.getName().equalsIgnoreCase("config")) {
-            if (event.getInteraction().getMember().hasPermission(Permission.ADMINISTRATOR)) {
                 try {
                     OptionMapping type = event.getOption("type");
                     OptionMapping field = event.getOption("field");
@@ -37,9 +36,7 @@ public class ConfigCmd extends ListenerAdapter {
                 } catch (Exception e) {
                     event.reply("Bei deinen Anpassungen sind fehler aufgetreten...").setEphemeral(true).queue();
                 }
-            } else {
-                event.reply("Auf diesen Command hast du keinen Zugriff.").setEphemeral(true).queue();
-            }
+            
         }
     }
 }
