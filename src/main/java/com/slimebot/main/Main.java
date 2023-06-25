@@ -34,14 +34,13 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.TimerTask;
 
 public class Main {
     public static JDA jdaInstance;
-    private static final String activityText;
-    static {activityText = Config.getBotInfo("activity.text");}
-    private static final String activityType;
-    static { activityType = Config.getBotInfo("activity.type");}
+    private static final String activityText = Config.getBotInfo("activity.text");
+    public static String activityType = Config.getBotInfo("activity.type");
     public static ArrayList<String> blocklist(String guildID) {
         YamlFile config = Config.getConfig(guildID, "mainConfig");
         try {
@@ -65,10 +64,12 @@ public class Main {
             );
     }
     public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
+    private static final String token = Config.getBotInfo("token.test");
 
     public static void main(String[] args) throws IOException {
-        System.out.println(Config.getBotInfo("version"));
-        jdaInstance = JDABuilder.createDefault(Config.getBotInfo("token.test"))
+        System.out.println("Bot Version: "+ Config.getBotInfo("version"));
+        if (Objects.equals(token, "")){missingToken();}
+        jdaInstance = JDABuilder.createDefault(token)
                 .setActivity(Activity.of(getActivityType(activityType), activityText))
 
                 .enableIntents(EnumSet.allOf(GatewayIntent.class))
@@ -186,13 +187,19 @@ public class Main {
         });
     }
 
+    public static void missingToken(){
+        YamlFile botConfig = new YamlFile("Slimebot/main/botConfig.yml");
+        System.out.println("\n\nBITTE TRAGEN DEN TOKEN EIN\n"+botConfig.getFilePath()+"\n\n");
+        System.exit(800);
+    }
+
     public static JDA getJDAInstance() {
         return jdaInstance;
     }
 
-    private static Activity.ActivityType getActivityType(String type) {
+    private static Activity.ActivityType getActivityType(String aType) {
 
-        return switch (type) {
+        return switch (aType) {
             case "WATCHING" -> Activity.ActivityType.WATCHING;
             case "STREAMING" -> Activity.ActivityType.STREAMING;
             case "LISTENING" -> Activity.ActivityType.LISTENING;

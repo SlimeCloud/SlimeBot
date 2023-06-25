@@ -1,5 +1,6 @@
 package com.slimebot.utils;
 
+import com.slimebot.main.Main;
 import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.IOException;
@@ -53,9 +54,9 @@ public class Config {
         mainConfig.set("blocklist", Arrays.asList("123456", "7891021"));
         mainConfig.set("staffRoleID", 0);
         mainConfig.set("punishmentChannelID", 0);
-        mainConfig.set("embedColor.red", "86");
-        mainConfig.set("embedColor.green", "157");
-        mainConfig.set("embedColor.blue", "60");
+        mainConfig.set("embedColor.red", 86);
+        mainConfig.set("embedColor.green", 157);
+        mainConfig.set("embedColor.blue", 60);
 
         mainConfig.options().headerFormatter()
                 .prefixFirst("######################")
@@ -81,7 +82,23 @@ public class Config {
     }
 
     public static String getBotInfo(String probPath){
-        YamlFile botConfig = new YamlFile("src/main/resources/botConfig.yml");
+        YamlFile botConfig = new YamlFile("Slimebot/main/botConfig.yml");
+        if (!(botConfig.exists())){
+            try {
+                botConfig.createNewFile(true);
+                botConfig.load();
+                botConfig.set("name", "SlimeBot");
+                botConfig.set("version", "2.0");
+                botConfig.set("activity.type", "PLAYING");
+                botConfig.set("activity.text", "mit Slimebällen");
+                botConfig.set("token.main", "");
+                botConfig.set("token.test", "");
+                botConfig.save();
+                Main.missingToken();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         try {
             botConfig.load();
         } catch (IOException e) {

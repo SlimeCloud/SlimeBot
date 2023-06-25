@@ -6,6 +6,8 @@ build/
 
 out
 
+Slimebot/
+
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -40,4 +42,3 @@ bin/
 !.idea/encodings.xml
 !.idea/runConfigurations
 !.idea/codeStyleSettings.xml
-src/main/resources/botConfig.yml
