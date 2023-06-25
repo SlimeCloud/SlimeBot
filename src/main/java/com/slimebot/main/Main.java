@@ -17,6 +17,8 @@ import com.slimebot.report.modals.CloseReport;
 import com.slimebot.report.modals.ReportModal;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.TimeScheduler;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -134,7 +136,7 @@ public class Main {
         jdaInstance.upsertCommand(Commands.slash("role_check", "[Team Befehl] Geht ALLE Mitglieder durch und gibt ihnen eine Rolle")
                 .addOption(OptionType.ROLE, "rolle", "Auf welche Rolle sollen die User überprüft werden?", true)
                 .addOption(OptionType.BOOLEAN, "bots", "Sollen Bots mit überprüft werden?", true)
-        ).queue();
+        ).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
 
         jdaInstance.upsertCommand(Commands.slash("blockreport", "Blocke eine Person das sie keine Reports mehr erstellen kann")
                 .addOptions(new OptionData(OptionType.USER, "user", "Wähle einen User aus")
