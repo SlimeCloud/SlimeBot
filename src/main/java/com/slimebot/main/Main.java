@@ -70,7 +70,7 @@ public class Main {
         System.out.println("Welcher Bot soll gestartet werden? 'main' oder 'test'");
         Scanner in = new Scanner(System.in);
         String inToken = in.nextLine();
-        String token = Config.getBotInfo("token."+inToken.toLowerCase());
+        String token = Config.getEnvKey("TOKEN");
         if (Objects.equals(token, "")){missingToken();}
 
         jdaInstance = JDABuilder.createDefault(token)
