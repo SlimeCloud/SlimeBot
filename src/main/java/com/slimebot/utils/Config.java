@@ -2,11 +2,18 @@ package com.slimebot.utils;
 
 import com.slimebot.main.Main;
 import org.simpleyaml.configuration.file.YamlFile;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 public class Config {
+
+    private static final Dotenv dotenv = Dotenv.load();
+
+    public static String getEnvKey(String key) {
+        return dotenv.get(key.toUpperCase());
+    }
 
     public static YamlFile getConfig(String guildID, String configName){
         return new YamlFile("Slimebot/"+guildID+"/"+configName+".yml");
