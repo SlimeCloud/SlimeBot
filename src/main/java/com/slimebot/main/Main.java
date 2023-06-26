@@ -17,6 +17,8 @@ import com.slimebot.report.modals.CloseReport;
 import com.slimebot.report.modals.ReportModal;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.TimeScheduler;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -127,6 +129,7 @@ public class Main {
                         .setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, "value", "Welcher Wert soll bei dem Feld gesetzt werden?")
                         .setRequired(true))
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
         ).queue();
 
         jdaInstance.upsertCommand(Commands.slash("ping", "ping pong")).queue();
