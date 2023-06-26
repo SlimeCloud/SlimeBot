@@ -129,7 +129,8 @@ public class Main {
                         .setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, "value", "Welcher Wert soll bei dem Feld gesetzt werden?")
                         .setRequired(true))
-        ).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
+        ).queue();
 
         jdaInstance.upsertCommand(Commands.slash("ping", "ping pong")).queue();
 
