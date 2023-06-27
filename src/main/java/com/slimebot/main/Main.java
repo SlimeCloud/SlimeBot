@@ -18,6 +18,7 @@ import com.slimebot.report.modals.CloseReport;
 import com.slimebot.report.modals.ReportModal;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.TimeScheduler;
+import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.JDA;
@@ -71,7 +72,8 @@ public class Main {
         System.out.println("Welcher Bot soll gestartet werden? 'main' oder 'test'");
         Scanner in = new Scanner(System.in);
         String inToken = in.nextLine();
-        String token = Config.getBotInfo("token."+inToken.toLowerCase());
+        System.out.println(inToken.toUpperCase()+"-Bot wird gestartet...");
+        String token = Config.getEnvKey("TOKEN_"+inToken.toUpperCase());
         if (Objects.equals(token, "")){missingToken();}
 
         jdaInstance = JDABuilder.createDefault(token)
@@ -197,9 +199,8 @@ public class Main {
     }
 
     public static void missingToken(){
-        YamlFile botConfig = new YamlFile("Slimebot/main/botConfig.yml");
-        System.out.println("\n\nBITTE TRAGEN DEN TOKEN EIN\n"+botConfig.getFilePath()+"\n\n");
-        System.exit(800);
+        System.out.println("\n\nPLEASE ADD A TOKEN (.env in root dir)\n\n");
+        System.exit(420);
     }
 
     public static JDA getJDAInstance() {
