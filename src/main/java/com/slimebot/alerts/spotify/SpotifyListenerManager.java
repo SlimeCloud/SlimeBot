@@ -6,6 +6,7 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class SpotifyListenerManager {
@@ -36,14 +37,8 @@ public class SpotifyListenerManager {
         }
         String message = config.getString("message");
         for (Map.Entry<String, Object> entry : config.getConfigurationSection("artists").getMapValues(false).entrySet()) {
-            if (!(entry.getValue() instanceof String)) {
-                System.out.println("[SPOTIFY] Error in config.yml: " + entry.getKey() + " is not a String");
-                continue;
-            }
             String artistID = entry.getKey();
-            long channelID = (Integer) entry.getValue();
-            new SpotifyListener(artistID, channelID, message, api);
-            System.out.println("[SPOTIFY] Added " + artistID + " to the Channel " + channelID);
+            new SpotifyListener(artistID, config, message, api);
         }
     }
 
@@ -63,7 +58,8 @@ public class SpotifyListenerManager {
                 {1}
                 """);
         config.setComment("message", "Format: {0} = Albumname, {1} = Link zum Album");
-        config.set("artists.xvjasildjf", 123456);
+        config.set("artists.xvjasildjf.channelId", 123456);
+        config.set("artists.xvjasildjf.publishedAlbums", new ArrayList<String>());
         config.setComment("artists", "Format: <artist id>: <channel id>");
         try {
             config.save();

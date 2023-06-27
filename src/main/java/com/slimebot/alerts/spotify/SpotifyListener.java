@@ -4,17 +4,18 @@ import com.slimebot.main.Main;
 import com.slimebot.utils.DailyTask;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.simpleyaml.configuration.ConfigurationSection;
+import org.simpleyaml.configuration.file.YamlFile;
 import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.enums.ReleaseDatePrecision;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistsAlbumsRequest;
 
+import java.io.IOException;
 import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class SpotifyListener implements Runnable {
     private final String artistId;
@@ -22,42 +23,56 @@ public class SpotifyListener implements Runnable {
     private final SpotifyApi spotifyApi;
     private final String message;
 
-    SpotifyListener(String artistId, long channelId, String message, SpotifyApi api) {
+    private final ConfigurationSection section;
+
+    private final YamlFile config;
+
+    private final List<String> publishedAlbums;
+
+
+    SpotifyListener(String artistId, YamlFile config, String message, SpotifyApi api) {
+        this.config = config;
+        this.section = config.getConfigurationSection("artists." + artistId);
         this.artistId = artistId;
-        this.channelId = channelId;
+        this.channelId = section.getLong("channelId");
         this.message = message;
         spotifyApi = api;
+        publishedAlbums = section.getStringList("publishedAlbums");
+        try {
+            Main.getJDAInstance().awaitReady();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        run();
         new DailyTask(12, this);
     }
 
     public void run() {
         log("INFO: Überprüfe auf neue Releases");
+        for (AlbumSimplified album : getLatestAlbums()) {
+            if (!publishedAlbums.contains(album.getId())) {
+                log("INFO: Album " + album.getName() + " wurde veröffentlicht");
+                publishedAlbums.add(album.getId());
+                broadcastAlbum(album);
+            }
+
+        }
         try {
-            AlbumSimplified latestAlbum = getLatestAlbum();
-            if (!isPublishedToday(latestAlbum)) {
-                log("INFO: Kein neuer Release");
-                return;
-            }
-            JDA jda = Main.getJDAInstance();
-            TextChannel channel = jda.getTextChannelById(channelId);
-            if (channel == null) {
-                log("ERROR: Channel nicht verfügbar: " + channelId);
-                return;
-            }
-            channel.sendMessage(MessageFormat.format(message, latestAlbum.getName(), latestAlbum.getExternalUrls().get("spotify"))).queue();
-        } catch (Exception e) {
-            log("ERROR: Release des Albums kann nicht überprüft werden");
-            e.printStackTrace();
+            config.set("artists." + artistId + ".publishedAlbums", publishedAlbums);
+            config.save();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private AlbumSimplified getLatestAlbum() {
+    private AlbumSimplified[] getLatestAlbums() {
         GetArtistsAlbumsRequest request = spotifyApi.getArtistsAlbums(artistId).build();
         final Paging<AlbumSimplified> albumSimplifiedPaging;
         try {
             albumSimplifiedPaging = request.execute();
-            return albumSimplifiedPaging.getItems()[0];
+            List<AlbumSimplified> albums = Arrays.asList(albumSimplifiedPaging.getItems());
+            Collections.reverse(albums);
+            return albums.toArray(new AlbumSimplified[0]);
         } catch (Exception e) {
             log("ERROR: Alben können nicht geladen werden");
             throw new RuntimeException(e);
@@ -68,19 +83,13 @@ public class SpotifyListener implements Runnable {
         System.out.println("[SPOTIFY] " + s);
     }
 
-    private boolean isPublishedToday(AlbumSimplified album) {
-        if (album.getReleaseDatePrecision() != ReleaseDatePrecision.DAY) {
-            log("Album kann nicht geladen werden: zu ungenaue release Angabe " + album.getReleaseDatePrecision().precision);
-            return false;
+    private void broadcastAlbum(AlbumSimplified album) {
+        JDA jda = Main.getJDAInstance();
+        TextChannel channel = jda.getTextChannelById(channelId);
+        if (channel == null) {
+            log("ERROR: Channel nicht verfügbar: " + channelId);
+            return;
         }
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            LocalDate date = format.parse(album.getReleaseDate()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate now = LocalDate.now();
-            return now.isEqual(date);
-        } catch (ParseException e) {
-            log("Album kann nicht geladen werden: Falsches Release-Date Format: " + album.getReleaseDate());
-            return false;
-        }
+        channel.sendMessage(MessageFormat.format(message, album.getName(), album.getExternalUrls().get("spotify"))).queue();
     }
 }
