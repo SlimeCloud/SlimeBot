@@ -58,8 +58,8 @@ public class SpotifyListenerManager {
                 {1}
                 """);
         config.setComment("message", "Format: {0} = Albumname, {1} = Link zum Album");
-        config.set("artists.xvjasildjf.channelId", 123456);
-        config.set("artists.xvjasildjf.publishedAlbums", new ArrayList<String>());
+        config.set("artists.0ZzsW7JiW4Ok3H7nFl4yV1.channelId", 123456);
+        config.set("artists.0ZzsW7JiW4Ok3H7nFl4yV1.publishedAlbums", new ArrayList<String>());
         config.setComment("artists", "Format: <artist id>: <channel id>");
         try {
             config.save();
