@@ -1,5 +1,6 @@
 package com.slimebot.main;
 
+import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
 import com.slimebot.events.OnJoin;
 import com.slimebot.events.ReadyEvent;
@@ -178,6 +179,9 @@ public class Main {
         jdaInstance.updateCommands();
 
         checkForGuilds();
+
+        //Register Spotify Hooks
+        new SpotifyListenerManager();
     }
 
     public static void checkForGuilds() {
