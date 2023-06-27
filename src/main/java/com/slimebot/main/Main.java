@@ -4,7 +4,6 @@ import com.slimebot.commands.*;
 import com.slimebot.events.OnJoin;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.events.Timeout;
-import com.slimebot.report.assets.Report;
 import com.slimebot.report.buttons.Close;
 import com.slimebot.report.buttons.DetailDropdown;
 import com.slimebot.report.commands.Blockreport;
@@ -66,7 +65,6 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Bot Version: "+ Config.getBotInfo("version"));
-
         System.out.println("Welcher Bot soll gestartet werden? 'main' oder 'test'");
         Scanner in = new Scanner(System.in);
         String inToken = in.nextLine();
@@ -90,6 +88,7 @@ public class Main {
                 .addEventListeners(new GetReportDetail())
                 .addEventListeners(new ReportList())
                 .addEventListeners(new Info())
+                .addEventListeners(new Fdmds())
 
                 //Events
                 .addEventListeners(new ReadyEvent())
