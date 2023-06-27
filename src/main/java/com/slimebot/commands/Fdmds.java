@@ -68,7 +68,21 @@ public class Fdmds extends ListenerAdapter {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            TextChannel channel = event.getGuild().getTextChannelById(config.getString("logChannel"));
+            TextChannel channel;
+            try {
+                channel = event.getGuild().getTextChannelById(config.getString("fdmdsLogChannel"));
+            } catch (IllegalArgumentException n){
+                config.set("fdmdsLogChannel", 0);
+                try {
+                    config.save();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
+                return;
+            }
+
+
 
             // Get User
             User user = Main.getJDAInstance().retrieveUserById(event.getMember().getId()).complete();
@@ -126,6 +140,7 @@ public class Fdmds extends ListenerAdapter {
             embedBuilder.addField("Auswahlmöglichkeiten:", choices, false);
 
             event.getMessage().editMessage("Edited").setEmbeds(embedBuilder.build()).queue();
+            event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
         }
     }
 
@@ -166,7 +181,6 @@ public class Fdmds extends ListenerAdapter {
         }
 
         // Send Button
-        //ToDo abfrage ob channel gesendet wurde
         if(event.getButton().getId().equals("fdmds.sendButton")) {
             // create text
             String text = "Einen Wunderschönen <:slimewave:1080225151104331817> ,\r\n";
@@ -184,7 +198,19 @@ public class Fdmds extends ListenerAdapter {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            TextChannel channel = event.getGuild().getTextChannelById(config.getString("fdmdsChannel"));
+            TextChannel channel;
+            try {
+                channel = event.getGuild().getTextChannelById(config.getString("fdmdsChannel"));
+            } catch (IllegalArgumentException n){
+                config.set("fdmdsChannel", 0);
+                try {
+                    config.save();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
+                return;
+            }
 
             // Send and add reactions
             channel.sendMessage(text).queue(m -> {
