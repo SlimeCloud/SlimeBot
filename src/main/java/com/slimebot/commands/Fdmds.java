@@ -143,7 +143,7 @@ public class Fdmds extends ListenerAdapter {
 
             // Crate Edit Modal
             TextInput questionTextInput = TextInput
-                    .create("fdmds.edit.question" + event.getInteraction().getMember().getId(), "Frage", TextInputStyle.PARAGRAPH)
+                    .create("fdmds.edit.question" + event.getInteraction().getMember().getId(), "Frage", TextInputStyle.SHORT)
                     .setMinLength(10)
                     .setValue(question)
                     .build();
