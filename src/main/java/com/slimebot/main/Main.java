@@ -170,12 +170,12 @@ public class Main {
 
         jdaInstance.upsertCommand(Commands.slash("info", "Bekomme genauere Informationen über den Bot")).queue();
 
+        jdaInstance.upsertCommand(Commands.slash("fdmds", "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!")).queue();
+
 
         //Register Context Menus
         jdaInstance.upsertCommand(Commands.context(Command.Type.USER, "Report User")).queue();
         jdaInstance.upsertCommand(Commands.context(Command.Type.MESSAGE, "Report Message")).queue();
-
-        jdaInstance.upsertCommand(Commands.slash("fdmds", "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!")).queue();
 
         jdaInstance.updateCommands();
 
