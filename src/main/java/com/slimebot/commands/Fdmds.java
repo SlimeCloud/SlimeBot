@@ -41,7 +41,7 @@ public class Fdmds extends ListenerAdapter {
     @Override
     public void onModalInteraction(ModalInteractionEvent event) {
         super.onModalInteraction(event);
-        if (!(event.getModalId().equals("fdmds")))return;
+        if (!(event.getModalId().equals("fdmds" + event.getInteraction().getMember().getId())))return;
 
         // get Log-channel
         YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
@@ -56,7 +56,7 @@ public class Fdmds extends ListenerAdapter {
         User user = Main.getJDAInstance().retrieveUserById(event.getMember().getId()).complete();
 
         // Get Content
-        String content = event.getInteraction().getValue("fdmds:").getAsString();
+        String content = event.getInteraction().getValue("fdmds:" + event.getInteraction().getMember().getId()).getAsString();
 
         // Create and send Embed
         EmbedBuilder embedBuilder = new EmbedBuilder();
