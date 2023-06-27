@@ -20,9 +20,6 @@ public class Config {
     }
 
 
-
-
-
     public static void addNewConfig(String configName, String guildID){
         YamlFile newConfig = getConfig(guildID, configName);
 
@@ -98,8 +95,6 @@ public class Config {
                 botConfig.set("version", "2.0");
                 botConfig.set("activity.type", "PLAYING");
                 botConfig.set("activity.text", "mit Slimebällen");
-                botConfig.set("token.main", "");
-                botConfig.set("token.test", "");
                 botConfig.save();
                 Main.missingToken();
             } catch (IOException e) {
