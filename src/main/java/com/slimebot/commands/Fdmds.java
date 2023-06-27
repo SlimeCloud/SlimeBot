@@ -48,7 +48,8 @@ public class Fdmds extends ListenerAdapter {
 
             Modal modal = Modal
                     .create("fdmds" + event.getInteraction().getMember().getId(), "Schlage eine fdmds Frage vor")
-                    .addActionRows(ActionRow.of(questionTextInput), ActionRow.of(choicesTextInput))
+                    .addActionRow(questionTextInput)
+                    .addActionRow(choicesTextInput)
                     .build();
             event.replyModal(modal).queue();
         }
@@ -157,13 +158,15 @@ public class Fdmds extends ListenerAdapter {
 
             Modal modal = Modal
                     .create("fdmds.edit" + event.getInteraction().getMember().getId(), "Editiere diesen vorschlag")
-                    .addActionRows(ActionRow.of(questionTextInput), ActionRow.of(choicesTextInput))
+                    .addActionRow(questionTextInput)
+                    .addActionRow(choicesTextInput)
                     .build();
             event.replyModal(modal).queue();
             return;
         }
 
         // Send Button
+        //ToDo abfrage ob channel gesendet wurde
         if(event.getButton().getId().equals("fdmds.sendButton")) {
             // create text
             String text = "Einen Wunderschönen <:slimewave:1080225151104331817> ,\r\n";
