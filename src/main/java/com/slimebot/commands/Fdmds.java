@@ -48,7 +48,8 @@ public class Fdmds extends ListenerAdapter {
 
             Modal modal = Modal
                     .create("fdmds" + event.getInteraction().getMember().getId(), "Schlage eine fdmds Frage vor")
-                    .addActionRows(ActionRow.of(questionTextInput), ActionRow.of(choicesTextInput))
+                    .addActionRow(questionTextInput)
+                    .addActionRow(choicesTextInput)
                     .build();
             event.replyModal(modal).queue();
         }
