@@ -48,12 +48,10 @@ public class SpotifyListenerManager {
         config.set("message", """
                 <@&roleId>
                             
-                ## 😌ACHTUNG ACHTUNG😌
-                Deine Playlist ist voll öde??
-                Du suchst neue Musik??
-                Du willst mal was anderes? Was richtig, richtig cooles? Was nur die krassen Kids hören?? :P
-                            
-                Dann gönn dir umbedingt das neue Album: **{0}**
+                ## 🎶 ALARM ALARM 🎶
+                Neuer Musik Release. 🥳
+                                            
+                Gönn dir umbedingt das neue Album: **{0}**
                             
                 {1}
                 """);
