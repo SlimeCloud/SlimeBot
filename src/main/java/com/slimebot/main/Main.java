@@ -65,6 +65,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Bot Version: "+ Config.getBotInfo("version"));
+
         System.out.println("Welcher Bot soll gestartet werden? 'main' oder 'test'");
         Scanner in = new Scanner(System.in);
         String inToken = in.nextLine();
