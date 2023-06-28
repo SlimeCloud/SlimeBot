@@ -56,6 +56,7 @@ public class PodcastListener implements Runnable {
         try {
             Paging<EpisodeSimplified> episodes = api.getShowEpisodes(showID).market(CountryCode.DE).limit(20).build().execute();
             if(episodes.getTotal()>20){
+                System.out.println("INFO: Es gibt mehr als 20 Episoden, hole die letzten 20");
                 episodes=api.getShowEpisodes(showID).market(CountryCode.DE).offset(episodes.getTotal()-20).build().execute();
             }
             List<EpisodeSimplified> episodeList = new ArrayList<>(Arrays.asList(episodes.getItems()));
