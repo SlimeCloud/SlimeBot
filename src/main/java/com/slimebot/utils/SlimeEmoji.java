@@ -16,25 +16,34 @@ public enum SlimeEmoji {
 
 
 
-    public int id;
-    public String string;
+    private int id;
+    private String string;
 
     SlimeEmoji(int id, String string) {
         this.id = id;
         this.string = string;
     }
 
+    public int getId() {return this.id;}
     public String getAsString() {
         return this.string;
     }
 
     public Emoji getEmoji() {
-        return Emoji.fromFormatted(string);
+        return Emoji.fromFormatted(this.string);
     }
 
     public static SlimeEmoji fromId(int id) {
         for(SlimeEmoji emoji : SlimeEmoji.values()) {
             if(emoji.id == id)return emoji;
+        }
+        return null;
+    }
+
+    public static SlimeEmoji fromEmoji(Emoji emoji) {
+        String formatted = emoji.getFormatted();
+        for(SlimeEmoji slimeEmoji : SlimeEmoji.values()) {
+            if(slimeEmoji.string.equals(formatted))return slimeEmoji;
         }
         return null;
     }

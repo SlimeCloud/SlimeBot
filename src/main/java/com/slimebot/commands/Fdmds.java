@@ -32,24 +32,7 @@ public class Fdmds extends ListenerAdapter {
         super.onSlashCommandInteraction(event);
 
         if (event.getName().equalsIgnoreCase("fdmds")) {
-            TextInput questionTextInput = TextInput
-                    .create("fdmds.question" + event.getInteraction().getMember().getId(), "Deine Frage", TextInputStyle.SHORT)
-                    .setMinLength(10)
-                    .setPlaceholder("Was ist euer lieblings Eis?")
-                    .build();
-            questionTextInput.isRequired();
-
-            TextInput choicesTextInput = TextInput
-                    .create("fdmds.choices" + event.getInteraction().getMember().getId(), "Deine Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
-                    .setMinLength(10)
-                    .setPlaceholder("Schoko ; Erdbeere ; Vanille")
-                    .build();
-            choicesTextInput.isRequired();
-
-            Modal modal = Modal
-                    .create("fdmds" + event.getInteraction().getMember().getId(), "Schlage eine fdmds Frage vor")
-                    .addActionRows(ActionRow.of(questionTextInput), ActionRow.of(choicesTextInput))
-                    .build();
+            Modal modal = getFdmdsModal("fdmds", event.getMember().getId(), null);
             event.replyModal(modal).queue();
         }
     }
@@ -60,14 +43,15 @@ public class Fdmds extends ListenerAdapter {
         if (!(event.getModalId().equals("fdmds" + event.getInteraction().getMember().getId())) && !(event.getModalId().equals("fdmds.edit" + event.getInteraction().getMember().getId())))return;
 
         if(event.getModalId().equals("fdmds" + event.getInteraction().getMember().getId())) {
+
             // get Log-channel
-            YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
-            try {
-                config.load();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            TextChannel channel = getChannelFromConfig(event.getGuild().getId(), "fdmdsLogChannel");
+            if(channel == null) {
+                event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
+                return;
             }
-            TextChannel channel = event.getGuild().getTextChannelById(config.getString("logChannel"));
+
+
 
             // Get User
             User user = Main.getJDAInstance().retrieveUserById(event.getMember().getId()).complete();
@@ -125,6 +109,7 @@ public class Fdmds extends ListenerAdapter {
             embedBuilder.addField("Auswahlmöglichkeiten:", choices, false);
 
             event.getMessage().editMessage("Edited").setEmbeds(embedBuilder.build()).queue();
+            event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
         }
     }
 
@@ -141,24 +126,7 @@ public class Fdmds extends ListenerAdapter {
             String choices = embed.getFields().get(1).getValue();
 
             // Crate Edit Modal
-            TextInput questionTextInput = TextInput
-                    .create("fdmds.edit.question" + event.getInteraction().getMember().getId(), "Frage", TextInputStyle.PARAGRAPH)
-                    .setMinLength(10)
-                    .setValue(question)
-                    .build();
-            questionTextInput.isRequired();
-
-            TextInput choicesTextInput = TextInput
-                    .create("fdmds.edit.choices" + event.getInteraction().getMember().getId(), "Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
-                    .setMinLength(10)
-                    .setValue(choices)
-                    .build();
-            choicesTextInput.isRequired();
-
-            Modal modal = Modal
-                    .create("fdmds.edit" + event.getInteraction().getMember().getId(), "Editiere diesen vorschlag")
-                    .addActionRows(ActionRow.of(questionTextInput), ActionRow.of(choicesTextInput))
-                    .build();
+            Modal modal = getFdmdsModal("fdmds.edit", event.getMember().getId(), new String[] {question, choices});
             event.replyModal(modal).queue();
             return;
         }
@@ -175,13 +143,11 @@ public class Fdmds extends ListenerAdapter {
             text = text + " \r\n" + question + "\r\n \r\n" + choices;
 
             // get fdmds-channel
-            YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
-            try {
-                config.load();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            TextChannel channel = getChannelFromConfig(event.getGuild().getId(), "fdmdsChannel");
+            if(channel == null) {
+                event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
+                return;
             }
-            TextChannel channel = event.getGuild().getTextChannelById(config.getString("fdmdsChannel"));
 
             // Send and add reactions
             channel.sendMessage(text).queue(m -> {
@@ -192,5 +158,56 @@ public class Fdmds extends ListenerAdapter {
                 event.reply("Frage verschickt!").setEphemeral(true).queue();
             });
         }
+    }
+
+    // idPrefix must be 'fdmds' or 'fdmds.edit'
+    // value is only set if it is the edit Modal
+    private Modal getFdmdsModal(String idPrefix, String memberId, String[] values) {
+        if(idPrefix == null || memberId == null)return null;
+
+        TextInput.Builder questionTextInput = TextInput
+                .create(idPrefix + ".question" + memberId, "Deine Frage", TextInputStyle.SHORT)
+                .setMinLength(10);
+        if(values == null)questionTextInput.setPlaceholder("Was ist eure lieblings Eissorte?");
+        if(values != null)questionTextInput.setValue(values[0]);
+        questionTextInput.isRequired();
+
+        TextInput.Builder choicesTextInput = TextInput
+                .create(idPrefix + ".choices" + memberId, "Deine Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
+                .setMinLength(10);
+        if(values == null)choicesTextInput.setPlaceholder("Schoko ; Erdbeere ; Vanille");
+        if(values != null)choicesTextInput.setValue(values[1]);
+        choicesTextInput.isRequired();
+
+        Modal modal = Modal
+                .create(idPrefix + memberId, "Schlage eine fdmds Frage vor")
+                .addActionRow(questionTextInput.build())
+                .addActionRow(choicesTextInput.build())
+                .build();
+
+        return modal;
+    }
+
+    private TextChannel getChannelFromConfig(String guildId, String path) {
+        if(guildId == null || path == null)return null;
+        YamlFile config = Config.getConfig(guildId, "mainConfig");
+        try {
+            config.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        TextChannel channel;
+        try {
+            channel = Main.getJDAInstance().getGuildById(guildId).getTextChannelById(config.getString(path));
+        } catch (IllegalArgumentException n){
+            config.set(path, 0);
+            try {
+                config.save();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        }
+        return channel;
     }
 }
