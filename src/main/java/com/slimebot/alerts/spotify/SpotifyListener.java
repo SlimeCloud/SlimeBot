@@ -1,5 +1,6 @@
 package com.slimebot.alerts.spotify;
 
+import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.Main;
 import com.slimebot.utils.DailyTask;
 import net.dv8tion.jda.api.JDA;
@@ -66,10 +67,14 @@ public class SpotifyListener implements Runnable {
     }
 
     private AlbumSimplified[] getLatestAlbums() {
-        GetArtistsAlbumsRequest request = spotifyApi.getArtistsAlbums(artistId).build();
-        final Paging<AlbumSimplified> albumSimplifiedPaging;
+        GetArtistsAlbumsRequest request = spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).build();
+        Paging<AlbumSimplified> albumSimplifiedPaging;
         try {
             albumSimplifiedPaging = request.execute();
+            if(albumSimplifiedPaging.getTotal()>20){
+                log("WARN: Es wurden mehr als 20 Alben gefunden. Es werden nur die 20 neuesten veröffentlicht");
+                albumSimplifiedPaging= spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal()-20).build().execute();
+            }
             List<AlbumSimplified> albums = Arrays.asList(albumSimplifiedPaging.getItems());
             Collections.reverse(albums);
             return albums.toArray(new AlbumSimplified[0]);

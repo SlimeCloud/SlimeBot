@@ -40,6 +40,10 @@ public class SpotifyListenerManager {
             String artistID = entry.getKey();
             new SpotifyListener(artistID, config, message, api);
         }
+        for (Map.Entry<String, Object> entry : config.getConfigurationSection("show").getMapValues(false).entrySet()) {
+            String showID = entry.getKey();
+            new PodcastListener(showID, config, api);
+        }
     }
 
     private void createConfig() {
@@ -59,6 +63,20 @@ public class SpotifyListenerManager {
         config.set("artists.0ZzsW7JiW4Ok3H7nFl4yV1.channelId", 123456);
         config.set("artists.0ZzsW7JiW4Ok3H7nFl4yV1.publishedAlbums", new ArrayList<String>());
         config.setComment("artists", "Format: <artist id>: <channel id>");
+        config.set("show.0HNYFHg2WNq1P56qK6defn.message", """
+                <@&roleId>
+                            
+                ## 🎙️ ALARM ALARM 🎙️
+                Neue Podcast-Folge! Rein da!
+                
+                                            
+                In der heutigen Folge: **{0}**
+                            
+                {1}
+                """);
+        config.setComment("show.0HNYFHg2WNq1P56qK6defn.message", "Format: {0} = Podcasttitel, {1} = Link zum Podcast");
+        config.set("show.0HNYFHg2WNq1P56qK6defn.channelId", 123456);
+        config.set("show.0HNYFHg2WNq1P56qK6defn.publishedEpisodes", new ArrayList<String>());
         try {
             config.save();
         } catch (IOException e) {
