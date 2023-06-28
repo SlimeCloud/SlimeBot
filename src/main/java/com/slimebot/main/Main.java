@@ -5,7 +5,6 @@ import com.slimebot.commands.*;
 import com.slimebot.events.OnJoin;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.events.Timeout;
-import com.slimebot.report.assets.Report;
 import com.slimebot.report.buttons.Close;
 import com.slimebot.report.buttons.DetailDropdown;
 import com.slimebot.report.commands.Blockreport;
@@ -93,6 +92,7 @@ public class Main {
                 .addEventListeners(new GetReportDetail())
                 .addEventListeners(new ReportList())
                 .addEventListeners(new Info())
+                .addEventListeners(new Fdmds())
 
                 //Events
                 .addEventListeners(new ReadyEvent())
@@ -172,6 +172,8 @@ public class Main {
         ).queue();
 
         jdaInstance.upsertCommand(Commands.slash("info", "Bekomme genauere Informationen über den Bot")).queue();
+
+        jdaInstance.upsertCommand(Commands.slash("fdmds", "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!")).queue();
 
 
         //Register Context Menus
