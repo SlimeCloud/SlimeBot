@@ -2,18 +2,22 @@ package com.slimebot.utils;
 
 import com.slimebot.main.Main;
 import org.simpleyaml.configuration.file.YamlFile;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 public class Config {
 
+    private static final Dotenv dotenv = Dotenv.load();
+
+    public static String getEnvKey(String key) {
+        return dotenv.get(key.toUpperCase());
+    }
+
     public static YamlFile getConfig(String guildID, String configName){
         return new YamlFile("Slimebot/"+guildID+"/"+configName+".yml");
     }
-
-
-
 
 
     public static void addNewConfig(String configName, String guildID){
@@ -52,6 +56,7 @@ public class Config {
 
         mainConfig.set("logChannel", 0);
         mainConfig.set("fdmdsChannel", 0);
+        mainConfig.set("fdmdsLogChannel", 0);
         mainConfig.set("blocklist", Arrays.asList("123456", "7891021"));
         mainConfig.set("staffRoleID", 0);
         mainConfig.set("punishmentChannelID", 0);
@@ -68,6 +73,7 @@ public class Config {
 
         mainConfig.setComment("logChannel", "Default logging Channel ID e.g. 2309845209845202");
         mainConfig.setComment("fdmdsChannel", "Default fdmds Channel ID");
+        mainConfig.setComment("fdmdsLogChannel", "Default fdmds Log Channel ID");
         mainConfig.setComment("blocklist", "Users who a blocked from creating Reports");
         mainConfig.setComment("staffRoleID", "ID From the Staff Role");
         mainConfig.setComment("punishmentChannelID", "Channel ID from where things like the Timeouts were logged");
@@ -93,8 +99,6 @@ public class Config {
                 botConfig.set("version", "2.0");
                 botConfig.set("activity.type", "PLAYING");
                 botConfig.set("activity.text", "mit Slimebällen");
-                botConfig.set("token.main", "");
-                botConfig.set("token.test", "");
                 botConfig.save();
                 Main.missingToken();
             } catch (IOException e) {

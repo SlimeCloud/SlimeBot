@@ -9,6 +9,7 @@ out
 Slimebot/
 
 ### Eclipse ###
+.env
 .apt_generated
 .classpath
 .factorypath
