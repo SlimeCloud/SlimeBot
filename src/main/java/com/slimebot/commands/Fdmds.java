@@ -167,14 +167,16 @@ public class Fdmds extends ListenerAdapter {
 
         TextInput.Builder questionTextInput = TextInput
                 .create(idPrefix + ".question" + memberId, "Deine Frage", TextInputStyle.SHORT)
-                .setMinLength(10);
+                .setMinLength(10)
+                .setMaxLength(150);
         if(values == null)questionTextInput.setPlaceholder("Was ist eure lieblings Eissorte?");
         if(values != null)questionTextInput.setValue(values[0]);
         questionTextInput.isRequired();
 
         TextInput.Builder choicesTextInput = TextInput
                 .create(idPrefix + ".choices" + memberId, "Deine Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
-                .setMinLength(10);
+                .setMinLength(10)
+                .setMaxLength(800);
         if(values == null)choicesTextInput.setPlaceholder("Schoko ; Erdbeere ; Vanille");
         if(values != null)choicesTextInput.setValue(values[1]);
         choicesTextInput.isRequired();
