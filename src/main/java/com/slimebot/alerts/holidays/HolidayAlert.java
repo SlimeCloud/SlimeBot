@@ -8,7 +8,6 @@ import com.slimebot.utils.Config;
 import com.slimebot.utils.DailyTask;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -18,17 +17,10 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.simpleyaml.configuration.file.YamlFile;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class HolidayAlert implements Runnable {
@@ -55,11 +47,7 @@ public class HolidayAlert implements Runnable {
             JsonObject object = getObjectAtDate(localDate.format(formatter));
             if(object == null)return;
             sendMessage(object);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
+        } catch (URISyntaxException | IOException | ParseException e) {
             throw new RuntimeException(e);
         }
     }
