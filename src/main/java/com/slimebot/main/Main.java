@@ -1,5 +1,6 @@
 package com.slimebot.main;
 
+import com.slimebot.alerts.holidays.HolidayAlert;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
 import com.slimebot.events.OnJoin;
@@ -17,7 +18,6 @@ import com.slimebot.report.modals.CloseReport;
 import com.slimebot.report.modals.ReportModal;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.TimeScheduler;
-import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.JDA;
@@ -34,6 +34,7 @@ import org.simpleyaml.configuration.file.YamlFile;
 
 import java.awt.*;
 import java.io.IOException;
+import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -186,6 +187,9 @@ public class Main {
 
         //Register Spotify Hooks
         new SpotifyListenerManager();
+
+        //Register HolidayAlert
+        new HolidayAlert(new URL("https://ferien-api.de/api/v1/holidays"));
     }
 
     public static void checkForGuilds() {
