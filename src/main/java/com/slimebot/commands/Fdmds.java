@@ -3,27 +3,26 @@ package com.slimebot.commands;
 import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.SlimeEmoji;
-import com.sun.jdi.Field;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Fdmds extends ListenerAdapter {
 
@@ -157,6 +156,20 @@ public class Fdmds extends ListenerAdapter {
 
                 event.reply("Frage verschickt!").setEphemeral(true).queue();
             });
+
+            // Edit embed
+            EmbedBuilder embedBuilder = new EmbedBuilder();
+            embedBuilder.setTitle(embed.getTitle());
+            embedBuilder.setColor(embed.getColor());
+            embedBuilder.setFooter(embed.getFooter().getText());
+            embedBuilder.addField("Frage:", embed.getFields().get(0).getValue(), false);
+            embedBuilder.addField("Auswahlmöglichkeiten:", embed.getFields().get(1).getValue(), false);
+            embedBuilder.addField("Versendet:", "Am "+ LocalDateTime.now().atZone(ZoneId.systemDefault()).format(Main.dtf), false);
+
+            List<LayoutComponent> actionRow = new ArrayList<>();
+            event.getMessage().editMessageComponents(actionRow).setEmbeds(embedBuilder.build()).queue();
+
+
         }
     }
 
@@ -167,14 +180,16 @@ public class Fdmds extends ListenerAdapter {
 
         TextInput.Builder questionTextInput = TextInput
                 .create(idPrefix + ".question" + memberId, "Deine Frage", TextInputStyle.SHORT)
-                .setMinLength(10);
+                .setMinLength(10)
+                .setMaxLength(150);
         if(values == null)questionTextInput.setPlaceholder("Was ist eure lieblings Eissorte?");
         if(values != null)questionTextInput.setValue(values[0]);
         questionTextInput.isRequired();
 
         TextInput.Builder choicesTextInput = TextInput
                 .create(idPrefix + ".choices" + memberId, "Deine Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
-                .setMinLength(10);
+                .setMinLength(10)
+                .setMaxLength(800);
         if(values == null)choicesTextInput.setPlaceholder("Schoko ; Erdbeere ; Vanille");
         if(values != null)choicesTextInput.setValue(values[1]);
         choicesTextInput.isRequired();
