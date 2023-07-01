@@ -37,4 +37,8 @@ test {
     systemProperty "file.encoding", "utf-8"
 }
 
+run {
+    standardInput = System.in
+}
+
 compileJava.options.encoding = 'UTF-8'
