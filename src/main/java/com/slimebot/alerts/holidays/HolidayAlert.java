@@ -46,6 +46,10 @@ public class HolidayAlert implements Runnable {
         try {
             JsonObject object = getObjectAtDate(localDate.format(formatter));
             if(object == null)return;
+
+            // returns if it's not a "real" holiday
+            if(object.get("name").getAsString().contains("("))return;
+
             sendMessage(object);
         } catch (URISyntaxException | IOException | ParseException e) {
             throw new RuntimeException(e);
@@ -55,14 +59,17 @@ public class HolidayAlert implements Runnable {
     private void sendMessage(JsonObject object) {
 
         for(Guild guild : Main.jdaInstance.getGuilds()) {
-            TextChannel channel = getChannelFromConfig(guild.getId(), "logChannel");
+            TextChannel channel = getChannelFromConfig(guild.getId(), "greetingsChannel");
             if(channel == null)return;
             /*
 
                 TODO: good Message
 
              */
-            channel.sendMessage(object.get("name").getAsString()).queue();
+
+            // 0: holiday name, 1: state, 2: year
+            String[] name = object.get("name").getAsString().split(" ");
+            channel.sendMessage("Frohe " + name[0] + " in " + name[1] + "!").queue();
         }
     }
 

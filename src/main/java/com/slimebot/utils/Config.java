@@ -57,6 +57,7 @@ public class Config {
         mainConfig.set("logChannel", 0);
         mainConfig.set("fdmdsChannel", 0);
         mainConfig.set("fdmdsLogChannel", 0);
+        mainConfig.set("greetingsChannel", 0);
         mainConfig.set("blocklist", Arrays.asList("123456", "7891021"));
         mainConfig.set("staffRoleID", 0);
         mainConfig.set("punishmentChannelID", 0);
@@ -74,6 +75,7 @@ public class Config {
         mainConfig.setComment("logChannel", "Default logging Channel ID e.g. 2309845209845202");
         mainConfig.setComment("fdmdsChannel", "Default fdmds Channel ID");
         mainConfig.setComment("fdmdsLogChannel", "Default fdmds Log Channel ID");
+        mainConfig.setComment("greetingsChannel", "Default fdmds Log Channel ID");
         mainConfig.setComment("blocklist", "Users who a blocked from creating Reports");
         mainConfig.setComment("staffRoleID", "ID From the Staff Role");
         mainConfig.setComment("punishmentChannelID", "Channel ID from where things like the Timeouts were logged");
