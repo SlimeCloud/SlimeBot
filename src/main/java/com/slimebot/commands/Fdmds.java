@@ -141,6 +141,10 @@ public class Fdmds extends ListenerAdapter {
             String choices = embed.getFields().get(1).getValue();
             String roleMention = "\n\n"+getRoleMentionFromConfig(event.getGuild().getId(), "fdmdsRoleId");
 
+            if(roleMention==null){
+                event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
+                return;
+            }
 
             text = text + " \r\n" + question + "\r\n \r\n" + choices+roleMention;
 
@@ -159,20 +163,7 @@ public class Fdmds extends ListenerAdapter {
 
                 event.reply("Frage verschickt!").setEphemeral(true).queue();
             });
-
-            // Edit embed
-            EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder.setTitle(embed.getTitle());
-            embedBuilder.setColor(embed.getColor());
-            embedBuilder.setFooter(embed.getFooter().getText());
-            embedBuilder.addField("Frage:", embed.getFields().get(0).getValue(), false);
-            embedBuilder.addField("Auswahlmöglichkeiten:", embed.getFields().get(1).getValue(), false);
-            embedBuilder.addField("Versendet:", "Am "+ LocalDateTime.now().atZone(ZoneId.systemDefault()).format(Main.dtf), false);
-
-            List<LayoutComponent> actionRow = new ArrayList<>();
-            event.getMessage().editMessageComponents(actionRow).setEmbeds(embedBuilder.build()).queue();
-
-
+            event.getMessage().delete().queue();
         }
     }
 
