@@ -139,14 +139,14 @@ public class Fdmds extends ListenerAdapter {
             MessageEmbed embed = event.getMessage().getEmbeds().get(0);
             String question = embed.getFields().get(0).getValue();
             String choices = embed.getFields().get(1).getValue();
-            String roleMention = "\n\n"+getRoleMentionFromConfig(event.getGuild().getId(), "fdmdsRoleId");
+            String roleMention = getRoleMentionFromConfig(event.getGuild().getId(), "fdmdsRoleId");
 
             if(roleMention==null){
-                event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
+                event.reply("Error: Rolle wurde nicht gesetzt!").setEphemeral(true).queue();
                 return;
             }
 
-            text = text + " \r\n" + question + "\r\n \r\n" + choices+roleMention;
+            text = text + " \r\n" + question + "\r\n \r\n" + choices+"\n\n"+roleMention;
 
             // get fdmds-channel
             TextChannel channel = getChannelFromConfig(event.getGuild().getId(), "fdmdsChannel");
