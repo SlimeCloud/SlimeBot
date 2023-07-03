@@ -57,6 +57,7 @@ public class Config {
         mainConfig.set("logChannel", 0);
         mainConfig.set("fdmdsChannel", 0);
         mainConfig.set("fdmdsLogChannel", 0);
+        mainConfig.set("fdmdsRoleId", 0);
         mainConfig.set("blocklist", Arrays.asList("123456", "7891021"));
         mainConfig.set("staffRoleID", 0);
         mainConfig.set("punishmentChannelID", 0);

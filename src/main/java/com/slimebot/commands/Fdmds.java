@@ -1,5 +1,6 @@
 package com.slimebot.commands;
 
+import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.SlimeEmoji;
@@ -84,7 +85,7 @@ public class Fdmds extends ListenerAdapter {
             embedBuilder.setColor(Main.embedColor(event.getGuild().getId()));
             embedBuilder.setTitle("Frag doch mal den Schleim");
             embedBuilder.setFooter("Vorschlag von: " + user.getAsTag() + " (" + user.getId() + ")");
-            embedBuilder.addField("Frage:", question, false);
+            embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, "+question, false);
             embedBuilder.addField("Auswahlmöglichkeiten:", choicesStr, false);
             channel.sendMessageEmbeds(embedBuilder.build())
                     .addActionRow(editButton, sendButton).queue();
@@ -138,8 +139,14 @@ public class Fdmds extends ListenerAdapter {
             MessageEmbed embed = event.getMessage().getEmbeds().get(0);
             String question = embed.getFields().get(0).getValue();
             String choices = embed.getFields().get(1).getValue();
+            String roleMention = getRoleMentionFromConfig(event.getGuild().getId(), "fdmdsRoleId");
 
-            text = text + " \r\n" + question + "\r\n \r\n" + choices;
+            if(roleMention==null){
+                event.reply("Error: Rolle wurde nicht gesetzt!").setEphemeral(true).queue();
+                return;
+            }
+
+            text = text + " \r\n" + question + "\r\n \r\n" + choices+"\n\n"+roleMention;
 
             // get fdmds-channel
             TextChannel channel = getChannelFromConfig(event.getGuild().getId(), "fdmdsChannel");
@@ -156,20 +163,7 @@ public class Fdmds extends ListenerAdapter {
 
                 event.reply("Frage verschickt!").setEphemeral(true).queue();
             });
-
-            // Edit embed
-            EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder.setTitle(embed.getTitle());
-            embedBuilder.setColor(embed.getColor());
-            embedBuilder.setFooter(embed.getFooter().getText());
-            embedBuilder.addField("Frage:", embed.getFields().get(0).getValue(), false);
-            embedBuilder.addField("Auswahlmöglichkeiten:", embed.getFields().get(1).getValue(), false);
-            embedBuilder.addField("Versendet:", "Am "+ LocalDateTime.now().atZone(ZoneId.systemDefault()).format(Main.dtf), false);
-
-            List<LayoutComponent> actionRow = new ArrayList<>();
-            event.getMessage().editMessageComponents(actionRow).setEmbeds(embedBuilder.build()).queue();
-
-
+            event.getMessage().delete().queue();
         }
     }
 
@@ -182,7 +176,7 @@ public class Fdmds extends ListenerAdapter {
                 .create(idPrefix + ".question" + memberId, "Deine Frage", TextInputStyle.SHORT)
                 .setMinLength(10)
                 .setMaxLength(150);
-        if(values == null)questionTextInput.setPlaceholder("Was ist eure lieblings Eissorte?");
+        if(values == null)questionTextInput.setPlaceholder("Welche Eissorte mögt ihr am liebsten?");
         if(values != null)questionTextInput.setValue(values[0]);
         questionTextInput.isRequired();
 
@@ -190,7 +184,7 @@ public class Fdmds extends ListenerAdapter {
                 .create(idPrefix + ".choices" + memberId, "Deine Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
                 .setMinLength(10)
                 .setMaxLength(800);
-        if(values == null)choicesTextInput.setPlaceholder("Schoko ; Erdbeere ; Vanille");
+        if(values == null)choicesTextInput.setPlaceholder("Antworten mit ; trennen z.B. Erdbeere; Cookie; Schokolade");
         if(values != null)choicesTextInput.setValue(values[1]);
         choicesTextInput.isRequired();
 
@@ -224,5 +218,37 @@ public class Fdmds extends ListenerAdapter {
             return null;
         }
         return channel;
+    }
+
+    private String getRoleMentionFromConfig(String guildId, String path){
+        if(guildId == null || path == null)return null;
+        YamlFile config = Config.getConfig(guildId, "mainConfig");
+        try {
+            config.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String roleMention="";
+        if(!config.contains(path)){
+            config.set(path, 0);
+            try {
+                config.save();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        }
+        try {
+            roleMention = "<@&"+config.getLong(path)+">";
+        } catch (IllegalArgumentException n){
+            config.set(path, 0);
+            try {
+                config.save();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        }
+        return roleMention;
     }
 }
