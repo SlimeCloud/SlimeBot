@@ -6,7 +6,9 @@ import com.google.gson.JsonParser;
 import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.DailyTask;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -44,7 +46,9 @@ public class HolidayAlert implements Runnable {
         LocalDate localDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
-            JsonObject object = getObjectAtDate(localDate.format(formatter));
+            String date = localDate.format(formatter);
+            date = date.replace("07-06", "06-22");
+            JsonObject object = getObjectAtDate(date);
             if(object == null)return;
 
             // returns if it's not a "real" holiday
@@ -59,6 +63,7 @@ public class HolidayAlert implements Runnable {
     private void sendMessage(JsonObject object) {
 
         for(Guild guild : Main.jdaInstance.getGuilds()) {
+            System.out.println("aaaaaa");
             TextChannel channel = getChannelFromConfig(guild.getId(), "greetingsChannel");
             if(channel == null)return;
             /*
@@ -69,7 +74,16 @@ public class HolidayAlert implements Runnable {
 
             // 0: holiday name, 1: state, 2: year
             String[] name = object.get("name").getAsString().split(" ");
-            channel.sendMessage("Frohe " + name[0] + " in " + name[1] + "!").queue();
+            if(name.length < 2)return;
+
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setColor(Main.embedColor(guild.getId()));
+            embed.setTitle("ENDLICH FERIEN");
+            embed.setDescription("**Alle Schüler aus " + name[1].toUpperCase() + " haben endlich Ferien!**\r\n" +
+                    "Genießt die Ferien solange sie noch sind...");
+            embed.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png");
+
+            channel.sendMessageEmbeds(embed.build()).queue();
         }
     }
 
