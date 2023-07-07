@@ -42,12 +42,13 @@ public class Config {
 				mainConfig.createNewFile();
 				System.out.println("New file has been created: " + mainConfig.getFilePath() + "\nGenerate default property...");
 			}
+
 			else {
 				return;
 			}
+
 			mainConfig.load();
 		} catch(final Exception e) {
-
 			e.printStackTrace();
 		}
 

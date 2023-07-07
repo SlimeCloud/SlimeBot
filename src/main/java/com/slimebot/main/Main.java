@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -131,7 +130,6 @@ public class Main {
 				.build();
 
 		registerCommands();
-		checkForGuilds();
 
 		//Register Spotify Hooks
 		spotify = new SpotifyListenerManager();
@@ -193,14 +191,6 @@ public class Main {
 				Commands.context(Command.Type.USER, "Report User"),
 				Commands.context(Command.Type.MESSAGE, "Report Message")
 		).queue();
-	}
-
-	public static void checkForGuilds() {
-		executor.schedule(() ->
-						jdaInstance.getGuilds().stream()
-								.map(Guild::getId)
-								.forEach(Config::createMain),
-				5, TimeUnit.MINUTES);///TODO I don't think we need this at all because the guild config is already being created in onJoin.
 	}
 
 	public static void scheduleDaily(int hour, Runnable task) {

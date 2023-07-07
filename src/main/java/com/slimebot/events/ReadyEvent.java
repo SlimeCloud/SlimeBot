@@ -23,6 +23,8 @@ public class ReadyEvent extends ListenerAdapter {
 		}
 
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
+			Config.createMain(guild.getId());
+
 			YamlFile config = Config.getConfig(guild.getId(), "mainConfig");
 			YamlFile reportFile = Config.getConfig(guild.getId(), "reports");
 
