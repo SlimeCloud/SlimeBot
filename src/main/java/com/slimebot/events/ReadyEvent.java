@@ -16,7 +16,11 @@ import java.util.Date;
 public class ReadyEvent extends ListenerAdapter {
 	@Override
 	public void onReady(@NotNull net.dv8tion.jda.api.events.session.ReadyEvent event) {
-		Main.spotify.register();
+		try {
+			Main.spotify.register();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
 			YamlFile config = Config.getConfig(guild.getId(), "mainConfig");
