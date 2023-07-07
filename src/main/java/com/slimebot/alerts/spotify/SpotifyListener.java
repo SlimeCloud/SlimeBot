@@ -17,76 +17,76 @@ import java.util.Collections;
 import java.util.List;
 
 public class SpotifyListener implements Runnable {
-    private final String artistId;
-    private final long channelId;
-    private final SpotifyApi spotifyApi;
-    private final String message;
+	private final String artistId;
+	private final long channelId;
+	private final SpotifyApi spotifyApi;
+	private final String message;
 
-    private final ConfigurationSection section;
+	private final ConfigurationSection section;
 
-    private final YamlFile config;
+	private final YamlFile config;
 
-    private final List<String> publishedAlbums;
+	private final List<String> publishedAlbums;
 
-    public SpotifyListener(String artistId, YamlFile config, String message, SpotifyApi api) {
-        this.config = config;
-        this.section = config.getConfigurationSection("artists." + artistId);
-        this.artistId = artistId;
-        this.channelId = section.getLong("channelId");
-        this.message = message;
-        this.spotifyApi = api;
-        this.publishedAlbums = section.getStringList("publishedAlbums");
+	public SpotifyListener(String artistId, YamlFile config, String message, SpotifyApi api) {
+		this.config = config;
+		this.section = config.getConfigurationSection("artists." + artistId);
+		this.artistId = artistId;
+		this.channelId = section.getLong("channelId");
+		this.message = message;
+		this.spotifyApi = api;
+		this.publishedAlbums = section.getStringList("publishedAlbums");
 
-        run();
-        Main.scheduleDaily(12, this);
-    }
+		run();
+		Main.scheduleDaily(12, this);
+	}
 
-    public void run() {
-        log("INFO: Überprüfe auf neue Releases");
-        for (AlbumSimplified album : getLatestAlbums()) {
-            if (!publishedAlbums.contains(album.getId())) {
-                log("INFO: Album " + album.getName() + " wurde veröffentlicht");
-                publishedAlbums.add(album.getId());
-                broadcastAlbum(album);
-            }
+	public void run() {
+		log("INFO: Überprüfe auf neue Releases");
+		for(AlbumSimplified album : getLatestAlbums()) {
+			if(!publishedAlbums.contains(album.getId())) {
+				log("INFO: Album " + album.getName() + " wurde veröffentlicht");
+				publishedAlbums.add(album.getId());
+				broadcastAlbum(album);
+			}
 
-        }
-        try {
-            config.set("artists." + artistId + ".publishedAlbums", publishedAlbums);
-            config.save();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		}
+		try {
+			config.set("artists." + artistId + ".publishedAlbums", publishedAlbums);
+			config.save();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    private AlbumSimplified[] getLatestAlbums() {
-        GetArtistsAlbumsRequest request = spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).build();
-        Paging<AlbumSimplified> albumSimplifiedPaging;
-        try {
-            albumSimplifiedPaging = request.execute();
-            if(albumSimplifiedPaging.getTotal()>20){
-                log("WARN: Es wurden mehr als 20 Alben gefunden. Es werden nur die 20 neuesten veröffentlicht");
-                albumSimplifiedPaging= spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal()-20).build().execute();
-            }
-            List<AlbumSimplified> albums = Arrays.asList(albumSimplifiedPaging.getItems());
-            Collections.reverse(albums);
-            return albums.toArray(new AlbumSimplified[0]);
-        } catch (Exception e) {
-            log("ERROR: Alben können nicht geladen werden");
-            throw new RuntimeException(e);
-        }
-    }
+	private AlbumSimplified[] getLatestAlbums() {
+		GetArtistsAlbumsRequest request = spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).build();
+		Paging<AlbumSimplified> albumSimplifiedPaging;
+		try {
+			albumSimplifiedPaging = request.execute();
+			if(albumSimplifiedPaging.getTotal() > 20) {
+				log("WARN: Es wurden mehr als 20 Alben gefunden. Es werden nur die 20 neuesten veröffentlicht");
+				albumSimplifiedPaging = spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal() - 20).build().execute();
+			}
+			List<AlbumSimplified> albums = Arrays.asList(albumSimplifiedPaging.getItems());
+			Collections.reverse(albums);
+			return albums.toArray(new AlbumSimplified[0]);
+		} catch(Exception e) {
+			log("ERROR: Alben können nicht geladen werden");
+			throw new RuntimeException(e);
+		}
+	}
 
-    private void log(String s) {
-        System.out.println("[SPOTIFY] " + s);
-    }
+	private void log(String s) {
+		System.out.println("[SPOTIFY] " + s);
+	}
 
-    private void broadcastAlbum(AlbumSimplified album) {
-        TextChannel channel = Main.jdaInstance.getTextChannelById(channelId);
-        if (channel == null) {
-            log("ERROR: Channel nicht verfügbar: " + channelId);
-            return;
-        }
-        channel.sendMessage(MessageFormat.format(message, album.getName(), album.getExternalUrls().get("spotify"))).queue();
-    }
+	private void broadcastAlbum(AlbumSimplified album) {
+		TextChannel channel = Main.jdaInstance.getTextChannelById(channelId);
+		if(channel == null) {
+			log("ERROR: Channel nicht verfügbar: " + channelId);
+			return;
+		}
+		channel.sendMessage(MessageFormat.format(message, album.getName(), album.getExternalUrls().get("spotify"))).queue();
+	}
 }

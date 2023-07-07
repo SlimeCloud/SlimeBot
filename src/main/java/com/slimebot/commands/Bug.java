@@ -1,9 +1,8 @@
 package com.slimebot.commands;
 
-import com.slimebot.utils.Config;
 import com.slimebot.main.Main;
+import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -18,63 +17,60 @@ import org.simpleyaml.configuration.file.YamlFile;
 import java.io.IOException;
 
 public class Bug extends ListenerAdapter {
+	@Override
+	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+		if(!event.getFullCommandName().equals("bug")) return;
 
-    @Override
-    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        super.onSlashCommandInteraction(event);
+		TextInput textInput = TextInput.create("bug:" + event.getInteraction().getMember().getId(), "Bug", TextInputStyle.PARAGRAPH)
+				.setMinLength(10)
+				.build();
 
-        if (event.getName().equalsIgnoreCase("bug")) {
-            TextInput textInput = TextInput
-                    .create("bug:" + event.getInteraction().getMember().getId(), "Bug", TextInputStyle.PARAGRAPH)
-                    .setMinLength(10)
-                    .build();
-            textInput.isRequired();
+		Modal modal = Modal.create("bug" + event.getInteraction().getMember().getId(), "Melde einen Bug")
+				.addActionRow(textInput)
+				.build();
 
-            Modal modal = Modal
-                    .create("bug" + event.getInteraction().getMember().getId(), "Melde einen Bug")
-                    .addActionRow(textInput)
-                    .build();
-            event.replyModal(modal).queue();
-        }
-    }
+		event.replyModal(modal).queue();
+	}
 
-    @Override
-    public void onModalInteraction(ModalInteractionEvent event) {
-        super.onModalInteraction(event);
-        YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
-        try {
-            config.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        if (!(event.getModalId().equals("bug"))){return;}
+	@Override
+	public void onModalInteraction(ModalInteractionEvent event) {
+		if(!event.getModalId().equals("bug")) return;
 
-        ModalMapping modalMapping = event.getInteraction().getValues().get(0);
-        String label = "Ein neuer Bug wurde gefunden!";
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.setColor(Main.embedColor(event.getGuild().getId()));
-        embedBuilder.setTitle(label);
+		YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
 
-        if (modalMapping.getId().contains("bug")) {
-            User user = Main.jdaInstance.retrieveUserById(modalMapping.getId().split(":")[1]).complete();
-            embedBuilder.setDescription("Fehlerbeschreibung: \n\n");
-            embedBuilder.appendDescription(modalMapping.getAsString() + "\n");
-            embedBuilder.setFooter("Report von: " + user.getAsTag() + " (" + user.getId() + ")");
-            event.reply("Der Report wurde erfolgreich ausgeführt").setEphemeral(true).queue();
-            event.getGuild()
-                    .getTextChannelById(config.getString("logChannel"))
-                    .sendMessageEmbeds(embedBuilder.build())
-                    .setActionRow(Button.secondary("close_bug", "Bug schließen")).queue();
-        }
-    }
+		try {
+			config.load();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
 
-    @Override
-    public void onButtonInteraction(ButtonInteractionEvent event) {
-        super.onButtonInteraction(event);
+		ModalMapping modalMapping = event.getInteraction().getValues().get(0);
 
-        if (event.getButton().getId().equalsIgnoreCase("close_bug")) {
-            event.getMessage().delete().queue();
-            event.reply("Der Bug wurde erfolgreich geschlossen!").setEphemeral(true).queue();
-        }
-    }
+		Main.jdaInstance.retrieveUserById(modalMapping.getId().split(":")[1]).queue(user -> {
+			String label = "Ein neuer Bug wurde gefunden!";
+
+			EmbedBuilder embedBuilder = new EmbedBuilder()
+					.setColor(Main.embedColor(event.getGuild().getId()))
+					.setTitle(label)
+
+					.setDescription("Fehlerbeschreibung: \n\n")
+					.appendDescription(modalMapping.getAsString() + "\n")
+					.setFooter("Report von: " + user.getGlobalName() + " (" + user.getId() + ")");
+
+			event.reply("Der Report wurde erfolgreich ausgeführt").setEphemeral(true).queue();
+
+			event.getGuild()
+					.getTextChannelById(config.getString("logChannel"))
+					.sendMessageEmbeds(embedBuilder.build())
+					.setActionRow(Button.secondary("close_bug", "Bug schließen")).queue();
+		});
+	}
+
+	@Override
+	public void onButtonInteraction(ButtonInteractionEvent event) {
+		if(!event.getButton().getId().equals("close_bug")) return;
+
+		event.getMessage().delete().queue();
+		event.reply("Der Bug wurde erfolgreich geschlossen!").setEphemeral(true).queue();
+	}
 }
