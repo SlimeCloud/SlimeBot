@@ -1,8 +1,7 @@
 package com.slimebot.utils;
 
-import com.slimebot.main.Main;
-import org.simpleyaml.configuration.file.YamlFile;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -101,7 +100,6 @@ public class Config {
                 botConfig.set("activity.type", "PLAYING");
                 botConfig.set("activity.text", "mit Slimebällen");
                 botConfig.save();
-                Main.missingToken();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

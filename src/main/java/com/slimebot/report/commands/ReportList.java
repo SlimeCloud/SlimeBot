@@ -1,10 +1,10 @@
 package com.slimebot.report.commands;
 
+import com.slimebot.utils.Config;
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Status;
 import com.slimebot.utils.Checks;
-import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

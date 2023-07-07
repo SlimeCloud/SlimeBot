@@ -1,7 +1,7 @@
 package com.slimebot.report.assets;
 
-import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
+import com.slimebot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -115,7 +115,7 @@ public class Report {
     public static Report get(String guildID, Integer reportID){
         YamlFile reportFile = Config.getConfig(guildID, "reports");
         Report report = new Report();
-        Guild guild = Main.getJDAInstance().getGuildById(guildID);
+        Guild guild = Main.jdaInstance.getGuildById(guildID);
 
         try {
             reportFile.load();

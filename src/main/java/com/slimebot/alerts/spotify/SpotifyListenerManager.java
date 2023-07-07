@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class SpotifyListenerManager {
-    final YamlFile config = new YamlFile("Slimebot/spotify/config.yml");
+    private final YamlFile config = new YamlFile("Slimebot/spotify/config.yml");
+    private final SpotifyApi api;
 
     public SpotifyListenerManager() {
         if (!config.exists()) {
@@ -26,7 +27,7 @@ public class SpotifyListenerManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        SpotifyApi api = new SpotifyApi.Builder()
+        api = new SpotifyApi.Builder()
                 .setClientId(config.getString("clientId"))
                 .setClientSecret(config.getString("clientSecret"))
                 .build();
@@ -35,7 +36,11 @@ public class SpotifyListenerManager {
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void register() {
         String message = config.getString("message");
+
         for (Map.Entry<String, Object> entry : config.getConfigurationSection("artists").getMapValues(false).entrySet()) {
             String artistID = entry.getKey();
             new SpotifyListener(artistID, config, message, api);

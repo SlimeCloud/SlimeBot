@@ -1,7 +1,7 @@
 package com.slimebot.commands;
 
-import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
+import com.slimebot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -56,7 +56,7 @@ public class Bug extends ListenerAdapter {
         embedBuilder.setTitle(label);
 
         if (modalMapping.getId().contains("bug")) {
-            User user = Main.getJDAInstance().retrieveUserById(modalMapping.getId().split(":")[1]).complete();
+            User user = Main.jdaInstance.retrieveUserById(modalMapping.getId().split(":")[1]).complete();
             embedBuilder.setDescription("Fehlerbeschreibung: \n\n");
             embedBuilder.appendDescription(modalMapping.getAsString() + "\n");
             embedBuilder.setFooter("Report von: " + user.getAsTag() + " (" + user.getId() + ")");

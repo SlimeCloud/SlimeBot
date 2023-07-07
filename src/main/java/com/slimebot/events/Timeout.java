@@ -1,12 +1,10 @@
 package com.slimebot.events;
 
-import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
+import com.slimebot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
-import net.dv8tion.jda.api.audit.AuditLogChange;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.simpleyaml.configuration.file.YamlFile;

@@ -1,8 +1,8 @@
 package com.slimebot.report.modals;
 
+import com.slimebot.utils.Config;
 import com.slimebot.main.Main;
 import com.slimebot.report.assets.Report;
-import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;

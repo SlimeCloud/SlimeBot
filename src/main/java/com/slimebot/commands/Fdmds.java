@@ -1,8 +1,7 @@
 package com.slimebot.commands;
 
-import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
-import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
+import com.slimebot.main.Main;
 import com.slimebot.utils.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -12,7 +11,6 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
@@ -20,10 +18,6 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Fdmds extends ListenerAdapter {
 
@@ -54,7 +48,7 @@ public class Fdmds extends ListenerAdapter {
 
 
             // Get User
-            User user = Main.getJDAInstance().retrieveUserById(event.getMember().getId()).complete();
+            User user = Main.jdaInstance.retrieveUserById(event.getMember().getId()).complete();
 
             // Get Contents
             String question = event.getInteraction().getValue("fdmds.question" + event.getInteraction().getMember().getId()).getAsString();
@@ -207,7 +201,7 @@ public class Fdmds extends ListenerAdapter {
         }
         TextChannel channel;
         try {
-            channel = Main.getJDAInstance().getGuildById(guildId).getTextChannelById(config.getString(path));
+            channel = Main.jdaInstance.getGuildById(guildId).getTextChannelById(config.getString(path));
         } catch (IllegalArgumentException n){
             config.set(path, 0);
             try {

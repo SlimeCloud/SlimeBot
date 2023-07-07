@@ -1,8 +1,8 @@
 package com.slimebot.report.commands;
 
-import com.slimebot.utils.Checks;
-import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
+import com.slimebot.main.Main;
+import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Blockreport extends ListenerAdapter {

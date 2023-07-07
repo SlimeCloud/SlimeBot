@@ -2,7 +2,6 @@ package com.slimebot.alerts.spotify;
 
 import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.Main;
-import com.slimebot.utils.DailyTask;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.hc.core5.http.ParseException;
 import org.simpleyaml.configuration.file.YamlFile;
@@ -18,20 +17,22 @@ import java.util.Arrays;
 import java.util.List;
 
 public class PodcastListener implements Runnable {
-    YamlFile config;
-    SpotifyApi api;
-    String showID;
+    private final YamlFile config;
+    private final SpotifyApi api;
+    private final String showID;
+
     public PodcastListener(String showID, YamlFile config, SpotifyApi api) {
         this.config = config;
         this.api = api;
         this.showID = showID;
         try {
-            Main.getJDAInstance().awaitReady();
+            Main.jdaInstance.awaitReady();
             run();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        new DailyTask(12, this);
+
+        Main.scheduleDaily(12, this);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class PodcastListener implements Runnable {
     private void broadcastEpisode(EpisodeSimplified episode){
         String message = config.getString("show." + showID + ".message");
         message=MessageFormat.format(message, episode.getName(), episode.getExternalUrls().get("spotify"));
-        TextChannel channel = Main.getJDAInstance().getTextChannelById(config.getLong("show." + showID + ".channelId"));
+        TextChannel channel = Main.jdaInstance.getTextChannelById(config.getLong("show." + showID + ".channelId"));
         if(channel==null){
             throw new RuntimeException("Channel not found");
         }

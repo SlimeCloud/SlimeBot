@@ -2,8 +2,6 @@ package com.slimebot.alerts.spotify;
 
 import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.Main;
-import com.slimebot.utils.DailyTask;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlFile;
@@ -30,22 +28,17 @@ public class SpotifyListener implements Runnable {
 
     private final List<String> publishedAlbums;
 
-
-    SpotifyListener(String artistId, YamlFile config, String message, SpotifyApi api) {
+    public SpotifyListener(String artistId, YamlFile config, String message, SpotifyApi api) {
         this.config = config;
         this.section = config.getConfigurationSection("artists." + artistId);
         this.artistId = artistId;
         this.channelId = section.getLong("channelId");
         this.message = message;
-        spotifyApi = api;
-        publishedAlbums = section.getStringList("publishedAlbums");
-        try {
-            Main.getJDAInstance().awaitReady();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        this.spotifyApi = api;
+        this.publishedAlbums = section.getStringList("publishedAlbums");
+
         run();
-        new DailyTask(12, this);
+        Main.scheduleDaily(12, this);
     }
 
     public void run() {
@@ -89,8 +82,7 @@ public class SpotifyListener implements Runnable {
     }
 
     private void broadcastAlbum(AlbumSimplified album) {
-        JDA jda = Main.getJDAInstance();
-        TextChannel channel = jda.getTextChannelById(channelId);
+        TextChannel channel = Main.jdaInstance.getTextChannelById(channelId);
         if (channel == null) {
             log("ERROR: Channel nicht verfügbar: " + channelId);
             return;

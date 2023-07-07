@@ -1,13 +1,10 @@
 package com.slimebot.commands;
 
 import com.slimebot.utils.Config;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.simpleyaml.configuration.file.YamlFile;
-
-import java.io.IOException;
 
 
 public class ConfigCmd extends ListenerAdapter {
