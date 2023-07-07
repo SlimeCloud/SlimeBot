@@ -45,7 +45,7 @@ public class MsgReport extends ListenerAdapter {
 
         String msgWithLink = "[" + msg + "](" + event.getTarget().getJumpUrl() + ")";
 
-        Report.save(event.getGuild().getId(), Report.newReport(reportID, Type.MSG, event.getTarget().getMember(), event.getMember(), msgWithLink));
+        Report.save(event.getGuild().getId(), new Report(reportID, Type.MSG, event.getTarget().getMember(), event.getMember(), msgWithLink));
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
