@@ -28,8 +28,30 @@ public class ReadyEvent extends ListenerAdapter {
             YamlFile config = Config.getConfig(guild.getId(), "mainConfig");
             YamlFile reportFile = Config.getConfig(guild.getId(), "reports");
 
+            try {
+                config.load();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
             if (!(config.exists())){
                 Config.createMain(guild.getId());
+            } else {
+                TextChannel channel = Main.getJDAInstance().getGuildById(guild.getId()).getTextChannelById(config.getString("logChannel"));
+
+                if (channel == null)return;
+
+                EmbedBuilder embed = new EmbedBuilder();
+
+                embed.setTitle("Bot wurde gestartet")
+                        .setDescription("Der Bot hat sich mit der DiscordAPI (neu-) verbunden")
+                        .setColor(Main.embedColor(guild.getId()))
+                        .setTimestamp(new Date().toInstant());
+
+                MessageEmbed em = embed.build();
+
+
+                channel.sendMessageEmbeds(em).queue();
             }
 
             if (!(reportFile.exists())){
@@ -48,19 +70,6 @@ public class ReadyEvent extends ListenerAdapter {
         }
 
 
-
-        TextChannel DEVlogChannel = event.getJDA().getTextChannelById("978351336485683214");//Channel only for dev not for each Discord
-
-        EmbedBuilder embed = new EmbedBuilder();
-
-        embed.setTitle("Bot wurde gestartet")
-                .setDescription("Der Bot hat sich mit der DiscordAPI (neu-) verbunden")
-                .setColor(Main.embedColor(DEVlogChannel.getGuild().getId()))
-                .setTimestamp(new Date().toInstant());
-
-        MessageEmbed em = embed.build();
-
-        DEVlogChannel.sendMessageEmbeds(em).queue();
 
 
     }

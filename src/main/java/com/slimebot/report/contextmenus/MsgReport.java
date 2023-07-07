@@ -39,15 +39,11 @@ public class MsgReport extends ListenerAdapter {
 
         String msg = event.getTarget().getContentRaw();
 
-        if ( msg.length() > 800) {
-            msg = msg.substring(0,800) + "...";
+        if (msg.length() > 800) {
+            msg = msg.substring(0, 800) + "...";
         }
 
-        String GuildId = event.getGuild().getId();
-        String ChannelId = event.getChannel().getId();
-        String MessageId = event.getTarget().getId();
-
-        String msgWithLink = "[" + msg + "](https://discord.com/channels/"+GuildId+"/"+ChannelId+"/"+MessageId+")";
+        String msgWithLink = "[" + msg + "](" + event.getTarget().getJumpUrl() + ")";
 
         Report.save(event.getGuild().getId(), Report.newReport(reportID, Type.MSG, event.getTarget().getMember(), event.getMember(), msgWithLink));
 
