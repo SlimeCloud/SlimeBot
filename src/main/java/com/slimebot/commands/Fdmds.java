@@ -73,7 +73,7 @@ public class Fdmds extends ListenerAdapter {
 			EmbedBuilder embedBuilder = new EmbedBuilder();
 			embedBuilder.setColor(Main.embedColor(event.getGuild().getId()));
 			embedBuilder.setTitle("Frag doch mal den Schleim");
-			embedBuilder.setFooter("Vorschlag von: " + user.getAsTag() + " (" + user.getId() + ")");
+			embedBuilder.setFooter("Vorschlag von: " + user.getGlobalName() + " (" + user.getId() + ")");
 			embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question, false);
 			embedBuilder.addField("Auswahlmöglichkeiten:", choicesStr, false);
 			channel.sendMessageEmbeds(embedBuilder.build())
