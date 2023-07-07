@@ -8,7 +8,6 @@ import com.slimebot.utils.Config;
 import com.slimebot.utils.DailyTask;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -47,7 +46,6 @@ public class HolidayAlert implements Runnable {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
             String date = localDate.format(formatter);
-            date = date.replace("07-06", "06-22");
             JsonObject object = getObjectAtDate(date);
             if(object == null)return;
 
@@ -63,14 +61,8 @@ public class HolidayAlert implements Runnable {
     private void sendMessage(JsonObject object) {
 
         for(Guild guild : Main.jdaInstance.getGuilds()) {
-            System.out.println("aaaaaa");
             TextChannel channel = getChannelFromConfig(guild.getId(), "greetingsChannel");
             if(channel == null)return;
-            /*
-
-                TODO: good Message
-
-             */
 
             // 0: holiday name, 1: state, 2: year
             String[] name = object.get("name").getAsString().split(" ");
