@@ -25,7 +25,7 @@ public class Bug extends ListenerAdapter {
 				.setMinLength(10)
 				.build();
 
-		Modal modal = Modal.create("bug" + event.getInteraction().getMember().getId(), "Melde einen Bug")
+		Modal modal = Modal.create("bug", "Melde einen Bug")
 				.addActionRow(textInput)
 				.build();
 
@@ -46,24 +46,22 @@ public class Bug extends ListenerAdapter {
 
 		ModalMapping modalMapping = event.getInteraction().getValues().get(0);
 
-		Main.jdaInstance.retrieveUserById(modalMapping.getId().split(":")[1]).queue(user -> {
-			String label = "Ein neuer Bug wurde gefunden!";
+		String label = "Ein neuer Bug wurde gefunden!";
 
-			EmbedBuilder embedBuilder = new EmbedBuilder()
-					.setColor(Main.embedColor(event.getGuild().getId()))
-					.setTitle(label)
+		EmbedBuilder embedBuilder = new EmbedBuilder()
+				.setColor(Main.embedColor(event.getGuild().getId()))
+				.setTitle(label)
 
-					.setDescription("Fehlerbeschreibung: \n\n")
-					.appendDescription(modalMapping.getAsString() + "\n")
-					.setFooter("Report von: " + user.getGlobalName() + " (" + user.getId() + ")");
+				.setDescription("Fehlerbeschreibung: \n\n")
+				.appendDescription(modalMapping.getAsString() + "\n")
+				.setFooter("Report von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")");
 
-			event.reply("Der Report wurde erfolgreich ausgeführt").setEphemeral(true).queue();
+		event.reply("Der Report wurde erfolgreich ausgeführt").setEphemeral(true).queue();
 
-			event.getGuild()
-					.getTextChannelById(config.getString("logChannel"))
-					.sendMessageEmbeds(embedBuilder.build())
-					.setActionRow(Button.secondary("close_bug", "Bug schließen")).queue();
-		});
+		event.getGuild()
+				.getTextChannelById(config.getString("logChannel"))
+				.sendMessageEmbeds(embedBuilder.build())
+				.setActionRow(Button.secondary("close_bug", "Bug schließen")).queue();
 	}
 
 	@Override
