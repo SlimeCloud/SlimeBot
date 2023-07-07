@@ -47,7 +47,7 @@ public class Main {
 	public static String activityType = Config.getBotInfo("activity.type");
 
 	public static JDA jdaInstance;
-	public static SpotifyListenerManager spotify;
+	public static SpotifyListenerManager spotify = new SpotifyListenerManager();
 
 	public static ArrayList<String> blocklist(String guildID) {
 		YamlFile config = Config.getConfig(guildID, "mainConfig");
@@ -130,9 +130,6 @@ public class Main {
 				.build();
 
 		registerCommands();
-
-		//Register Spotify Hooks
-		spotify = new SpotifyListenerManager();
 	}
 
 	public static void registerCommands() {

@@ -36,7 +36,7 @@ public class SpotifyListenerManager {
 		try {
 			api.setAccessToken(api.clientCredentials().build().execute().getAccessToken());
 		} catch(IOException | SpotifyWebApiException | ParseException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
 	}
 
