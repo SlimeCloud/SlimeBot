@@ -5,7 +5,6 @@ import com.slimebot.utils.Config;
 import com.slimebot.utils.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,177 +23,168 @@ public class Fdmds extends ListenerAdapter {
 	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
 		if(!event.getFullCommandName().equals("fdmds")) return;
 
-		Modal modal = getFdmdsModal("fdmds", event.getMember().getId(), null);
+		Modal modal = getFdmdsModal("fdmds", null);
 		event.replyModal(modal).queue();
 	}
 
 	@Override
 	public void onModalInteraction(ModalInteractionEvent event) {
-		if(!(event.getModalId().equals("fdmds" + event.getInteraction().getMember().getId())) && !(event.getModalId().equals("fdmds.edit" + event.getInteraction().getMember().getId()))) return;
+		switch(event.getModalId()) {
+			case "fdmds" -> {
+				// get Log-channel
+				TextChannel channel = getChannelFromConfig(event.getGuild().getId(), "fdmdsLogChannel");
+				if(channel == null) {
+					event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
+					return;
+				}
 
-		if(event.getModalId().equals("fdmds" + event.getInteraction().getMember().getId())) {
+				// Get Contents
+				String question = event.getInteraction().getValue("fdmds.question").getAsString();
+				String[] choices = event.getInteraction().getValue("fdmds.choices").getAsString().split(";");
 
-			// get Log-channel
-			TextChannel channel = getChannelFromConfig(event.getGuild().getId(), "fdmdsLogChannel");
-			if(channel == null) {
-				event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
-				return;
+				if(choices.length <= 1) {
+					event.reply("Du musst mindestens 2 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
+					return;
+				}
+				if(choices.length > 9) {
+					event.reply("Du kannst maximal 9 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
+					return;
+				}
+
+				StringBuilder choicesStr = new StringBuilder();
+				for(int i = 0; i < choices.length; i++) {
+					choicesStr
+							.append(SlimeEmoji.values()[i].string)
+							.append(" -> ")
+							.append(choices[i].strip())
+							.append("\r\n");
+				}
+
+				// Create Buttons
+				Button editButton = Button.secondary("fdmds.editButton", "Edit");
+				Button sendButton = Button.danger("fdmds.sendButton", "Senden");
+
+				// Create and send Embed
+				EmbedBuilder embedBuilder = new EmbedBuilder()
+						.setColor(Main.embedColor(event.getGuild().getId()))
+						.setTitle("Frag doch mal den Schleim")
+						.setFooter("Vorschlag von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")")
+						.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question, false)
+						.addField("Auswahlmöglichkeiten:", choicesStr.toString(), false);
+
+				channel.sendMessageEmbeds(embedBuilder.build())
+						.addActionRow(editButton, sendButton).queue();
+
+				// Send User Feedback
+				event.reply("Vorschlag erfolgreich verschickt!").setEphemeral(true).queue();
 			}
 
+			case "fdmds.edit" -> {
+				// Get Contents
+				String question = event.getInteraction().getValue("fdmds.edit.question").getAsString();
+				String choices = event.getInteraction().getValue("fdmds.edit.choices").getAsString();
 
-			// Get User
-			User user = Main.jdaInstance.retrieveUserById(event.getMember().getId()).complete();
+				EmbedBuilder embedBuilder = new EmbedBuilder(event.getMessage().getEmbeds().get(0))
+						.clearFields()
+						.addField("Frage:", question, false)
+						.addField("Auswahlmöglichkeiten:", choices, false);
 
-			// Get Contents
-			String question = event.getInteraction().getValue("fdmds.question" + event.getInteraction().getMember().getId()).getAsString();
-			String[] choices = event.getInteraction().getValue("fdmds.choices" + event.getInteraction().getMember().getId()).getAsString().split(";");
-
-			if(choices.length <= 1) {
-				event.reply("Du musst mindestens 2 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
-				return;
+				event.getMessage().editMessage("Edited").setEmbeds(embedBuilder.build()).queue();
+				event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
 			}
-			if(choices.length > 9) {
-				event.reply("Du kannst maximal 9 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
-				return;
-			}
-			String choicesStr = "";
-			for(int i = 0; i < choices.length; i++) {
-				choicesStr += SlimeEmoji.fromId(i + 1).getAsString()
-						+ " -> "
-						+ choices[i].strip()
-						+ "\r\n";
-			}
-
-			// Create Buttons
-			Button editButton = Button.secondary("fdmds.editButton", "Edit");
-			Button sendButton = Button.danger("fdmds.sendButton", "Senden");
-
-			// Create and send Embed
-			EmbedBuilder embedBuilder = new EmbedBuilder();
-			embedBuilder.setColor(Main.embedColor(event.getGuild().getId()));
-			embedBuilder.setTitle("Frag doch mal den Schleim");
-			embedBuilder.setFooter("Vorschlag von: " + user.getGlobalName() + " (" + user.getId() + ")");
-			embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question, false);
-			embedBuilder.addField("Auswahlmöglichkeiten:", choicesStr, false);
-			channel.sendMessageEmbeds(embedBuilder.build())
-					.addActionRow(editButton, sendButton).queue();
-
-			// Send User Feedback
-			event.reply("Vorschlag erfolgreich verschickt!").setEphemeral(true).queue();
-		}
-
-		if(event.getModalId().equals("fdmds.edit" + event.getInteraction().getMember().getId())) {
-			// Get Contents
-			String question = event.getInteraction().getValue("fdmds.edit.question" + event.getInteraction().getMember().getId()).getAsString();
-			String choices = event.getInteraction().getValue("fdmds.edit.choices" + event.getInteraction().getMember().getId()).getAsString();
-
-			// Edit embed
-			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
-			EmbedBuilder embedBuilder = new EmbedBuilder();
-			embedBuilder.setTitle(embed.getTitle());
-			embedBuilder.setColor(embed.getColor());
-			embedBuilder.setFooter(embed.getFooter().getText());
-			embedBuilder.addField("Frage:", question, false);
-			embedBuilder.addField("Auswahlmöglichkeiten:", choices, false);
-
-			event.getMessage().editMessage("Edited").setEmbeds(embedBuilder.build()).queue();
-			event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
 		}
 	}
 
 	@Override
 	public void onButtonInteraction(ButtonInteractionEvent event) {
-		super.onButtonInteraction(event);
 		if(!event.getButton().getId().equals("fdmds.editButton") && !event.getButton().getId().equals("fdmds.sendButton")) return;
 
-		// Edit Button
-		if(event.getButton().getId().equals("fdmds.editButton")) {
-			// Get Contents
-			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
-			String question = embed.getFields().get(0).getValue();
-			String choices = embed.getFields().get(1).getValue();
+		switch(event.getButton().getId()) {
+			case "fdmds.editButton" -> {
+				// Get Contents
+				MessageEmbed embed = event.getMessage().getEmbeds().get(0);
+				String question = embed.getFields().get(0).getValue();
+				String choices = embed.getFields().get(1).getValue();
 
-			// Crate Edit Modal
-			Modal modal = getFdmdsModal("fdmds.edit", event.getMember().getId(), new String[]{question, choices});
-			event.replyModal(modal).queue();
-			return;
-		}
-
-		// Send Button
-		if(event.getButton().getId().equals("fdmds.sendButton")) {
-			// create text
-			String text = "Einen Wunderschönen <:slimewave:1080225151104331817> ,\r\n";
-
-			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
-			String question = embed.getFields().get(0).getValue();
-			String choices = embed.getFields().get(1).getValue();
-			String roleMention = getRoleMentionFromConfig(event.getGuild().getId(), "fdmdsRoleId");
-
-			if(roleMention == null) {
-				event.reply("Error: Rolle wurde nicht gesetzt!").setEphemeral(true).queue();
+				// Crate Edit Modal
+				Modal modal = getFdmdsModal("fdmds.edit", new String[]{question, choices});
+				event.replyModal(modal).queue();
 				return;
 			}
 
-			text = text + " \r\n" + question + "\r\n \r\n" + choices + "\n\n" + roleMention;
+			case "fdmds.sendButton" -> {
+				// create text
+				String text = "Einen Wunderschönen <:slimewave:1080225151104331817> ,\r\n";
 
-			// get fdmds-channel
-			TextChannel channel = getChannelFromConfig(event.getGuild().getId(), "fdmdsChannel");
-			if(channel == null) {
-				event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
-				return;
-			}
+				MessageEmbed embed = event.getMessage().getEmbeds().get(0);
+				String question = embed.getFields().get(0).getValue();
+				String choices = embed.getFields().get(1).getValue();
+				String roleMention = getRoleMentionFromConfig(event.getGuild().getId(), "fdmdsRoleId");
 
-			// Send and add reactions
-			channel.sendMessage(text).queue(m -> {
-				for(int i = 0; i < choices.lines().count(); i++) {
-					m.addReaction(SlimeEmoji.fromId(i + 1).getEmoji()).queue();
+				if(roleMention == null) {
+					event.reply("Error: Rolle wurde nicht gesetzt!").setEphemeral(true).queue();
+					return;
 				}
 
-				event.reply("Frage verschickt!").setEphemeral(true).queue();
-			});
-			event.getMessage().delete().queue();
+				text = text + " \r\n" + question + "\r\n \r\n" + choices + "\n\n" + roleMention;
+
+				// get fdmds-channel
+				TextChannel channel = getChannelFromConfig(event.getGuild().getId(), "fdmdsChannel");
+				if(channel == null) {
+					event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
+					return;
+				}
+
+				// Send and add reactions
+				channel.sendMessage(text).queue(m -> {
+					for(int i = 0; i < choices.lines().count(); i++) {
+						m.addReaction(SlimeEmoji.values()[i].getEmoji()).queue();
+					}
+
+					event.reply("Frage verschickt!").setEphemeral(true).queue();
+				});
+				event.getMessage().delete().queue();
+			}
 		}
 	}
 
 	// idPrefix must be 'fdmds' or 'fdmds.edit'
 	// value is only set if it is the edit Modal
-	private Modal getFdmdsModal(String idPrefix, String memberId, String[] values) {
-		if(idPrefix == null || memberId == null) return null;
+	private Modal getFdmdsModal(String idPrefix, String[] values) {
+		if(idPrefix == null) return null;
 
-		TextInput.Builder questionTextInput = TextInput
-				.create(idPrefix + ".question" + memberId, "Deine Frage", TextInputStyle.SHORT)
+		TextInput.Builder questionTextInput = TextInput.create(idPrefix + ".question", "Deine Frage", TextInputStyle.SHORT)
 				.setMinLength(10)
-				.setMaxLength(150);
+				.setMaxLength(150)
+				.setRequired(true);
 		if(values == null) questionTextInput.setPlaceholder("Welche Eissorte mögt ihr am liebsten?");
 		if(values != null) questionTextInput.setValue(values[0]);
-		questionTextInput.isRequired();
 
-		TextInput.Builder choicesTextInput = TextInput
-				.create(idPrefix + ".choices" + memberId, "Deine Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
+		TextInput.Builder choicesTextInput = TextInput.create(idPrefix + ".choices", "Deine Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
 				.setMinLength(10)
-				.setMaxLength(800);
+				.setMaxLength(800)
+				.setRequired(true);
 		if(values == null) choicesTextInput.setPlaceholder("Antworten mit ; trennen z.B. Erdbeere; Cookie; Schokolade");
 		if(values != null) choicesTextInput.setValue(values[1]);
-		choicesTextInput.isRequired();
 
-		Modal modal = Modal
-				.create(idPrefix + memberId, "Schlage eine fdmds Frage vor")
+		return Modal.create(idPrefix, "Schlage eine fdmds Frage vor")
 				.addActionRow(questionTextInput.build())
 				.addActionRow(choicesTextInput.build())
 				.build();
-
-		return modal;
 	}
 
 	private TextChannel getChannelFromConfig(String guildId, String path) {
 		if(guildId == null || path == null) return null;
+
 		YamlFile config = Config.getConfig(guildId, "mainConfig");
 		try {
 			config.load();
 		} catch(IOException e) {
 			throw new RuntimeException(e);
 		}
+
 		TextChannel channel;
+
 		try {
 			channel = Main.jdaInstance.getGuildById(guildId).getTextChannelById(config.getString(path));
 		} catch(IllegalArgumentException n) {
@@ -206,18 +196,20 @@ public class Fdmds extends ListenerAdapter {
 			}
 			return null;
 		}
+
 		return channel;
 	}
 
 	private String getRoleMentionFromConfig(String guildId, String path) {
 		if(guildId == null || path == null) return null;
+
 		YamlFile config = Config.getConfig(guildId, "mainConfig");
 		try {
 			config.load();
 		} catch(IOException e) {
 			throw new RuntimeException(e);
 		}
-		String roleMention = "";
+
 		if(!config.contains(path)) {
 			config.set(path, 0);
 			try {
@@ -227,8 +219,9 @@ public class Fdmds extends ListenerAdapter {
 			}
 			return null;
 		}
+
 		try {
-			roleMention = "<@&" + config.getLong(path) + ">";
+			return "<@&" + config.getLong(path) + ">";
 		} catch(IllegalArgumentException n) {
 			config.set(path, 0);
 			try {
@@ -238,6 +231,5 @@ public class Fdmds extends ListenerAdapter {
 			}
 			return null;
 		}
-		return roleMention;
 	}
 }
