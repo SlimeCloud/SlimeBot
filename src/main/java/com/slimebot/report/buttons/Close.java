@@ -10,10 +10,9 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 public class Close extends ListenerAdapter {
 	@Override
 	public void onButtonInteraction(ButtonInteractionEvent event) {
-		if(!event.getButton().getId().equals("close_report")) return;
+		if(!event.getComponentId().equals("close_report")) return;
 
-		String[] nameSplit = event.getButton().getLabel().split(" ");
-		String reportID = nameSplit[1].substring(1);
+		String reportID = event.getButton().getLabel().split("#")[1];
 
 		TextInput reason = TextInput.create("reason", "Wie Wurde mit dem Report Verfahren?", TextInputStyle.SHORT)
 				.setRequired(true)
