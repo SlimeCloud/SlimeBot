@@ -124,7 +124,8 @@ public class ReportList extends ListenerAdapter {
 	private void addReportField(Report report, EmbedBuilder embed) {
 		embed.addField("Report #" + report.id,
 				report.user.getAsMention() + " wurde am ` " + report.time.format(Main.dtf) + "` von " + report.by.getAsMention() + " gemeldet.",
-				false);
+				false
+		);
 	}
 
 	private StringSelectMenu DetailDropdownButton(ArrayList<Integer> reportList) {

@@ -17,7 +17,7 @@ public class MsgReport extends ListenerAdapter {
 
 	@Override
 	public void onMessageContextInteraction(MessageContextInteractionEvent event) {
-		if(!event.getName().equals("Report Message")) return;
+		if(!event.getFullCommandName().equals("Report Message")) return;
 
 		if(Main.blocklist(event.getGuild().getId()).contains(event.getMember().getId())) {
 			EmbedBuilder embedBuilder = new EmbedBuilder()

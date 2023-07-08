@@ -44,7 +44,7 @@ public class Bug extends ListenerAdapter {
 			throw new RuntimeException(e);
 		}
 
-		ModalMapping modalMapping = event.getInteraction().getValues().get(0);
+		ModalMapping modalMapping = event.getValues().get(0);
 
 		String label = "Ein neuer Bug wurde gefunden!";
 

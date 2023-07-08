@@ -19,7 +19,7 @@ import java.time.ZoneId;
 public class UserReport extends ListenerAdapter {
 	@Override
 	public void onUserContextInteraction(UserContextInteractionEvent event) {
-		if(!event.getName().equals("Report User")) return;
+		if(!event.getFullCommandName().equals("Report User")) return;
 
 		if(Main.blocklist(event.getGuild().getId()).contains(event.getMember().getId())) {
 			EmbedBuilder embedBuilder = new EmbedBuilder()

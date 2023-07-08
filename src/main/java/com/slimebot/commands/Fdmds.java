@@ -39,8 +39,8 @@ public class Fdmds extends ListenerAdapter {
 				}
 
 				// Get Contents
-				String question = event.getInteraction().getValue("fdmds.question").getAsString();
-				String[] choices = event.getInteraction().getValue("fdmds.choices").getAsString().split(";");
+				String question = event.getValue("fdmds.question").getAsString();
+				String[] choices = event.getValue("fdmds.choices").getAsString().split(";");
 
 				if(choices.length <= 1) {
 					event.reply("Du musst mindestens 2 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
@@ -81,8 +81,8 @@ public class Fdmds extends ListenerAdapter {
 
 			case "fdmds.edit" -> {
 				// Get Contents
-				String question = event.getInteraction().getValue("fdmds.edit.question").getAsString();
-				String choices = event.getInteraction().getValue("fdmds.edit.choices").getAsString();
+				String question = event.getValue("fdmds.edit.question").getAsString();
+				String choices = event.getValue("fdmds.edit.choices").getAsString();
 
 				EmbedBuilder embedBuilder = new EmbedBuilder(event.getMessage().getEmbeds().get(0))
 						.clearFields()
