@@ -19,12 +19,10 @@ public class ConfigCmd extends ListenerAdapter {
 			OptionMapping field = event.getOption("field");
 			OptionMapping value = event.getOption("value");
 
-			switch(type.getAsString()) {
-				case "config":
-					config.load();
-					config.set(field.getAsString(), value.getAsString());
-					config.save();
-					break;
+			if(type.getAsString().equals("config")) {
+				config.load();
+				config.set(field.getAsString(), value.getAsString());
+				config.save();
 			}
 
 			event.reply("Du hast erfolgreich Anpassungen getätigt!").setEphemeral(true).queue();

@@ -15,8 +15,8 @@ public enum SlimeEmoji {
 	SLIME9(9, "<:slime9:1080225265420075168>");
 
 
-	private int id;
-	private String string;
+	private final int id;
+	private final String string;
 
 	SlimeEmoji(int id, String string) {
 		this.id = id;
