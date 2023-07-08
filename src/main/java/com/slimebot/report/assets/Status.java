@@ -1,7 +1,7 @@
 package com.slimebot.report.assets;
 
 public enum Status {
-	CLOSED("Geschlossed"),
+	CLOSED("Geschlossen"),
 	OPEN("Offen");
 
 	public final String str;
