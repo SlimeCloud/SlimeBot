@@ -1,6 +1,7 @@
 package com.slimebot.events;
 
 
+import com.slimebot.alerts.spotify.SpotifyListener;
 import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -19,7 +20,7 @@ public class ReadyEvent extends ListenerAdapter {
 		try {
 			Main.spotify.register();
 		} catch(Exception e) {
-			e.printStackTrace();
+			SpotifyListener.logger.error("Failed to register spotify listeners", e);
 		}
 
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
