@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
-import com.slimebot.utils.DailyTask;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -31,12 +30,12 @@ public class HolidayAlert implements Runnable {
     public HolidayAlert(URL apiURL) {
         this.apiUrl = apiURL;
         try {
-            Main.getJDAInstance().awaitReady();
+            Main.jdaInstance.awaitReady();
             run();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        new DailyTask(6, this);
+        Main.scheduleDaily(6, this);
     }
 
 
@@ -108,7 +107,7 @@ public class HolidayAlert implements Runnable {
         }
         TextChannel channel;
         try {
-            channel = Main.getJDAInstance().getGuildById(guildId).getTextChannelById(config.getString(path));
+            channel = Main.jdaInstance.getGuildById(guildId).getTextChannelById(config.getString(path));
         } catch (IllegalArgumentException n){
             config.set(path, 0);
             try {
