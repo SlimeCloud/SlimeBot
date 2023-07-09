@@ -47,14 +47,15 @@ public class SpotifyListener implements Runnable {
 
 	public void run() {
         logger.info("Überprüfe auf neue Releases");
+
 		for(AlbumSimplified album : getLatestAlbums()) {
 			if(!publishedAlbums.contains(album.getId())) {
                 logger.info("Album {} wurde veröffentlicht", album.getName());
 				publishedAlbums.add(album.getId());
 				broadcastAlbum(album);
 			}
-
 		}
+
 		try {
 			config.set("artists." + artistId + ".publishedAlbums", publishedAlbums);
 			config.save();
@@ -66,14 +67,17 @@ public class SpotifyListener implements Runnable {
 	private AlbumSimplified[] getLatestAlbums() {
 		GetArtistsAlbumsRequest request = spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).build();
 		Paging<AlbumSimplified> albumSimplifiedPaging;
+
 		try {
 			albumSimplifiedPaging = request.execute();
 			if(albumSimplifiedPaging.getTotal() > 20) {
                 logger.warn("Es wurden mehr als 20 Alben gefunden. Es werden nur die 20 neuesten veröffentlicht");
 				albumSimplifiedPaging = spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal() - 20).build().execute();
 			}
+
 			List<AlbumSimplified> albums = Arrays.asList(albumSimplifiedPaging.getItems());
 			Collections.reverse(albums);
+
 			return albums.toArray(new AlbumSimplified[0]);
 		} catch(Exception e) {
             logger.error("Alben können nicht geladen werden");
@@ -83,10 +87,12 @@ public class SpotifyListener implements Runnable {
 
 	private void broadcastAlbum(AlbumSimplified album) {
 		TextChannel channel = Main.jdaInstance.getTextChannelById(channelId);
+
 		if(channel == null) {
             logger.error("Kanal nicht verfügbar: {}", channelId);
 			return;
 		}
+
 		channel.sendMessage(MessageFormat.format(message, album.getName(), album.getExternalUrls().get("spotify"))).queue();
 	}
 }

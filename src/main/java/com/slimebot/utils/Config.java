@@ -2,6 +2,8 @@ package com.slimebot.utils;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.simpleyaml.configuration.file.YamlFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
