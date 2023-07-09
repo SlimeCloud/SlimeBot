@@ -18,7 +18,7 @@ public class DailyTask {
         ZonedDateTime nextRun = now.withHour(hour).withMinute(0).withSecond(0);
         if(now.compareTo(nextRun) > 0)
             nextRun = nextRun.plusDays(1);
-        logger.info("Next run: {}", nextRun);
+        logger.info("Nächstes Ausführen: {}", nextRun);
         Duration duration = Duration.between(now, nextRun);
         long initialDelay = duration.getSeconds();
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);

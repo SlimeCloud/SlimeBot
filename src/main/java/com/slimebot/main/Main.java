@@ -191,7 +191,7 @@ public class Main {
         try {
             new SpotifyListenerManager();
         } catch(Exception e) {
-            logger.error("Failed to connect to spotify", e);
+            logger.error("Konnte keine Verbindung zu Spotify aufbauen", e);
         }
     }
 
@@ -208,7 +208,7 @@ public class Main {
     }
 
     public static void missingToken(){
-        logger.error("\n\nPLEASE ADD A TOKEN (.env in root dir)\n\n");
+        logger.error("\n\nBITTE EIN TOKEN ANGEBEN (.env im bot-ordner)\n\n");
         System.exit(420);
     }
 

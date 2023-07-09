@@ -18,7 +18,7 @@ public class SpotifyListenerManager {
                 config.createNewFile();
                 createConfig();
             } catch (IOException e) {
-                SpotifyListener.logger.error("Failed to create spotify config");
+                SpotifyListener.logger.error("Spotify config konnte nicht erstellt werden");
             }
         }
         try {

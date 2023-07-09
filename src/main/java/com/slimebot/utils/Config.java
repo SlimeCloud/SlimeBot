@@ -27,14 +27,14 @@ public class Config {
         YamlFile newConfig = getConfig(guildID, configName);
 
         if (newConfig.exists()){
-            logger.error("Can't create Config! {} already exists!", newConfig.getFilePath());
+            logger.error("Config konnte nicht erstellt werden! {} existiert bereits!", newConfig.getFilePath());
         } else {
             try {
                 newConfig.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            logger.info("New Config created at {}", newConfig.getFilePath());
+            logger.info("Neue config erstellt bei {}", newConfig.getFilePath());
 
         }
     }
@@ -47,13 +47,13 @@ public class Config {
         try {
             if (!mainConfig.exists()) {
                 mainConfig.createNewFile();
-                logger.info("New file has been created: {}; Generate default property...", mainConfig.getFilePath());
+                logger.info("Neue Datei erstellt: {}; Generiere standard Werte...", mainConfig.getFilePath());
             } else {
                 return;
             }
             mainConfig.load();
         } catch (final Exception e) {
-            logger.error("Failed to create config", e);
+            logger.error("Config konnte nicht erstellt werden", e);
         }
 
         mainConfig.set("logChannel", 0);

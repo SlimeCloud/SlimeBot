@@ -92,7 +92,7 @@ public class SpotifyListener implements Runnable {
         JDA jda = Main.getJDAInstance();
         TextChannel channel = jda.getTextChannelById(channelId);
         if (channel == null) {
-            logger.error("Channel nicht verfügbar: {}", channelId);
+            logger.error("Kanal nicht verfügbar: {}", channelId);
             return;
         }
         channel.sendMessage(MessageFormat.format(message, album.getName(), album.getExternalUrls().get("spotify"))).queue();
