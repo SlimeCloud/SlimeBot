@@ -19,48 +19,46 @@ import java.util.Objects;
 
 public class ReportModal extends ListenerAdapter {
 
-    @Override
-    public void onModalInteraction(@NotNull ModalInteractionEvent event) {
-        super.onModalInteraction(event);
+	@Override
+	public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+		if(!event.getModalId().equals("userReport")) return;
 
-        if (!(event.getModalId().equals("userReport"))){return;}
+		Report currentReport = null;
 
-        Report currentReport = null;
+		ModalMapping id = event.getValue("id");
+		ModalMapping description = event.getValue("usrDescr");
 
-        ModalMapping id = event.getValue("id");
-        ModalMapping description = event.getValue("usrDescr");
+		YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
+		try {
+			reportFile.load();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
 
-        YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
-        try {
-            reportFile.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        ConfigurationSection reportSection = reportFile.getConfigurationSection("reports");
-        ArrayList<Report> allReports = new ArrayList<>();
-        for (int ids = 2; ids <= reportSection.size() ; ids++) {
-            allReports.add(Report.get(event.getGuild().getId(), ids));
-        }
+		ConfigurationSection reportSection = reportFile.getConfigurationSection("reports");
+		ArrayList<Report> allReports = new ArrayList<>();
+		for(int ids = 2; ids <= reportSection.size(); ids++) {
+			allReports.add(Report.get(event.getGuild().getId(), ids));
+		}
 
+		for(Report report : allReports) {
+			if(Objects.equals(String.valueOf(report.id), id.getAsString()) && event.getMember() == report.by) {
+				currentReport = report;
+				break;
+			}
+		}
 
-        for (Report report:allReports) {
-            if (Objects.equals(String.valueOf(report.getId()), id.getAsString()) && event.getMember() == report.getBy()) {
-                currentReport = report;
-                break;
-            }
-        }
+		currentReport.msgContent = description.getAsString();
 
-        currentReport.setMsgContent(description.getAsString());
+		Report.save(event.getGuild().getId(), currentReport);
 
-        Report.save(event.getGuild().getId(), currentReport);
+		EmbedBuilder embedBuilder = new EmbedBuilder()
+				.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+				.setColor(Main.embedColor(event.getGuild().getId()))
+				.setTitle(":white_check_mark: Report Erfolgreich")
+				.setDescription(currentReport.user.getAsMention() + " wurde erfolgreich gemeldet");
 
-        EmbedBuilder embedBuilder = new EmbedBuilder()
-                .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                .setColor(Main.embedColor(event.getGuild().getId()))
-                .setTitle(":white_check_mark: Report Erfolgreich")
-                .setDescription(currentReport.getUser().getAsMention() + " wurde erfolgreich gemeldet");
-        event.replyEmbeds(embedBuilder.build()).queue();
-        Report.log(currentReport.getId(), event.getGuild().getId());
-
-    }
+		event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
+		Report.log(currentReport.id, event.getGuild().getId());
+	}
 }
