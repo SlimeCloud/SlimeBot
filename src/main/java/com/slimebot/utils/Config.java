@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class Config {
-    public final static Logger logger = LoggerFactory.getLogger(Config.class);
+	public final static Logger logger = LoggerFactory.getLogger(Config.class);
 	private static final Dotenv dotenv = Dotenv.load();
 
 	public static String getEnvKey(String key) {
@@ -24,7 +24,7 @@ public class Config {
 		YamlFile newConfig = getConfig(guildID, configName);
 
 		if(newConfig.exists()) {
-            logger.error("Config konnte nicht erstellt werden! {} existiert bereits!", newConfig.getFilePath());
+			logger.error("Config konnte nicht erstellt werden! {} existiert bereits!", newConfig.getFilePath());
 		}
 
 		else {
@@ -34,7 +34,7 @@ public class Config {
 				throw new RuntimeException(e);
 			}
 
-            logger.info("Neue config erstellt bei {}", newConfig.getFilePath());
+			logger.info("Neue config erstellt bei {}", newConfig.getFilePath());
 		}
 	}
 
@@ -44,8 +44,8 @@ public class Config {
 		try {
 			if(!mainConfig.exists()) {
 				mainConfig.createNewFile();
-                logger.info("Neue Datei erstellt: {}; Generiere standard Werte...", mainConfig.getFilePath());
-            }
+				logger.info("Neue Datei erstellt: {}; Generiere standard Werte...", mainConfig.getFilePath());
+			}
 
 			else {
 				return;
@@ -53,7 +53,7 @@ public class Config {
 
 			mainConfig.load();
 		} catch(final Exception e) {
-            logger.error("Config konnte nicht erstellt werden", e);
+			logger.error("Config konnte nicht erstellt werden", e);
 		}
 
 		mainConfig.set("logChannel", 0);
@@ -88,7 +88,7 @@ public class Config {
 			throw new RuntimeException(e);
 		}
 
-        logger.info("Config für {} erstellt", guildID);
+		logger.info("Config für {} erstellt", guildID);
 	}
 
 	public static String getBotInfo(String probPath) {

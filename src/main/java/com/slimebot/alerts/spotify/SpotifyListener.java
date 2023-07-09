@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class SpotifyListener implements Runnable {
-    public final static Logger logger = LoggerFactory.getLogger(SpotifyListener.class);
+	public final static Logger logger = LoggerFactory.getLogger(SpotifyListener.class);
 
 	private final String artistId;
 	private final long channelId;
@@ -46,11 +46,11 @@ public class SpotifyListener implements Runnable {
 	}
 
 	public void run() {
-        logger.info("Überprüfe auf neue Releases");
+		logger.info("Überprüfe auf neue Releases");
 
 		for(AlbumSimplified album : getLatestAlbums()) {
 			if(!publishedAlbums.contains(album.getId())) {
-                logger.info("Album {} wurde veröffentlicht", album.getName());
+				logger.info("Album {} wurde veröffentlicht", album.getName());
 				publishedAlbums.add(album.getId());
 				broadcastAlbum(album);
 			}
@@ -71,7 +71,7 @@ public class SpotifyListener implements Runnable {
 		try {
 			albumSimplifiedPaging = request.execute();
 			if(albumSimplifiedPaging.getTotal() > 20) {
-                logger.warn("Es wurden mehr als 20 Alben gefunden. Es werden nur die 20 neuesten veröffentlicht");
+				logger.warn("Es wurden mehr als 20 Alben gefunden. Es werden nur die 20 neuesten veröffentlicht");
 				albumSimplifiedPaging = spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal() - 20).build().execute();
 			}
 
@@ -80,7 +80,7 @@ public class SpotifyListener implements Runnable {
 
 			return albums.toArray(new AlbumSimplified[0]);
 		} catch(Exception e) {
-            logger.error("Alben können nicht geladen werden");
+			logger.error("Alben können nicht geladen werden");
 			throw new RuntimeException(e);
 		}
 	}
@@ -89,7 +89,7 @@ public class SpotifyListener implements Runnable {
 		TextChannel channel = Main.jdaInstance.getTextChannelById(channelId);
 
 		if(channel == null) {
-            logger.error("Kanal nicht verfügbar: {}", channelId);
+			logger.error("Kanal nicht verfügbar: {}", channelId);
 			return;
 		}
 

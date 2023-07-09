@@ -19,7 +19,7 @@ public class SpotifyListenerManager {
 				config.createNewFile();
 				createConfig();
 			} catch(IOException e) {
-                SpotifyListener.logger.error("Spotify config konnte nicht erstellt werden");
+				SpotifyListener.logger.error("Spotify config konnte nicht erstellt werden");
 			}
 		}
 
@@ -36,7 +36,7 @@ public class SpotifyListenerManager {
 		try {
 			api.setAccessToken(api.clientCredentials().build().execute().getAccessToken());
 		} catch(IOException | SpotifyWebApiException | ParseException e) {
-            SpotifyListener.logger.error("Spotify login fehlgeshlagen", e);
+			SpotifyListener.logger.error("Spotify login fehlgeshlagen", e);
 		}
 	}
 

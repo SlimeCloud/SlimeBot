@@ -103,7 +103,7 @@ public class Report {
 			reportFile.save();
 		} catch(IOException e) {
 			throw new RuntimeException(e);
-        }
+		}
 	}
 
 	public static Report get(String guildID, Integer reportID) {

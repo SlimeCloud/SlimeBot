@@ -57,13 +57,13 @@ public class PodcastListener implements Runnable {
 	}
 
 	private EpisodeSimplified[] getLatestEpisodes() {
-        SpotifyListener.logger.info("Überprüfe auf neue Episoden bei {}", showID);
+		SpotifyListener.logger.info("Überprüfe auf neue Episoden bei {}", showID);
 
-        try {
+		try {
 			Paging<EpisodeSimplified> episodes = api.getShowEpisodes(showID).market(CountryCode.DE).limit(20).build().execute();
 
 			if(episodes.getTotal() > 20) {
-                SpotifyListener.logger.warn("Es gibt mehr als 20 Episoden, hole die letzten 20");
+				SpotifyListener.logger.warn("Es gibt mehr als 20 Episoden, hole die letzten 20");
 				episodes = api.getShowEpisodes(showID).market(CountryCode.DE).offset(episodes.getTotal() - 20).build().execute();
 			}
 

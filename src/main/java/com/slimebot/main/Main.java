@@ -43,7 +43,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
-    public final static Logger logger = LoggerFactory.getLogger(Main.class);
+	public final static Logger logger = LoggerFactory.getLogger(Main.class);
 
 	public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
 
@@ -80,18 +80,18 @@ public class Main {
 	public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
 
 	public static void main(String[] args) throws IOException {
-        logger.info("Bot Version: {}", Config.getBotInfo("version"));
+		logger.info("Bot Version: {}", Config.getBotInfo("version"));
 		if(args.length == 0) {
-            logger.error("BITTE EIN TOKEN NAME ALS COMMAND-LINE-PARAMETER ÜBERGEBEN (.env im bot-ordner)");
+			logger.error("BITTE EIN TOKEN NAME ALS COMMAND-LINE-PARAMETER ÜBERGEBEN (.env im bot-ordner)");
 			System.exit(420);
 		}
 
 		String tokenName = args[0];
 
-        logger.info("{}-Bot wird gestartet...", tokenName);
+		logger.info("{}-Bot wird gestartet...", tokenName);
 		String token = Config.getEnvKey("TOKEN_" + tokenName.toUpperCase());
 		if(token == null || token.isEmpty()) {
-            logger.error("BITTE EIN TOKEN ANGEBEN (.env im bot-ordner)");
+			logger.error("BITTE EIN TOKEN ANGEBEN (.env im bot-ordner)");
 			System.exit(421);
 		}
 
