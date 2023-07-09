@@ -28,6 +28,6 @@ public class Info extends ListenerAdapter {
                 .addField("Prefix:", "Dieser Bot nutzt Slash Commands", true)
                 .setFooter("SlimeBall", "https://media.discordapp.net/attachments/1098639892608712714/1098639949592539166/SlimeBall.png");
 
-        event.replyEmbeds(embedBuilder.build()).queue();
+        event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
     }
 }
