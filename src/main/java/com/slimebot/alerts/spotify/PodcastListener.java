@@ -26,13 +26,7 @@ public class PodcastListener implements Runnable {
 		this.api = api;
 		this.showID = showID;
 
-		try {
-			Main.jdaInstance.awaitReady();
-			run();
-		} catch(InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-
+		run();
 		Main.scheduleDaily(12, this);
 	}
 
