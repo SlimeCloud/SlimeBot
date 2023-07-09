@@ -17,45 +17,42 @@ import java.time.ZoneId;
 
 public class ReportCmd extends ListenerAdapter {
 
-    @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        super.onSlashCommandInteraction(event);
+	@Override
+	public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+		if(!event.getName().equals("report")) return;
 
-        if (!(event.getName().equals("report"))) {return;}
-        if (Main.blocklist(event.getGuild().getId()).contains(event.getMember().getId())) {
-            EmbedBuilder embedBuilder = new EmbedBuilder()
-                    .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                    .setColor(Main.embedColor(event.getGuild().getId()))
-                    .setTitle(":exclamation: Error: Blocked")
-                    .setDescription("Du wurdest gesperrt, so dass du keine Reports mehr erstellen kannst");
-            event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
-            return;
-        }
+		if(Main.blocklist(event.getGuild().getId()).contains(event.getMember().getId())) {
+			EmbedBuilder embedBuilder = new EmbedBuilder()
+					.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+					.setColor(Main.embedColor(event.getGuild().getId()))
+					.setTitle(":exclamation: Error: Blocked")
+					.setDescription("Du wurdest gesperrt, so dass du keine Reports mehr erstellen kannst");
 
-        YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
-        try {
-            reportFile.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+			event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
+			return;
+		}
 
-        int reportID = reportFile.getConfigurationSection("reports").size() + 1;
+		YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
+		try {
+			reportFile.load();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
 
-        OptionMapping user = event.getOption("user");
-        OptionMapping description = event.getOption("beschreibung");
+		int reportID = reportFile.getConfigurationSection("reports").size() + 1;
 
-        Report.save(event.getGuild().getId(), Report.newReport(reportID, Type.USER, user.getAsMember(), event.getMember(), description.getAsString()));
+		OptionMapping user = event.getOption("user");
+		OptionMapping description = event.getOption("beschreibung");
 
-        EmbedBuilder embedBuilder = new EmbedBuilder()
-                .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                .setColor(Main.embedColor(event.getGuild().getId()))
-                .setTitle(":white_check_mark: Report Erfolgreich")
-                .setDescription(user.getAsMentionable().getAsMention() + " wurde erfolgreich gemeldet");
-        event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
-        Report.log(reportID, event.getGuild().getId());
+		Report.save(event.getGuild().getId(), new Report(reportID, Type.USER, user.getAsMember(), event.getMember(), description.getAsString()));
 
+		EmbedBuilder embedBuilder = new EmbedBuilder()
+				.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+				.setColor(Main.embedColor(event.getGuild().getId()))
+				.setTitle(":white_check_mark: Report Erfolgreich")
+				.setDescription(user.getAsMentionable().getAsMention() + " wurde erfolgreich gemeldet");
 
-
-
-    }
+		event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
+		Report.log(reportID, event.getGuild().getId());
+	}
 }

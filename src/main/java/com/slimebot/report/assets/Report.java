@@ -14,241 +14,149 @@ import org.simpleyaml.configuration.file.YamlFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Objects;
 
 public class Report {
-    public Integer id;
-    public Type type;
-    public Member user;
-    public Member by;
-    public LocalDateTime time;
-    public Status status;
-    public String msgContent;
-    public String closeReason;
+	public int id;
+	public Type type;
+	public Member user;
+	public Member by;
+	public LocalDateTime time;
+	public Status status = Status.OPEN;
+	public String msgContent;
+	public String closeReason = "Nonde";
 
-    public static Report newReport(Integer id, Type type, Member user, Member by, String msgContent){
-        Report report = new Report();
-        report.setId(id);
-        report.setType(type);
-        report.setUser(user);
-        report.setBy(by);
-        report.setTime(LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        report.setStatus(Status.OPEN);
-        report.setMsgContent(msgContent);
-        report.setCloseReason("None");
+	public Report(int id, Type type, Member user, Member by, String msgContent) {
+		this.id = id;
+		this.type = type;
+		this.user = user;
+		this.by = by;
+		this.msgContent = msgContent;
+		this.time = LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	}
 
-        return report;
-    }
+	public static Button closeButton(int reportID) {
+		return Button.danger("close_report", "Close #" + reportID).withEmoji(Emoji.fromUnicode("\uD83D\uDD12"));
+	}
 
-    public static Button closeBtn(String reportID){
-        return Button.danger("close_report", "Close #" + reportID).withEmoji(Emoji.fromUnicode("\uD83D\uDD12"));
-    }
+	public static void log(Integer reportID, String guildID) {
+		YamlFile config = Config.getConfig(guildID, "mainConfig");
 
-    public static void log(Integer reportID, String guildID){
-        YamlFile config = Config.getConfig(guildID, "mainConfig");
+		Report newReport = get(guildID, reportID);
 
-        Report newReport = get(guildID, reportID);
+		try {
+			config.load();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
 
-        try {
-            config.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        TextChannel logChannel = Main.jdaInstance.getTextChannelById(config.getString("punishmentChannelID"));
+		TextChannel logChannel = Main.jdaInstance.getTextChannelById(config.getString("punishmentChannelID"));
 
-        EmbedBuilder embedBuilder = new EmbedBuilder()
-                .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                .setColor(Main.embedColor(guildID))
-                .setTitle(":exclamation: Neuer Report!")
-                .addField("Report von:", newReport.getBy().getAsMention(), true)
-                .addField("Gemeldet:", newReport.getUser().getAsMention(), true);
+		EmbedBuilder embedBuilder = new EmbedBuilder()
+				.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+				.setColor(Main.embedColor(guildID))
+				.setTitle(":exclamation: Neuer Report!")
+				.addField("Report von:", newReport.by.getAsMention(), true)
+				.addField("Gemeldet:", newReport.user.getAsMention(), true);
 
-        if (newReport.getType() == Type.MSG){
-            embedBuilder.setDescription("Es wurde eine Nachricht gemeldet!")
-                    .addField("Nachricht:", newReport.getMsgContent(), false);
-        } else {
-            embedBuilder.setDescription("Es wurde eine Person gemeldet!")
-                    .addField("Begründung:", newReport.getMsgContent(), false);
-        }
+		if(newReport.type == Type.MSG) {
+			embedBuilder
+					.setDescription("Es wurde eine Nachricht gemeldet!")
+					.addField("Nachricht:", newReport.msgContent, false);
+		}
 
+		else {
+			embedBuilder
+					.setDescription("Es wurde eine Person gemeldet!")
+					.addField("Begründung:", newReport.msgContent, false);
+		}
 
-        logChannel.sendMessageEmbeds(embedBuilder.build()).addActionRow(closeBtn(reportID.toString())).queue();
-    }
+		logChannel.sendMessageEmbeds(embedBuilder.build()).addActionRow(closeButton(reportID)).queue();
+	}
 
-    public static void save(String guildID, Report report){
-        YamlFile reportFile = Config.getConfig(guildID, "reports");
+	public static void save(String guildID, Report report) {
+		YamlFile reportFile = Config.getConfig(guildID, "reports");
 
-        if (!reportFile.exists()){
-            try {
-                reportFile.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+		if(!reportFile.exists()) {
+			try {
+				reportFile.createNewFile();
+			} catch(IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
 
-        try {
-            reportFile.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+		try {
+			reportFile.load();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
 
-        String rID = String.valueOf(report.getId());
+		reportFile.set("reports." + report.id + ".id", report.id);
+		reportFile.set("reports." + report.id + ".type", report.type.toString());
+		reportFile.set("reports." + report.id + ".user", report.user.getId());
+		reportFile.set("reports." + report.id + ".by", report.by.getId());
+		reportFile.set("reports." + report.id + ".time", report.time.toString());
+		reportFile.set("reports." + report.id + ".status", report.status.toString());
+		reportFile.set("reports." + report.id + ".msgContent", report.msgContent);
+		reportFile.set("reports." + report.id + ".closeReason", report.closeReason);
 
-        reportFile.set("reports."+ rID +".id", report.getId());
-        reportFile.set("reports."+ rID +".type", report.getType().toString());
-        reportFile.set("reports."+ rID +".user", report.getUser().getId());
-        reportFile.set("reports."+ rID +".by", report.getBy().getId());
-        reportFile.set("reports."+ rID +".time", report.getTime().toString());
-        reportFile.set("reports."+ rID +".status", report.getStatus().toString());
-        reportFile.set("reports."+ rID +".msgContent", String.valueOf(report.getMsgContent()));
-        reportFile.set("reports."+ rID +".closeReason", report.getCloseReason().toString());
+		try {
+			reportFile.save();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-        try {
-            reportFile.save();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+	public static Report get(String guildID, Integer reportID) {
+		YamlFile reportFile = Config.getConfig(guildID, "reports");
 
-    }
+		try {
+			reportFile.load();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
 
-    public static Report get(String guildID, Integer reportID){
-        YamlFile reportFile = Config.getConfig(guildID, "reports");
-        Report report = new Report();
-        Guild guild = Main.getJDAInstance().getGuildById(guildID);
+		Guild guild = Main.jdaInstance.getGuildById(guildID);
 
-        try {
-            reportFile.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+		Report report = new Report(
+				reportFile.getInt("reports." + reportID + ".id"),
+				Type.valueOf(reportFile.getString("reports." + reportID + ".type")),
+				guild.getMemberById(reportFile.getString("reports." + reportID + ".user")),
+				guild.getMemberById(reportFile.getString("reports." + reportID + ".by")),
+				reportFile.getString("reports." + reportID + ".msgContent")
+		);
 
+		report.time = LocalDateTime.parse(reportFile.getString("reports." + reportID + ".time"));
+		report.status = Status.valueOf(reportFile.getString("reports." + reportID + ".status"));
+		report.closeReason = reportFile.getString("reports." + reportID + ".closeReason");
 
-        report.setId(reportFile.getInt("reports."+ reportID+".id"));
-        String rID = reportID.toString();
+		return report;
+	}
 
-        if (Objects.equals(reportFile.getString("reports." + rID + ".type"), "MSG")){
-            report.setType(Type.MSG);
-        } else {
-            report.setType(Type.USER);
-        }
+	public MessageEmbed asEmbed(String guildID) {
+		EmbedBuilder embed = new EmbedBuilder()
+				.setColor(Main.embedColor(guildID))
+				.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+				.setTitle(":exclamation:  Details zu Report #" + id)
+				.addField("Report Typ:", type.str, true)
+				.addField("Gemeldeter User:", user.getAsMention(), true)
+				.addField("Gemeldet von:", by.getAsMention(), true)
+				.addField("Gemeldet am:", time.format(Main.dtf) + "Uhr", true)
+				.addField("Status:", status.str, true);
 
-        report.setUser(guild.getMemberById(reportFile.getString("reports."+ rID+".user")));
-        report.setBy(guild.getMemberById(reportFile.getString("reports."+ rID+".by")));
-        report.setTime(LocalDateTime.parse(reportFile.getString("reports."+ rID+".time")));
+		if(type == Type.MSG) {
+			embed.addField("Gemeldete Nachricht:", msgContent, false);
+		}
 
-        if (Objects.equals(reportFile.getString("reports." + rID + ".status"), "OPEN")){
-            report.setStatus(Status.OPEN);
-        } else {
-            report.setStatus(Status.CLOSED);
-        }
+		else if(type == Type.USER) {
+			embed.addField("Meldegrund:", msgContent, true);
+		}
 
+		if(status == Status.CLOSED) {
+			embed.addField("Verfahren:", closeReason, true);
+		}
 
-        String msgC = reportFile.getString("reports."+ rID +".msgContent");
-        String clR = reportFile.getString("reports."+ rID +".closeReason");
-        report.setCloseReason(clR);
-        report.setMsgContent(msgC);
-
-        return report;
-    }
-
-    public static MessageEmbed getReportAsEmbed(Report report, String guildID){
-
-        String TypeStr = "";
-        switch (report.getType()) {
-            case MSG -> TypeStr = "Nachricht";
-            case USER -> TypeStr = "User";
-        }
-
-        String StatusStr = "";
-        switch (report.getStatus()) {
-            case CLOSED -> StatusStr = "Geschlossen";
-            case OPEN -> StatusStr = "Offen";
-        }
-
-        EmbedBuilder embed = new EmbedBuilder()
-                .setColor(Main.embedColor(guildID))
-                .setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-                .setTitle(":exclamation:  Details zu Report #" + report.getId().toString())
-                .addField("Report Typ:", TypeStr, true)
-                .addField("Gemeldeter User:", report.getUser().getAsMention(), true)
-                .addField("Gemeldet von:", report.getBy().getAsMention(), true)
-                .addField("Gemeldet am:", report.getTime().format(Main.dtf) + "Uhr", true)
-                .addField("Status:", StatusStr, true);
-
-        if (report.getType() == Type.MSG){
-            embed.addField("Gemeldete Nachricht:", report.getMsgContent(), false);
-        } else if (report.getType() == Type.USER) {
-            embed.addField("Meldegrund:", report.getMsgContent(), true);
-        }
-
-        if (report.getStatus() == Status.CLOSED) {
-            embed.addField("Verfahren:", report.getCloseReason(), true);
-        }
-
-        return embed.build();
-
-
-    }
-
-
-    public Integer getId() {
-        return id;
-    }
-    public Type getType() {
-        return type;
-    }
-    public Member getUser() {return user;}
-    public Member getBy() {
-        return by;
-    }
-
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public String getMsgContent() {
-        return msgContent;
-    }
-
-    public String getCloseReason() {
-        return closeReason;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public void setUser(Member user) {
-        this.user = user;
-    }
-
-    public void setBy(Member by) {
-        this.by = by;
-    }
-
-    public void setTime(LocalDateTime time) {
-        this.time = time;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public void setMsgContent(String msgContent) {
-        this.msgContent = msgContent;
-    }
-
-    public void setCloseReason(String closeReason) {
-        this.closeReason = closeReason;
-    }
+		return embed.build();
+	}
 }
 
 

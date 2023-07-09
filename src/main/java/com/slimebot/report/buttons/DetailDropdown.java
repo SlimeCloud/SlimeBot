@@ -8,27 +8,23 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class DetailDropdown extends ListenerAdapter {
-    @Override
-    public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-        super.onStringSelectInteraction(event);
-        if (!(event.getComponentId().equals("detail_btn"))) {return;}
+	@Override
+	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+		if(!event.getComponentId().equals("detail_btn")) return;
 
-        String id = event.getValues().get(0);
-        MessageEmbed eb;
+		String id = event.getValues().get(0);
 
+		Report report = Report.get(event.getGuild().getId(), Integer.valueOf(id));
 
-        Report report = Report.get(event.getGuild().getId(), Integer.valueOf(id));
+		MessageEmbed embed = report.asEmbed(event.getGuild().getId());
 
-        eb = Report.getReportAsEmbed(report, event.getGuild().getId());
-        if (report.getStatus() == Status.CLOSED){
-            event.replyEmbeds(eb).queue();
-        } else {
-            Button closeBtn = Report.closeBtn(report.getId().toString());
-            event.replyEmbeds(eb).setActionRow(closeBtn).queue();
-        }
+		if(report.status == Status.CLOSED) {
+			event.replyEmbeds(embed).queue();
+		}
 
-
-
-
-    }
+		else {
+			Button closeBtn = Report.closeButton(report.id);
+			event.replyEmbeds(embed).setActionRow(closeBtn).queue();
+		}
+	}
 }
