@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
-import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class ReportCmd extends ListenerAdapter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(reportFile.getConfigurationSection("reports").getName());
+
         int reportID = reportFile.getConfigurationSection("reports").size() + 1;
 
         OptionMapping user = event.getOption("user");

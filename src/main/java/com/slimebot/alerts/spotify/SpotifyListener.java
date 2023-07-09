@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
@@ -19,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class SpotifyListener implements Runnable {
+    public final static Logger logger = LoggerFactory.getLogger(SpotifyListener.class);
+
     private final String artistId;
     private final long channelId;
     private final SpotifyApi spotifyApi;
@@ -49,10 +53,10 @@ public class SpotifyListener implements Runnable {
     }
 
     public void run() {
-        log("INFO: Überprüfe auf neue Releases");
+        logger.info("Überprüfe auf neue Releases");
         for (AlbumSimplified album : getLatestAlbums()) {
             if (!publishedAlbums.contains(album.getId())) {
-                log("INFO: Album " + album.getName() + " wurde veröffentlicht");
+                logger.info("Album {} wurde veröffentlicht", album.getName());
                 publishedAlbums.add(album.getId());
                 broadcastAlbum(album);
             }
@@ -72,27 +76,23 @@ public class SpotifyListener implements Runnable {
         try {
             albumSimplifiedPaging = request.execute();
             if(albumSimplifiedPaging.getTotal()>20){
-                log("WARN: Es wurden mehr als 20 Alben gefunden. Es werden nur die 20 neuesten veröffentlicht");
+                logger.warn("Es wurden mehr als 20 Alben gefunden. Es werden nur die 20 neuesten veröffentlicht");
                 albumSimplifiedPaging= spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal()-20).build().execute();
             }
             List<AlbumSimplified> albums = Arrays.asList(albumSimplifiedPaging.getItems());
             Collections.reverse(albums);
             return albums.toArray(new AlbumSimplified[0]);
         } catch (Exception e) {
-            log("ERROR: Alben können nicht geladen werden");
+            logger.error("Alben können nicht geladen werden");
             throw new RuntimeException(e);
         }
-    }
-
-    private void log(String s) {
-        System.out.println("[SPOTIFY] " + s);
     }
 
     private void broadcastAlbum(AlbumSimplified album) {
         JDA jda = Main.getJDAInstance();
         TextChannel channel = jda.getTextChannelById(channelId);
         if (channel == null) {
-            log("ERROR: Channel nicht verfügbar: " + channelId);
+            logger.error("Kanal nicht verfügbar: {}", channelId);
             return;
         }
         channel.sendMessage(MessageFormat.format(message, album.getName(), album.getExternalUrls().get("spotify"))).queue();
