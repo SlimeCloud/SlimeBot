@@ -8,8 +8,8 @@ import com.slimebot.events.Timeout;
 import com.slimebot.report.buttons.Close;
 import com.slimebot.report.buttons.DetailDropdown;
 import com.slimebot.report.commands.Blockreport;
-import com.slimebot.report.commands.ReportCmd;
 import com.slimebot.report.commands.GetReportDetail;
+import com.slimebot.report.commands.ReportCmd;
 import com.slimebot.report.commands.ReportList;
 import com.slimebot.report.contextmenus.MsgReport;
 import com.slimebot.report.contextmenus.UserReport;
@@ -17,20 +17,21 @@ import com.slimebot.report.modals.CloseReport;
 import com.slimebot.report.modals.ReportModal;
 import com.slimebot.utils.Config;
 import com.slimebot.utils.TimeScheduler;
-import io.github.cdimascio.dotenv.Dotenv;
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.simpleyaml.configuration.file.YamlFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
@@ -38,6 +39,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Main {
+    public final static Logger logger = LoggerFactory.getLogger(Main.class);
+
     public static JDA jdaInstance;
     private static final String activityText = Config.getBotInfo("activity.text");
     public static String activityType = Config.getBotInfo("activity.type");
@@ -66,12 +69,12 @@ public class Main {
     public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
 
     public static void main(String[] args) throws IOException {
-        System.out.println("Bot Version: "+ Config.getBotInfo("version"));
+        logger.info("Bot Version: {}", Config.getBotInfo("version"));
 
         System.out.println("Welcher Bot soll gestartet werden? 'main' oder 'test'");
         Scanner in = new Scanner(System.in);
         String inToken = in.nextLine();
-        System.out.println(inToken.toUpperCase()+"-Bot wird gestartet...");
+        logger.info("{}-Bot wird gestartet...", inToken.toUpperCase());
         String token = Config.getEnvKey("TOKEN_"+inToken.toUpperCase());
         if (Objects.equals(token, "")){missingToken();}
 
@@ -185,7 +188,11 @@ public class Main {
         checkForGuilds();
 
         //Register Spotify Hooks
-        new SpotifyListenerManager();
+        try {
+            new SpotifyListenerManager();
+        } catch(Exception e) {
+            logger.error("Failed to connect to spotify", e);
+        }
     }
 
     public static void checkForGuilds() {
@@ -201,7 +208,7 @@ public class Main {
     }
 
     public static void missingToken(){
-        System.out.println("\n\nPLEASE ADD A TOKEN (.env in root dir)\n\n");
+        logger.error("\n\nPLEASE ADD A TOKEN (.env in root dir)\n\n");
         System.exit(420);
     }
 

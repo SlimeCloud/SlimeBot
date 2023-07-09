@@ -1,13 +1,16 @@
 package com.slimebot.utils;
 
 import com.slimebot.main.Main;
-import org.simpleyaml.configuration.file.YamlFile;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.simpleyaml.configuration.file.YamlFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 public class Config {
+    public final static Logger logger = LoggerFactory.getLogger(Config.class);
 
     private static final Dotenv dotenv = Dotenv.load();
 
@@ -24,14 +27,14 @@ public class Config {
         YamlFile newConfig = getConfig(guildID, configName);
 
         if (newConfig.exists()){
-            System.out.println("\n[ERROR] Can't create Config!\n"+newConfig.getFilePath() + " exists already!\n");
+            logger.error("Can't create Config! {} already exists!", newConfig.getFilePath());
         } else {
             try {
                 newConfig.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("[SUCCESS] New Config created at "+newConfig.getFilePath());
+            logger.info("New Config created at {}", newConfig.getFilePath());
 
         }
     }
@@ -44,14 +47,13 @@ public class Config {
         try {
             if (!mainConfig.exists()) {
                 mainConfig.createNewFile();
-                System.out.println("New file has been created: " + mainConfig.getFilePath() + "\nGenerate default property...");
+                logger.info("New file has been created: {}; Generate default property...", mainConfig.getFilePath());
             } else {
                 return;
             }
             mainConfig.load();
         } catch (final Exception e) {
-
-            e.printStackTrace();
+            logger.error("Failed to create config", e);
         }
 
         mainConfig.set("logChannel", 0);
