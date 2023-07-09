@@ -108,7 +108,6 @@ public class Report {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(reportFile.getString("reports."+ rID +".msgContent"));
 
     }
 

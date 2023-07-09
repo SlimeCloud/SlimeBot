@@ -4,7 +4,7 @@
  - [ ] Tested the Code
  - [ ] This PR is ready to review and merge
 
-## Description:
+## Description
 Describe what you have changed
 
 ## Related Issue

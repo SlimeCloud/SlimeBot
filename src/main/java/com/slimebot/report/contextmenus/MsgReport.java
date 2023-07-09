@@ -52,7 +52,7 @@ public class MsgReport extends ListenerAdapter {
                 .setColor(Main.embedColor(event.getGuild().getId()))
                 .setTitle(":white_check_mark: Report Erfolgreich")
                 .setDescription(event.getTarget().getAuthor().getAsMention() + " wurde erfolgreich gemeldet");
-        event.replyEmbeds(embedBuilder.build()).queue();
+        event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
         Report.log(reportID, event.getGuild().getId());
 
 
