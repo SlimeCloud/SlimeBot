@@ -80,7 +80,7 @@ public class StaffMessage extends ListenerAdapter {
         try {
             config.createNewFile(true);
             config.set("roles.123456.description", "This is a description");
-            config.set("messageID", 123456);
+            config.set("messageID", -1);
             config.set("channelID", 123456);
             config.setComment("messageID", "The ID of the message that should be edited. Set to -1 if you want to create a new message");
             config.set("message", """
