@@ -2,6 +2,8 @@ package com.slimebot.utils;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 
+import java.util.stream.Stream;
+
 public enum SlimeEmoji {
 	SLIME0(0, "<:slime0:1080225248076632064>"),
 	SLIME1(1, "<:slime1:1080225250400280788>"),
@@ -14,16 +16,27 @@ public enum SlimeEmoji {
 	SLIME8(8, "<:slime8:1080225263809474610>"),
 	SLIME9(9, "<:slime9:1080225265420075168>");
 
-
 	public final int id;
-	public final String string;
+	public final Emoji emoji;
 
-	SlimeEmoji(int id, String string) {
+	SlimeEmoji(int id, String emoji) {
 		this.id = id;
-		this.string = string;
+		this.emoji = Emoji.fromFormatted(emoji);
 	}
 
-	public Emoji getEmoji() {
-		return Emoji.fromFormatted(this.string);
+	public String format() {
+		return emoji.getFormatted();
+	}
+
+	public static SlimeEmoji fromId(int id) {
+		return Stream.of(values())
+				.filter(e -> e.id == id)
+				.findAny().orElse(null);
+	}
+
+	public static SlimeEmoji fromEmoji(Emoji emoji) {
+		return Stream.of(values())
+				.filter(e -> e.emoji.equals(emoji))
+				.findAny().orElse(null);
 	}
 }

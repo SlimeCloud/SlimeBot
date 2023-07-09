@@ -54,7 +54,7 @@ public class Fdmds extends ListenerAdapter {
 				StringBuilder choicesStr = new StringBuilder();
 				for(int i = 0; i < choices.length; i++) {
 					choicesStr
-							.append(SlimeEmoji.values()[i].string)
+							.append(SlimeEmoji.fromId(i).format())
 							.append(" -> ")
 							.append(choices[i].strip())
 							.append("\r\n");
@@ -138,7 +138,7 @@ public class Fdmds extends ListenerAdapter {
 				// Send and add reactions
 				channel.sendMessage(text).queue(m -> {
 					for(int i = 0; i < choices.lines().count(); i++) {
-						m.addReaction(SlimeEmoji.values()[i].getEmoji()).queue();
+						m.addReaction(SlimeEmoji.fromId(i).emoji).queue();
 					}
 
 					event.reply("Frage verschickt!").setEphemeral(true).queue();
