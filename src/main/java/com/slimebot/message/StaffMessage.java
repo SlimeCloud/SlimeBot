@@ -12,7 +12,6 @@ import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class StaffMessage extends ListenerAdapter {
@@ -81,10 +80,10 @@ public class StaffMessage extends ListenerAdapter {
         try {
             config.createNewFile(true);
             config.set("roles.123456.description", "This is a description");
-            config.set("messageID", 123456);
+            config.set("messageID", -1);
             config.set("channelID", 123456);
             config.setComment("messageID", "The ID of the message that should be edited. Set to -1 if you want to create a new message");
-            config.set("roles.premessage", """
+            config.set("message", """
                     🪐Team Vorstellung🪐
                     
                     *Im Im folgenden werden die Teammitglieder im Zusammenhang mit ihren Rollen vorgestellt. Bei Bedarf und Situation werden diese unangekündigt verändert!*""");
@@ -97,28 +96,14 @@ public class StaffMessage extends ListenerAdapter {
 
     private List<Long> getRoleIDs(YamlFile config) {
         ConfigurationSection section = config.getConfigurationSection("roles");
-        List<Long> roleIds=new ArrayList<>();
-        for (String key : section.getKeys(false)) {
-            try {
-                Long.parseLong(key);
-            } catch (NumberFormatException e) {
-                continue;
-            }
-            roleIds.add(Long.parseLong(key));
-        }
-        return roleIds;
+        return section.getKeys(false).stream().map(Long::parseLong).toList();
     }
 
     private String buildMessage(YamlFile config, Guild guild) {
         ConfigurationSection section = config.getConfigurationSection("roles");
         StringBuilder builder = new StringBuilder();
+        builder.append(config.getString("message")).append("\n\n");
         for (String key : section.getKeys(false)) {
-            try {
-                Long.parseLong(key);
-            } catch (NumberFormatException e) {
-                builder.append(section.getString(key)).append("\n\n");
-                continue;
-            }
             Role role = guild.getRoleById(key);
             assert role != null;
             List<Member> members = guild.getMembersWithRoles(role);

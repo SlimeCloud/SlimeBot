@@ -5,11 +5,11 @@ build/
 !**/src/test/**/build/
 
 out
-
+logs/
 Slimebot/
+.env
 
 ### Eclipse ###
-.env
 .apt_generated
 .classpath
 .factorypath
