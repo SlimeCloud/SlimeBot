@@ -20,7 +20,7 @@ public class ReadyEvent extends ListenerAdapter {
 		try {
 			Main.spotify.register();
 		} catch(Exception e) {
-			SpotifyListener.logger.error("Failed to register spotify listeners", e);
+			SpotifyListener.logger.error("Konnte spotify listener nicht starten", e);
 		}
 
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
