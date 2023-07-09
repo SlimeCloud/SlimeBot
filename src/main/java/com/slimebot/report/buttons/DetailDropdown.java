@@ -2,6 +2,7 @@ package com.slimebot.report.buttons;
 
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Status;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -13,11 +14,9 @@ public class DetailDropdown extends ListenerAdapter {
 
 		String id = event.getValues().get(0);
 
-		System.out.println("id = " + id);
-
 		Report report = Report.get(event.getGuild().getId(), Integer.valueOf(id));
 
-		var embed = report.asEmbed(event.getGuild().getId());
+		MessageEmbed embed = report.asEmbed(event.getGuild().getId());
 
 		if(report.status == Status.CLOSED) {
 			event.replyEmbeds(embed).queue();

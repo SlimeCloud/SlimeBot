@@ -103,9 +103,7 @@ public class Report {
 			reportFile.save();
 		} catch(IOException e) {
 			throw new RuntimeException(e);
-		}
-
-		System.out.println(reportFile.getString("reports." + report.id + ".msgContent"));
+        }
 	}
 
 	public static Report get(String guildID, Integer reportID) {

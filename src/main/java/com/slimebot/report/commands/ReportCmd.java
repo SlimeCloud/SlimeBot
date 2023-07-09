@@ -39,7 +39,6 @@ public class ReportCmd extends ListenerAdapter {
 			throw new RuntimeException(e);
 		}
 
-		System.out.println(reportFile.getConfigurationSection("reports").getName());
 		int reportID = reportFile.getConfigurationSection("reports").size() + 1;
 
 		OptionMapping user = event.getOption("user");
