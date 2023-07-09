@@ -104,7 +104,6 @@ public class StaffMessage extends ListenerAdapter {
         StringBuilder builder = new StringBuilder();
         builder.append(config.getString("message")).append("\n\n");
         for (String key : section.getKeys(false)) {
-            System.out.println(key);
             Role role = guild.getRoleById(key);
             assert role != null;
             List<Member> members = guild.getMembersWithRoles(role);
