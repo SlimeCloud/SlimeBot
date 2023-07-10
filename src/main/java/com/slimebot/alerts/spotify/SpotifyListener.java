@@ -42,7 +42,7 @@ public class SpotifyListener {
 
 
 	public void check() {
-		if (System.currentTimeMillis() > tokenExpiry) fetchToken();
+		if (System.currentTimeMillis() > tokenExpiry - 10000) fetchToken();
 
 		List<String> known = Main.config.database != null
 				? Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list())
