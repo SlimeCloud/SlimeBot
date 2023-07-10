@@ -14,9 +14,11 @@ import org.simpleyaml.configuration.file.YamlFile;
 import java.io.IOException;
 import java.util.Date;
 
-public class ReadyEvent extends ListenerAdapter {
+public class StartupListener extends ListenerAdapter {
 	@Override
 	public void onReady(@NotNull net.dv8tion.jda.api.events.session.ReadyEvent event) {
+		Main.discordUtils.getCommandCache().updateGlobalCommands(error -> Main.logger.error("Failed to update commands", error));
+
 		try {
 			Main.spotify.register();
 		} catch(Exception e) {

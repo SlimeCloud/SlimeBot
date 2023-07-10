@@ -10,10 +10,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 
-public class Timeout extends ListenerAdapter {
+public class TimeoutListener extends ListenerAdapter {
 
 	@Override
 	public void onGuildMemberUpdateTimeOut(GuildMemberUpdateTimeOutEvent event) {
@@ -24,7 +23,7 @@ public class Timeout extends ListenerAdapter {
 				EmbedBuilder embedBuilder = new EmbedBuilder()
 						.setTitle("Du wurdest getimeouted")
 						.setColor(Main.embedColor(event.getGuild().getId()))
-						.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+						.setTimestamp(Instant.now())
 						.setDescription("Du wurdest auf dem SlimeCloud Discord getimeouted")
 						.addField("Grund:", entry.getReason(), true);
 
@@ -33,7 +32,7 @@ public class Timeout extends ListenerAdapter {
 				EmbedBuilder embedBuilderLog = new EmbedBuilder()
 						.setTitle("\"" + event.getMember().getEffectiveName() + "\"" + " wurde getimeouted")
 						.setColor(Main.embedColor(event.getGuild().getId()))
-						.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+						.setTimestamp(Instant.now())
 						.addField("Grund:", entry.getReason(), true)
 						.addField("Wer: ", event.getMember().getAsMention(), true);
 
