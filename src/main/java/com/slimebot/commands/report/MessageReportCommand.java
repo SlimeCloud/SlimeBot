@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 
 import java.time.Instant;
 
-@ApplicationCommand(name = "Nachricht melden", type = Command.Type.MESSAGE)
+@ApplicationCommand(name = "Nachricht melden", type = Command.Type.MESSAGE, guildOnly = true)
 public class MessageReportCommand {
 	@ApplicationCommandMethod
 	public void performCommand(MessageContextInteractionEvent event) {

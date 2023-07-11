@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 
 import java.time.Instant;
 
-@ApplicationCommand(name = "Nutzer melden", type = Command.Type.USER)
+@ApplicationCommand(name = "Nutzer melden", type = Command.Type.USER, guildOnly = true)
 public class UserReportCommand {
 	public static Modal createMode(String targetUser) {
 		return Modal.create("report:user", "Nutzer melden")

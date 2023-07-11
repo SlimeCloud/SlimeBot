@@ -19,7 +19,7 @@ import org.simpleyaml.configuration.file.YamlFile;
 import java.io.IOException;
 import java.time.Instant;
 
-@ApplicationCommand(name = "report", description = "Verwaltet reports", subcommands = {BlockCommand.class, DetailsCommand.class, ListCommand.class})
+@ApplicationCommand(name = "report", description = "Verwaltet reports", guildOnly = true, subcommands = {BlockCommand.class, DetailsCommand.class, ListCommand.class})
 public class ReportCommand {
 	public final CommandPermission permission = CommandPermission.TEAM;
 
