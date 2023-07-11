@@ -6,6 +6,7 @@ import com.slimebot.commands.*;
 import com.slimebot.events.OnJoin;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.events.Timeout;
+import com.slimebot.message.StaffMessage;
 import com.slimebot.report.buttons.Close;
 import com.slimebot.report.buttons.DetailDropdown;
 import com.slimebot.report.commands.Blockreport;
@@ -120,6 +121,9 @@ public class Main {
 				.addEventListeners(new ReadyEvent())
 				.addEventListeners(new Timeout())
 				.addEventListeners(new OnJoin())
+        
+        //Team update
+        .addEventListeners(new StaffMessage())
 
 				//Context Menus
 				.addEventListeners(new MsgReport())
