@@ -58,10 +58,10 @@ public class BugCommand {
 									.setFooter("Report von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")")
 									.build()
 					)
-					.setActionRow(Button.secondary("close_bug", "Bug schließen")).queue();
+					.setActionRow(Button.secondary("bug:close", "Bug schließen")).queue();
 		}));
 
-		manager.getEventManager().registerHandler(new ButtonHandler("close_bug", event -> {
+		manager.getEventManager().registerHandler(new ButtonHandler("bug:close", event -> {
 			event.getMessage().delete().queue();
 			event.reply("Der Bug wurde erfolgreich geschlossen!").setEphemeral(true).queue();
 		}));
