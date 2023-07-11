@@ -2,6 +2,7 @@ package com.slimebot.alerts.spotify;
 
 import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.Main;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlFile;
@@ -86,13 +87,17 @@ public class SpotifyListener implements Runnable {
 	}
 
 	private void broadcastAlbum(AlbumSimplified album) {
+
 		TextChannel channel = Main.jdaInstance.getTextChannelById(channelId);
+		NewsChannel newsChannel = Main.jdaInstance.getNewsChannelById(channelId);
 
-		if(channel == null) {
-			logger.error("Kanal nicht verfügbar: {}", channelId);
-			return;
+		if(channel == null && newsChannel == null) throw new RuntimeException("Channel not found");
+
+		try {
+			channel.sendMessage(MessageFormat.format(message, album.getName(), album.getExternalUrls().get("spotify"))).queue();
+		} catch (NullPointerException e){
+			newsChannel.sendMessage(MessageFormat.format(message, album.getName(), album.getExternalUrls().get("spotify"))).queue();
 		}
-
-		channel.sendMessage(MessageFormat.format(message, album.getName(), album.getExternalUrls().get("spotify"))).queue();
 	}
+
 }
