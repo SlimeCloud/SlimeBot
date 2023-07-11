@@ -2,6 +2,7 @@ package com.slimebot.alerts.spotify;
 
 import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.Main;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.hc.core5.http.ParseException;
 import org.simpleyaml.configuration.file.YamlFile;
@@ -73,9 +74,14 @@ public class PodcastListener implements Runnable {
 		String message = MessageFormat.format(config.getString("show." + showID + ".message"), episode.getName(), episode.getExternalUrls().get("spotify"));
 
 		TextChannel channel = Main.jdaInstance.getTextChannelById(config.getLong("show." + showID + ".channelId"));
+		NewsChannel newsChannel = Main.jdaInstance.getNewsChannelById(config.getLong("show." + showID + ".channelId"));
 
-		if(channel == null) throw new RuntimeException("Channel not found");
+		if(channel == null && newsChannel == null) throw new RuntimeException("Channel not found");
 
-		channel.sendMessage(message).queue();
+		try {
+			channel.sendMessage(message).queue();
+		} catch (NullPointerException e){
+			newsChannel.sendMessage(message).queue();
+		}
 	}
 }
