@@ -9,6 +9,7 @@ import de.mineking.discord.commands.annotated.WhenFinished;
 import de.mineking.discord.events.interaction.ButtonHandler;
 import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
@@ -47,7 +48,7 @@ public class BugCommand {
 			event.reply("Der Report wurde erfolgreich ausgeführt").setEphemeral(true).queue();
 
 			event.getGuild()
-					.getTextChannelById(config.getString("logChannel"))
+					.getChannelById(MessageChannel.class, config.getString("logChannel"))
 					.sendMessageEmbeds(
 							new EmbedBuilder()
 									.setColor(Main.embedColor(event.getGuild().getId()))

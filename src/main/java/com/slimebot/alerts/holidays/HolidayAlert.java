@@ -7,7 +7,7 @@ import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -61,7 +61,8 @@ public class HolidayAlert implements Runnable {
 
 	private void sendMessage(JsonObject object) {
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
-			TextChannel channel = getChannelFromConfig(guild.getId(), "greetingsChannel");
+			MessageChannel channel = getChannelFromConfig(guild.getId(), "greetingsChannel");
+
 			if(channel == null) return;
 
 			// 0: holiday name, 1: state, 2: year
@@ -98,7 +99,7 @@ public class HolidayAlert implements Runnable {
 		return null;
 	}
 
-	private TextChannel getChannelFromConfig(String guildId, String path) {
+	private MessageChannel getChannelFromConfig(String guildId, String path) {
 		if(guildId == null || path == null) return null;
 
 		YamlFile config = Config.getConfig(guildId, "mainConfig");
@@ -110,7 +111,7 @@ public class HolidayAlert implements Runnable {
 		}
 
 		try {
-			return Main.jdaInstance.getGuildById(guildId).getTextChannelById(config.getString(path));
+			return Main.jdaInstance.getGuildById(guildId).getChannelById(MessageChannel.class, config.getString(path));
 		} catch(IllegalArgumentException n) {
 			config.set(path, 0);
 			try {

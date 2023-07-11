@@ -12,7 +12,7 @@ import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
@@ -115,7 +115,7 @@ public class FdmdsCommand {
 					throw new RuntimeException(e);
 				}
 
-				TextChannel channel = event.getGuild().getTextChannelById(config.getLong("fdmdsLogChannel", 0));
+				MessageChannel channel = event.getGuild().getChannelById(MessageChannel.class, config.getLong("fdmdsLogChannel", 0));
 				if(channel == null) {
 					event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
 					return;
@@ -150,7 +150,7 @@ public class FdmdsCommand {
 				return;
 			}
 
-			TextChannel channel = event.getGuild().getTextChannelById(config.getLong("fdmdsChannel", 0));
+			MessageChannel channel = event.getGuild().getChannelById(MessageChannel.class, config.getLong("fdmdsChannel", 0));
 
 			if(channel == null) {
 				event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();

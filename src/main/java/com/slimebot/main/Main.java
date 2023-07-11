@@ -8,6 +8,7 @@ import com.slimebot.commands.report.UserReportCommand;
 import com.slimebot.events.JoinListener;
 import com.slimebot.events.StartupListener;
 import com.slimebot.events.TimeoutListener;
+import com.slimebot.message.StaffMessage;
 import com.slimebot.utils.Config;
 import de.mineking.discord.DiscordUtils;
 import de.mineking.discord.commands.ContextBase;
@@ -97,7 +98,8 @@ public class Main {
 				//Events
 				.addEventListeners(new StartupListener())
 				.addEventListeners(new TimeoutListener())
-				.addEventListeners(new JoinListener());
+				.addEventListeners(new JoinListener())
+				.addEventListeners(new StaffMessage());
 
 		discordUtils = new DiscordUtils("", jdaBuilder)
 				.useEventManager(null)
