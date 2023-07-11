@@ -1,5 +1,6 @@
 package com.slimebot.message;
 
+import com.slimebot.alerts.spotify.SpotifyListener;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -10,12 +11,15 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StaffMessage extends ListenerAdapter {
+    public final static Logger logger = LoggerFactory.getLogger(StaffMessage.class);
     @Override
     public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
         updateMessage(event.getGuild(), event.getRoles());
@@ -45,7 +49,7 @@ public class StaffMessage extends ListenerAdapter {
     private void updateMessage(Guild guild, YamlFile config){
         String message = buildMessage(config, guild);
         TextChannel channel = guild.getTextChannelById(config.getLong("channelID"));
-        assert channel != null;
+        if (channel == null){logger.warn("Konnte Channel nicht finden!");return;}
         if (config.getInt("messageID") == -1) {
             channel.sendMessage(message).queue(message1 -> {
                 config.set("messageID", message1.getIdLong());
@@ -80,14 +84,14 @@ public class StaffMessage extends ListenerAdapter {
     private void createConfig(YamlFile config) {
         try {
             config.createNewFile(true);
-            config.set("roles.123456.description", "This is a description");
-            config.set("messageID", -1);
-            config.set("channelID", 123456);
-            config.setComment("messageID", "The ID of the message that should be edited. Set to -1 if you want to create a new message");
             config.set("roles.premessage", """
                     🪐Team Vorstellung🪐
                     
                     *Im Im folgenden werden die Teammitglieder im Zusammenhang mit ihren Rollen vorgestellt. Bei Bedarf und Situation werden diese unangekündigt verändert!*""");
+            config.set("roles.123456.description", "This is a description");
+            config.set("messageID", -1);
+            config.set("channelID", 123456);
+            config.setComment("messageID", "The ID of the message that should be edited. Set to -1 if you want to create a new message");
             config.setComment("message", "Is shown before the roles");
             config.save();
         } catch (Exception e) {
@@ -121,8 +125,15 @@ public class StaffMessage extends ListenerAdapter {
             }
             Role role = guild.getRoleById(key);
             assert role != null;
-            List<Member> members = guild.getMembersWithRoles(role);
-            if (members.isEmpty()) {
+            List<Member> members = null;
+            try {
+                members = guild.getMembersWithRoles(role);
+            } catch (IllegalArgumentException e){
+                logger.warn("Rolle ("+key+") nicht gefunden");
+            }
+
+
+            if (members == null ||members.isEmpty()) {
                 continue;
             }
             builder.append(role.getAsMention()).append(" *").append(section.getString(key + ".description")).append("*\n");
