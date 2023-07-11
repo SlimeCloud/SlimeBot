@@ -1,7 +1,7 @@
 package com.slimebot.report.assets;
 
 import com.slimebot.main.Main;
-import com.slimebot.utils.Config;
+import com.slimebot.main.config.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -132,15 +132,15 @@ public class Report {
 		return report;
 	}
 
-	public MessageEmbed asEmbed(String guildID) {
+	public MessageEmbed asEmbed(Guild guild) {
 		EmbedBuilder embed = new EmbedBuilder()
-				.setColor(Main.embedColor(guildID))
+				.setColor(Main.database.getColor(guild))
 				.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
 				.setTitle(":exclamation:  Details zu Report #" + id)
 				.addField("Report Typ:", type.str, true)
 				.addField("Gemeldeter User:", user.getAsMention(), true)
 				.addField("Gemeldet von:", by.getAsMention(), true)
-				.addField("Gemeldet am:", time.format(Main.dtf) + "Uhr", true)
+				.addField("Gemeldet am:", time.format(Main.dateFormat) + "Uhr", true)
 				.addField("Status:", status.str, true);
 
 		if(type == Type.MSG) {

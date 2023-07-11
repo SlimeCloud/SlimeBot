@@ -1,7 +1,7 @@
 package com.slimebot.events;
 
 import com.slimebot.main.Main;
-import com.slimebot.utils.Config;
+import com.slimebot.main.config.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;

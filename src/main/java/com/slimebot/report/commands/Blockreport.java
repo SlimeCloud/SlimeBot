@@ -1,8 +1,8 @@
 package com.slimebot.report.commands;
 
 import com.slimebot.main.Main;
+import com.slimebot.main.config.Config;
 import com.slimebot.utils.Checks;
-import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

@@ -1,10 +1,10 @@
 package com.slimebot.report.commands;
 
 import com.slimebot.main.Main;
+import com.slimebot.main.config.Config;
 import com.slimebot.report.assets.Report;
 import com.slimebot.report.assets.Status;
 import com.slimebot.utils.Checks;
-import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -123,7 +123,7 @@ public class ReportList extends ListenerAdapter {
 
 	private void addReportField(Report report, EmbedBuilder embed) {
 		embed.addField("Report #" + report.id,
-				report.user.getAsMention() + " wurde am ` " + report.time.format(Main.dtf) + "` von " + report.by.getAsMention() + " gemeldet.",
+				report.user.getAsMention() + " wurde am ` " + report.time.format(Main.dateFormat) + "` von " + report.by.getAsMention() + " gemeldet.",
 				false
 		);
 	}

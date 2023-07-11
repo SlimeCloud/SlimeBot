@@ -1,11 +1,12 @@
 package com.slimebot.main;
 
-import com.slimebot.alerts.holidays.HolidayAlert;
+import com.google.gson.Gson;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
 import com.slimebot.events.OnJoin;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.events.Timeout;
+import com.slimebot.main.config.Config;
 import com.slimebot.report.buttons.Close;
 import com.slimebot.report.buttons.DetailDropdown;
 import com.slimebot.report.commands.Blockreport;
@@ -16,11 +17,9 @@ import com.slimebot.report.contextmenus.MsgReport;
 import com.slimebot.report.contextmenus.UserReport;
 import com.slimebot.report.modals.CloseReport;
 import com.slimebot.report.modals.ReportModal;
-import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -28,61 +27,38 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.simpleyaml.configuration.file.YamlFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.io.IOException;
-import java.net.URL;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
+	public final static String version = "2.0.0"; //TODO Automatically replace this from gradle build
+
 	public final static Logger logger = LoggerFactory.getLogger(Main.class);
-
 	public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
+	public final static Gson gson = new Gson();
 
-	private static final String activityText = Config.getBotInfo("activity.text");
-	public static String activityType = Config.getBotInfo("activity.type");
+
+	public static Config config;
 
 	public static JDA jdaInstance;
+	public static Database database;
 	public static SpotifyListenerManager spotify = new SpotifyListenerManager();
 
-	public static ArrayList<String> blocklist(String guildID) {
-		YamlFile config = Config.getConfig(guildID, "mainConfig");
-		try {
-			config.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-		return (ArrayList<String>) config.getStringList("blocklist");
-	}
-
-	public static Color embedColor(String guildID) {
-		YamlFile config = Config.getConfig(guildID, "mainConfig");
-		try {
-			config.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-		return new Color(
-				config.getInt("embedColor.red"),
-				config.getInt("embedColor.green"),
-				config.getInt("embedColor.blue")
-		);
-	}
-
-	public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
+	public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
 
 	public static void main(String[] args) throws IOException {
-		logger.info("Bot Version: {}", Config.getBotInfo("version"));
+		config = Config.readFromFile("config");
+
+		logger.info("Bot Version: {}", version);
 		if(args.length == 0) {
 			logger.error("BITTE EIN TOKEN NAME ALS COMMAND-LINE-PARAMETER ÜBERGEBEN (.env im bot-ordner)");
 			System.exit(420);
@@ -91,14 +67,14 @@ public class Main {
 		String tokenName = args[0];
 
 		logger.info("{}-Bot wird gestartet...", tokenName);
-		String token = Config.getEnvKey("TOKEN_" + tokenName.toUpperCase());
+		String token = Config.env.get("TOKEN_" + tokenName.toUpperCase());
 		if(token == null || token.isEmpty()) {
 			logger.error("BITTE EIN TOKEN ANGEBEN (.env im bot-ordner)");
 			System.exit(421);
 		}
 
 		jdaInstance = JDABuilder.createDefault(token)
-				.setActivity(Activity.of(Activity.ActivityType.valueOf(activityType), activityText))
+				.setActivity(config.activity.build())
 
 				.enableIntents(EnumSet.allOf(GatewayIntent.class))
 				.setEventPassthrough(true)
@@ -106,7 +82,6 @@ public class Main {
 
 				// Commands
 				.addEventListeners(new Bug())
-				.addEventListeners(new ConfigCmd())
 				.addEventListeners(new BulkAddRole())
 				.addEventListeners(new Ping())
 				.addEventListeners(new Blockreport())
@@ -136,6 +111,8 @@ public class Main {
 				.build();
 
 		registerCommands();
+
+		database = new Database();
 	}
 
 	public static void registerCommands() {

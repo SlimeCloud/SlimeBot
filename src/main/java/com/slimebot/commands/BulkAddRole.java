@@ -45,7 +45,7 @@ public class BulkAddRole extends ListenerAdapter {
 
 		EmbedBuilder embedBuilder = new EmbedBuilder()
 				.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-				.setColor(Main.embedColor(event.getGuild().getId()))
+				.setColor(Main.database.getColor(event.getGuild()))
 				.setTitle(":white_check_mark: Rollen Verteilt")
 				.setDescription("Die Rolle " + roleOption.getAsRole().getAsMention() + " wurde " + (long) memberWithout.size() + " Membern gegeben!");
 

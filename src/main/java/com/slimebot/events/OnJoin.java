@@ -1,6 +1,6 @@
 package com.slimebot.events;
 
-import com.slimebot.utils.Config;
+import com.slimebot.main.config.Config;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 

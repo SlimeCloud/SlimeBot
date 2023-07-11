@@ -18,15 +18,16 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation 'net.dv8tion:JDA:5.0.0-beta.11'
-    implementation 'com.github.Carleslc:Simple-YAML:1.8.4'
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.0.0'
     implementation 'ch.qos.logback:logback-classic:1.4.8'
-    implementation group: 'io.github.cdimascio', name: 'java-dotenv', version: '5.1.1'
+    implementation 'io.github.cdimascio:java-dotenv:5.1.1'
 
-    implementation platform('org.jdbi:jdbi3-bom:3.40.0')
+    implementation 'com.google.code.gson:gson:2.10.1'
+
     implementation 'org.postgresql:postgresql:42.6.0'
-    implementation 'org.jdbi:jdbi3-sqlobject'
-    implementation 'org.jdbi:jdbi3-postgres'
+    implementation 'org.jdbi:jdbi3-core:3.39.0'
+    implementation 'org.jdbi:jdbi3-sqlobject:3.39.0'
+    implementation 'org.jdbi:jdbi3-postgres3.39.0'
 }
 
 

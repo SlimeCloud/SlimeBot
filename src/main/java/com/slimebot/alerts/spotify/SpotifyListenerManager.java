@@ -1,7 +1,7 @@
 package com.slimebot.alerts.spotify;
 
+import com.slimebot.main.Main;
 import org.apache.hc.core5.http.ParseException;
-import org.simpleyaml.configuration.file.YamlFile;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
@@ -10,28 +10,12 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class SpotifyListenerManager {
-	private final YamlFile config = new YamlFile("Slimebot/spotify/config.yml");
 	private final SpotifyApi api;
 
 	public SpotifyListenerManager() {
-		if(!config.exists()) {
-			try {
-				config.createNewFile();
-				createConfig();
-			} catch(IOException e) {
-				SpotifyListener.logger.error("Spotify config konnte nicht erstellt werden");
-			}
-		}
-
-		try {
-			config.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-
 		api = new SpotifyApi.Builder()
-				.setClientId(config.getString("clientId"))
-				.setClientSecret(config.getString("clientSecret"))
+				.setClientId(Main.config.spotify.clientId)
+				.setClientSecret(Main.config.spotify.clientSecret)
 				.build();
 		try {
 			api.setAccessToken(api.clientCredentials().build().execute().getAccessToken());

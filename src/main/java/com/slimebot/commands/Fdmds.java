@@ -1,11 +1,12 @@
 package com.slimebot.commands;
 
+import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
-import com.slimebot.utils.Config;
-import com.slimebot.utils.SlimeEmoji;
+import com.slimebot.main.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -14,9 +15,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-import org.simpleyaml.configuration.file.YamlFile;
-
-import java.io.IOException;
 
 public class Fdmds extends ListenerAdapter {
 	@Override
@@ -32,7 +30,8 @@ public class Fdmds extends ListenerAdapter {
 		switch(event.getModalId()) {
 			case "fdmds" -> {
 				// get Log-channel
-				TextChannel channel = getChannelFromConfig(event.getGuild().getId(), "fdmdsLogChannel");
+				MessageChannel channel = Main.database.getChannel(event.getGuild(), DatabaseField.FDMDS_LOG_CHANNEL);
+
 				if(channel == null) {
 					event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
 					return;
@@ -66,7 +65,7 @@ public class Fdmds extends ListenerAdapter {
 
 				// Create and send Embed
 				EmbedBuilder embedBuilder = new EmbedBuilder()
-						.setColor(Main.embedColor(event.getGuild().getId()))
+						.setColor(Main.database.getColor(event.getGuild()))
 						.setTitle("Frag doch mal den Schleim")
 						.setFooter("Vorschlag von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")")
 						.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question, false)
@@ -109,7 +108,6 @@ public class Fdmds extends ListenerAdapter {
 				// Crate Edit Modal
 				Modal modal = getFdmdsModal("fdmds.edit", new String[]{question, choices});
 				event.replyModal(modal).queue();
-				return;
 			}
 
 			case "fdmds.sendButton" -> {
@@ -119,17 +117,19 @@ public class Fdmds extends ListenerAdapter {
 				MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 				String question = embed.getFields().get(0).getValue();
 				String choices = embed.getFields().get(1).getValue();
-				String roleMention = getRoleMentionFromConfig(event.getGuild().getId(), "fdmdsRoleId");
 
-				if(roleMention == null) {
+				Role role = Main.database.getRole(event.getGuild(), DatabaseField.FDMDS_ROLE);
+
+				if(role == null) {
 					event.reply("Error: Rolle wurde nicht gesetzt!").setEphemeral(true).queue();
 					return;
 				}
 
-				text = text + " \r\n" + question + "\r\n \r\n" + choices + "\n\n" + roleMention;
+				text = text + " \r\n" + question + "\r\n \r\n" + choices + "\n\n" + role.getAsMention();
 
 				// get fdmds-channel
-				TextChannel channel = getChannelFromConfig(event.getGuild().getId(), "fdmdsChannel");
+				MessageChannel channel = Main.database.getChannel(event.getGuild(), DatabaseField.FDMDS_CHANNEL);
+
 				if(channel == null) {
 					event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
 					return;
@@ -171,65 +171,5 @@ public class Fdmds extends ListenerAdapter {
 				.addActionRow(questionTextInput.build())
 				.addActionRow(choicesTextInput.build())
 				.build();
-	}
-
-	private TextChannel getChannelFromConfig(String guildId, String path) {
-		if(guildId == null || path == null) return null;
-
-		YamlFile config = Config.getConfig(guildId, "mainConfig");
-		try {
-			config.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		TextChannel channel;
-
-		try {
-			channel = Main.jdaInstance.getGuildById(guildId).getTextChannelById(config.getString(path));
-		} catch(IllegalArgumentException n) {
-			config.set(path, 0);
-			try {
-				config.save();
-			} catch(IOException e) {
-				throw new RuntimeException(e);
-			}
-			return null;
-		}
-
-		return channel;
-	}
-
-	private String getRoleMentionFromConfig(String guildId, String path) {
-		if(guildId == null || path == null) return null;
-
-		YamlFile config = Config.getConfig(guildId, "mainConfig");
-		try {
-			config.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		if(!config.contains(path)) {
-			config.set(path, 0);
-			try {
-				config.save();
-			} catch(IOException e) {
-				throw new RuntimeException(e);
-			}
-			return null;
-		}
-
-		try {
-			return "<@&" + config.getLong(path) + ">";
-		} catch(IllegalArgumentException n) {
-			config.set(path, 0);
-			try {
-				config.save();
-			} catch(IOException e) {
-				throw new RuntimeException(e);
-			}
-			return null;
-		}
 	}
 }

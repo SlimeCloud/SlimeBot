@@ -3,7 +3,7 @@ package com.slimebot.events;
 
 import com.slimebot.alerts.spotify.SpotifyListener;
 import com.slimebot.main.Main;
-import com.slimebot.utils.Config;
+import com.slimebot.main.config.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;

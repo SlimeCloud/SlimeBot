@@ -1,7 +1,7 @@
 package com.slimebot.commands;
 
+import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
-import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -12,9 +12,6 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
-import org.simpleyaml.configuration.file.YamlFile;
-
-import java.io.IOException;
 
 public class Bug extends ListenerAdapter {
 	@Override
@@ -36,20 +33,12 @@ public class Bug extends ListenerAdapter {
 	public void onModalInteraction(ModalInteractionEvent event) {
 		if(!event.getModalId().equals("bug")) return;
 
-		YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
-
-		try {
-			config.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-
 		ModalMapping modalMapping = event.getValues().get(0);
 
 		String label = "Ein neuer Bug wurde gefunden!";
 
 		EmbedBuilder embedBuilder = new EmbedBuilder()
-				.setColor(Main.embedColor(event.getGuild().getId()))
+				.setColor(Main.database.getColor(event.getGuild()))
 				.setTitle(label)
 
 				.setDescription("Fehlerbeschreibung: \n\n")
@@ -58,8 +47,7 @@ public class Bug extends ListenerAdapter {
 
 		event.reply("Der Report wurde erfolgreich ausgeführt").setEphemeral(true).queue();
 
-		event.getGuild()
-				.getTextChannelById(config.getString("logChannel"))
+		Main.database.getChannel(event.getGuild(), DatabaseField.LOG_CHANNEL)
 				.sendMessageEmbeds(embedBuilder.build())
 				.setActionRow(Button.secondary("close_bug", "Bug schließen")).queue();
 	}

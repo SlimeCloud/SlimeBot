@@ -1,0 +1,19 @@
+{
+    "activity": {
+        "type:" "PLAYING",
+        "text": "mit Slimebällen"
+    },
+
+    "database": {
+        "host": "localhost/slime",
+        "user": "slime",
+        "password": "test123"
+    },
+
+    "spotify": {
+        "clientId": "-- your client id --",
+        "clientSecret": "-- your client secret --"
+    },
+
+    "color": "#569d3c"
+}

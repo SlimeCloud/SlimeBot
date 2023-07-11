@@ -15,7 +15,7 @@ public class Ping extends ListenerAdapter {
 		EmbedBuilder embed = new EmbedBuilder()
 				.setTitle("Pong")
 				.setDescription(event.getJDA().getGatewayPing() + "ms")
-				.setColor(Main.embedColor(event.getGuild().getId()));
+				.setColor(Main.database.getColor(event.getGuild()));
 
 		event.replyEmbeds(embed.build()).setEphemeral(true).queue();
 	}

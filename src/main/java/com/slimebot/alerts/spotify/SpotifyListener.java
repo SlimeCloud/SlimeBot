@@ -3,8 +3,6 @@ package com.slimebot.alerts.spotify;
 import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.simpleyaml.configuration.ConfigurationSection;
-import org.simpleyaml.configuration.file.YamlFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -21,25 +19,16 @@ import java.util.List;
 public class SpotifyListener implements Runnable {
 	public final static Logger logger = LoggerFactory.getLogger(SpotifyListener.class);
 
+
 	private final String artistId;
-	private final long channelId;
 	private final SpotifyApi spotifyApi;
 	private final String message;
 
-	private final ConfigurationSection section;
 
-	private final YamlFile config;
-
-	private final List<String> publishedAlbums;
-
-	public SpotifyListener(String artistId, YamlFile config, String message, SpotifyApi api) {
-		this.config = config;
-		this.section = config.getConfigurationSection("artists." + artistId);
+	public SpotifyListener(SpotifyApi api, String artistId, String message) {
 		this.artistId = artistId;
-		this.channelId = section.getLong("channelId");
 		this.message = message;
 		this.spotifyApi = api;
-		this.publishedAlbums = section.getStringList("publishedAlbums");
 
 		run();
 		Main.scheduleDaily(12, this);
