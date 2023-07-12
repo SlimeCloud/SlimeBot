@@ -4,8 +4,10 @@ import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.hc.core5.http.ParseException;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.EpisodeSimplified;
@@ -32,13 +34,19 @@ public class PodcastListener implements Runnable {
 	public void run() {
 		SpotifyListener.logger.info("Überprüfe auf neue Podcast Episode");
 
-		List<String> known = Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list());
+		Main.database.run(handle -> {
+			List<String> known = handle.createQuery("select id from spotify_known").mapTo(String.class).list();
+			PreparedBatch update = handle.prepareBatch("insert into spotify_known values(:id)");
 
-		for(EpisodeSimplified episode : getLatestEpisodes()) {
-			if(known.contains(episode.getId())) continue;
+			for(EpisodeSimplified episode : getLatestEpisodes()) {
+				if(known.contains(episode.getId())) continue;
 
-			broadcastEpisode(episode);
-		}
+				broadcastEpisode(episode);
+				update.bind("id", episode.getId()).add();
+			}
+
+			update.execute();
+		});
 	}
 
 	private List<EpisodeSimplified> getLatestEpisodes() {
@@ -62,13 +70,12 @@ public class PodcastListener implements Runnable {
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
 			MessageChannel channel = Main.database.getChannel(guild, DatabaseField.SPOTIFY_PODCAST_CHANNEL);
 
-			if(channel == null) {
-				SpotifyListener.logger.warn("Kanal nicht verfügbar");
-				continue;
-			}
+			if(channel == null) continue;
 
-			channel.sendMessage(MessageFormat.format(Main.config.spotify.music.message,
-					Main.database.getRole(guild, DatabaseField.SPOTIFY_NOTIFICATION_ROLE),
+			Role notification = Main.database.getRole(guild, DatabaseField.SPOTIFY_NOTIFICATION_ROLE);
+
+			channel.sendMessage(MessageFormat.format(Main.config.spotify.podcast.message,
+					notification == null ? "" : notification.getAsMention(),
 					episode.getName(),
 					episode.getExternalUrls().get("spotify")
 			)).queue();

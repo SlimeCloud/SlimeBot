@@ -4,7 +4,9 @@ import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -33,13 +35,19 @@ public class SpotifyListener implements Runnable {
 	public void run() {
 		logger.info("Überprüfe auf neue Releases");
 
-		List<String> known = Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list());
+		Main.database.run(handle -> {
+			List<String> known = handle.createQuery("select id from spotify_known").mapTo(String.class).list();
+			PreparedBatch update = handle.prepareBatch("insert into spotify_known values(:id)");
 
-		for(AlbumSimplified album : getLatestAlbums()) {
-			if(known.contains(album.getId())) continue;
+			for(AlbumSimplified album : getLatestAlbums()) {
+				if(known.contains(album.getId())) continue;
 
-			broadcastAlbum(album);
-		}
+				broadcastAlbum(album);
+				update.bind("id", album.getId()).add();
+			}
+
+			update.execute();
+		});
 	}
 
 	private List<AlbumSimplified> getLatestAlbums() {
@@ -64,13 +72,12 @@ public class SpotifyListener implements Runnable {
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
 			MessageChannel channel = Main.database.getChannel(guild, DatabaseField.SPOTIFY_MUSIC_CHANNEL);
 
-			if(channel == null) {
-				logger.warn("Kanal nicht verfügbar");
-				continue;
-			}
+			if(channel == null) continue;
+
+			Role notification = Main.database.getRole(guild, DatabaseField.SPOTIFY_NOTIFICATION_ROLE);
 
 			channel.sendMessage(MessageFormat.format(Main.config.spotify.music.message,
-					Main.database.getRole(guild, DatabaseField.SPOTIFY_NOTIFICATION_ROLE),
+					notification == null ? "" : notification.getAsMention(),
 					album.getName(),
 					album.getExternalUrls().get("spotify")
 			)).queue();

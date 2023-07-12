@@ -15,26 +15,14 @@
         "clientSecret": "-- your client secret --",
 
         "music": {
-            "message": "
-              {0}
-              ## 🎶 ALARM ALARM 🎶
-              Neuer Musik Release. 🥳
-              Gönn dir umbedingt das neue Album: **{1}**
-              {2}
-            ",
+            "message": "{0}\n## 🎶 ALARM ALARM 🎶\nNeuer Musik Release. 🥳\nGönn dir umbedingt das neue Album: [**{1}**]({2})",
             "artistIds": [
                 "0ZzsW7JiW4Ok3H7nFl4yV1"
             ]
         },
 
         "podcast": {
-            "message": "
-              {0}
-              ## 🎙️ ALARM ALARM 🎙️
-              Neue Podcast-Folge! Rein da!
-              In der heutigen Folge: **{1}**
-              {2}
-            ",
+            "message": "{0}\n## 🎙️ ALARM ALARM 🎙️\nNeue Podcast-Folge!\nRein da!In der heutigen Folge: [**{1}**]({2})",
             "artistIds": [
                 "0HNYFHg2WNq1P56qK6defn"
             ]
