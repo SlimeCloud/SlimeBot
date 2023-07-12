@@ -5,7 +5,6 @@ import com.slimebot.alerts.spotify.SpotifyListener;
 import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -22,21 +21,6 @@ public class ReadyListener extends ListenerAdapter {
 			}
 		} catch(Exception e) {
 			SpotifyListener.logger.error("Konnte spotify listener nicht starten", e);
-		}
-
-		for(Guild guild : Main.jdaInstance.getGuilds()) {
-			MessageChannel channel = Main.database.getChannel(guild, DatabaseField.LOG_CHANNEL);
-
-			if(channel == null) continue;
-
-			channel.sendMessageEmbeds(
-					new EmbedBuilder()
-							.setTitle("Bot wurde gestartet")
-							.setDescription("Der Bot hat sich mit der DiscordAPI (neu-) verbunden")
-							.setColor(Main.database.getColor(guild))
-							.setTimestamp(Instant.now())
-							.build()
-			).queue();
 		}
 	}
 
