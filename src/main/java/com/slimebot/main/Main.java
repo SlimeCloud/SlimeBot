@@ -1,6 +1,7 @@
 package com.slimebot.main;
 
 import com.google.gson.Gson;
+import com.slimebot.alerts.holidays.HolidayAlert;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
 import com.slimebot.events.ReadyListener;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -123,6 +125,8 @@ public class Main {
 		else {
 			logger.info("No spotify configuration found - Disabled spotify notifications");
 		}
+
+		new HolidayAlert(new URL("https://ferien-api.de/api/v1/holidays"));
 	}
 
 	public static void registerCommands() {

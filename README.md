@@ -6,6 +6,7 @@
 ### Der Discord Bot für den SlimeCloud Discord Server
 
 Dieser Discord bot gehört zu dem deutschen Discord "[SlimeCloud](https://discord.gg/slimecloud)". Beachte das dies Projekt unter der [GNU Affero General Public License v3.0](https://github.com/SlimeCloud/java-SlimeBot/blob/master/LICENSE) läuft.
+
 **Bitte beachtet, dass dieser Bot bzw. dieses Projekt noch sehr am Anfang steht, weshalb noch wenig dokumentiert ist und ggf. komplizierter ist als nötig. Aber lasst uns das doch zusammen ändern!**
 
 Der Bot läuft mit der jdk version 17.
