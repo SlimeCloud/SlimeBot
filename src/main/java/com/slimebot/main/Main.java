@@ -95,8 +95,8 @@ public class Main {
 				.addEventListeners(new ReadyEvent())
 				.addEventListeners(new Timeout())
 
-			    //Team update
-			    .addEventListeners(new StaffMessage())
+				//Team update
+				.addEventListeners(new StaffMessage())
 
 				//Context Menus
 				.addEventListeners(new MsgReport())

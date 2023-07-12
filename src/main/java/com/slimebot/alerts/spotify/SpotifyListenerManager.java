@@ -6,7 +6,6 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class SpotifyListenerManager {
 	private final SpotifyApi api;
