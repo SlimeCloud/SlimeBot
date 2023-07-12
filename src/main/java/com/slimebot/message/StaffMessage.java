@@ -53,13 +53,14 @@ public class StaffMessage extends ListenerAdapter {
 				.findOne().orElse(null)
 		);
 
-		if(message == null) {
+		if(message == null || message == 0) {
 			channel.sendMessage(content).queue(id -> Main.database.run(handle -> handle.createUpdate("update staff_config set message = :message where guild = :guild")
 					.bind("message", id.getIdLong())
 					.bind("guild", guild.getIdLong())
 					.execute()
 			));
 		}
+
 		else {
 			channel.editMessageById(message, content).queue();
 		}
@@ -79,12 +80,16 @@ public class StaffMessage extends ListenerAdapter {
 
 			List<Member> members = guild.getMembersWithRoles(role.role);
 
-			if(members.isEmpty()) continue;
-
 			builder.append(role.role.getAsMention()).append(" *").append(role.description).append("*\n");
 
-			for(Member member : members) {
-				builder.append("> ").append(member.getAsMention()).append("\n");
+			if(members.isEmpty()) {
+				builder.append("*Keine Mitglieder*").append("\n");
+			}
+
+			else {
+				for(Member member : members) {
+					builder.append("> ").append(member.getAsMention()).append("\n");
+				}
 			}
 
 			builder.append("\n");
