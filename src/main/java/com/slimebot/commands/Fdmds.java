@@ -56,7 +56,7 @@ public class Fdmds extends ListenerAdapter {
 							.append(SlimeEmoji.fromId(i).format())
 							.append(" -> ")
 							.append(choices[i].strip())
-							.append("\r\n");
+							.append("\n");
 				}
 
 				// Create Buttons
@@ -112,7 +112,7 @@ public class Fdmds extends ListenerAdapter {
 
 			case "fdmds.sendButton" -> {
 				// create text
-				String text = "Einen Wunderschönen <:slimewave:1080225151104331817> ,\r\n";
+				String text = "Einen Wunderschönen <:slimewave:1080225151104331817>,\n";
 
 				MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 				String question = embed.getFields().get(0).getValue();
@@ -125,7 +125,7 @@ public class Fdmds extends ListenerAdapter {
 					return;
 				}
 
-				text = text + " \r\n" + question + "\r\n \r\n" + choices + "\n\n" + role.getAsMention();
+				text = text + " \n" + question + "\n\n" + choices + "\n\n" + role.getAsMention();
 
 				// get fdmds-channel
 				MessageChannel channel = Main.database.getChannel(event.getGuild(), DatabaseField.FDMDS_CHANNEL);

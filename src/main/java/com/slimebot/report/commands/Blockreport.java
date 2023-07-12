@@ -13,8 +13,8 @@ import java.time.Instant;
 public class Blockreport extends ListenerAdapter {
 	public static boolean isBlocked(Member member) {
 		return Main.database.handle(handle -> handle.createQuery("select count(*) from report_blocks where guild = :guild and user = :user")
-				.bind("guild", member.getGuild().getId())
-				.bind("user", member.getId())
+				.bind("guild", member.getGuild().getIdLong())
+				.bind("user", member.getIdLong())
 				.mapTo(int.class).one()
 		) > 0;
 	}
@@ -48,8 +48,8 @@ public class Blockreport extends ListenerAdapter {
 				}
 
 				Main.database.run(handle -> handle.createUpdate("insert into report_blocks values(:guild, :user)")
-						.bind("guild", event.getGuild().getId())
-						.bind("user", event.getOption("user").getAsUser().getId())
+						.bind("guild", event.getGuild().getIdLong())
+						.bind("user", event.getOption("user").getAsUser().getIdLong())
 						.execute()
 				);
 
@@ -74,8 +74,8 @@ public class Blockreport extends ListenerAdapter {
 				}
 
 				Main.database.run(handle -> handle.createUpdate("delete into from where guild = :guild and user = :user")
-						.bind("guild", event.getGuild().getId())
-						.bind("user", event.getOption("user").getAsUser().getId())
+						.bind("guild", event.getGuild().getIdLong())
+						.bind("user", event.getOption("user").getAsUser().getIdLong())
 						.execute()
 				);
 

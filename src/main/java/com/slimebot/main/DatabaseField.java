@@ -1,10 +1,10 @@
 package com.slimebot.main;
 
 public enum DatabaseField {
-	LOG_CHANNEL("guildConfigration", "logChannel"),
-	GREETINGS_CHANNEL("guildConfigration", "greetingsChannel"),
-	PUNISHMENT_CHANNEL("guildConfigration", "punishmentChannel"),
-	STAFF_ROLE("guildConfigration", "staffRole"),
+	LOG_CHANNEL("guild_config", "logChannel"),
+	GREETINGS_CHANNEL("guild_config", "greetingsChannel"),
+	PUNISHMENT_CHANNEL("guild_config", "punishmentChannel"),
+	STAFF_ROLE("guild_config", "staffRole"),
 
 
 	FDMDS_CHANNEL("fdmds", "channel"),
@@ -13,7 +13,9 @@ public enum DatabaseField {
 
 	SPOTIFY_NOTIFICATION_ROLE("spotify", "notificationRole"),
 	SPOTIFY_PODCAST_CHANNEL("spotify", "podcastChannel"),
-	SPOTIFY_MUSIC_CHANNEL("spotify", "musicChannel");
+	SPOTIFY_MUSIC_CHANNEL("spotify", "musicChannel"),
+
+	STAFF_CHANNEL("staff_config", "channel");
 
 
 	public final String table;

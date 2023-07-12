@@ -1,5 +1,6 @@
 package com.slimebot.main;
 
+import com.slimebot.message.StaffRole;
 import com.slimebot.report.assets.Report;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -19,17 +20,21 @@ public class Database {
 
 		run(handle -> {
 			handle.createUpdate("create table if not exists color(guild bigint, color text)").execute();
-			handle.createUpdate("create table if not exists guildConfiguration(guild bigint, logChannel bigint, greetingsChannel bigint, punishmentChannel bigint, staffRole bigint").execute();
-			handle.createUpdate("create table if not exists fdmds(guild bigint, channel bigint, logChannel bigint, role bigint").execute();
+			handle.createUpdate("create table if not exists guild_config(guild bigint, logChannel bigint, greetingsChannel bigint, punishmentChannel bigint, staffRole bigint)").execute();
+			handle.createUpdate("create table if not exists fdmds(guild bigint, channel bigint, logChannel bigint, role bigint)").execute();
 
 			handle.createUpdate("create table if not exists spotify(guild bigint, notificationRole bigint, podcastChannel bigint, musicChannel bigint)").execute();
 			handle.createUpdate("create table if not exists spotify_known(id text)").execute();
 
-			handle.createUpdate("create table if not exists report_blocks(guild bigint, user bigint)").execute();
+			handle.createUpdate("create table if not exists staff_roles(guild bigint, role bigint, description text)").execute();
+			handle.createUpdate("create table if not exists staff_config(guild bigint, channel bigint, message bigint)").execute();
+
+			handle.createUpdate("create table if not exists report_blocks(guild bigint, \"user\" bigint)").execute();
 			handle.createUpdate("create table if not exists reports(guild bigint, id serial, issuer bigint, target bigint, type text, time timestamp default now(), message text, status text default 'OPEN', closeReason text)").execute();
 		});
 
 		jdbi.registerRowMapper(Report.class, new Report.ReportRowMapper());
+		jdbi.registerRowMapper(StaffRole.class, new StaffRole.StaffRoleRowMapper());
 	}
 
 	public <T, U> U handle(Class<T> type, Function<T, U> handler) {
@@ -62,7 +67,7 @@ public class Database {
 
 	public long getSnowflake(Guild guild, String table, String field) {
 		return handle(handle -> handle.createQuery("select " + field + " from " + table + " where guild = :guild")
-				.bind("guild", guild.getId())
+				.bind("guild", guild.getIdLong())
 				.mapTo(Long.class)
 				.findOne()
 				.orElse(0L)

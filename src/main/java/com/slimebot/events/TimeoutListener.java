@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.time.Instant;
 
-public class Timeout extends ListenerAdapter {
+public class TimeoutListener extends ListenerAdapter {
 
 	@Override
 	public void onGuildMemberUpdateTimeOut(GuildMemberUpdateTimeOutEvent event) {

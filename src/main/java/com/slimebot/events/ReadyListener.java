@@ -7,12 +7,13 @@ import com.slimebot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 
-public class ReadyEvent extends ListenerAdapter {
+public class ReadyListener extends ListenerAdapter {
 	@Override
 	public void onReady(@NotNull net.dv8tion.jda.api.events.session.ReadyEvent event) {
 		try {
@@ -35,5 +36,21 @@ public class ReadyEvent extends ListenerAdapter {
 							.build()
 			).queue();
 		}
+	}
+
+	@Override
+	public void onGuildReady(GuildReadyEvent event) {
+		MessageChannel channel = Main.database.getChannel(event.getGuild(), DatabaseField.LOG_CHANNEL);
+
+		if(channel == null) return;
+
+		channel.sendMessageEmbeds(
+				new EmbedBuilder()
+						.setTitle("Bot wurde gestartet")
+						.setDescription("Der Bot hat sich mit der DiscordAPI (neu-) verbunden")
+						.setColor(Main.database.getColor(event.getGuild()))
+						.setTimestamp(Instant.now())
+						.build()
+		).queue();
 	}
 }

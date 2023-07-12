@@ -3,8 +3,8 @@ package com.slimebot.main;
 import com.google.gson.Gson;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
-import com.slimebot.events.ReadyEvent;
-import com.slimebot.events.Timeout;
+import com.slimebot.events.ReadyListener;
+import com.slimebot.events.TimeoutListener;
 import com.slimebot.main.config.Config;
 import com.slimebot.message.StaffMessage;
 import com.slimebot.report.buttons.Close;
@@ -51,7 +51,7 @@ public class Main {
 
 	public static JDA jdaInstance;
 	public static Database database;
-	public static SpotifyListenerManager spotify = new SpotifyListenerManager();
+	public static SpotifyListenerManager spotify;
 
 	public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
 
@@ -73,6 +73,8 @@ public class Main {
 			System.exit(421);
 		}
 
+		database = new Database();
+
 		jdaInstance = JDABuilder.createDefault(token)
 				.setActivity(config.activity.build())
 
@@ -92,8 +94,8 @@ public class Main {
 				.addEventListeners(new Fdmds())
 
 				//Events
-				.addEventListeners(new ReadyEvent())
-				.addEventListeners(new Timeout())
+				.addEventListeners(new ReadyListener())
+				.addEventListeners(new TimeoutListener())
 
 				//Team update
 				.addEventListeners(new StaffMessage())
@@ -114,7 +116,7 @@ public class Main {
 
 		registerCommands();
 
-		database = new Database();
+		spotify = new SpotifyListenerManager();
 	}
 
 	public static void registerCommands() {

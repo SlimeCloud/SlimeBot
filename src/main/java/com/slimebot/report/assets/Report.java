@@ -47,7 +47,7 @@ public class Report {
 
 	public static Report createReport(Guild guild, Type type, User issuer, User target, String reason) {
 		int id = Main.database.handle(handle -> handle.createUpdate("insert into reports(guild, issuer, target, type, message) values(:guild, :issuer, :target, :type, :message)")
-				.bind("guild", guild.getId())
+				.bind("guild", guild.getIdLong())
 				.bind("issuer", issuer.getIdLong())
 				.bind("target", target.getIdLong())
 				.bind("type", type.toString())
@@ -61,7 +61,7 @@ public class Report {
 
 	public static Optional<Report> get(Guild guild, int id) {
 		return Main.database.handle(handle -> handle.createQuery("select from reports where guild = :guild and id = :id")
-				.bind("guild", guild.getId())
+				.bind("guild", guild.getIdLong())
 				.bind("id", id)
 				.mapTo(Report.class)
 				.findOne()

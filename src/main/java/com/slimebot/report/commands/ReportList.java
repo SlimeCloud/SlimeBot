@@ -37,7 +37,7 @@ public class ReportList extends ListenerAdapter {
 				.setColor(Main.database.getColor(event.getGuild()));
 
 		List<Report> reports = Main.database.handle(handle -> handle.createQuery("select * from reports where guild = :guild")
-				.bind("guild", event.getGuild())
+				.bind("guild", event.getGuild().getIdLong())
 				.mapTo(Report.class)
 				.stream()
 				.filter(filter.filter)
