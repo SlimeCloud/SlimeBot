@@ -116,7 +116,13 @@ public class Main {
 
 		registerCommands();
 
-		spotify = new SpotifyListenerManager();
+		if(config.spotify != null) {
+			spotify = new SpotifyListenerManager();
+		}
+
+		else {
+			logger.info("No spotify configuration found - Disabled spotify notifications");
+		}
 	}
 
 	public static void registerCommands() {
