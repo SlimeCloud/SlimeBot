@@ -1,5 +1,6 @@
 package com.slimebot.main;
 
+import com.slimebot.alerts.holidays.HolidayAlert;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
 import com.slimebot.commands.report.MessageReportCommand;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
+import java.net.URL;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -122,6 +124,8 @@ public class Main {
 				.useCommandCache(null);
 
 		jdaInstance = discordUtils.build();
+
+		new HolidayAlert(new URL("https://ferien-api.de/api/v1/holidays"));
 	}
 
 	public static void scheduleDaily(int hour, Runnable task) {
