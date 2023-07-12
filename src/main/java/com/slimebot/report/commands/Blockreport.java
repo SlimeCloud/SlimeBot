@@ -73,7 +73,7 @@ public class Blockreport extends ListenerAdapter {
 					return;
 				}
 
-				Main.database.run(handle -> handle.createUpdate("delete into from where guild = :guild and user = :user")
+				Main.database.run(handle -> handle.createUpdate("delete from report_blocks where guild = :guild and \"user\" = :user")
 						.bind("guild", event.getGuild().getIdLong())
 						.bind("user", event.getOption("user").getAsUser().getIdLong())
 						.execute()
