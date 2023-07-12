@@ -5,6 +5,7 @@ import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.events.Timeout;
+import com.slimebot.main.config.Config;
 import com.slimebot.message.StaffMessage;
 import com.slimebot.report.buttons.Close;
 import com.slimebot.report.buttons.DetailDropdown;
