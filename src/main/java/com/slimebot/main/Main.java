@@ -3,7 +3,6 @@ package com.slimebot.main;
 import com.google.gson.Gson;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
-import com.slimebot.events.OnJoin;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.events.Timeout;
 import com.slimebot.main.config.Config;
@@ -94,7 +93,6 @@ public class Main {
 				//Events
 				.addEventListeners(new ReadyEvent())
 				.addEventListeners(new Timeout())
-				.addEventListeners(new OnJoin())
 
 				//Context Menus
 				.addEventListeners(new MsgReport())
