@@ -19,8 +19,7 @@ public class Database {
 		jdbi = Jdbi.create("jdbc:postgresql://" + Main.config.database.host, Main.config.database.user, Main.config.database.password);
 
 		run(handle -> {
-			handle.createUpdate("create table if not exists color(guild bigint, color text)").execute();
-			handle.createUpdate("create table if not exists guild_config(guild bigint, logChannel bigint, greetingsChannel bigint, punishmentChannel bigint, staffRole bigint)").execute();
+			handle.createUpdate("create table if not exists guild_config(guild bigint, color text, logChannel bigint, greetingsChannel bigint, punishmentChannel bigint, staffRole bigint)").execute();
 			handle.createUpdate("create table if not exists fdmds(guild bigint, channel bigint, logChannel bigint, role bigint)").execute();
 
 			handle.createUpdate("create table if not exists spotify(guild bigint, notificationRole bigint, podcastChannel bigint, musicChannel bigint)").execute();
@@ -54,11 +53,11 @@ public class Database {
 	}
 
 	public Color getColor(long guild) {
-		return Color.decode(handle(handle -> handle.createQuery("select color from colors where guild = guild")
+		return Color.decode(handle(handle -> handle.createQuery("select color from guild_config where guild = :guild")
 				.bind("guild", guild)
-				.mapTo(String.class))
+				.mapTo(String.class)
 				.findOne().orElse(Main.config.color)
-		);
+		));
 	}
 
 	public Color getColor(Guild guild) {
