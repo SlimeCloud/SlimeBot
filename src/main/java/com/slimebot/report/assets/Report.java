@@ -60,7 +60,7 @@ public class Report {
 	}
 
 	public static Optional<Report> get(Guild guild, int id) {
-		return Main.database.handle(handle -> handle.createQuery("select from reports where guild = :guild and id = :id")
+		return Main.database.handle(handle -> handle.createQuery("select * from reports where guild = :guild and id = :id")
 				.bind("guild", guild.getIdLong())
 				.bind("id", id)
 				.mapTo(Report.class)
