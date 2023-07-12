@@ -91,7 +91,8 @@ public class Blockreport extends ListenerAdapter {
 			case "list" -> {
 				StringBuilder msg = new StringBuilder();
 
-				for(long id : Main.database.handle(handle -> handle.createQuery("select user from report_blocks where guild = :guild")
+				for(long id : Main.database.handle(handle -> handle.createQuery("select \"user\" from report_blocks where guild = :guild")
+						.bind("guild", event.getGuild().getIdLong())
 						.mapTo(long.class)
 						.list()
 				)) {
