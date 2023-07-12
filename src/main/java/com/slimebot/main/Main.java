@@ -121,9 +121,10 @@ public class Main {
 				.addEventListeners(new ReadyEvent())
 				.addEventListeners(new Timeout())
 				.addEventListeners(new OnJoin())
+
         
-        //Team update
-        .addEventListeners(new StaffMessage())
+        		//Team update
+        		.addEventListeners(new StaffMessage())
 
 				//Context Menus
 				.addEventListeners(new MsgReport())
@@ -140,6 +141,9 @@ public class Main {
 				.build();
 
 		registerCommands();
+		
+		//Register HolidayAlert
+		new HolidayAlert(new URL("https://ferien-api.de/api/v1/holidays"));
 	}
 
 	public static void registerCommands() {
