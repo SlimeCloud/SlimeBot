@@ -71,6 +71,10 @@ public class Report {
 	public void log() {
 		MessageChannel logChannel = Main.database.getChannel(Main.jdaInstance.getGuildById(guild), DatabaseField.PUNISHMENT_CHANNEL);
 
+		if(logChannel == null) {
+			return;
+		}
+
 		EmbedBuilder embedBuilder = new EmbedBuilder()
 				.setTimestamp(Instant.now())
 				.setColor(Main.database.getColor(guild))
