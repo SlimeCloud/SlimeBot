@@ -1,65 +1,81 @@
 package com.slimebot.report.commands;
 
+import com.slimebot.main.Checks;
 import com.slimebot.main.Main;
-import com.slimebot.main.config.Config;
+import com.slimebot.report.assets.Filter;
 import com.slimebot.report.assets.Report;
-import com.slimebot.report.assets.Status;
-import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
-import org.simpleyaml.configuration.ConfigurationSection;
-import org.simpleyaml.configuration.file.YamlFile;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ReportList extends ListenerAdapter {
 	@Override
 	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
 		if(!event.getName().equals("report_list")) return;
 
-		if(Checks.hasTeamRole(event.getMember(), event.getGuild())) {
+		if(Checks.hasTeamRole(event.getMember())) {
 			EmbedBuilder noTeam = new EmbedBuilder()
-					.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-					.setColor(Main.embedColor(event.getGuild().getId()))
+					.setTimestamp(Instant.now())
+					.setColor(Main.database.getColor(event.getGuild()))
 					.setTitle(":exclamation: Error")
 					.setDescription("Der Befehl kann nur von einem Teammitglied ausgeführt werden!");
 			event.replyEmbeds(noTeam.build()).setEphemeral(true).queue();
 			return;
 		}
 
+		Filter filter = Filter.valueOf(event.getOption("status").getAsString().toUpperCase());
+
 		EmbedBuilder embed = new EmbedBuilder()
-				.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+				.setTimestamp(Instant.now())
 				.setDescription("Nutze /report_detail oder das Dropdown menu um mehr infos zu einem Report zu bekommen.")
-				.setColor(Main.embedColor(event.getGuild().getId()));
+				.setColor(Main.database.getColor(event.getGuild()));
+
+		List<Report> reports = Main.database.handle(handle -> handle.createQuery("select * from reports where guild = :guild")
+				.bind("guild", event.getGuild())
+				.mapTo(Report.class)
+				.stream()
+				.filter(filter.filter)
+				.toList()
+		);
+
+		if(reports.isEmpty()) {
+			EmbedBuilder embedBuilder = new EmbedBuilder()
+					.setTimestamp(Instant.now())
+					.setColor(Main.database.getColor(event.getGuild()))
+					.setTitle(":exclamation: Error: No Reports Found")
+					.setDescription("Es wurden keine Reports zu der Ausgewählten option (" + event.getOption("status").getAsString() + ") gefunden!");
+
+			event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
+		}
+
+		for(int i = 0; i < reports.size() && i < 24; i++) {
+			Report report = reports.get(i);
+
+			embed.addField("Report #" + report.getId(),
+					report.shortDescription(),
+					false
+			);
+		}
+
+		if(reports.size() > 24) {
+			embed.setFooter("Weitere Reports gefunden, es können jedoch maximal 25 angezeigt werden");
+		}
 
 		ArrayList<Integer> ReportIdList = new ArrayList<>();
 		int fieldSize = 0;
 		boolean maxFieldSize = false;
 
-		YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
-		try {
-			reportFile.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		ConfigurationSection reportSection = reportFile.getConfigurationSection("reports");
-		ArrayList<Report> allReports = new ArrayList<>();
-		for(int id = 2; id <= reportSection.size(); id++) {
-			allReports.add(Report.get(event.getGuild().getId(), id));
-		}
-
 		switch(event.getOption("status").getAsString()) {
 			case "all" -> {
 				embed.setTitle("Eine Liste aller Reports");
-				for(Report report : allReports) {
-					ReportIdList.add(report.id);
+				for(Report report : reports) {
+					ReportIdList.add(report.getId());
 					if(fieldSize > 24) {
 						maxFieldSize = true;
 						break;
@@ -70,11 +86,10 @@ public class ReportList extends ListenerAdapter {
 			}
 			case "closed" -> {
 				embed.setTitle("Eine Liste aller geschlossenen Reports");
-				for(Report report : allReports) {
-					if(!(report.status == Status.CLOSED)) {
-						continue;
-					}
-					ReportIdList.add(report.id);
+				for(Report report : reports) {
+					if(report.isOpen()) continue;
+
+					ReportIdList.add(report.getId());
 					if(fieldSize > 24) {
 						maxFieldSize = true;
 						break;
@@ -85,11 +100,10 @@ public class ReportList extends ListenerAdapter {
 			}
 			case "open" -> {
 				embed.setTitle("Eine Liste aller offenen Reports");
-				for(Report report : allReports) {
-					if(!(report.status == Status.OPEN)) {
-						continue;
-					}
-					ReportIdList.add(report.id);
+				for(Report report : reports) {
+					if(!report.isOpen()) continue;
+
+					ReportIdList.add(report.getId());
 					if(fieldSize > 24) {
 						maxFieldSize = true;
 						break;
@@ -103,8 +117,8 @@ public class ReportList extends ListenerAdapter {
 
 		if(ReportIdList.size() == 0) {
 			EmbedBuilder embedBuilder = new EmbedBuilder()
-					.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-					.setColor(Main.embedColor(event.getGuild().getId()))
+					.setTimestamp(Instant.now())
+					.setColor(Main.database.getColor(event.getGuild()))
 					.setTitle(":exclamation: Error: No Reports Found")
 					.setDescription("Es wurden keine Reports zu der Ausgewählten option (" + event.getOption("status").getAsString() + ") gefunden!");
 
@@ -122,19 +136,19 @@ public class ReportList extends ListenerAdapter {
 	}
 
 	private void addReportField(Report report, EmbedBuilder embed) {
-		embed.addField("Report #" + report.id,
-				report.user.getAsMention() + " wurde am ` " + report.time.format(Main.dateFormat) + "` von " + report.by.getAsMention() + " gemeldet.",
+		embed.addField("Report #" + report.getId(),
+				report.shortDescription(),
 				false
 		);
 	}
 
-	private StringSelectMenu DetailDropdownButton(ArrayList<Integer> reportList) {
+	private StringSelectMenu DetailDropdownButton(List<Integer> reportList) {
 		StringSelectMenu.Builder btnBuilder = StringSelectMenu.create("detail_btn")
 				.setPlaceholder("Details zu einem Report")
 				.setMaxValues(1);
 
-		for(Integer reportID : reportList) {
-			btnBuilder.addOption("Report #" + reportID, reportID.toString(), "Details zum Report #" + reportID);
+		for(int reportID : reportList) {
+			btnBuilder.addOption("Report #" + reportID, String.valueOf(reportID), "Details zum Report #" + reportID);
 		}
 
 		return btnBuilder.build();

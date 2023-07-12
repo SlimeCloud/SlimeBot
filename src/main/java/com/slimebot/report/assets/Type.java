@@ -1,7 +1,7 @@
 package com.slimebot.report.assets;
 
 public enum Type {
-	MSG("Nachricht"),
+	MESSAGE("Nachricht"),
 	USER("User");
 
 	public final String str;

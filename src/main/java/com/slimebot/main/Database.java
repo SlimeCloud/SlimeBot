@@ -1,5 +1,6 @@
 package com.slimebot.main;
 
+import com.slimebot.report.assets.Report;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -21,9 +22,13 @@ public class Database {
 			handle.createUpdate("create table if not exists guildConfiguration(guild bigint, logChannel bigint, greetingsChannel bigint, punishmentChannel bigint, staffRole bigint").execute();
 			handle.createUpdate("create table if not exists fdmds(guild bigint, channel bigint, logChannel bigint, role bigint").execute();
 
+			handle.createUpdate("create table if not exists features(guild bigint, spotify boolean, fdmds boolean)");
+
 			handle.createUpdate("create table if not exists report_blocks(guild bigint, user bigint)").execute();
-			handle.createUpdate("create table if not exists reports(guild bigint, id serial, issuer bigint, target bigint, type text, time timestamp default now(), message text, status text, closeReason text)").execute();
+			handle.createUpdate("create table if not exists reports(guild bigint, id serial, issuer bigint, target bigint, type text, time timestamp default now(), message text, status text default 'OPEN', closeReason text)").execute();
 		});
+
+		jdbi.registerRowMapper(Report.class, new Report.ReportRowMapper());
 	}
 
 	public <T, U> U handle(Class<T> type, Function<T, U> handler) {
@@ -42,12 +47,16 @@ public class Database {
 		return jdbi.withHandle(handler::apply);
 	}
 
-	public Color getColor(Guild guild) {
+	public Color getColor(long guild) {
 		return Color.decode(handle(handle -> handle.createQuery("select color from colors where guild = guild")
-				.bind("guild", guild.getId())
+				.bind("guild", guild)
 				.mapTo(String.class))
 				.findOne().orElse(Main.config.color)
 		);
+	}
+
+	public Color getColor(Guild guild) {
+		return getColor(guild.getIdLong());
 	}
 
 	public long getSnowflake(Guild guild, String table, String field) {

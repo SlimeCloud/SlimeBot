@@ -1,30 +1,32 @@
 package com.slimebot.report.commands;
 
+import com.slimebot.main.Checks;
 import com.slimebot.main.Main;
-import com.slimebot.main.config.Config;
-import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.simpleyaml.configuration.file.YamlFile;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
 
 public class Blockreport extends ListenerAdapter {
+	public static boolean isBlocked(Member member) {
+		return Main.database.handle(handle -> handle.createQuery("select count(*) from report_blocks where guild = :guild and user = :user")
+				.bind("guild", member.getGuild().getId())
+				.bind("user", member.getId())
+				.mapTo(int.class).one()
+		) > 0;
+	}
+
 	@Override
 	public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
 		if(!event.getName().equals("blockreport")) return;
 
-		if(Checks.hasTeamRole(event.getMember(), event.getGuild())) {
+		if(Checks.hasTeamRole(event.getMember())) {
 			EmbedBuilder noTeam = new EmbedBuilder()
-					.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-					.setColor(Main.embedColor(event.getGuild().getId()))
+					.setTimestamp(Instant.now())
+					.setColor(Main.database.getColor(event.getGuild()))
 					.setTitle(":exclamation: Error")
 					.setDescription("Der Befehl kann nur von einem Teammitglied ausgeführt werden!");
 
@@ -34,10 +36,10 @@ public class Blockreport extends ListenerAdapter {
 
 		switch(event.getOption("action").getAsString()) {
 			case "add" -> {
-				if(Main.blocklist(event.getGuild().getId()).contains(event.getOption("user").getAsMember().getId())) {
+				if(isBlocked(event.getOption("user").getAsMember())) {
 					EmbedBuilder embedBuilder = new EmbedBuilder()
-							.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-							.setColor(Main.embedColor(event.getGuild().getId()))
+							.setTimestamp(Instant.now())
+							.setColor(Main.database.getColor(event.getGuild()))
 							.setTitle(":exclamation: Error: Already blocked!")
 							.setDescription(event.getOption("user").getAsMember().getAsMention() + " ist bereits blockiert");
 
@@ -45,31 +47,25 @@ public class Blockreport extends ListenerAdapter {
 					return;
 				}
 
-				List<String> updatedList = Main.blocklist(event.getGuild().getId());
-				updatedList.add(event.getOption("user").getAsMember().getId());
-				YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
-
-				try {
-					config.load();
-					config.set("blocklist", updatedList);
-					config.save();
-				} catch(IOException e) {
-					throw new RuntimeException(e);
-				}
+				Main.database.run(handle -> handle.createUpdate("insert into report_blocks values(:guild, :user)")
+						.bind("guild", event.getGuild().getId())
+						.bind("user", event.getOption("user").getAsUser().getId())
+						.execute()
+				);
 
 				EmbedBuilder embedBuilder = new EmbedBuilder()
-						.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-						.setColor(Main.embedColor(event.getGuild().getId()))
+						.setTimestamp(Instant.now())
+						.setColor(Main.database.getColor(event.getGuild()))
 						.setTitle(":white_check_mark: Erfolgreich Blockiert")
 						.setDescription(event.getOption("user").getAsMentionable().getAsMention() + " wurde blockiert und kann nun keine Reports mehr erstellen");
 
 				event.replyEmbeds(embedBuilder.build()).queue();
 			}
 			case "remove" -> {
-				if(!Main.blocklist(event.getGuild().getId()).contains(event.getOption("user").getAsMember().getId())) {
+				if(!isBlocked(event.getOption("user").getAsMember())) {
 					EmbedBuilder embedBuilder = new EmbedBuilder()
-							.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-							.setColor(Main.embedColor(event.getGuild().getId()))
+							.setTimestamp(Instant.now())
+							.setColor(Main.database.getColor(event.getGuild()))
 							.setTitle(":exclamation: Error: Not Found")
 							.setDescription(event.getOption("user").getAsMember() + " konnte nicht in der Blockliste gefunden werden!");
 
@@ -77,22 +73,16 @@ public class Blockreport extends ListenerAdapter {
 					return;
 				}
 
-				ArrayList<String> updatedList;
-				updatedList = Main.blocklist(event.getGuild().getId());
-				updatedList.remove(event.getOption("user").getAsMember().getId());
-				YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
+				Main.database.run(handle -> handle.createUpdate("delete into from where guild = :guild and user = :user")
+						.bind("guild", event.getGuild().getId())
+						.bind("user", event.getOption("user").getAsUser().getId())
+						.execute()
+				);
 
-				try {
-					config.load();
-					config.set("blocklist", updatedList);
-					config.save();
-				} catch(IOException e) {
-					throw new RuntimeException(e);
-				}
 
 				EmbedBuilder embedBuilder = new EmbedBuilder()
-						.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-						.setColor(Main.embedColor(event.getGuild().getId()))
+						.setTimestamp(Instant.now())
+						.setColor(Main.database.getColor(event.getGuild()))
 						.setTitle(":white_check_mark: Entblockt")
 						.setDescription(event.getOption("user").getAsMentionable().getAsMention() + " kann nun wieder Reports erstellen");
 
@@ -101,17 +91,20 @@ public class Blockreport extends ListenerAdapter {
 			case "list" -> {
 				StringBuilder msg = new StringBuilder();
 
-				for(String memberID : Main.blocklist(event.getGuild().getId())) {
-					Member member = event.getGuild().getMemberById(memberID);
-					if(member == null) {
-						continue;
-					}
+				for(long id : Main.database.handle(handle -> handle.createQuery("select user from report_blocks where guild = :guild")
+						.mapTo(long.class)
+						.list()
+				)) {
+					Member member = event.getGuild().getMemberById(id);
+
+					if(member == null) continue;
+
 					msg.append(member.getAsMention()).append("\n");
 				}
 
 				EmbedBuilder embedBuilder = new EmbedBuilder()
-						.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-						.setColor(Main.embedColor(event.getGuild().getId()))
+						.setTimestamp(Instant.now())
+						.setColor(Main.database.getColor(event.getGuild()))
 						.setTitle("Geblockte User:")
 						.setDescription("Folgende Member sind blockiert und können keine Reports mehr erstellen:\n" + msg);
 

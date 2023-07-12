@@ -1,21 +1,15 @@
 package com.slimebot.report.modals;
 
 import com.slimebot.main.Main;
-import com.slimebot.main.config.Config;
 import com.slimebot.report.assets.Report;
+import com.slimebot.report.assets.Type;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import org.jetbrains.annotations.NotNull;
-import org.simpleyaml.configuration.ConfigurationSection;
-import org.simpleyaml.configuration.file.YamlFile;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.time.Instant;
 
 public class ReportModal extends ListenerAdapter {
 
@@ -23,42 +17,20 @@ public class ReportModal extends ListenerAdapter {
 	public void onModalInteraction(@NotNull ModalInteractionEvent event) {
 		if(!event.getModalId().equals("userReport")) return;
 
-		Report currentReport = null;
+		User user = event.getJDA().getUserById(event.getValue("id").getAsString());
+		String description = event.getValue("usrDescr").getAsString();
 
-		ModalMapping id = event.getValue("id");
-		ModalMapping description = event.getValue("usrDescr");
+		Report report = Report.createReport(event.getGuild(), Type.USER, event.getUser(), user, description);
 
-		YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
-		try {
-			reportFile.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
+		event.replyEmbeds(
+				new EmbedBuilder()
+						.setTimestamp(Instant.now())
+						.setColor(Main.database.getColor(event.getGuild()))
+						.setTitle(":white_check_mark: Report Erfolgreich")
+						.setDescription(user.getAsMention() + " wurde erfolgreich gemeldet")
+						.build()
+		).setEphemeral(true).queue();
 
-		ConfigurationSection reportSection = reportFile.getConfigurationSection("reports");
-		ArrayList<Report> allReports = new ArrayList<>();
-		for(int ids = 2; ids <= reportSection.size(); ids++) {
-			allReports.add(Report.get(event.getGuild().getId(), ids));
-		}
-
-		for(Report report : allReports) {
-			if(Objects.equals(String.valueOf(report.id), id.getAsString()) && event.getMember() == report.by) {
-				currentReport = report;
-				break;
-			}
-		}
-
-		currentReport.msgContent = description.getAsString();
-
-		Report.save(event.getGuild().getId(), currentReport);
-
-		EmbedBuilder embedBuilder = new EmbedBuilder()
-				.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-				.setColor(Main.embedColor(event.getGuild().getId()))
-				.setTitle(":white_check_mark: Report Erfolgreich")
-				.setDescription(currentReport.user.getAsMention() + " wurde erfolgreich gemeldet");
-
-		event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();
-		Report.log(currentReport.id, event.getGuild().getId());
+		report.log();
 	}
 }
