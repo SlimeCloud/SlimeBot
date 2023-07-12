@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.6.0'
     implementation 'org.jdbi:jdbi3-core:3.39.0'
     implementation 'org.jdbi:jdbi3-sqlobject:3.39.0'
-    implementation 'org.jdbi:jdbi3-postgres3.39.0'
+    implementation 'org.jdbi:jdbi3-postgres:3.39.0'
 }
 
 

@@ -22,7 +22,8 @@ public class Database {
 			handle.createUpdate("create table if not exists guildConfiguration(guild bigint, logChannel bigint, greetingsChannel bigint, punishmentChannel bigint, staffRole bigint").execute();
 			handle.createUpdate("create table if not exists fdmds(guild bigint, channel bigint, logChannel bigint, role bigint").execute();
 
-			handle.createUpdate("create table if not exists features(guild bigint, spotify boolean, fdmds boolean)");
+			handle.createUpdate("create table if not exists spotify(guild bigint, notificationRole bigint, podcastChannel bigint, musicChannel bigint)").execute();
+			handle.createUpdate("create table if not exists spotify_known(id text)").execute();
 
 			handle.createUpdate("create table if not exists report_blocks(guild bigint, user bigint)").execute();
 			handle.createUpdate("create table if not exists reports(guild bigint, id serial, issuer bigint, target bigint, type text, time timestamp default now(), message text, status text default 'OPEN', closeReason text)").execute();

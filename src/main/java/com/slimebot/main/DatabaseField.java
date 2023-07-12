@@ -9,7 +9,11 @@ public enum DatabaseField {
 
 	FDMDS_CHANNEL("fdmds", "channel"),
 	FDMDS_LOG_CHANNEL("fdmds", "logChannel"),
-	FDMDS_ROLE("fdmds", "role");
+	FDMDS_ROLE("fdmds", "role"),
+
+	SPOTIFY_NOTIFICATION_ROLE("spotify", "notificationRole"),
+	SPOTIFY_PODCAST_CHANNEL("spotify", "podcastChannel"),
+	SPOTIFY_MUSIC_CHANNEL("spotify", "musicChannel");
 
 
 	public final String table;
