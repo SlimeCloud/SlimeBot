@@ -10,14 +10,10 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class StaffMessage extends ListenerAdapter {
-	public final static Logger logger = LoggerFactory.getLogger(StaffMessage.class);
-
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
 		updateMessage(event.getGuild(), event.getRoles());
@@ -48,10 +44,7 @@ public class StaffMessage extends ListenerAdapter {
 	private void updateMessage(Guild guild) {
 		MessageChannel channel = Main.database.getChannel(guild, DatabaseField.STAFF_CHANNEL);
 
-		if(channel == null) {
-			logger.warn("Konnte Channel nicht finden!");
-			return;
-		}
+		if(channel == null) return;
 
 		String content = buildMessage(guild);
 		Long message = Main.database.handle(handle -> handle.createQuery("select message from staff_config where guild = :guild")
