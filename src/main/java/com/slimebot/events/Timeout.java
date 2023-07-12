@@ -1,17 +1,14 @@
 package com.slimebot.events;
 
+import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
-import com.slimebot.main.config.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.simpleyaml.configuration.file.YamlFile;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 
 public class Timeout extends ListenerAdapter {
 
@@ -21,31 +18,26 @@ public class Timeout extends ListenerAdapter {
 
 		for(AuditLogEntry entry : event.getGuild().retrieveAuditLogs().type(ActionType.MEMBER_UPDATE)) {
 			if(entry.getTargetId().equals(event.getMember().getId())) {
-				EmbedBuilder embedBuilder = new EmbedBuilder()
-						.setTitle("Du wurdest getimeouted")
-						.setColor(Main.embedColor(event.getGuild().getId()))
-						.setTimestamp(Instant.now())
-						.setDescription("Du wurdest auf dem SlimeCloud Discord getimeouted")
-						.addField("Grund:", entry.getReason(), true);
+				event.getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(
+						new EmbedBuilder()
+								.setTitle("Du wurdest getimeouted")
+								.setColor(Main.database.getColor(event.getGuild()))
+								.setTimestamp(Instant.now())
+								.setDescription("Du wurdest auf dem SlimeCloud Discord getimeouted")
+								.addField("Grund:", entry.getReason(), true)
+								.build()
+				)).queue();
 
-				event.getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(embedBuilder.build())).queue();
-
-				EmbedBuilder embedBuilderLog = new EmbedBuilder()
-						.setTitle("\"" + event.getMember().getEffectiveName() + "\"" + " wurde getimeouted")
-						.setColor(Main.embedColor(event.getGuild().getId()))
-						.setTimestamp(Instant.now())
-						.addField("Grund:", entry.getReason(), true)
-						.addField("Wer: ", event.getMember().getAsMention(), true);
-
-				YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
-
-				try {
-					config.load();
-				} catch(IOException e) {
-					throw new RuntimeException(e);
-				}
-
-				event.getGuild().getTextChannelById(config.getString("punishmentChannelID")).sendMessageEmbeds(embedBuilderLog.build()).queue();
+				Main.database.getChannel(event.getGuild(), DatabaseField.PUNISHMENT_CHANNEL)
+						.sendMessageEmbeds(
+								new EmbedBuilder()
+										.setTitle("\"" + event.getMember().getEffectiveName() + "\"" + " wurde getimeouted")
+										.setColor(Main.database.getColor(event.getGuild()))
+										.setTimestamp(Instant.now())
+										.addField("Grund:", entry.getReason(), true)
+										.addField("Wer: ", event.getMember().getAsMention(), true)
+										.build()
+						).queue();
 
 				break;
 			}

@@ -1,8 +1,8 @@
 package com.slimebot.commands;
 
 
+import com.slimebot.main.Checks;
 import com.slimebot.main.Main;
-import com.slimebot.utils.Checks;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -10,8 +10,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -20,7 +19,7 @@ public class BulkAddRole extends ListenerAdapter {
 	public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
 		if(!event.getFullCommandName().equals("role_check")) return;
 
-		if(Checks.hasTeamRole(event.getMember(), event.getGuild())) {
+		if(Checks.hasTeamRole(event.getMember())) {
 			event.reply("Dieser befehl kann nur von einem Teammitglied ausgeführt werden").setEphemeral(true).queue();
 			return;
 		}
