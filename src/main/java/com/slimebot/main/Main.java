@@ -5,7 +5,7 @@ import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
 import com.slimebot.events.ReadyEvent;
 import com.slimebot.events.Timeout;
-import com.slimebot.main.config.Config;
+import com.slimebot.message.StaffMessage;
 import com.slimebot.report.buttons.Close;
 import com.slimebot.report.buttons.DetailDropdown;
 import com.slimebot.report.commands.Blockreport;
@@ -93,6 +93,9 @@ public class Main {
 				//Events
 				.addEventListeners(new ReadyEvent())
 				.addEventListeners(new Timeout())
+
+			    //Team update
+			    .addEventListeners(new StaffMessage())
 
 				//Context Menus
 				.addEventListeners(new MsgReport())

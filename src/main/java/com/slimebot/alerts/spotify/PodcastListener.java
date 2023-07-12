@@ -64,7 +64,7 @@ public class PodcastListener implements Runnable {
 
 			if(channel == null) {
 				SpotifyListener.logger.warn("Kanal nicht verfügbar");
-				return;
+				continue;
 			}
 
 			channel.sendMessage(MessageFormat.format(Main.config.spotify.music.message,
