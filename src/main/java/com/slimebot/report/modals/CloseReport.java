@@ -11,7 +11,7 @@ import java.time.Instant;
 public class CloseReport extends ListenerAdapter {
 	@Override
 	public void onModalInteraction(ModalInteractionEvent event) {
-		if(!event.getModalId().equals("close")) return;
+		if(!event.getModalId().equals("report:close")) return;
 
 		int reportID = Integer.parseInt(event.getValue("id").getAsString());
 

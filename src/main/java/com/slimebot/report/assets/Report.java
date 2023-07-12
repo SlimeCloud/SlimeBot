@@ -98,7 +98,7 @@ public class Report {
 	}
 
 	public void close(String reason) {
-		Main.database.run(handle -> handle.createUpdate("update reports set status = CLOSED, closeReason = :reason where guild = :guild and id = :id")
+		Main.database.run(handle -> handle.createUpdate("update reports set status = 'CLOSED', closeReason = :reason where guild = :guild and id = :id")
 				.bind("reason", reason)
 				.bind("guild", guild)
 				.bind("id", id)

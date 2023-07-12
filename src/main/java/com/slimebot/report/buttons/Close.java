@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 public class Close extends ListenerAdapter {
 	@Override
 	public void onButtonInteraction(ButtonInteractionEvent event) {
-		if(!event.getComponentId().equals("close_report")) return;
+		if(!event.getComponentId().equals("report:close")) return;
 
 		String reportID = event.getButton().getLabel().split("#")[1];
 
@@ -25,7 +25,7 @@ public class Close extends ListenerAdapter {
 				.setPlaceholder("Dieses Feld wird automatisch ausgefüllt!")
 				.build();
 
-		Modal close = Modal.create("close", "Close Report")
+		Modal close = Modal.create("report:close", "Close Report")
 				.addActionRow(reason)
 				.addActionRow(id)
 				.build();
