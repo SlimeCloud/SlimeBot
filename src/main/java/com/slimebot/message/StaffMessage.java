@@ -1,20 +1,18 @@
 package com.slimebot.message;
 
+import com.slimebot.main.DatabaseField;
+import com.slimebot.main.Main;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
-import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.simpleyaml.configuration.ConfigurationSection;
-import org.simpleyaml.configuration.file.YamlFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class StaffMessage extends ListenerAdapter {
@@ -31,121 +29,74 @@ public class StaffMessage extends ListenerAdapter {
 	}
 
 	@Override
-	public void onReady(ReadyEvent event) {
-		for(Guild guild : event.getJDA().getGuilds()) {
-			updateMessage(guild, getConfig(guild.getId()));
-		}
+	public void onGuildReady(GuildReadyEvent event) {
+		updateMessage(event.getGuild());
 	}
 
 	private void updateMessage(Guild guild, List<Role> roles) {
-		YamlFile config = getConfig(guild.getId());
-		List<Long> roleIDs = getRoleIDs(config);
-		if(roles.stream().noneMatch(role -> roleIDs.contains(role.getIdLong()))) {
-			return;
-		}
-		updateMessage(guild, config);
+		List<Long> staffRoles = Main.database.handle(handle -> handle.createQuery("select role from staff_roles where guild = :guild")
+						.bind("guild", guild.getIdLong())
+						.mapTo(Long.class)
+						.list()
+		);
+
+		if(roles.stream().map(Role::getIdLong).noneMatch(staffRoles::contains)) return;
+
+		updateMessage(guild);
 	}
 
-	private void updateMessage(Guild guild, YamlFile config) {
-		String message = buildMessage(config, guild);
-		TextChannel channel = guild.getTextChannelById(config.getLong("channelID"));
+	private void updateMessage(Guild guild) {
+		MessageChannel channel = Main.database.getChannel(guild, DatabaseField.STAFF_CHANNEL);
+
 		if(channel == null) {
 			logger.warn("Konnte Channel nicht finden!");
 			return;
 		}
-		if(config.getInt("messageID") == -1) {
-			channel.sendMessage(message).queue(message1 -> {
-				config.set("messageID", message1.getIdLong());
-				try {
-					config.save();
-				} catch(IOException e) {
-					e.printStackTrace();
-				}
-			});
+
+		String content = buildMessage(guild);
+		Long message = Main.database.handle(handle -> handle.createQuery("select message from staff_config where guild = :guild")
+				.bind("guild", guild.getIdLong())
+				.mapTo(Long.class)
+				.findOne().orElse(null)
+		);
+
+		if(message == null) {
+			channel.sendMessage(content).queue(id -> Main.database.run(handle -> handle.createUpdate("update staff_config set message = :message where guild = :guild")
+					.bind("message", id.getIdLong())
+					.bind("guild", guild.getIdLong())
+					.execute()
+			));
 		}
 		else {
-			channel.editMessageById(config.getLong("messageID"), message).queue();
+			channel.editMessageById(message, content).queue();
 		}
 	}
 
-	private YamlFile getConfig(String guildId) {
-		YamlFile config = new YamlFile("Slimebot/" + guildId + "/staffMessage.yml");
-		if(!config.exists()) {
-			try {
-				createConfig(config);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
-		try {
-			config.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-		return config;
-	}
+	private String buildMessage(Guild guild) {
+		List<StaffRole> roles = Main.database.handle(handle -> handle.createQuery("select * from staff_roles where guild = :guild")
+				.bind("guild", guild.getIdLong())
+				.mapTo(StaffRole.class)
+				.list()
+		);
 
-	private void createConfig(YamlFile config) {
-		try {
-			config.createNewFile(true);
-			config.set("roles.premessage", """
-					🪐Team Vorstellung🪐
-					                    
-					*Im Im folgenden werden die Teammitglieder im Zusammenhang mit ihren Rollen vorgestellt. Bei Bedarf und Situation werden diese unangekündigt verändert!*""");
-			config.set("roles.123456.description", "This is a description");
-			config.set("messageID", -1);
-			config.set("channelID", 123456);
-			config.setComment("messageID", "The ID of the message that should be edited. Set to -1 if you want to create a new message");
-			config.setComment("message", "Is shown before the roles");
-			config.save();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private List<Long> getRoleIDs(YamlFile config) {
-		ConfigurationSection section = config.getConfigurationSection("roles");
-		List<Long> roleIds = new ArrayList<>();
-		for(String key : section.getKeys(false)) {
-			try {
-				Long.parseLong(key);
-			} catch(NumberFormatException e) {
-				continue;
-			}
-			roleIds.add(Long.parseLong(key));
-		}
-		return roleIds;
-	}
-
-	private String buildMessage(YamlFile config, Guild guild) {
-		ConfigurationSection section = config.getConfigurationSection("roles");
 		StringBuilder builder = new StringBuilder();
-		for(String key : section.getKeys(false)) {
-			try {
-				Long.parseLong(key);
-			} catch(NumberFormatException e) {
-				builder.append(section.getString(key)).append("\n\n");
-				continue;
-			}
-			Role role = guild.getRoleById(key);
-			assert role != null;
-			List<Member> members = null;
-			try {
-				members = guild.getMembersWithRoles(role);
-			} catch(IllegalArgumentException e) {
-				logger.warn("Rolle (" + key + ") nicht gefunden");
-			}
 
+		for(StaffRole role : roles) {
+			if(role == null) continue;
 
-			if(members == null || members.isEmpty()) {
-				continue;
-			}
-			builder.append(role.getAsMention()).append(" *").append(section.getString(key + ".description")).append("*\n");
+			List<Member> members = guild.getMembersWithRoles(role.role);
+
+			if(members.isEmpty()) continue;
+
+			builder.append(role.role.getAsMention()).append(" *").append(role.description).append("*\n");
+
 			for(Member member : members) {
 				builder.append("> ").append(member.getAsMention()).append("\n");
 			}
+
 			builder.append("\n");
 		}
+
 		return builder.toString();
 	}
 }
