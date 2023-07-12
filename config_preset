@@ -15,7 +15,7 @@
         "clientSecret": "-- your client secret --",
 
         "music": {
-            "message": "{0}\n## 🎶 ALARM ALARM 🎶\nNeuer Musik Release. 🥳\nGönn dir umbedingt das neue Album: [**{1}**]({2})",
+            "message": "{0}\n## 🎶 ALARM ALARM 🎶\nNeuer Musik Release. 🥳\nGönn dir unbedingt das neue Album: [**{1}**]({2})",
             "artistIds": [
                 "0ZzsW7JiW4Ok3H7nFl4yV1"
             ]
