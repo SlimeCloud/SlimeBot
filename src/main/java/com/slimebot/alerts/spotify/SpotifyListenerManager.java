@@ -24,7 +24,7 @@ public class SpotifyListenerManager {
 	}
 
 	public void register() {
-		Main.config.spotify.artistIds.forEach(id -> new SpotifyListener(api, id));
-		Main.config.spotify.podcastIds.forEach(id -> new PodcastListener(api, id));
+		Main.config.spotify.music.artistIds.forEach(id -> new SpotifyListener(api, id));
+		Main.config.spotify.podcast.artistIds.forEach(id -> new PodcastListener(api, id));
 	}
 }
