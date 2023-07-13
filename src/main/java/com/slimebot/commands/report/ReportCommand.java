@@ -1,9 +1,11 @@
 package com.slimebot.commands.report;
 
+import com.slimebot.main.CommandContext;
 import com.slimebot.main.CommandPermission;
 import com.slimebot.main.Main;
 import com.slimebot.report.Report;
 import de.mineking.discord.DiscordUtils;
+import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.WhenFinished;
 import de.mineking.discord.events.interaction.ButtonHandler;
@@ -15,12 +17,14 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 
 import java.time.Instant;
 
-@ApplicationCommand(name = "report", description = "Verwaltet reports", guildOnly = true, subcommands = {BlockCommand.class, DetailsCommand.class, ListCommand.class})
+@ApplicationCommand(name = "report", description = "Verwaltet reports", guildOnly = true, subcommands = {BlockCommand.class, DetailsCommand.class})
 public class ReportCommand {
 	public final CommandPermission permission = CommandPermission.TEAM;
 
 	@WhenFinished
-	public void setup(DiscordUtils manager) {
+	public void setup(DiscordUtils manager, CommandManager<CommandContext> cmdMan) {
+		cmdMan.registerCommand("report list", new ReportListCommand());
+
 		manager.getEventManager().registerHandler(new ButtonHandler("report:close", event -> {
 			String reportID = event.getButton().getLabel().split("#")[1];
 

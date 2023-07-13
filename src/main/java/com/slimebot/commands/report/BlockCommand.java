@@ -1,9 +1,15 @@
 package com.slimebot.commands.report;
 
+import com.slimebot.main.CommandContext;
+import com.slimebot.main.CommandPermission;
 import com.slimebot.main.Main;
+import com.slimebot.report.list.ReportBlockSet;
+import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
+import de.mineking.discord.commands.annotated.WhenFinished;
 import de.mineking.discord.commands.annotated.option.Option;
+import de.mineking.discord.list.ListCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,6 +24,11 @@ public class BlockCommand {
 				.bind("user", member.getIdLong())
 				.mapTo(int.class).one()
 		) > 0;
+	}
+
+	@WhenFinished
+	public void setup(CommandManager<CommandContext> manager) {
+		manager.registerCommand("report block list", new BlockListCommand());
 	}
 
 	@ApplicationCommand(name = "add", description = "Fügt einen Nutzer zur Block-Liste hinzu, sodass er keine Meldungen mehr machen kann")
@@ -90,32 +101,13 @@ public class BlockCommand {
 		}
 	}
 
-	@ApplicationCommand(name = "list", description = "Zeigt alle vom Report-System ausgeschlossenen Nutzer")
-	public static class ListCommand {
-		@ApplicationCommandMethod
-		public void performCommand(SlashCommandInteractionEvent event) {
-			StringBuilder msg = new StringBuilder();
+	public static class BlockListCommand extends ListCommand<CommandContext, ReportBlockSet.ReportBlock, ReportBlockSet> {
+		public BlockListCommand() {
+			super(CommandPermission.TEAM,
+					(context, options) -> new ReportBlockSet(context.guild)
+			);
 
-			for(long id : Main.database.handle(handle -> handle.createQuery("select \"user\" from report_blocks where guild = :guild")
-					.bind("guild", event.getGuild().getIdLong())
-					.mapTo(long.class)
-					.list()
-			)) {
-				Member member = event.getGuild().getMemberById(id);
-
-				if(member == null) continue;
-
-				msg.append(member.getAsMention()).append("\n");
-			}
-
-			event.replyEmbeds(
-					new EmbedBuilder()
-							.setTimestamp(Instant.now())
-							.setColor(Main.database.getColor(event.getGuild()))
-							.setTitle("Geblockte User:")
-							.setDescription("Folgende Member sind blockiert und können keine Reports mehr erstellen:\n" + msg)
-							.build()
-			).setEphemeral(true).queue();
+			description = "Zeigt alle vom Report-System ausgeschlossenen Nutzer";
 		}
 	}
 }

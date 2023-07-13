@@ -2,6 +2,8 @@ package com.slimebot.report;
 
 import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
+import de.mineking.discord.list.ListContext;
+import de.mineking.discord.list.ListEntry;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -9,6 +11,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.TimeFormat;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jdbi.v3.core.mapper.RowMapper;
@@ -20,7 +23,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
 
-public class Report {
+public class Report implements ListEntry {
 	private final long guild;
 	private final int id;
 	private final Type type;
@@ -114,16 +117,10 @@ public class Report {
 				.addField("Report Typ:", type.str, true)
 				.addField("Gemeldeter User:", target.getAsMention(), true)
 				.addField("Gemeldet von:", issuer.getAsMention(), true)
-				.addField("Gemeldet am:", time.toLocalDateTime().format(Main.dateFormat) + "Uhr", true)
+				.addField("Gemeldet am:", TimeFormat.DEFAULT.format(time.toInstant()), true)
 				.addField("Status:", status.str, true);
 
-		if(type == Type.MESSAGE) {
-			embed.addField("Gemeldete Nachricht:", reason, false);
-		}
-
-		else if(type == Type.USER) {
-			embed.addField("Meldegrund:", reason, true);
-		}
+		embed.addField(type == Type.MESSAGE ? "Gemeldete Nachricht:" : "Meldegrund:", reason, false);
 
 		if(!isOpen()) {
 			embed.addField("Verfahren:", closeReason, true);
@@ -151,8 +148,9 @@ public class Report {
 		return status == Status.OPEN;
 	}
 
-	public String shortDescription() {
-		return target.getAsMention() + " wurde am ` " + time.toLocalDateTime().format(Main.dateFormat) + "` von " + issuer.getAsMention() + " gemeldet.";
+	@Override
+	public String build(int index, ListContext<?> context) {
+		return (index + 1) + ". [" + status.emoji + "] " + TimeFormat.DEFAULT.format(time.toInstant()) + ": " + target.getAsMention() + " gemeldet von " + issuer.getAsMention();
 	}
 
 	public static class ReportRowMapper implements RowMapper<Report> {

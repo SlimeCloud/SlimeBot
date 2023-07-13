@@ -14,9 +14,12 @@ import com.slimebot.message.StaffMessage;
 import de.mineking.discord.DiscordUtils;
 import de.mineking.discord.commands.ContextBase;
 import de.mineking.discord.commands.ContextCreator;
+import de.mineking.discord.commands.inherited.Option;
+import de.mineking.discord.list.ListCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.slf4j.Logger;
@@ -40,6 +43,9 @@ public class Main {
 	public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
 	public final static Gson gson = new Gson();
 
+	static {
+		ListCommand.pageOption = new Option(OptionType.INTEGER, "seite", "Startseite").range(1, null);
+	}
 
 	public static Config config;
 
@@ -49,7 +55,7 @@ public class Main {
 	public static DiscordUtils discordUtils;
 	public static SpotifyListenerManager spotify;
 
-	public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
+	public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 
 	public static void main(String[] args) throws IOException {
 		config = Config.readFromFile("config");
@@ -85,7 +91,7 @@ public class Main {
 
 		discordUtils = new DiscordUtils("", jdaBuilder)
 				.useEventManager(null)
-				.useUIManager(null)
+				.useListCommands(null)
 				.useCommandManager(
 						new ContextCreator<>(ContextBase.class, CommandContext::new),
 						config -> {
