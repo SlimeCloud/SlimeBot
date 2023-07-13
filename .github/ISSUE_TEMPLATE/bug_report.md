@@ -21,6 +21,14 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
+**Solution idea**
+Do you have any idea how to fix this bug?
+
+**ToDos**
+A todo list for fixing the error
+- [ ] example
+- [x] todo
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 

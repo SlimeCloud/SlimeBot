@@ -31,9 +31,9 @@ public class StaffMessage extends ListenerAdapter {
 
 	private void updateMessage(Guild guild, List<Role> roles) {
 		List<Long> staffRoles = Main.database.handle(handle -> handle.createQuery("select role from staff_roles where guild = :guild")
-						.bind("guild", guild.getIdLong())
-						.mapTo(Long.class)
-						.list()
+				.bind("guild", guild.getIdLong())
+				.mapTo(Long.class)
+				.list()
 		);
 
 		if(roles.stream().map(Role::getIdLong).noneMatch(staffRoles::contains)) return;

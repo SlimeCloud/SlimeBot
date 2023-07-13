@@ -19,7 +19,7 @@ public class Config {
 
 	public static Config readFromFile(String file) throws IOException {
 		try(Reader reader = new FileReader(file)) {
-			Config config =  Main.gson.fromJson(reader, Config.class);
+			Config config = Main.gson.fromJson(reader, Config.class);
 
 			if(config.activity == null || config.database == null || config.color == null) {
 				throw new IOException("Required database field not set. See https://github.com/SlimeCloud/java-SlimeBot/blob/master/config_preset");

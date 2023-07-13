@@ -28,15 +28,10 @@ public class HolidayAlert implements Runnable {
 
 	public HolidayAlert(URL apiURL) {
 		this.apiUrl = apiURL;
-		try {
-			Main.jdaInstance.awaitReady();
-			run();
-		} catch(InterruptedException e) {
-			throw new RuntimeException(e);
-		}
+
+		run();
 		Main.scheduleDaily(6, this);
 	}
-
 
 	@Override
 	public void run() {

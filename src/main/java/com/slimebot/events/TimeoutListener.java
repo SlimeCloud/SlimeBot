@@ -38,7 +38,6 @@ public class TimeoutListener extends ListenerAdapter {
 										.addField("Wer: ", event.getMember().getAsMention(), true)
 										.build()
 						).queue();
-
 				break;
 			}
 		}

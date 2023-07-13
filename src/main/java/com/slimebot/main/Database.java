@@ -1,7 +1,7 @@
 package com.slimebot.main;
 
 import com.slimebot.message.StaffRole;
-import com.slimebot.report.assets.Report;
+import com.slimebot.report.Report;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;

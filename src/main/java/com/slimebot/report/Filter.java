@@ -1,4 +1,4 @@
-package com.slimebot.report.assets;
+package com.slimebot.report;
 
 import java.util.function.Predicate;
 

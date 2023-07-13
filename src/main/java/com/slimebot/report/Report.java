@@ -1,4 +1,4 @@
-package com.slimebot.report.assets;
+package com.slimebot.report;
 
 import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
@@ -172,7 +172,3 @@ public class Report {
 		}
 	}
 }
-
-
-
-

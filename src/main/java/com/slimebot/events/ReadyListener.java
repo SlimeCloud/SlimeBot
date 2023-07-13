@@ -22,10 +22,14 @@ public class ReadyListener extends ListenerAdapter {
 		} catch(Exception e) {
 			SpotifyListener.logger.error("Konnte spotify listener nicht starten", e);
 		}
+
+		Main.discordUtils.getCommandCache().updateGlobalCommands(error -> Main.logger.error("Failed to update commands", error));
 	}
 
 	@Override
 	public void onGuildReady(GuildReadyEvent event) {
+		Main.updateGuildCommands(event.getGuild());
+
 		MessageChannel channel = Main.database.getChannel(event.getGuild(), DatabaseField.LOG_CHANNEL);
 
 		if(channel == null) return;
