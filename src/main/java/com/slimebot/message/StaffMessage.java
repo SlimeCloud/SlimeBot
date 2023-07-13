@@ -29,7 +29,7 @@ public class StaffMessage extends ListenerAdapter {
 		updateMessage(event.getGuild());
 	}
 
-	private void updateMessage(Guild guild, List<Role> roles) {
+	public static void updateMessage(Guild guild, List<Role> roles) {
 		List<Long> staffRoles = Main.database.handle(handle -> handle.createQuery("select role from staff_roles where guild = :guild")
 				.bind("guild", guild.getIdLong())
 				.mapTo(Long.class)
@@ -41,7 +41,7 @@ public class StaffMessage extends ListenerAdapter {
 		updateMessage(guild);
 	}
 
-	private void updateMessage(Guild guild) {
+	public static void updateMessage(Guild guild) {
 		MessageChannel channel = Main.database.getChannel(guild, DatabaseField.STAFF_CHANNEL);
 
 		if(channel == null) return;
@@ -66,7 +66,7 @@ public class StaffMessage extends ListenerAdapter {
 		}
 	}
 
-	private String buildMessage(Guild guild) {
+	public static String buildMessage(Guild guild) {
 		List<StaffRole> roles = Main.database.handle(handle -> handle.createQuery("select * from staff_roles where guild = :guild")
 				.bind("guild", guild.getIdLong())
 				.mapTo(StaffRole.class)

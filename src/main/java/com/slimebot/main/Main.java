@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.slimebot.alerts.holidays.HolidayAlert;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
+import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
@@ -95,6 +96,8 @@ public class Main {
 				.useCommandManager(
 						new ContextCreator<>(ContextBase.class, CommandContext::new),
 						config -> {
+							config.registerCommand(ConfigCommand.class);
+
 							config.registerCommand(BugCommand.class);
 							config.registerCommand(BulkAddRoleCommand.class);
 							config.registerCommand(PingCommand.class);

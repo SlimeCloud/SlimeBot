@@ -17,6 +17,7 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
     implementation 'net.dv8tion:JDA:5.0.0-beta.11'
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.0.0'
     implementation 'ch.qos.logback:logback-classic:1.4.8'
@@ -29,9 +30,8 @@ dependencies {
     implementation 'org.jdbi:jdbi3-sqlobject:3.39.0'
     implementation 'org.jdbi:jdbi3-postgres:3.39.0'
 
-    implementation 'com.github.MineKingBot:DiscordUtils:2eec666'
+    implementation 'com.github.MineKingBot:DiscordUtils:55b69c2'
 }
-
 
 jar {
     manifest {
