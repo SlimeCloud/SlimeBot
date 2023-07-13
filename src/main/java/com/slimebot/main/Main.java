@@ -101,7 +101,8 @@ public class Main {
 				.addEventListeners(new StartupListener())
 				.addEventListeners(new TimeoutListener())
 				.addEventListeners(new JoinListener())
-				.addEventListeners(new StaffMessage());
+				.addEventListeners(new StaffMessage())
+				.addEventListeners(new BugCommand());
 
 		discordUtils = new DiscordUtils("", jdaBuilder)
 				.useEventManager(null)
@@ -116,7 +117,6 @@ public class Main {
 							config.registerCommand(FdmdsCommand.class);
 							config.registerCommand(InfoCommand.class);
 							config.registerCommand(BonkCommand.class);
-
 							config.registerCommand(UserReportCommand.class);
 							config.registerCommand(MessageReportCommand.class);
 							config.registerCommand(ReportCommand.class);
