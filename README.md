@@ -48,6 +48,37 @@ Häufige fehler:
 - **Das Value ist None**: `ymlconfig.get(PATH)` funktioniert nicht immer, nutzt stattdessen `ymlconfig.getString(PATH)` oder `ymlconfig.getInt(PATH)` etc..
 - **.set() geht nicht**: Vergesst nicht eure änderungen mit `ymlconfig.save()` zu speichern
 
+### Commands
+Wir verwenden [DiscordUtils](https://github.com/MineKingBot/DiscordUtils) as library für das command handling. Um damit einen Befehl zu erstellen, kannst du einfach eine Klasse mit der `@ApplicationCommand`-Annotation erstellen und 
+diese in der `Main`-Klasse bei den anderen Befehlen registrieren.<br>
+Um das Verhalten des Befehls anzugeben, könnt ihr eine Methode mit der Annotation `@pplicationCommandMethod` erstellen (sie muss nicht, sollte aber `performCommand` heißen). Um setup-code auszuführen, könnt ihr eine Methode mit der 
+`@WhenFinished`-Annotation erstellen, die `setup` heißen sollte. Diese wird dann einmalig ausgeführt, nachdem der Befehl registriert wurde<br>
+Sowohl in einer `@WhenFinished`, also auch `@ApplicationCommand` Methoden können beliebig parameter vom Typ `CommandManager` oder `DiscordUtils` verwendet werden. Diesen wird automatisch die `DiscordUtils` und `CommandManager` Instanz, 
+die verwendet wird, zugewiesen.<br>
+In der `@ApplicationCommandMethod` Methode werden zusätzlich alle Parameter, die von `SlashCommandInteractionEvent` zuweisbar sind, haben beim Aufrufen der Methode den Wert des Events der Befehlsinteraktion.<br>
+Um Optionen für den Befehl zu erstellen und zu verwenden, können weitere Parameter mit `@Option` in der `@ApplicationCommandMethod`-Methode hinzugefügt werden. Standardmäßig sind diese `required`, mit einem Annotation-Parameter kann 
+dies jedoch geändert werden. Optionale Optionen ohne Wert haben beim Aufrufen der `@ApplicationCommandMethod`-Methode den Wert `null`. Bei primitiven typen sollte daher die Wrapper-Klasse verwendet werden (`int` -> `Integer`).
+```java
+@ApplicationCommand(name = "test", description = "Test-Befehl als Beispiel")
+public class TestCommand {
+	@ApplicationCommandMethod
+    public void performCommand(SlashCommandInteractionEvent event, 
+                               @Option(name = "text", description = "Ein text") String text,
+                               @Option(name = "Anzahl", description = "Anzahl an Wiederholungen", required = false) Integer amount 
+    ) {
+		if(amount == null) amount = 1; //Standardwert für den Fall, dass kein Wert übergeben wird
+		
+		event.reply(text.repeat(amount)).queue();
+    }
+}
+```
+```java
+//...
+        .registerCommand(TestCommand.class)
+```
+Wenn ein Befehl registriert wurde, musst du dich nicht weiter um das manuelle erstellen von `CommandData` oder ähnlichem kümmern; Basieren auf den Annotationen werden die Befehle automatisch auf Discord erstellt.
+Für weitere Informationen kannst du gerne im [DiscordUtils Wiki](https://github.com/MineKingBot/DiscordUtils/wiki/CommandManager) nachschauen :)
+
 ## Fragen
 
 Bei Fragen wendet euch gerne auf dem Discord im Channel *#👾│tüftlerecke* an die Community oder in einem Ticket direkt an das Team.
