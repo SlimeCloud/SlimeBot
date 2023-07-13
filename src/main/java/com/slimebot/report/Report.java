@@ -26,7 +26,7 @@ public class Report {
 	public LocalDateTime time;
 	public Status status = Status.OPEN;
 	public String msgContent;
-	public String closeReason = "Nonde";
+	public String closeReason = "None";
 
 	public Report(int id, Type type, User user, User by, String msgContent) {
 		this.id = id;
