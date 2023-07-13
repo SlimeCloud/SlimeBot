@@ -1,53 +1,33 @@
 [![discord](https://img.shields.io/discord/1077255218728796192?label=slimecloud&style=plastic)](https://discord.gg/slimecloud)
-[![jda-version](https://img.shields.io/badge/JDA--Version-5.0.0--beta.8-blue?style=plastic)](https://github.com/DV8FromTheWorld/JDA/releases/tag/v5.0.0-beta.8)
+[![jda-version](https://img.shields.io/badge/JDA--Version-5.0.0--beta.11-blue?style=plastic)](https://github.com/DV8FromTheWorld/JDA/releases/tag/v5.0.0-beta.11)
 
-# SlimeBall Bot
+# 👋 SlimeBall Bot
+Diese Repository enthält den Quellcode für den `SlimeBall` Bot auf dem [SlimeCloud Discord Server](https://discord.gg/slimecloud). 
+Der Bot steht unter ständiger Entwicklung, falls du Interesse daran hast mitzuwirken, schau dir doch die [Contributing-Sektion](#-contributing) an.
 
-### Der Discord Bot für den SlimeCloud Discord Server
+Dieses Projekt steht unter der [GNU Affero General Public License v3.0](https://github.com/SlimeCloud/java-SlimeBot/blob/master/LICENSE) Lizenz!
 
-Dieser Discord bot gehört zu dem deutschen Discord "[SlimeCloud](https://discord.gg/slimecloud)". Beachte das dies Projekt unter der [GNU Affero General Public License v3.0](https://github.com/SlimeCloud/java-SlimeBot/blob/master/LICENSE) läuft.
+1. [Issues](#-issues)
+2. [Mitmachen](#-contributing)
+3. [Style-Guide](#-style-guide)
+4. [Datenbank](#-datenbank)
+5. [Befehle](#-befehle)
 
-**Bitte beachtet, dass dieser Bot bzw. dieses Projekt noch sehr am Anfang steht, weshalb noch wenig dokumentiert ist und ggf. komplizierter ist als nötig. Aber lasst uns das doch zusammen ändern!**
+## ❗ Issues
+Wir verwenden GitHub issues um Fehler und Feature-Anfragen zu verwalten. 
+Auch wenn du nicht selbst programmieren kannst, kannst du gerne [einen Issue erstellen](hhttps://github.com/SlimeCloud/java-SlimeBot/issues/new/choose), wenn du 
+eine Idee für ein Feature hast oder einen Fehler melden möchtest. Die Entwickler suchen sich regelmäßig die dringendsten Issues um diese umzusetzen.
 
-Der Bot läuft mit der jdk version 17.
+## 💻 Contributing
+Wenn du die Programmiersprache Java selbst beherrschst und dich mit der [JDA-Bibliothek](https://github.com/discord-jda/JDA) auskennst, kannst du gerne neue Features programmieren oder Fehler reparieren.
+Dazu kannst du [die Repository forken](https://github.com/SlimeCloud/java-SlimeBot/fork) und in deiner eigenen Kopie einen neuen Branch für deine Änderungen anlegen (Halte dich dabei an die [Styleguides](#-style-guide)!).
+Sobald du mit deinen Änderungen begonnen hast, kannst du [eine Pull-request erstellen](https://github.com/SlimeCloud/java-SlimeBot/compare). 
+Hier gibst du an, was du verändert hast. Durch der erstellen der Pull-request zeigst du anderen Entwicklern woran du arbeitest und die Maintainer können dir Hinweise geben, wenn du etwas anders angehen solltest.
 
-## Contributing
+### 🏡 Entwicklungsumgebung
 
-### Issues
+### 🪞 Style-Guide
 
-In den Issues Sammeln wir jegliche ToDos bezüglich dieses Bots von Ideen bis Fehlern. Nutzt gerne die vorgeschlagenen templates um einen übersichtlich und verständlichen Issue zu erstellen.
+### 🗄️ Datenbank
 
-### Pull requests
-
-Solltet ihr einen Issue bearbeitet haben könnt ihr einen Pull request (PR) erstellen. Bitte beschreibt in diesem kurz, was ihr verändert habt und gebt ggf. an auf welchen Issue ihr euch bezieht.
-
-### Commits
-
-Ein Commit sollte einen kurzen aber verständlichen Titel tragen (fixed a bug ist kein aussagekräftiger Titel). In der Beschreibung könnt ihr dann z.B. den Bug genauer beschreiben, wie er entstanden ist und was der fix dafür war.
-Beachtet dass ihr keine Commits doppelt erstellt.
-
-### Sprache
-
-**Im Code**: Wir geben Variablen, Methoden, Classes etc. Englische Namen. Texte die für den Anwender sichtbar sind verfassen wir auf Deutsch
-
-**Kommunikation**: in Issues, PR, Commits etc. ist es euch freigestellt, ob ihr Deutsch oder Englisch nutzt.
-
-### Conventions
-
-**Benennung**: Variablen, IDs, Funktionen schreiben wir im camelCase; Klassen werden mit einem Großbuchstaben am Anfang geschrieben.
-
-Ihr könnt ToDos auch gerne im Code mit `///ToDo` oder `///FixMe` notieren. Beachtet aber bitte das sowas schnell untergeht, wenn zusätzlich kein Issue erstellt wurde.
-
-### Config
-
-Wir nutzen zum speichern von bspw. UserIDs YAML-Files. Um dies einfacher zu gestallten benuzten wir die [Simple-YAML](https://github.com/Carleslc/Simple-YAML/) Lib.
-Es gibt zudem eine [Config Class](https://github.com/SlimeCloud/java-SlimeBot/blob/master/src/main/java/com/slimebot/utils/Config.java) in der einige Methoden sind die man häufiger braucht.
-
-Häufige fehler:
-- **Das Value ist None**: Vergesst nich die Config zuerst mit `ymlconfig.load()` zu laden.
-- **Das Value ist None**: `ymlconfig.get(PATH)` funktioniert nicht immer, nutzt stattdessen `ymlconfig.getString(PATH)` oder `ymlconfig.getInt(PATH)` etc..
-- **.set() geht nicht**: Vergesst nicht eure änderungen mit `ymlconfig.save()` zu speichern
-
-## Fragen
-
-Bei Fragen wendet euch gerne auf dem Discord im Channel *#👾│tüftlerecke* an die Community oder in einem Ticket direkt an das Team.
+### 🤖 Befehle
