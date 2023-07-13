@@ -129,11 +129,6 @@ public class FdmdsCommand {
 
 			Role role = Main.database.getRole(event.getGuild(), DatabaseField.FDMDS_ROLE);
 
-			if(role == null) {
-				event.reply("Error: Rolle wurde nicht gesetzt!").setEphemeral(true).queue();
-				return;
-			}
-
 			// get fdmds-channel
 			MessageChannel channel = Main.database.getChannel(event.getGuild(), DatabaseField.FDMDS_CHANNEL);
 
@@ -145,8 +140,11 @@ public class FdmdsCommand {
 			StringBuilder text = new StringBuilder()
 					.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
 					.append(question).append("\n\n")
-					.append(choices).append("\n\n")
-					.append(role.getAsMention());
+					.append(choices).append("\n\n");
+
+			if(role != null) {
+					text.append(role.getAsMention());
+			}
 
 			// Send and add reactions
 			channel.sendMessage(text).queue(m -> {
@@ -156,6 +154,7 @@ public class FdmdsCommand {
 
 				event.reply("Frage verschickt!").setEphemeral(true).queue();
 			});
+
 			event.getMessage().delete().queue();
 		}));
 	}
