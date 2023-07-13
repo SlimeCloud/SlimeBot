@@ -16,15 +16,21 @@ Dieses Projekt steht unter der [GNU Affero General Public License v3.0](https://
 ## ❗ Issues
 Wir verwenden GitHub issues um Fehler und Feature-Anfragen zu verwalten. 
 Auch wenn du nicht selbst programmieren kannst, kannst du gerne [einen Issue erstellen](hhttps://github.com/SlimeCloud/java-SlimeBot/issues/new/choose), wenn du 
-eine Idee für ein Feature hast oder einen Fehler melden möchtest. Die Entwickler suchen sich regelmäßig die dringendsten Issues um diese umzusetzen.
+eine Idee für ein Feature hast oder einen Fehler melden möchtest. 
+Die Entwickler suchen sich regelmäßig die dringendsten Issues, um diese umzusetzen.
 
 ## 💻 Contributing
-Wenn du die Programmiersprache Java selbst beherrschst und dich mit der [JDA-Bibliothek](https://github.com/discord-jda/JDA) auskennst, kannst du gerne neue Features programmieren oder Fehler reparieren.
+Wenn du die Programmiersprache Java selbst beherrschst und dich mit der [JDA-Bibliothek](https://github.com/discord-jda/JDA) auskennst, kannst du gerne neue Features programmieren oder Fehler reparieren.<br>
 Dazu kannst du [die Repository forken](https://github.com/SlimeCloud/java-SlimeBot/fork) und in deiner eigenen Kopie einen neuen Branch für deine Änderungen anlegen (Halte dich dabei an die [Styleguides](#-style-guide)!).
-Sobald du mit deinen Änderungen begonnen hast, kannst du [eine Pull-request erstellen](https://github.com/SlimeCloud/java-SlimeBot/compare). 
-Hier gibst du an, was du verändert hast. Durch der erstellen der Pull-request zeigst du anderen Entwicklern woran du arbeitest und die Maintainer können dir Hinweise geben, wenn du etwas anders angehen solltest.
+Sobald du mit deinen Änderungen begonnen hast, kannst du [eine Pull-request erstellen](https://github.com/SlimeCloud/java-SlimeBot/compare).<br>
+Wenn die Änderungen noch nicht fertig sind, solltest du sie als Draft erstellen, um zu zeigen, dass du noch nicht fertig bist.
+Im Text der Pull-request oder des Drafts gibst du an, was du verändert hast. 
+Durch der erstellen der Pull-request zeigst du anderen Entwicklern woran du arbeitest und die Maintainer können dir Hinweise geben, wenn du etwas anders angehen solltest.
+<br>
+Sobald deine Änderungen fertig sind, kannst du den Draft als "Ready for Review" markieren, um einen Maintainer der Repository darum zu bitten, deine Änderungen zu verifizieren und letztendlich in den `master`-Branch zu übernehmen.
 
 ### 🏡 Entwicklungsumgebung
+
 
 ### 🪞 Style-Guide
 
