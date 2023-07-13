@@ -1,14 +1,20 @@
-package com.slimebot.report.commands;
+package com.slimebot.commands.report;
 
 import com.slimebot.main.Main;
-import com.slimebot.report.assets.Report;
-import com.slimebot.report.assets.Status;
-import com.slimebot.utils.Checks;
+import com.slimebot.report.Report;
+import com.slimebot.report.Status;
 import com.slimebot.utils.Config;
+import de.mineking.discord.DiscordUtils;
+import de.mineking.discord.commands.Choice;
+import de.mineking.discord.commands.annotated.ApplicationCommand;
+import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
+import de.mineking.discord.commands.annotated.WhenFinished;
+import de.mineking.discord.commands.annotated.option.Option;
+import de.mineking.discord.events.interaction.SelectionHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlFile;
@@ -17,21 +23,40 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class ReportList extends ListenerAdapter {
-	@Override
-	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-		if(!event.getName().equals("report_list")) return;
+@ApplicationCommand(name = "list", description = "Zeigt alle Meldungen an")
+public class ListCommand {
+	@WhenFinished
+	public void setup(DiscordUtils manager) {
+		manager.getEventManager().registerHandler(new SelectionHandler<>(StringSelectInteractionEvent.class, "report:details", event -> {
+			String id = event.getValues().get(0);
+			Report report = Report.get(event.getGuild().getId(), Integer.parseInt(id));
 
-		if(Checks.hasTeamRole(event.getMember(), event.getGuild())) {
-			EmbedBuilder noTeam = new EmbedBuilder()
-					.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
-					.setColor(Main.embedColor(event.getGuild().getId()))
-					.setTitle(":exclamation: Error")
-					.setDescription("Der Befehl kann nur von einem Teammitglied ausgeführt werden!");
-			event.replyEmbeds(noTeam.build()).setEphemeral(true).queue();
-			return;
-		}
+			MessageEmbed embed = report.asEmbed(event.getGuild().getId());
+
+			if(report.status == Status.CLOSED) {
+				event.replyEmbeds(embed).setEphemeral(true).queue();
+			}
+
+			else {
+				event.replyEmbeds(embed).setActionRow(Report.closeButton(report.id)).setEphemeral(true).queue();
+			}
+		}));
+	}
+
+	public final List<Choice> statusChoices = Arrays.asList(
+			new Choice("Alle", "all"),
+			new Choice("Geschlossen", "closed"),
+			new Choice("Offen", "open")
+	);
+
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event,
+	                           @Option(name = "status", description = "Der Status, nach dem gefiltert werden soll", choices = "statusChoices") String status
+	) {
+		//TODO Rework this as soon as we use a database for storing these information
 
 		EmbedBuilder embed = new EmbedBuilder()
 				.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
@@ -118,7 +143,7 @@ public class ReportList extends ListenerAdapter {
 
 		MessageEmbed ed = embed.build();
 
-		event.replyEmbeds(ed).addActionRow(DetailDropdownButton(ReportIdList)).queue();
+		event.replyEmbeds(ed).addActionRow(DetailDropdownButton(ReportIdList)).setEphemeral(true).queue();
 	}
 
 	private void addReportField(Report report, EmbedBuilder embed) {
@@ -129,7 +154,7 @@ public class ReportList extends ListenerAdapter {
 	}
 
 	private StringSelectMenu DetailDropdownButton(ArrayList<Integer> reportList) {
-		StringSelectMenu.Builder btnBuilder = StringSelectMenu.create("detail_btn")
+		StringSelectMenu.Builder btnBuilder = StringSelectMenu.create("report:details")
 				.setPlaceholder("Details zu einem Report")
 				.setMaxValues(1);
 
