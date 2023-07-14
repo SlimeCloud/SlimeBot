@@ -101,8 +101,7 @@ public class Main {
 				.addEventListeners(new StartupListener())
 				.addEventListeners(new TimeoutListener())
 				.addEventListeners(new JoinListener())
-				.addEventListeners(new StaffMessage())
-				.addEventListeners(new BugCommand());
+				.addEventListeners(new StaffMessage());
 
 		discordUtils = new DiscordUtils("", jdaBuilder)
 				.useEventManager(null)

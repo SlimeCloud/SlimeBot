@@ -2,12 +2,14 @@ package com.slimebot.commands;
 
 import com.slimebot.main.Main;
 import com.slimebot.utils.Config;
+import de.mineking.discord.DiscordUtils;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
+import de.mineking.discord.commands.annotated.WhenFinished;
+import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
@@ -25,7 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @ApplicationCommand(name = "bug", description = "Melde einen Bug")
-public class BugCommand extends ListenerAdapter {
+public class BugCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(BugCommand.class);
 
@@ -92,9 +94,8 @@ public class BugCommand extends ListenerAdapter {
         }
     }
 
-    @ApplicationCommandMethod()
+    @ApplicationCommandMethod
     public void performCommand(SlashCommandInteractionEvent event) {
-        if (!event.getFullCommandName().equals("bug")) return;
         if (lastBugReport.containsKey(event.getUser().getId())) {
             LocalDateTime lastReport = lastBugReport.get(event.getUser().getId());
             if (lastReport.plusMinutes(5).isAfter(LocalDateTime.now())) {
@@ -143,8 +144,12 @@ public class BugCommand extends ListenerAdapter {
         event.replyModal(modal).queue();
     }
 
-    @Override
-    public void onModalInteraction(ModalInteractionEvent event) {
+    @WhenFinished
+    public void setup(DiscordUtils utils){
+        utils.getEventManager().registerHandler(new ModalHandler("bug", this::processModal));
+    }
+
+    public void processModal(ModalInteractionEvent event) {
         if (!event.getModalId().equals("bug")) return;
 
         YamlFile config = Config.getConfig(Objects.requireNonNull(event.getGuild()).getId(), "mainConfig");
