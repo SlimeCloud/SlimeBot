@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -27,8 +28,8 @@ public class Report implements ListEntry {
 	private final long guild;
 	private final int id;
 	private final Type type;
-	private final User issuer;
-	private final User target;
+	private final UserSnowflake issuer;
+	private final UserSnowflake target;
 
 	private final Timestamp time;
 
@@ -36,7 +37,7 @@ public class Report implements ListEntry {
 	private final String reason;
 	private final String closeReason;
 
-	private Report(long guild, int id, Type type, User issuer, User target, Timestamp timestamp, Status status, String reason, String closeReason) {
+	private Report(long guild, int id, Type type, UserSnowflake issuer, UserSnowflake target, Timestamp timestamp, Status status, String reason, String closeReason) {
 		this.guild = guild;
 		this.id = id;
 		this.type = type;
@@ -74,9 +75,7 @@ public class Report implements ListEntry {
 	public void log() {
 		MessageChannel logChannel = Main.database.getChannel(Main.jdaInstance.getGuildById(guild), DatabaseField.PUNISHMENT_CHANNEL);
 
-		if(logChannel == null) {
-			return;
-		}
+		if(logChannel == null) return;
 
 		EmbedBuilder embedBuilder = new EmbedBuilder()
 				.setTimestamp(Instant.now())
@@ -160,8 +159,8 @@ public class Report implements ListEntry {
 					rs.getLong("guild"),
 					rs.getInt("id"),
 					Type.valueOf(rs.getString("type")),
-					Main.jdaInstance.getUserById(rs.getLong("issuer")),
-					Main.jdaInstance.getUserById(rs.getLong("target")),
+					UserSnowflake.fromId(rs.getLong("issuer")),
+					UserSnowflake.fromId(rs.getLong("target")),
 					rs.getTimestamp("time"),
 					Status.valueOf(rs.getString("status")),
 					rs.getString("message"),
