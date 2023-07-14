@@ -150,8 +150,6 @@ public class BugCommand {
     }
 
     public void processModal(ModalInteractionEvent event) {
-        if (!event.getModalId().equals("bug")) return;
-
         YamlFile config = Config.getConfig(Objects.requireNonNull(event.getGuild()).getId(), "mainConfig");
 
 
