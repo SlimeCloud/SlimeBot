@@ -143,7 +143,7 @@ public class FdmdsCommand {
 					.append(choices).append("\n\n");
 
 			if(role != null) {
-					text.append(role.getAsMention());
+				text.append(role.getAsMention());
 			}
 
 			// Send and add reactions

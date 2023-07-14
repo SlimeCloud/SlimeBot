@@ -19,7 +19,7 @@ public class Database {
 		jdbi = Jdbi.create("jdbc:postgresql://" + Main.config.database.host, Main.config.database.user, Main.config.database.password);
 
 		run(handle -> {
-			handle.createUpdate("create table if not exists guild_config(guild bigint, color text, logChannel bigint, greetingsChannel bigint, punishmentChannel bigint, staffRole bigint)").execute();
+			handle.createUpdate("create table if not exists guild_config(guild bigint primary key, color text, logChannel bigint, greetingsChannel bigint, punishmentChannel bigint, staffRole bigint)").execute();
 			handle.createUpdate("create table if not exists fdmds(guild bigint, channel bigint, logChannel bigint, role bigint)").execute();
 
 			handle.createUpdate("create table if not exists spotify(guild bigint, notificationRole bigint, podcastChannel bigint, musicChannel bigint)").execute();

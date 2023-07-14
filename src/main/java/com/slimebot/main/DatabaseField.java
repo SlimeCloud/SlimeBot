@@ -5,6 +5,7 @@ public enum DatabaseField {
 	GREETINGS_CHANNEL("guild_config", "greetingsChannel"),
 	PUNISHMENT_CHANNEL("guild_config", "punishmentChannel"),
 	STAFF_ROLE("guild_config", "staffRole"),
+	COLOR("guild_config", "color"),
 
 
 	FDMDS_CHANNEL("fdmds", "channel"),
