@@ -20,13 +20,13 @@ public class Database {
 
 		run(handle -> {
 			handle.createUpdate("create table if not exists guild_config(guild bigint primary key, color text, logChannel bigint, greetingsChannel bigint, punishmentChannel bigint, staffRole bigint)").execute();
-			handle.createUpdate("create table if not exists fdmds(guild bigint, channel bigint, logChannel bigint, role bigint)").execute();
+			handle.createUpdate("create table if not exists fdmds(guild bigint primary key, channel bigint, logChannel bigint, role bigint)").execute();
 
-			handle.createUpdate("create table if not exists spotify(guild bigint, notificationRole bigint, podcastChannel bigint, musicChannel bigint)").execute();
+			handle.createUpdate("create table if not exists spotify(guild bigint primary key, notificationRole bigint, podcastChannel bigint, musicChannel bigint)").execute();
 			handle.createUpdate("create table if not exists spotify_known(id text)").execute();
 
 			handle.createUpdate("create table if not exists staff_roles(guild bigint, role bigint, description text)").execute();
-			handle.createUpdate("create table if not exists staff_config(guild bigint, channel bigint, message bigint)").execute();
+			handle.createUpdate("create table if not exists staff_config(guild bigint primary key, channel bigint, message bigint)").execute();
 
 			handle.createUpdate("create table if not exists report_blocks(guild bigint, \"user\" bigint)").execute();
 			handle.createUpdate("create table if not exists reports(guild bigint, id serial, issuer bigint, target bigint, type text, time timestamp default now(), message text, status text default 'OPEN', closeReason text)").execute();
@@ -56,7 +56,7 @@ public class Database {
 		return Color.decode(handle(handle -> handle.createQuery("select color from guild_config where guild = :guild")
 				.bind("guild", guild)
 				.mapTo(String.class)
-				.findOne().orElse(Main.config.color)
+				.findOne().filter(color -> !color.isEmpty()).orElse(Main.config.color)
 		));
 	}
 
