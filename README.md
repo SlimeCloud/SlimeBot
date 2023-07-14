@@ -30,7 +30,10 @@ Durch der erstellen der Pull-request zeigst du anderen Entwicklern woran du arbe
 Sobald deine Änderungen fertig sind, kannst du den Draft als "Ready for Review" markieren, um einen Maintainer der Repository darum zu bitten, deine Änderungen zu verifizieren und letztendlich in den `master`-Branch zu übernehmen.
 
 ## 🏡 Entwicklungsumgebung
+Dieser Bot verwendet java 17! Wenn du den bot selber verwenden oder an der Entwicklung teilnehmen möchtest, wird vorausgesetzt, dass du bereits ein JRE/JDK 17 installiert hast, und weißt, wie du es verwendest!<br>
 
+Für die Entwicklung empfehlen wir [IntelliJ](https://www.jetbrains.com/idea/download/) (Community Version reicht aus) als Entwicklungsumgebung. Andere IDE's können auch verwendet werden, folgende Erklärungen beziehen sich jedoch 
+ausschließlich auf IntelliJ.
 
 ## 🪞 Style-Guide
 
