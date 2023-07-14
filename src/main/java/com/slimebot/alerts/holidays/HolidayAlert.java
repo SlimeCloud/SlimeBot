@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -50,10 +51,10 @@ public class HolidayAlert implements Runnable {
 
 		try {
 			String date = localDate.format(formatter);
-			List<JsonObject> objects = getObjectsAtDate(date);
-			if(objects.isEmpty()) return;
-
-			sendMessage(objects);
+			getObjectsAtDate(date, objects -> {
+				if(objects.isEmpty()) return;
+				sendMessage(objects);
+			});
 		} catch(URISyntaxException | IOException | ParseException e) {
 			throw new RuntimeException(e);
 		}
@@ -86,31 +87,28 @@ public class HolidayAlert implements Runnable {
 
 
 	// date = yyyy-MM-dd
-	private List<JsonObject> getObjectsAtDate(String date) throws URISyntaxException, IOException, ParseException {
+	private void getObjectsAtDate(String date, Consumer<List<JsonObject>> consumer) throws URISyntaxException, IOException, ParseException {
 		HttpGet request = new HttpGet(apiUrl.toURI());
 
-		AtomicReference<JsonArray> atomicArray = new AtomicReference<>(new JsonArray());
-
 		httpClient.execute(request, response -> {
+
 			HttpEntity entity = response.getEntity();
 
-			atomicArray.set(JsonParser.parseString(EntityUtils.toString(entity)).getAsJsonArray());
+			JsonArray array = JsonParser.parseString(EntityUtils.toString(entity)).getAsJsonArray();
+
+			List<JsonObject> jsonObjects = IntStream
+					.range(0, array.size())
+					// get only the holidays at the right date
+					.filter(i -> array.get(i).getAsJsonObject().get("start").getAsString().equalsIgnoreCase(date))
+					// get only "real" holidays
+					.filter(i -> !(array.get(i).getAsJsonObject().get("name").getAsString().contains("(")))
+					// map to JsonObject
+					.mapToObj(i -> array.get(i).getAsJsonObject())
+					.collect(Collectors.toList());
+
+			consumer.accept(jsonObjects);
 			return response;
 		});
-
-		JsonArray array = atomicArray.get();
-
-		List<JsonObject> jsonObjects = IntStream
-				.range(0, array.size())
-				// get only the holidays at the right date
-				.filter(i -> array.get(i).getAsJsonObject().get("start").getAsString().equalsIgnoreCase(date))
-				// get only "real" holidays
-				.filter(i -> !(array.get(i).getAsJsonObject().get("name").getAsString().contains("(")))
-				// map to JsonObject
-				.mapToObj(i -> array.get(i).getAsJsonObject())
-				.collect(Collectors.toList());
-
-		return jsonObjects;
 	}
 
 	private MessageChannel getChannelFromConfig(String guildId, String path) {
