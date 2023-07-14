@@ -60,4 +60,28 @@ Im Folgenden werden die für diesen Bot nötigen Grundlagen erklärt, für detai
 
 
 #### Events
-
+Um Events, die z.B. Components oder Modals von Befehlen zu handhaben, werden die Handler in der Klasse des Befehls registriert. Dazu wird aber kein ListenerAdapter verwendet, sondern der `EventManager` von DiscordUtils.<br>
+Beispiel:
+```java
+@ApplicationCommand(name = "test", description = "Test Command")
+public class TestCommand {
+	@ApplicationCommandMethod
+    public void performCommand(SlashCommandInteractionEvent event) {
+		event.replyModal(
+				Modal.create("test:modal", "Titel")
+                        .addActionRow(
+								TextInput.create("test", "Test", TextInputStyle.SHORT)
+                                        .build()
+                        )
+                        .build()
+        ).queue();
+    }
+	
+	@WhenFinished
+    public void setup(DiscordUtils manager) {
+		manager.getEventManager().registerHandler(new ModalHandler("test:modal", event -> 
+			event.reply(event.getValue("test").getAsString()).setEphemeral(true).queue()
+		));
+    }
+}
+```
