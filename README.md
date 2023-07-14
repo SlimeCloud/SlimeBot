@@ -78,8 +78,8 @@ public class TestCommand {
     }
 	
 	@WhenFinished
-    public void setup(DiscordUtils manager) { //Executed when the command was successfully registered
-		manager.getEventManager().registerHandler(new ModalHandler("test:modal", event -> //Register a ModalHandler that listens to modals with the ID 'test:modal'
+    public void setup(DiscordUtils manager) { //Wird ausgeführt sobald der Befehl registriert wurde
+		manager.getEventManager().registerHandler(new ModalHandler("test:modal", event -> //Handler registrieren, der auf Modals mit der ID 'test:modal' hört
 			event.reply(event.getValue("test").getAsString()).setEphemeral(true).queue()
 		));
     }
