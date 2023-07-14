@@ -5,15 +5,15 @@ import com.slimebot.utils.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 
-public class Timeout extends ListenerAdapter {
+public class TimeoutListener extends ListenerAdapter {
 
 	@Override
 	public void onGuildMemberUpdateTimeOut(GuildMemberUpdateTimeOutEvent event) {
@@ -24,7 +24,7 @@ public class Timeout extends ListenerAdapter {
 				EmbedBuilder embedBuilder = new EmbedBuilder()
 						.setTitle("Du wurdest getimeouted")
 						.setColor(Main.embedColor(event.getGuild().getId()))
-						.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+						.setTimestamp(Instant.now())
 						.setDescription("Du wurdest auf dem SlimeCloud Discord getimeouted")
 						.addField("Grund:", entry.getReason(), true);
 
@@ -33,7 +33,7 @@ public class Timeout extends ListenerAdapter {
 				EmbedBuilder embedBuilderLog = new EmbedBuilder()
 						.setTitle("\"" + event.getMember().getEffectiveName() + "\"" + " wurde getimeouted")
 						.setColor(Main.embedColor(event.getGuild().getId()))
-						.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()))
+						.setTimestamp(Instant.now())
 						.addField("Grund:", entry.getReason(), true)
 						.addField("Wer: ", event.getMember().getAsMention(), true);
 
@@ -45,7 +45,7 @@ public class Timeout extends ListenerAdapter {
 					throw new RuntimeException(e);
 				}
 
-				event.getGuild().getTextChannelById(config.getString("punishmentChannelID")).sendMessageEmbeds(embedBuilderLog.build()).queue();
+				event.getGuild().getChannelById(MessageChannel.class, config.getString("punishmentChannelID")).sendMessageEmbeds(embedBuilderLog.build()).queue();
 
 				break;
 			}
