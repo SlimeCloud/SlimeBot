@@ -1,105 +1,88 @@
 package com.slimebot.alerts.holidays;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
+import de.mineking.discord.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.ParseException;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.Route;
+import net.dv8tion.jda.api.utils.data.DataArray;
+import net.dv8tion.jda.api.utils.data.DataObject;
+import net.dv8tion.jda.internal.requests.CompletedRestAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class HolidayAlert implements Runnable {
-	private final URL apiUrl;
-	private final CloseableHttpClient httpClient = HttpClients.createDefault();
+	public final static Logger logger = LoggerFactory.getLogger(HolidayAlert.class);
 
-	public HolidayAlert(URL apiURL) {
-		this.apiUrl = apiURL;
+	public final static String apiHost = "https://ferien-api.de";
+	public final static Route apiRoute = Route.get("api/v1/holidays");
 
-		run();
+	private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	public HolidayAlert() {
 		Main.scheduleDaily(6, this);
 	}
 
 	@Override
 	public void run() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		retrieveHolidays(LocalDate.now().format(formatter))
+				.flatMap(this::sendMessage)
+				.queue();
+	}
 
-		try {
-			String date = localDate.format(formatter);
-			getObjectsAtDate(date, objects -> {
-				if(objects.isEmpty()) return;
-				sendMessage(objects);
-			});
-		} catch(URISyntaxException | IOException | ParseException e) {
-			throw new RuntimeException(e);
+	private RestAction<?> sendMessage(List<Holiday> holidays) {
+		if(holidays.isEmpty()) {
+			return new CompletedRestAction<>(Main.jdaInstance, null);
+		}
+
+		return Utils.accumulate(Main.jdaInstance, Main.jdaInstance.getGuilds().stream()
+				.map(guild -> (GuildMessageChannel) Main.database.getChannel(guild, DatabaseField.GREETINGS_CHANNEL))
+				.filter(Objects::nonNull)
+				.map(channel -> {
+					String states = holidays
+							.stream()
+							.map(h -> h.name.split(" ")[1].toUpperCase())
+							.collect(Collectors.joining(", "))
+							.replaceFirst(",(?=[^,]*$)", " und");
+
+					if(holidays.size() > 3) states = holidays.size() + " Bundesländern";
+
+					return channel.sendMessageEmbeds(
+							new EmbedBuilder()
+									.setColor(Main.database.getColor(channel.getGuild()))
+									.setTitle("ENDLICH FERIEN")
+									.setDescription("**Alle Schüler aus " + states + " haben endlich Ferien!**\nGenießt die Ferien solange sie noch sind...")
+									.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png")
+									.build()
+					);
+				})
+				.toList()
+		);
+	}
+
+	private RestAction<List<Holiday>> retrieveHolidays(String date) {
+		return Main.discordUtils.getCustomRestActionManager().request(apiHost, apiRoute.compile(), null, (response, request) ->
+				response.getArray().stream(DataArray::getObject)
+						.map(Holiday::new)
+						.filter(h -> h.start().equalsIgnoreCase(date)) // get only the holidays at the right date
+						.filter(h -> !h.name().contains("(")) // get only "real" holidays
+						.peek(h -> logger.info("Ferien erkannt: " + h))
+						.toList()
+		);
+	}
+
+	public record Holiday(int year, String start, String name, String end, String stateCode, String slug) {
+		public Holiday(DataObject data) {
+			this(data.getInt("year"), data.getString("start"), data.getString("name"), data.getString("end"), data.getString("stateCode"), data.getString("slug"));
 		}
 	}
 
-	private void sendMessage(List<JsonObject> objects) {
-		for(Guild guild : Main.jdaInstance.getGuilds()) {
-			MessageChannel channel = Main.database.getChannel(guild, DatabaseField.GREETINGS_CHANNEL);
-
-			if(channel == null) return;
-
-			String states = objects
-					.stream()
-					.map(o -> o.get("name").getAsString().split(" ")[1].toUpperCase())
-					.collect(Collectors.joining(", "));
-
-			//
-			if(objects.size() > 3)states = objects.size() + " Bundesländern";
-
-			channel.sendMessageEmbeds(
-					new EmbedBuilder()
-							.setColor(Main.database.getColor(guild))
-							.setTitle("ENDLICH FERIEN")
-							.setDescription("**Alle Schüler aus " + states + " haben endlich Ferien!**\nGenießt die Ferien solange sie noch sind...")
-							.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png")
-							.build()
-			).queue();
-		}
-	}
-
-
-	// date = yyyy-MM-dd
-	private void getObjectsAtDate(String date, Consumer<List<JsonObject>> consumer) throws URISyntaxException, IOException, ParseException {
-		HttpGet request = new HttpGet(apiUrl.toURI());
-
-		httpClient.execute(request, response -> {
-
-			HttpEntity entity = response.getEntity();
-
-			JsonArray array = JsonParser.parseString(EntityUtils.toString(entity)).getAsJsonArray();
-
-			List<JsonObject> jsonObjects = IntStream
-					.range(0, array.size())
-					// get only the holidays at the right date
-					.filter(i -> array.get(i).getAsJsonObject().get("start").getAsString().equalsIgnoreCase(date))
-					// get only "real" holidays
-					.filter(i -> !(array.get(i).getAsJsonObject().get("name").getAsString().contains("(")))
-					// map to JsonObject
-					.mapToObj(i -> array.get(i).getAsJsonObject())
-					.collect(Collectors.toList());
-
-			consumer.accept(jsonObjects);
-			return response;
-		});
-	}
 }

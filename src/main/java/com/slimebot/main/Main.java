@@ -27,10 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -54,9 +52,9 @@ public class Main {
 
 	public static Database database;
 	public static DiscordUtils discordUtils;
-	public static SpotifyListenerManager spotify;
 
-	public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
+	public static SpotifyListenerManager spotify;
+	public static HolidayAlert holiday;
 
 	public static void main(String[] args) throws IOException {
 		config = Config.readFromFile("config");
@@ -91,6 +89,7 @@ public class Main {
 				.addEventListeners(new StaffMessage());
 
 		discordUtils = new DiscordUtils("", jdaBuilder)
+				.useCustomRestactionManager(null)
 				.useEventManager(null)
 				.useListCommands(null)
 				.useCommandManager(
@@ -122,7 +121,7 @@ public class Main {
 			logger.info("No spotify configuration found - Disabled spotify notifications");
 		}
 
-		new HolidayAlert(new URL("https://ferien-api.de/api/v1/holidays"));
+		holiday = new HolidayAlert();
 	}
 
 	public static void updateGuildCommands(Guild guild) {

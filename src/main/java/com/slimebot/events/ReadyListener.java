@@ -19,6 +19,8 @@ public class ReadyListener extends ListenerAdapter {
 			if(Main.spotify != null) {
 				Main.spotify.register();
 			}
+
+			Main.holiday.run();
 		} catch(Exception e) {
 			SpotifyListener.logger.error("Konnte spotify listener nicht starten", e);
 		}

@@ -30,7 +30,7 @@ dependencies {
     implementation 'org.jdbi:jdbi3-sqlobject:3.39.0'
     implementation 'org.jdbi:jdbi3-postgres:3.39.0'
 
-    implementation 'com.github.MineKingBot:DiscordUtils:55b69c2'
+    implementation 'com.github.MineKingBot:DiscordUtils:d6eb945'
 }
 
 jar {
