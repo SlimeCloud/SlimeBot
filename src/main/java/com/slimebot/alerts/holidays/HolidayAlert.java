@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.ParseException;
@@ -22,6 +21,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class HolidayAlert implements Runnable {
 	private final URL apiUrl;
@@ -47,33 +51,34 @@ public class HolidayAlert implements Runnable {
 
 		try {
 			String date = localDate.format(formatter);
-			JsonObject object = getObjectAtDate(date);
-			if(object == null) return;
-
-			// returns if it's not a "real" holiday
-			if(object.get("name").getAsString().contains("(")) return;
-
-			sendMessage(object);
+			getObjectsAtDate(date, objects -> {
+				if(objects.isEmpty()) return;
+				sendMessage(objects);
+			});
 		} catch(URISyntaxException | IOException | ParseException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void sendMessage(JsonObject object) {
+	private void sendMessage(List<JsonObject> objects) {
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
 			MessageChannel channel = getChannelFromConfig(guild.getId(), "greetingsChannel");
 
 			if(channel == null) return;
 
-			// 0: holiday name, 1: state, 2: year
-			String[] name = object.get("name").getAsString().split(" ");
-			if(name.length < 2) return;
+			String states = objects
+					.stream()
+					.map(o -> o.get("name").getAsString().split(" ")[1].toUpperCase())
+					.collect(Collectors.joining(", "));
+
+			//
+			if(objects.size() > 3)states = objects.size() + " Bundesländern";
 
 			channel.sendMessageEmbeds(
 					new EmbedBuilder()
 							.setColor(Main.embedColor(guild.getId()))
 							.setTitle("ENDLICH FERIEN")
-							.setDescription("**Alle Schüler aus " + name[1].toUpperCase() + " haben endlich Ferien!**\nGenießt die Ferien solange sie noch sind...")
+							.setDescription("**Alle Schüler aus " + states + " haben endlich Ferien!**\nGenießt die Ferien solange sie noch sind...")
 							.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png")
 							.build()
 			).queue();
@@ -82,21 +87,28 @@ public class HolidayAlert implements Runnable {
 
 
 	// date = yyyy-MM-dd
-	private JsonObject getObjectAtDate(String date) throws URISyntaxException, IOException, ParseException {
+	private void getObjectsAtDate(String date, Consumer<List<JsonObject>> consumer) throws URISyntaxException, IOException, ParseException {
 		HttpGet request = new HttpGet(apiUrl.toURI());
 
-		CloseableHttpResponse response = httpClient.execute(request);
-		HttpEntity entity = response.getEntity();
+		httpClient.execute(request, response -> {
 
-		JsonArray array = JsonParser.parseString(EntityUtils.toString(entity)).getAsJsonArray();
+			HttpEntity entity = response.getEntity();
 
-		response.close();
+			JsonArray array = JsonParser.parseString(EntityUtils.toString(entity)).getAsJsonArray();
 
-		for(int i = 0; i < array.size(); i++) {
-			JsonObject object = array.get(i).getAsJsonObject();
-			if(object.get("start").getAsString().equalsIgnoreCase(date)) return object;
-		}
-		return null;
+			List<JsonObject> jsonObjects = IntStream
+					.range(0, array.size())
+					// get only the holidays at the right date
+					.filter(i -> array.get(i).getAsJsonObject().get("start").getAsString().equalsIgnoreCase(date))
+					// get only "real" holidays
+					.filter(i -> !(array.get(i).getAsJsonObject().get("name").getAsString().contains("(")))
+					// map to JsonObject
+					.mapToObj(i -> array.get(i).getAsJsonObject())
+					.collect(Collectors.toList());
+
+			consumer.accept(jsonObjects);
+			return response;
+		});
 	}
 
 	private MessageChannel getChannelFromConfig(String guildId, String path) {
