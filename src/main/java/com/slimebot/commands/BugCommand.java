@@ -176,7 +176,7 @@ public class BugCommand {
 
         event.getGuild()
                 .getTextChannelById(config.getString("logChannel"))
-                .sendMessage("## Ein neuer Bug wurde gefunden!" +
+                .sendMessage("## Ein neuer Bug wurde gefunden! " +
                         "Erstellt von " + event.getMember().getAsMention())
                 .setEmbeds(embedBuilder.build())
                 .queue();
