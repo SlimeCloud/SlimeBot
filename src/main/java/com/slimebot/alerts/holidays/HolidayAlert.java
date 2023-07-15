@@ -62,7 +62,7 @@ public class HolidayAlert implements Runnable {
 									.setDescription("**Alle Schüler aus " + states + " haben endlich Ferien!**\nGenießt die Ferien solange sie noch sind...")
 									.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png")
 									.build()
-					);
+					).mapToResult();
 				})
 				.toList()
 		);
