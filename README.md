@@ -66,7 +66,7 @@ Einen einfachen Befehl zu erstellen ist recht einfach. So sieht due Grundstruktu
 public class TestCommand {
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event) {
-		//Diese Methode wird bei Interaktion mit den Befehl aufgerufen
+		//Diese Methode wird bei Interaktion mit dem Befehl aufgerufen
 	}
 }
 ```
