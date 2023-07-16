@@ -12,6 +12,9 @@ Dieses Projekt steht unter der [GNU Affero General Public License v3.0](https://
 3. [Style-Guide](#-style-guide)
 4. [Datenbank](#-datenbank)
 5. [Befehle](#-befehle-und-zugehörige-events)
+   1. [Grundlagen](#befehle)
+   2. [Zusätzlicher Registrationscode](#setup)
+   3. [Events](#events)
 
 ## ❗ Issues
 Wir verwenden GitHub issues um Fehler und Feature-Anfragen zu verwalten.
@@ -129,3 +132,5 @@ public class TestCommand {
 	}
 }
 ```
+Für Event Listener, die unabhängig von Befehlen sind, verwenden wir Klassen, die `ListenerAdapter` extenden und in der `Main`-Klasse als Listener registriert werden. 
+Für jeden "Themenbereich" wird ein eigener Listener erstellt, in dem die Methoden für die jeweiligen Events überschrieben werden können.
