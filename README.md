@@ -115,20 +115,17 @@ Beispiel:
 @ApplicationCommand(name = "test", description = "Test Command")
 public class TestCommand {
 	@ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event) {
+	public void performCommand(SlashCommandInteractionEvent event) {
 		event.replyModal(
-				Modal.create("test:modal", "Titel")
-                        .addActionRow(
-								TextInput.create("test", "Test", TextInputStyle.SHORT)
-                                        .build()
-                        )
-                        .build()
-        ).queue();
-    }
+			Modal.create("test:modal", "Titel")
+				.addActionRow(TextInput.create("test", "Test", TextInputStyle.SHORT).build())
+				.build()
+		).queue();
+	}
 	
 	@Listener(type = ModalHandler.class, filter = "test:modal") //Methode wird ausgeführt, wenn ein Nutzer mit einem Modal mit ID "test:modal" interagiert
-    public void handleModal(ModalInteractionEvent event) {
+	public void handleModal(ModalInteractionEvent event) {
 		event.reply(event.getValue("test").getAsString()).setEphemeral(true).queue();
-    }
+	}
 }
 ```
