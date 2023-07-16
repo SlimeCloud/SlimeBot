@@ -2,21 +2,18 @@ package com.slimebot.alerts.holidays;
 
 import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
-import de.mineking.discord.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.Route;
 import net.dv8tion.jda.api.utils.data.DataArray;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.dv8tion.jda.internal.requests.CompletedRestAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HolidayAlert implements Runnable {
@@ -34,38 +31,32 @@ public class HolidayAlert implements Runnable {
 	@Override
 	public void run() {
 		retrieveHolidays(LocalDate.now().format(formatter))
-				.flatMap(this::sendMessage)
-				.queue();
+				.queue(this::sendMessage);
 	}
 
-	private RestAction<?> sendMessage(List<Holiday> holidays) {
-		if(holidays.isEmpty()) {
-			return new CompletedRestAction<>(Main.jdaInstance, null);
+	private void sendMessage(List<Holiday> holidays) {
+		if(holidays.isEmpty()) return;
+
+		for(Guild guild : Main.jdaInstance.getGuilds()) {
+			Main.database.getChannel(guild, DatabaseField.GREETINGS_CHANNEL).ifPresent(channel -> {
+				String states = holidays
+						.stream()
+						.map(h -> h.name.split(" ")[1].toUpperCase())
+						.collect(Collectors.joining(", "))
+						.replaceFirst(",(?=[^,]*$)", " und");
+
+				if(holidays.size() > 3) states = holidays.size() + " Bundesländern";
+
+				channel.sendMessageEmbeds(
+						new EmbedBuilder()
+								.setColor(Main.database.getColor(guild))
+								.setTitle("ENDLICH FERIEN")
+								.setDescription("**Alle Schüler aus " + states + " haben endlich Ferien!**\nGenießt die Ferien solange sie noch sind...")
+								.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png")
+								.build()
+				).queue();
+			});
 		}
-
-		return Utils.accumulate(Main.jdaInstance, Main.jdaInstance.getGuilds().stream()
-				.map(guild -> (GuildMessageChannel) Main.database.getChannel(guild, DatabaseField.GREETINGS_CHANNEL))
-				.filter(Objects::nonNull)
-				.map(channel -> {
-					String states = holidays
-							.stream()
-							.map(h -> h.name.split(" ")[1].toUpperCase())
-							.collect(Collectors.joining(", "))
-							.replaceFirst(",(?=[^,]*$)", " und");
-
-					if(holidays.size() > 3) states = holidays.size() + " Bundesländern";
-
-					return channel.sendMessageEmbeds(
-							new EmbedBuilder()
-									.setColor(Main.database.getColor(channel.getGuild()))
-									.setTitle("ENDLICH FERIEN")
-									.setDescription("**Alle Schüler aus " + states + " haben endlich Ferien!**\nGenießt die Ferien solange sie noch sind...")
-									.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png")
-									.build()
-					).mapToResult();
-				})
-				.toList()
-		);
 	}
 
 	private RestAction<List<Holiday>> retrieveHolidays(String date) {

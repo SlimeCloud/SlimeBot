@@ -35,18 +35,19 @@ public class BugCommand {
 		manager.getEventManager().registerHandler(new ModalHandler("bug", event -> {
 			event.reply("Der Report wurde erfolgreich ausgeführt").setEphemeral(true).queue();
 
-			Main.database.getChannel(event.getGuild(), DatabaseField.LOG_CHANNEL)
-					.sendMessageEmbeds(
-							new EmbedBuilder()
-									.setColor(Main.database.getColor(event.getGuild()))
-									.setTitle("Ein neuer Bug wurde gefunden!")
+			Main.database.getChannel(event.getGuild(), DatabaseField.LOG_CHANNEL).ifPresent(channel ->
+					channel.sendMessageEmbeds(
+									new EmbedBuilder()
+											.setColor(Main.database.getColor(event.getGuild()))
+											.setTitle("Ein neuer Bug wurde gefunden!")
 
-									.setDescription("Fehlerbeschreibung: \n\n")
-									.appendDescription(event.getValue("text").getAsString() + "\n")
-									.setFooter("Report von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")")
-									.build()
-					)
-					.setActionRow(Button.secondary("bug:close", "Bug schließen")).queue();
+											.setDescription("Fehlerbeschreibung: \n\n")
+											.appendDescription(event.getValue("text").getAsString() + "\n")
+											.setFooter("Report von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")")
+											.build()
+							)
+							.setActionRow(Button.secondary("bug:close", "Bug schließen")).queue()
+			);
 		}));
 
 		manager.getEventManager().registerHandler(new ButtonHandler("bug:close", event -> {

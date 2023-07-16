@@ -4,11 +4,12 @@ import com.slimebot.message.StaffRole;
 import com.slimebot.report.Report;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 
 import java.awt.*;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -64,20 +65,21 @@ public class Database {
 		return getColor(guild.getIdLong());
 	}
 
-	public long getSnowflake(Guild guild, String table, String field) {
+	public Optional<Long> getSnowflake(Guild guild, String table, String field) {
 		return handle(handle -> handle.createQuery("select " + field + " from " + table + " where guild = :guild")
 				.bind("guild", guild.getIdLong())
 				.mapTo(Long.class)
 				.findOne()
-				.orElse(0L)
 		);
 	}
 
-	public MessageChannel getChannel(Guild guild, DatabaseField field) {
-		return guild.getChannelById(MessageChannel.class, getSnowflake(guild, field.table, field.columnName));
+	public Optional<GuildMessageChannel> getChannel(Guild guild, DatabaseField field) {
+		return getSnowflake(guild, field.table, field.columnName)
+				.map(id -> guild.getChannelById(GuildMessageChannel.class, id));
 	}
 
-	public Role getRole(Guild guild, DatabaseField field) {
-		return guild.getRoleById(getSnowflake(guild, field.table, field.columnName));
+	public Optional<Role> getRole(Guild guild, DatabaseField field) {
+		return getSnowflake(guild, field.table, field.columnName)
+				.map(guild::getRoleById);
 	}
 }

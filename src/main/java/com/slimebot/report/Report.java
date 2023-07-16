@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.UserSnowflake;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.TimeFormat;
@@ -73,30 +72,28 @@ public class Report implements ListEntry {
 	}
 
 	public void log() {
-		MessageChannel logChannel = Main.database.getChannel(Main.jdaInstance.getGuildById(guild), DatabaseField.PUNISHMENT_CHANNEL);
+		Main.database.getChannel(Main.jdaInstance.getGuildById(guild), DatabaseField.PUNISHMENT_CHANNEL).ifPresent(channel -> {
+			EmbedBuilder embedBuilder = new EmbedBuilder()
+					.setTimestamp(Instant.now())
+					.setColor(Main.database.getColor(guild))
+					.setTitle(":exclamation: Neuer Report!")
+					.addField("Report von:", issuer.getAsMention(), true)
+					.addField("Gemeldet:", target.getAsMention(), true);
 
-		if(logChannel == null) return;
+			if(type == Type.MESSAGE) {
+				embedBuilder
+						.setDescription("Es wurde eine Nachricht gemeldet!")
+						.addField("Nachricht:", reason, false);
+			}
 
-		EmbedBuilder embedBuilder = new EmbedBuilder()
-				.setTimestamp(Instant.now())
-				.setColor(Main.database.getColor(guild))
-				.setTitle(":exclamation: Neuer Report!")
-				.addField("Report von:", issuer.getAsMention(), true)
-				.addField("Gemeldet:", target.getAsMention(), true);
+			else {
+				embedBuilder
+						.setDescription("Es wurde eine Person gemeldet!")
+						.addField("Begründung:", reason, false);
+			}
 
-		if(type == Type.MESSAGE) {
-			embedBuilder
-					.setDescription("Es wurde eine Nachricht gemeldet!")
-					.addField("Nachricht:", reason, false);
-		}
-
-		else {
-			embedBuilder
-					.setDescription("Es wurde eine Person gemeldet!")
-					.addField("Begründung:", reason, false);
-		}
-
-		logChannel.sendMessage(buildMessage()).queue();
+			channel.sendMessage(buildMessage()).queue();
+		});
 	}
 
 	public void close(String reason) {

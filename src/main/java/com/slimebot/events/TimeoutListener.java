@@ -28,8 +28,8 @@ public class TimeoutListener extends ListenerAdapter {
 								.build()
 				)).queue();
 
-				Main.database.getChannel(event.getGuild(), DatabaseField.PUNISHMENT_CHANNEL)
-						.sendMessageEmbeds(
+				Main.database.getChannel(event.getGuild(), DatabaseField.PUNISHMENT_CHANNEL).ifPresent(channel ->
+						channel.sendMessageEmbeds(
 								new EmbedBuilder()
 										.setTitle("\"" + event.getMember().getEffectiveName() + "\"" + " wurde getimeouted")
 										.setColor(Main.database.getColor(event.getGuild()))
@@ -37,7 +37,9 @@ public class TimeoutListener extends ListenerAdapter {
 										.addField("Grund:", entry.getReason(), true)
 										.addField("Wer: ", event.getMember().getAsMention(), true)
 										.build()
-						).queue();
+						).queue()
+				);
+
 				break;
 			}
 		}

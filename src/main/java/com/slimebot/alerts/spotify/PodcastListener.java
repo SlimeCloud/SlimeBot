@@ -5,7 +5,6 @@ import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.hc.core5.http.ParseException;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -68,17 +67,17 @@ public class PodcastListener implements Runnable {
 
 	private void broadcastEpisode(EpisodeSimplified episode) {
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
-			MessageChannel channel = Main.database.getChannel(guild, DatabaseField.SPOTIFY_PODCAST_CHANNEL);
+			Main.database.getChannel(guild, DatabaseField.SPOTIFY_PODCAST_CHANNEL).ifPresent(channel -> {
+				String notification = Main.database.getRole(guild, DatabaseField.SPOTIFY_NOTIFICATION_ROLE)
+						.map(Role::getAsMention)
+						.orElse("");
 
-			if(channel == null) continue;
-
-			Role notification = Main.database.getRole(guild, DatabaseField.SPOTIFY_NOTIFICATION_ROLE);
-
-			channel.sendMessage(MessageFormat.format(Main.config.spotify.podcast.message,
-					notification == null ? "" : notification.getAsMention(),
-					episode.getName(),
-					episode.getExternalUrls().get("spotify")
-			)).queue();
+				channel.sendMessage(MessageFormat.format(Main.config.spotify.podcast.message,
+						notification,
+						episode.getName(),
+						episode.getExternalUrls().get("spotify")
+				)).queue();
+			});
 		}
 	}
 }

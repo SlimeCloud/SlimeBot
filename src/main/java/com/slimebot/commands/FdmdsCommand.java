@@ -12,7 +12,6 @@ import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
@@ -21,6 +20,8 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
+
+import java.util.Optional;
 
 @ApplicationCommand(name = "fdmds", description = "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!", feature = "fdmds")
 public class FdmdsCommand {
@@ -105,16 +106,13 @@ public class FdmdsCommand {
 			}
 
 			else {
-				MessageChannel channel = Main.database.getChannel(event.getGuild(), DatabaseField.FDMDS_LOG_CHANNEL);
-
-				if(channel == null) {
-					event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
-					return;
-				}
-
-				channel.sendMessage(MessageCreateData.fromEditData(message)).queue();
-
-				event.reply("Vorschlag erfolgreich verschickt!").setEphemeral(true).queue();
+				Main.database.getChannel(event.getGuild(), DatabaseField.FDMDS_LOG_CHANNEL).ifPresentOrElse(
+						channel -> {
+							channel.sendMessage(MessageCreateData.fromEditData(message)).queue();
+							event.reply("Vorschlag erfolgreich verschickt!").setEphemeral(true).queue();
+						},
+						() -> event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue()
+				);
 			}
 		}));
 
@@ -123,39 +121,36 @@ public class FdmdsCommand {
 			sendModal(event, embed.getFields().get(0).getValue(), embed.getFields().get(1).getValue());
 		}));
 		manager.getEventManager().registerHandler(new ButtonHandler("fdmds.send", event -> {
-			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
-			String question = embed.getFields().get(0).getValue();
-			String choices = embed.getFields().get(1).getValue();
+			Main.database.getChannel(event.getGuild(), DatabaseField.FDMDS_CHANNEL).ifPresentOrElse(
+					channel -> {
 
-			Role role = Main.database.getRole(event.getGuild(), DatabaseField.FDMDS_ROLE);
+						MessageEmbed embed = event.getMessage().getEmbeds().get(0);
+						String question = embed.getFields().get(0).getValue();
+						String choices = embed.getFields().get(1).getValue();
 
-			// get fdmds-channel
-			MessageChannel channel = Main.database.getChannel(event.getGuild(), DatabaseField.FDMDS_CHANNEL);
 
-			if(channel == null) {
-				event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue();
-				return;
-			}
+						StringBuilder text = new StringBuilder()
+								.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
+								.append(question).append("\n\n")
+								.append(choices).append("\n\n");
 
-			StringBuilder text = new StringBuilder()
-					.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
-					.append(question).append("\n\n")
-					.append(choices).append("\n\n");
+						Optional<Role> role = Main.database.getRole(event.getGuild(), DatabaseField.FDMDS_ROLE);
 
-			if(role != null) {
-				text.append(role.getAsMention());
-			}
+						role.ifPresent(value -> text.append(value.getAsMention()));
 
-			// Send and add reactions
-			channel.sendMessage(text).queue(m -> {
-				for(int i = 0; i < choices.lines().count(); i++) {
-					m.addReaction(SlimeEmoji.fromId(i).emoji).queue();
-				}
+						// Send and add reactions
+						channel.sendMessage(text).queue(m -> {
+							for(int i = 0; i < choices.lines().count(); i++) {
+								m.addReaction(SlimeEmoji.fromId(i).emoji).queue();
+							}
 
-				event.reply("Frage verschickt!").setEphemeral(true).queue();
-			});
+							event.reply("Frage verschickt!").setEphemeral(true).queue();
+						});
 
-			event.getMessage().delete().queue();
+						event.getMessage().delete().queue();
+					},
+					() -> event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue()
+			);
 		}));
 	}
 }

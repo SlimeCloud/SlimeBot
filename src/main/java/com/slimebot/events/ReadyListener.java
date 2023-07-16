@@ -5,7 +5,6 @@ import com.slimebot.alerts.spotify.SpotifyListener;
 import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -32,17 +31,15 @@ public class ReadyListener extends ListenerAdapter {
 	public void onGuildReady(GuildReadyEvent event) {
 		Main.updateGuildCommands(event.getGuild());
 
-		MessageChannel channel = Main.database.getChannel(event.getGuild(), DatabaseField.LOG_CHANNEL);
-
-		if(channel == null) return;
-
-		channel.sendMessageEmbeds(
-				new EmbedBuilder()
-						.setTitle("Bot wurde gestartet")
-						.setDescription("Der Bot hat sich mit der DiscordAPI (neu-) verbunden")
-						.setColor(Main.database.getColor(event.getGuild()))
-						.setTimestamp(Instant.now())
-						.build()
-		).queue();
+		Main.database.getChannel(event.getGuild(), DatabaseField.LOG_CHANNEL).ifPresent(channel ->
+				channel.sendMessageEmbeds(
+						new EmbedBuilder()
+								.setTitle("Bot wurde gestartet")
+								.setDescription("Der Bot hat sich mit der DiscordAPI (neu-) verbunden")
+								.setColor(Main.database.getColor(event.getGuild()))
+								.setTimestamp(Instant.now())
+								.build()
+				).queue()
+		);
 	}
 }

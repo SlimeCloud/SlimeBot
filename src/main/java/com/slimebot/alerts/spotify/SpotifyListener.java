@@ -5,7 +5,6 @@ import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,17 +69,17 @@ public class SpotifyListener implements Runnable {
 
 	private void broadcastAlbum(AlbumSimplified album) {
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
-			MessageChannel channel = Main.database.getChannel(guild, DatabaseField.SPOTIFY_MUSIC_CHANNEL);
+			Main.database.getChannel(guild, DatabaseField.SPOTIFY_MUSIC_CHANNEL).ifPresent(channel -> {
+				String notification = Main.database.getRole(guild, DatabaseField.SPOTIFY_NOTIFICATION_ROLE)
+						.map(Role::getAsMention)
+						.orElse("");
 
-			if(channel == null) continue;
-
-			Role notification = Main.database.getRole(guild, DatabaseField.SPOTIFY_NOTIFICATION_ROLE);
-
-			channel.sendMessage(MessageFormat.format(Main.config.spotify.music.message,
-					notification == null ? "" : notification.getAsMention(),
-					album.getName(),
-					album.getExternalUrls().get("spotify")
-			)).queue();
+				channel.sendMessage(MessageFormat.format(Main.config.spotify.music.message,
+						notification,
+						album.getName(),
+						album.getExternalUrls().get("spotify")
+				)).queue();
+			});
 		}
 	}
 }
