@@ -38,6 +38,23 @@ Dieser Bot verwendet java 17! Wenn du den bot selber verwenden oder an der Entwi
 Für die Entwicklung empfehlen wir [IntelliJ](https://www.jetbrains.com/idea/download/) (Community Version reicht aus) als Entwicklungsumgebung. Andere IDE's können auch verwendet werden, folgende Erklärungen beziehen sich jedoch 
 ausschließlich auf IntelliJ.
 
+Beginne damit, eines Projekt zu erstellen. Nutze dazu das Menü `File->New->Poject from Version Control`. 
+Gib dort als URL die URL deines Forks der Repository an. Dadurch wird ein Projekt erstellt, das den Sourcecode sowie die Buildscripts der aktuellen Version des SlimeBallBots enthält.
+In der `Project Structure` des Projekts muss das JDK 17 angeben werden. 
+
+Um den Bot zu starten, musst du zunächst das Token deines Test-Bots in die `.env` Datei als `TEST` token eintragen. 
+Es wird vorausgesetzt, dass du bereits einen Bot Account im [Developer Portal](https://discord.com/developers) erstellt hast, und weißt, wie du dsa Token kopieren kannst.
+
+Anschließend muss die Datei `config_preset` nach `config` kopiert werden. 
+In dieser Datei müssen nun die Credentials der Datenbank eingetragen werden, die du zum Testen verwenden möchtest. 
+Es wird vorausgesetzt, dass du bereits eine PostgreSQL Datenbank zur Verfügung und einen Nutzer erstellt hast, den du Nutzen kannst.
+
+Wenn du keine Spotify Application hast und die mit Spotify zusammenhängenden Features nicht nutzen möchtest, kannst du das `spotify` Objekt aus der `config` Datei löschen. 
+Dadurch wird nicht versucht, die Spotify Listener zu starten und somit werden keine Fehlermeldungen bezüglich ungültiger spotify Tokens ausgegeben.
+
+Du kannst nun die Run Konfiguration `Run` auswählen und starten. Der SlimeBallBot sollte starten und auf deine Befehle reagieren. Wenn du den Bot außerhalb deiner IDE verwenden möchtest, musst du ihn als `jar` exportieren.
+Verwende dazu die `Package` Run Konfiguration.
+
 ## 🪞 Style-Guide
 Um den Code übersichtlich und einheitlich zu halten, sollten sich alle an einen Codestyle halten. Im Folgenden werden die wichtigsten Richtlinien aufgezählt.
 
