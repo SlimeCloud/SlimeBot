@@ -3,12 +3,12 @@ package com.slimebot.commands.report;
 import com.slimebot.main.Main;
 import com.slimebot.report.Report;
 import com.slimebot.report.Type;
-import de.mineking.discord.DiscordUtils;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
-import de.mineking.discord.commands.annotated.WhenFinished;
+import de.mineking.discord.events.Listener;
 import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.commands.Command;
@@ -59,31 +59,29 @@ public class UserReportCommand {
 		event.replyModal(createMode(event.getTarget().getId())).queue();
 	}
 
-	@WhenFinished
-	public void setup(DiscordUtils manager) {
-		manager.getEventManager().registerHandler(new ModalHandler("report:user", event -> {
-			try {
-				Main.jdaInstance.retrieveUserById(event.getValue("user").getAsString()).queue(user -> {
-							String description = event.getValue("reason").getAsString();
+	@Listener(type = ModalHandler.class, filter = "report:user")
+	public void handleReportModal(ModalInteractionEvent event) {
+		try {
+			Main.jdaInstance.retrieveUserById(event.getValue("user").getAsString()).queue(user -> {
+						String description = event.getValue("reason").getAsString();
 
-							Report report = Report.createReport(event.getGuild(), Type.USER, event.getUser(), user, description);
+						Report report = Report.createReport(event.getGuild(), Type.USER, event.getUser(), user, description);
 
-							event.replyEmbeds(
-									new EmbedBuilder()
-											.setTimestamp(Instant.now())
-											.setColor(Main.database.getColor(event.getGuild()))
-											.setTitle(":white_check_mark: Report Erfolgreich")
-											.setDescription(user.getAsMention() + " wurde erfolgreich gemeldet")
-											.build()
-							).setEphemeral(true).queue();
+						event.replyEmbeds(
+								new EmbedBuilder()
+										.setTimestamp(Instant.now())
+										.setColor(Main.database.getColor(event.getGuild()))
+										.setTitle(":white_check_mark: Report Erfolgreich")
+										.setDescription(user.getAsMention() + " wurde erfolgreich gemeldet")
+										.build()
+						).setEphemeral(true).queue();
 
-							report.log();
-						},
-						new ErrorHandler().handle(ErrorResponse.UNKNOWN_USER, e -> event.reply("Nutzer nicht gefunden").setEphemeral(true).queue())
-				);
-			} catch(NumberFormatException e) {
-				event.reply("Ungültige Nutzer ID").setEphemeral(true).queue();
-			}
-		}));
+						report.log();
+					},
+					new ErrorHandler().handle(ErrorResponse.UNKNOWN_USER, e -> event.reply("Nutzer nicht gefunden").setEphemeral(true).queue())
+			);
+		} catch(NumberFormatException e) {
+			event.reply("Ungültige Nutzer ID").setEphemeral(true).queue();
+		}
 	}
 }

@@ -16,6 +16,5 @@ public class BonkCommand {
 		Emoji bonkEmoji = Main.jdaInstance.getEmojiById("1128781773908758638");
 
 		event.reply(event.getUser().getAsMention() + " --> " + bonkEmoji.getFormatted() + " <-- " + user.getAsMention()).queue();
-
 	}
 }
