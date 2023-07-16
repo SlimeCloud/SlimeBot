@@ -72,7 +72,7 @@ public class FdmdsCommand {
 
 				for(int i = 0; i < choices.length; i++) {
 					choicesStr
-							.append(SlimeEmoji.fromId(i).format())
+							.append(SlimeEmoji.fromId(i + 1).format())
 							.append(" -> ")
 							.append(choices[i].strip())
 							.append("\r\n");
@@ -141,7 +141,7 @@ public class FdmdsCommand {
 						// Send and add reactions
 						channel.sendMessage(text).queue(m -> {
 							for(int i = 0; i < choices.lines().count(); i++) {
-								m.addReaction(SlimeEmoji.fromId(i).emoji).queue();
+								m.addReaction(SlimeEmoji.fromId(i + 1).emoji).queue();
 							}
 
 							event.reply("Frage verschickt!").setEphemeral(true).queue();
