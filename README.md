@@ -39,6 +39,33 @@ Für die Entwicklung empfehlen wir [IntelliJ](https://www.jetbrains.com/idea/dow
 ausschließlich auf IntelliJ.
 
 ## 🪞 Style-Guide
+Um den Code übersichtlich und einheitlich zu halten, sollten sich alle an einen Codestyle halten. Im Folgenden werden die wichtigsten Richtlinien aufgezählt.
+
+- **Einrückung:** Immer wenn ein neuer Codeblock eröffnet wird, wird um einen Tab weiter eingerückt. Diese Einrückungen werden mit `Tab` Zeichen vorgenommen und nicht mit Leerzeichen!
+- **Neue Zeilen:** Generell starten Blöcke in der neuen Zeile nach dem Steuerblock. 
+  Die geöffnete geschweifte Klammer steht dabei noch in der Zeile des Kontrollblocks. 
+  Wenn ein Block nur aus einem weiteren Steuerblock wie `return` oder 
+  `break` besteht, wird dieser in er Zeile des Kontrollblocks ohne geschweifte Klammern geschrieben:
+  ```java
+  if(false) return;
+  if(true) {
+    System.out.println("Test");
+    int x = 0;
+  }
+  ```
+- **Abstände:** Um den Code nicht gequetscht wirken zu lassen, werden zwischen einzelnen Teilen in einer Zeile Leerzeichen eingefügt:
+  ```java
+  for(int i = 0; i < 10; i++) {
+    System.out.println((i + 1) + ". Test");
+  }
+  ```
+- **Java API:** Wir verwenden die Java Stream- und Optional API. Das hat auch die starke Verwendung von Lambda-Ausdrücken zur Folge.
+- **Namen & Sprache**: Alle Variablen, Klassen und Methoden im Code werden englisch benannt. Variablen und Methoden in lowerCamelCase und Klassen in UpperCamelCase.
+  Alle Texte, die Nutzer sehen, sollen jedoch auf Deutsch verfasst werden.
+- **Kommentare:** Mit Kommentare könnt ihr gerne Stellen beschreiben, bei denen nicht sofort klar wird, was der Code warum tut. Ihr müsst jedoch nicht allen Code kommentieren. Wenn ihr markieren möchtet, dass etwas in Zukunft geändert 
+  werden soll, könnt ihr `//TODO` oder `//FIXME` Kommentare verwenden.
+
+Als gute Richtlinie lassen sich die intelliJ Standard-Vorgaben verwenden. Wenn du deinen Code mit der intelliJ Funktion "Reformat Code" formatierst, werden die groben Formatierungen bereits automatisch angewendet.
 
 ## 🔧 Konfiguration
 Allgemeine Konfiguration für den Bot wird in der `config`-Datei im gleichen Ordner wie der Bot durchgeführt.
