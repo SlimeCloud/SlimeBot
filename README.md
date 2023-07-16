@@ -73,11 +73,11 @@ public class TestCommand {
 Der Befehl muss anschließend im `CommandManager` registriert werden:
 ```java
 .useCommandManager(
-		...,
-		config -> {
-			//...
-			config.registerCommand(TestCommand.class);
-		}
+	...,
+	config -> {
+		//...
+		config.registerCommand(TestCommand.class);
+	}
 )
 ```
 Um Optionen hinzuzufügen, können parameter mit der `@Option`-Annotation zur `performCommand`-Methode hinzugefügt werden. Wenn Optionen optional sind und kein Wert angegeben wurde, haben sie beim Aufrufen der Methode der Wert `null`.
@@ -87,8 +87,8 @@ Optionen mit primitiven typen (wie `int` oder `boolean`) muss bei optionalen Opt
 public class TestCommand {
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event,
-                               @Option(name = "text", description = "Ein Text") String text,
-                               @Option(name = "anzahl", description = "Anzahl der Wiederholungen", required = false) Integer amount //Optionale Option
+                                   @Option(name = "text", description = "Ein Text") String text,
+                                   @Option(name = "anzahl", description = "Anzahl der Wiederholungen", required = false) Integer amount //Optionale Option
 	) {
 		if(amount == null) {
 			amount = 1;
