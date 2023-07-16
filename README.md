@@ -98,16 +98,18 @@ public class TestCommand {
 	}
 }
 ```
-Wenn dein Befehl code benötigt, der einmalig als Einrichtung benötigt wird, kann dieser code in die `setup`-Methode mit `@WhenFinished`-Annotation geschrieben werden.
-Diese Methode wird ausgeführt, sobald der Befehl erfolgreich registriert wurde.
-Ein Beispiel kann in der [Events-Sektion](#events) gefunden werden.
 
 Sowohl in der `performCommand`-Methode, als auch in der `setup`-Methode haben Parameter mit den typen `DiscordUtils` und `CommandManager` Werte mit den aktuellen Instanzen dieser Klassen.
 In der `performCommand`-Methode können zusätzlich Parameter mit den Typen `SlashCommandInteractionEvent`, `CommandContext` sowie Parameter mit der `@Option`-Annotation verwendet werden.
 Der CommandContext wird in diesem Projekt jedoch aktuell nicht verwendet.
 
+### Setup
+Wenn du nach dem Registrieren des Befehls Setup-Code für den Befehl ausführen möchtest, kannst du eine Methode mit der `@WhenFinished`-Annotation (mit dem Namen `setup`) erstellen.
+Dies kann zum Beispiel verwendet werden, um `ListComand`s hinzuzufügen. Da diese `inherited` Commands sind, können sie nicht ohne weiteres als Subcommands der `annotaed` Commands hinzugefügt werden, in der setup Methode können sie 
+jedoch manuell registriert werden.
+
 ### Events
-Um Events, die z.B. Components oder Modals von Befehlen zu handhaben, werden die Handler in der Klasse des Befehls registriert. Dazu wird aber kein ListenerAdapter verwendet, sondern der `EventManager` von DiscordUtils.<br>
+Um Interaktions-Events für deine Befehle zu handhaben, können Methoden mit der `@Listener`-Annotation erstellt werden.
 Beispiel:
 ```java
 @ApplicationCommand(name = "test", description = "Test Command")
@@ -124,11 +126,9 @@ public class TestCommand {
         ).queue();
     }
 	
-	@WhenFinished
-    public void setup(DiscordUtils manager) { //Wird ausgeführt, sobald der Befehl registriert wurde
-		manager.getEventManager().registerHandler(new ModalHandler("test:modal", event -> //Handler registrieren, der auf Modals mit der ID 'test:modal' hört
-			event.reply(event.getValue("test").getAsString()).setEphemeral(true).queue()
-		));
+	@Listener(type = ModalHandler.class, filter = "test:modal") //Methode wird ausgeführt, wenn ein Nutzer mit einem Modal mit ID "test:modal" interagiert
+    public void handleModal(ModalInteractionEvent event) {
+		event.reply(event.getValue("test").getAsString()).setEphemeral(true).queue();
     }
 }
 ```
