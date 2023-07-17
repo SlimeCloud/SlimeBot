@@ -1,7 +1,7 @@
 package com.slimebot.commands;
 
+import com.slimebot.main.BuildInfo;
 import com.slimebot.main.Main;
-import com.slimebot.utils.Config;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import net.dv8tion.jda.api.EmbedBuilder;
