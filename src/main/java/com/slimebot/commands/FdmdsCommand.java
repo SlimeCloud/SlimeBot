@@ -67,6 +67,7 @@ public class FdmdsCommand {
 					event.reply("Du musst mindestens 2 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
 					return;
 				}
+
 				if(choices.length > 9) {
 					event.reply("Du kannst maximal 9 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
 					return;
@@ -101,7 +102,7 @@ public class FdmdsCommand {
 					)
 					.build();
 
-			if(event.getMessage() != null) {
+			if(event.getModalId().contains("edit")) {
 				event.getMessage().editMessage(message).queue();
 
 				event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
@@ -127,6 +128,7 @@ public class FdmdsCommand {
 			}
 		}));
 
+		manager.getEventManager().registerHandler(new ButtonHandler("fdmds:create", event -> sendModal(event, null, null)));
 		manager.getEventManager().registerHandler(new ButtonHandler("fdmds.edit", event -> {
 			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 			sendModal(event, embed.getFields().get(0).getValue(), embed.getFields().get(1).getValue());
@@ -161,16 +163,21 @@ public class FdmdsCommand {
 					.append(role.getAsMention()).append("\n")
 					.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
 					.append(question).append("\n\n")
-					.append(choices).append("\n\n").append("Du möchtest selbst eine Umfrage Einreichen? Verwende </fdmds:").append(manager.getCommandCache().getGlobalCommand("fdmds")).append(">"); //TODO fdmds is a guild command after #46
+					.append(choices).append("\n\n").append("Du möchtest selbst eine Umfrage Einreichen? Verwende </fdmds:")
+					.append(manager.getCommandCache().getGlobalCommand("fdmds"))
+					.append(">") //TODO fdmds is a guild command after #46
+					.append(" Oder den Knopf unter dieser Nachricht!");
 
 			// Send and add reactions
-			channel.sendMessage(text).queue(m -> {
-				for(int i = 0; i < choices.lines().count(); i++) {
-					m.addReaction(SlimeEmoji.fromId(i).emoji).queue();
-				}
+			channel.sendMessage(text)
+					.addActionRow(Button.secondary("fdmds:create", "Frage erstellen"))
+					.queue(m -> {
+						for(int i = 0; i < choices.lines().count(); i++) {
+							m.addReaction(SlimeEmoji.fromId(i).emoji).queue();
+						}
 
-				event.reply("Frage verschickt!").setEphemeral(true).queue();
-			});
+						event.reply("Frage verschickt!").setEphemeral(true).queue();
+					});
 			event.getMessage().delete().queue();
 		}));
 	}
