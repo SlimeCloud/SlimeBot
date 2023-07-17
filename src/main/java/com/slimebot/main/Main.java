@@ -140,4 +140,8 @@ public class Main {
 
 		executor.scheduleAtFixedRate(task, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
 	}
+
+	public static void scheduleAtFixedRate(int amount, TimeUnit unit, Runnable task) {
+		executor.scheduleAtFixedRate(task, 0, amount, unit);
+	}
 }

@@ -15,6 +15,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class PodcastListener implements Runnable {
 	private final YamlFile config;
@@ -26,8 +27,7 @@ public class PodcastListener implements Runnable {
 		this.api = api;
 		this.showID = showID;
 
-		run();
-		Main.scheduleDaily(12, this);
+		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this);
 	}
 
 	@Override
