@@ -75,7 +75,7 @@ public class Main {
 	public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss ");
 
 	public static void main(String[] args) throws IOException {
-		logger.info("Bot Version: {}", Config.getBotInfo("version"));
+		logger.info("Bot Version: {}", BuildInfo.version);
 		if(args.length == 0) {
 			logger.error("BITTE EIN TOKEN NAME ALS COMMAND-LINE-PARAMETER ÜBERGEBEN (.env im bot-ordner)");
 			System.exit(420);
