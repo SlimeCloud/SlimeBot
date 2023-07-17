@@ -4,6 +4,7 @@
 # 👋 SlimeBall Bot
 Diese Repository enthält den Quellcode für den `SlimeBall` Bot auf dem [SlimeCloud Discord Server](https://discord.gg/slimecloud).
 Der Bot steht unter ständiger Entwicklung, falls du Interesse daran hast mitzuwirken, schau dir doch die [Contributing-Sektion](#-contributing) an.
+Wenn du Fragen hast oder dich mit anderen Entwicklern austauschen möchtest, kannst du in der [#👾│tüftlerecke](https://discord.com/channels/1077255218728796192/1098707158750724186) auf dem [SlimeCloud Discord Server](https://discord.gg/slimecloud) vorbeischauen.
 
 Dieses Projekt steht unter der [GNU Affero General Public License v3.0](https://github.com/SlimeCloud/java-SlimeBot/blob/master/LICENSE) Lizenz!
 
