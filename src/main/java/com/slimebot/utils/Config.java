@@ -101,7 +101,6 @@ public class Config {
 				botConfig.createNewFile(true);
 				botConfig.load();
 				botConfig.set("name", "SlimeBot");
-				botConfig.set("version", "2.0");
 				botConfig.set("activity.type", "PLAYING");
 				botConfig.set("activity.text", "mit Slimebällen");
 				botConfig.save();
