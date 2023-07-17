@@ -158,10 +158,10 @@ public class FdmdsCommand {
 			}
 
 			StringBuilder text = new StringBuilder()
+					.append(role.getAsMention()).append("\n")
 					.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
 					.append(question).append("\n\n")
-					.append(choices).append("\n\n")
-					.append(role.getAsMention());
+					.append(choices).append("\n\n").append("Du möchtest selbst eine Umfrage Einreichen? Verwende </fdmds:").append(manager.getCommandCache().getGlobalCommand("fdmds")).append(">"); //TODO fdmds is a guild command after #46
 
 			// Send and add reactions
 			channel.sendMessage(text).queue(m -> {
