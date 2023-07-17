@@ -151,6 +151,16 @@ Sowohl in der `performCommand`-Methode, als auch in der `setup`-Methode haben Pa
 In der `performCommand`-Methode können zusätzlich Parameter mit den Typen `SlashCommandInteractionEvent`, `CommandContext` sowie Parameter mit der `@Option`-Annotation verwendet werden.
 Der CommandContext wird in diesem Projekt jedoch aktuell nicht verwendet.
 
+Mit den Annotationsparametern `guildOnly` und `feature` in `@ApplicationCommand` kann bestimmt werden, wann und wo Befehle sichtbar sind. 
+Standardmäßig sind alle Befehle `Globalcommands`. 
+Das bedeutet, dass sie auf allen Servern und in Privatnachrichten verwendet werden können. 
+Mit dem Parameter `guildOnly` werden Befehle auf Server beschränkt und sind in Privatnachrichten Kanälen nicht mehr verwendbar.
+Wenn der `feature` parameter einen nicht-leeren String als Wert hat, wird der Befehl als `Guildcommand` erstellt.
+Solche Befehle werden für jeden Server einzeln erstellt, und pro Server nur dann, wenn in der Methode `Main#updateGuildCommands` `true` in der Map mit dem Wert des `feature` Parameters als Key hat.
+Dadurch werden Befehle auf Servern nur dann aktiviert, wenn die notwendige Konfiguration für diesen Befehl auf dem Server vorhanden ist. 
+Wichtig zu beachten ist, dass die Methode `Main#updateGuildCommands` bei `Guildcommands` immer aufgerufen werden muss, wenn die entsprechende Konfiguration geändert wird, 
+um daraus hervorgehende Änderungen in der Liste der Befehle auch an Discord zu senden.  
+
 ### Setup
 Wenn du nach dem Registrieren des Befehls Setup-Code für den Befehl ausführen möchtest, kannst du eine Methode mit der `@WhenFinished`-Annotation (mit dem Namen `setup`) erstellen.
 Dies kann zum Beispiel verwendet werden, um `ListComand`s hinzuzufügen. Da diese `inherited` Commands sind, können sie nicht ohne weiteres als Subcommands der `annotaed` Commands hinzugefügt werden, in der setup Methode können sie 
