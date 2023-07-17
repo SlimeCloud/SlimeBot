@@ -24,7 +24,6 @@ public class GuildConfigCommand {
 				return;
 			}
 
-
 			try {
 				Color.decode(color);
 
@@ -49,7 +48,6 @@ public class GuildConfigCommand {
 				return;
 			}
 
-
 			if(!channel.getGuild().equals(event.getGuild())) {
 				event.reply("Der Kanal ist nicht auf diesem Server!").setEphemeral(true).queue();
 				return;
@@ -72,7 +70,6 @@ public class GuildConfigCommand {
 				event.reply("Greetings-Kanal zurückgesetzt").setEphemeral(true).queue();
 				return;
 			}
-
 
 			if(!channel.getGuild().equals(event.getGuild())) {
 				event.reply("Der Kanal ist nicht auf diesem Server!").setEphemeral(true).queue();
@@ -124,6 +121,25 @@ public class GuildConfigCommand {
 			ConfigCommand.setField(event.getGuild(), DatabaseField.STAFF_ROLE, role.getIdLong());
 
 			event.reply("Team-Rolle auf " + role.getAsMention() + " gesetzt").setEphemeral(true).queue();
+		}
+	}
+
+	@ApplicationCommand(name = "contributor_role", description = "Ändert die Contributor-Rolle")
+	public static class ContributorRoleCommand {
+		@ApplicationCommandMethod
+		public void performCommand(SlashCommandInteractionEvent event,
+		                           @Option(name = "rolle", description = "Die neue Contributor-Rolle", required = false) Role role
+		) {
+			if(role == null) {
+				ConfigCommand.setField(event.getGuild(), DatabaseField.CONTRIBUTOR_ROLE, 0);
+				event.reply("Contributor-Rolle zurückgesetzt").setEphemeral(true).queue();
+				return;
+			}
+
+
+			ConfigCommand.setField(event.getGuild(), DatabaseField.CONTRIBUTOR_ROLE, role.getIdLong());
+
+			event.reply("Contributor-Rolle auf " + role.getAsMention() + " gesetzt").setEphemeral(true).queue();
 		}
 	}
 }
