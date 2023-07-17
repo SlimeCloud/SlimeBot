@@ -103,6 +103,7 @@ public class Main {
 							config.registerCommand(FdmdsCommand.class);
 							config.registerCommand(InfoCommand.class);
 							config.registerCommand(BonkCommand.class);
+							config.registerCommand(ContributorCommand.class);
 
 							config.registerCommand(UserReportCommand.class);
 							config.registerCommand(MessageReportCommand.class);
