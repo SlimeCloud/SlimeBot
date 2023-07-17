@@ -36,8 +36,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
-	public final static String version = "2.0.0"; //TODO Automatically replace this from gradle build
-
 	public final static Logger logger = LoggerFactory.getLogger(Main.class);
 	public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
 	public final static Gson gson = new Gson();
@@ -57,9 +55,8 @@ public class Main {
 	public static HolidayAlert holiday;
 
 	public static void main(String[] args) throws IOException {
-		config = Config.readFromFile("config");
+		logger.info("Bot Version: {}", BuildInfo.version);
 
-		logger.info("Bot Version: {}", version);
 		if(args.length == 0) {
 			logger.error("BITTE EIN TOKEN NAME ALS COMMAND-LINE-PARAMETER ÜBERGEBEN (.env im bot-ordner)");
 			System.exit(420);

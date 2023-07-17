@@ -7,7 +7,7 @@ plugins {
 mainClassName = "com.slimebot.main.Main"
 
 group 'com.slimebot'
-version '2.0-SNAPSHOT'
+version '2.5.0'
 
 repositories {
     mavenCentral()
@@ -33,6 +33,34 @@ dependencies {
     implementation 'com.github.MineKingBot:DiscordUtils:1add8bd'
 }
 
+tasks.register("prepareSources", Copy) {
+    delete("$buildDir/preparedSources")
+
+    from("src/main/java") {
+        include("**/BuildInfo.java")
+        var tokens = Map.of(
+                "VERSION", version.toString()
+        )
+
+        filter(ReplaceTokens, "tokens": tokens)
+    }
+    into("$buildDir/preparedSources")
+
+    includeEmptyDirs = false
+}
+
+compileJava {
+    var javaSources = sourceSets["main"].allJava.filter {
+        it.name != "BuildInfo.java"
+    }.asFileTree
+
+    source = javaSources + fileTree("$buildDir/preparedSources")
+
+    dependsOn "prepareSources"
+
+    options.encoding = 'UTF-8'
+}
+
 jar {
     manifest {
         attributes 'Main-Class': 'com.slimebot.main.Main'
@@ -44,9 +72,3 @@ test {
     useJUnitPlatform()
     systemProperty "file.encoding", "utf-8"
 }
-
-run {
-    standardInput = System.in
-}
-
-compileJava.options.encoding = 'UTF-8'
