@@ -87,7 +87,7 @@ Als gute Richtlinie lassen sich die intelliJ Standard-Vorgaben verwenden. Wenn d
 
 ## 🔧 Konfiguration
 Allgemeine Konfiguration für den Bot wird in der `config`-Datei im gleichen Ordner wie der Bot durchgeführt.
-Eine Vorlage für die Konfiguration ist in der `cnfig_preset`-Datei zu finden.<br>
+Eine Vorlage für die Konfiguration ist in der `config_preset`-Datei zu finden.<br>
 Zum Lesen der Konfiguration verwenden wir [Gson](https://github.com/google/gson).
 Im code sind die Konfigurationsfelder in der `Config`-Klasse lesbar.
 Eine Instanz dieser Klasse, die verwendet werden sollte befindet sich in `Main.config`.<br>
