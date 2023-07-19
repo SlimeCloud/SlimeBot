@@ -44,7 +44,7 @@ Gib dort als URL die URL deines Forks der Repository an. Dadurch wird ein Projek
 In der `Project Structure` des Projekts muss das JDK 17 angeben werden. 
 
 Um den Bot zu starten, musst du zunächst das Token deines Test-Bots in die `.env` Datei als `TEST` token eintragen. 
-Es wird vorausgesetzt, dass du bereits einen Bot Account im [Developer Portal](https://discord.com/developers) erstellt hast, und weißt, wie du dsa Token kopieren kannst.
+Es wird vorausgesetzt, dass du bereits einen Bot Account im [Developer Portal](https://discord.com/developers) erstellt hast, und weißt, wie du das Token kopieren kannst.
 
 Anschließend muss die Datei `config_preset` nach `config` kopiert werden. 
 In dieser Datei müssen nun die Credentials der Datenbank eingetragen werden, die du zum Testen verwenden möchtest. 
