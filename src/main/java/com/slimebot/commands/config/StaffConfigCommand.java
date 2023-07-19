@@ -19,6 +19,7 @@ public class StaffConfigCommand {
 		                           @Option(name = "kanal", description = "Der neue Kanal für die Staff-Nachricht", channelTypes = {ChannelType.TEXT, ChannelType.NEWS}, required = false) GuildMessageChannel channel
 		) {
 			if(channel == null) {
+				ConfigCommand.updateField(event.getGuild(), config -> config.getStaffConfig().ifPresent(staff -> staff.channel = null)); //Keep role configuration to make it easier to re-enable the feature
 				Main.database.run(handle -> handle.createUpdate("delete from staff_config where guild = :guild")
 						.bind("guild", event.getGuild().getIdLong())
 						.execute()
@@ -33,16 +34,7 @@ public class StaffConfigCommand {
 					return;
 				}
 
-				Main.database.run(handle -> {
-					handle.createUpdate("delete from staff_config where guild = :guild")
-							.bind("guild", event.getGuild().getIdLong())
-							.execute();
-
-					handle.createUpdate("insert into staff_config values(:guild, :channel)")
-							.bind("guild", event.getGuild().getIdLong())
-							.bind("channel", channel.getIdLong())
-							.execute();
-				});
+				ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateStaff().channel = channel.getIdLong());
 
 				StaffMessage.updateMessage(event.getGuild());
 
@@ -58,12 +50,7 @@ public class StaffConfigCommand {
 		                           @Option(name = "rolle", description = "Die Staff-Rolle") Role role,
 		                           @Option(name = "beschreibung", description = "Die Beschreibung der Rolle") String description
 		) {
-			Main.database.run(handle -> handle.createUpdate("insert into staff_roles values(:guild, :role, :description)")
-					.bind("guild", event.getGuild().getIdLong())
-					.bind("role", role.getIdLong())
-					.bind("description", description)
-					.execute()
-			);
+			ConfigCommand.updateField(event.getGuild(), config -> config.getStaffConfig().ifPresent(staff -> staff.roles.put(role.getId(), description)));
 
 			StaffMessage.updateMessage(event.getGuild());
 
@@ -77,11 +64,7 @@ public class StaffConfigCommand {
 		public void performCommand(SlashCommandInteractionEvent event,
 		                           @Option(name = "rolle", description = "Die Staff-Rolle") Role role
 		) {
-			Main.database.run(handle -> handle.createUpdate("delete from staff_roles where guild = :guild and role = :role")
-					.bind("guild", event.getGuild().getIdLong())
-					.bind("role", role.getIdLong())
-					.execute()
-			);
+			ConfigCommand.updateField(event.getGuild(), config -> config.getStaffConfig().ifPresent(staff -> staff.roles.remove(role.getId())));
 
 			StaffMessage.updateMessage(event.getGuild());
 

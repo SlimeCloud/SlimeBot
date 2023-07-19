@@ -3,6 +3,7 @@ package com.slimebot.commands.report;
 import com.slimebot.main.CommandContext;
 import com.slimebot.main.CommandPermission;
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.report.Report;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
@@ -62,7 +63,7 @@ public class ReportCommand {
 
 							event.replyEmbeds(
 									new EmbedBuilder()
-											.setColor(Main.database.getColor(event.getGuild()))
+											.setColor(GuildConfig.getColor(event.getGuild()))
 											.setTimestamp(Instant.now())
 											.setTitle("Report **#" + reportID + "** closed")
 											.setDescription("Der Report mit der ID **#" + reportID + "** wurde erfolgreich geschlossen")
@@ -72,7 +73,7 @@ public class ReportCommand {
 						() -> event.replyEmbeds(
 								new EmbedBuilder()
 										.setTimestamp(Instant.now())
-										.setColor(Main.database.getColor(event.getGuild()))
+										.setColor(GuildConfig.getColor(event.getGuild()))
 										.setTitle(":exclamation: Error: Report not Found")
 										.setDescription("Der Report #" + reportID + " konnte nicht gefunden werden!")
 										.build()

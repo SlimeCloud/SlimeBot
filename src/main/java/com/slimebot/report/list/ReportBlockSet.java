@@ -1,6 +1,7 @@
 package com.slimebot.report.list;
 
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.list.ListContext;
 import de.mineking.discord.list.ListEntry;
 import de.mineking.discord.list.Listable;
@@ -45,7 +46,7 @@ public class ReportBlockSet implements Listable<ReportBlockSet.ReportBlock> {
 	@Override
 	public EmbedBuilder createEmbed(ListContext<ReportBlock> context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.setColor(Main.database.getColor(guild))
+				.setColor(GuildConfig.getColor(guild))
 				.setTimestamp(Instant.now())
 				.setTitle("Vom Report-System ausgeschlossene Nutzer");
 

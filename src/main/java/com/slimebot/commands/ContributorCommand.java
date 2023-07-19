@@ -1,7 +1,7 @@
 package com.slimebot.commands;
 
-import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
@@ -25,7 +25,7 @@ public class ContributorCommand {
 	                           @Option(name = "user", description = "Wie heißt du auf GitHub?") String user,
 	                           @Option(name = "link", description = "Der GitHub link zu deinem PR") String link
 	) {
-		Main.database.getChannel(event.getGuild(), DatabaseField.LOG_CHANNEL).ifPresentOrElse(
+		GuildConfig.getConfig(event.getGuild()).getLogChannel().ifPresentOrElse(
 				channel -> {
 					channel.sendMessage(link).addEmbeds(
 							new EmbedBuilder()
@@ -34,7 +34,7 @@ public class ContributorCommand {
 									.addField("GitHubname:", user, false)
 									.addField("Discord User:", event.getUser().getAsMention(), false)
 									.addField("PR:", link, false)
-									.setColor(Main.database.getColor(event.getGuild()))
+									.setColor(GuildConfig.getColor(event.getGuild()))
 									.build()
 					).addActionRow(
 							Button.success("contributor:accept", "Annehmen"),
@@ -53,7 +53,7 @@ public class ContributorCommand {
 	public void handleAccept(ButtonInteractionEvent event) {
 		UserSnowflake user = getUser(event.getMessage().getEmbeds().get(0));
 
-		Main.database.getRole(event.getGuild(), DatabaseField.CONTRIBUTOR_ROLE).ifPresentOrElse(
+		GuildConfig.getConfig(event.getGuild()).getContributorRole().ifPresentOrElse(
 				role -> {
 					event.getGuild().addRoleToMember(user, role).reason("Hat an GitHub Projekt mitgearbeitet").queue();
 

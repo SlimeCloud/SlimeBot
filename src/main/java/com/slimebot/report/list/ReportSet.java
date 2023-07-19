@@ -1,6 +1,7 @@
 package com.slimebot.report.list;
 
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.report.Filter;
 import com.slimebot.report.Report;
 import de.mineking.discord.list.ListContext;
@@ -38,7 +39,7 @@ public class ReportSet implements Listable<Report> {
 	@Override
 	public EmbedBuilder createEmbed(ListContext<Report> context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.setColor(Main.database.getColor(guild))
+				.setColor(GuildConfig.getColor(guild))
 				.setTimestamp(Instant.now())
 				.setTitle("Reports mit Filter **" + filter.toString() + "**");
 

@@ -1,5 +1,6 @@
 package com.slimebot.main.config;
 
+import com.slimebot.main.Database;
 import com.slimebot.main.Main;
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
@@ -21,8 +22,12 @@ public class Config {
 		try(Reader reader = new FileReader(file)) {
 			Config config = Main.gson.fromJson(reader, Config.class);
 
-			if(config.activity == null || config.database == null || config.color == null) {
+			if(config.activity == null || config.color == null) {
 				throw new IOException("Required database field not set. See https://github.com/SlimeCloud/java-SlimeBot/blob/master/config_preset");
+			}
+
+			if(config.database == null) {
+				Database.logger.warn("No database config provided. Some features will not be available!");
 			}
 
 			return config;

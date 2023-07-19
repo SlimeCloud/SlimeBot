@@ -1,7 +1,6 @@
 package com.slimebot.commands;
 
-import com.slimebot.main.DatabaseField;
-import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.events.Listener;
@@ -35,10 +34,10 @@ public class BugCommand {
 	public void handleModal(ModalInteractionEvent event) {
 		event.reply("Der Report wurde erfolgreich ausgeführt").setEphemeral(true).queue();
 
-		Main.database.getChannel(event.getGuild(), DatabaseField.LOG_CHANNEL).ifPresent(channel ->
+		GuildConfig.getConfig(event.getGuild()).getLogChannel().ifPresent(channel ->
 				channel.sendMessageEmbeds(
 								new EmbedBuilder()
-										.setColor(Main.database.getColor(event.getGuild()))
+										.setColor(GuildConfig.getColor(event.getGuild()))
 										.setTitle("Ein neuer Bug wurde gefunden!")
 
 										.setDescription("Fehlerbeschreibung: \n\n")

@@ -2,7 +2,7 @@ package com.slimebot.commands;
 
 
 import com.slimebot.main.CommandPermission;
-import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
@@ -31,7 +31,7 @@ public class BulkAddRoleCommand {
 		event.replyEmbeds(
 				new EmbedBuilder()
 						.setTimestamp(Instant.now())
-						.setColor(Main.database.getColor(event.getGuild()))
+						.setColor(GuildConfig.getColor(event.getGuild()))
 						.setTitle(":white_check_mark: Rollen Verteilt")
 						.setDescription("Die Rolle " + role.getAsMention() + " wurde " + members.size() + " Membern gegeben!")
 						.build()

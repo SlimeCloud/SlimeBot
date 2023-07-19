@@ -1,6 +1,7 @@
 package com.slimebot.commands.report;
 
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.report.Report;
 import com.slimebot.report.Type;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
@@ -19,7 +20,7 @@ public class MessageReportCommand {
 			event.replyEmbeds(
 					new EmbedBuilder()
 							.setTimestamp(Instant.now())
-							.setColor(Main.database.getColor(event.getGuild()))
+							.setColor(GuildConfig.getColor(event.getGuild()))
 							.setTitle(":exclamation: Error: Blocked")
 							.setDescription("Du wurdest gesperrt, so dass du keine Reports mehr erstellen kannst")
 							.build()
@@ -38,7 +39,7 @@ public class MessageReportCommand {
 		event.replyEmbeds(
 				new EmbedBuilder()
 						.setTimestamp(Instant.now())
-						.setColor(Main.database.getColor(event.getGuild()))
+						.setColor(GuildConfig.getColor(event.getGuild()))
 						.setTitle(":white_check_mark: Report Erfolgreich")
 						.setDescription(event.getTarget().getAuthor().getAsMention() + " wurde erfolgreich gemeldet")
 						.build()

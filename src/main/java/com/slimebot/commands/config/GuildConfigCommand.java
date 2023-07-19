@@ -1,6 +1,5 @@
 package com.slimebot.commands.config;
 
-import com.slimebot.main.DatabaseField;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
@@ -16,18 +15,18 @@ public class GuildConfigCommand {
 	public static class ColorCommand {
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event,
-		                           @Option(name = "color", description = "Der HEX-Code für die Farbe", required = false) String color
+		                           @Option(name = "farbe", description = "Der HEX-Code für die Farbe", required = false) String color
 		) {
 			if(color == null) {
-				ConfigCommand.setField(event.getGuild(), DatabaseField.COLOR, "");
+				ConfigCommand.updateField(event.getGuild(), config -> config.color = null);
 				event.reply("Farbe zurückgesetzt").setEphemeral(true).queue();
 				return;
 			}
 
 			try {
-				Color.decode(color);
+				Color.decode(color); //Verify
 
-				ConfigCommand.setField(event.getGuild(), DatabaseField.COLOR, color);
+				ConfigCommand.updateField(event.getGuild(), config -> config.color = color);
 
 				event.reply("Farbe geändert").setEphemeral(true).queue();
 			} catch(NumberFormatException e) {
@@ -43,7 +42,7 @@ public class GuildConfigCommand {
 		                           @Option(name = "kanal", description = "Der neue Log-Kanal", required = false) GuildMessageChannel channel
 		) {
 			if(channel == null) {
-				ConfigCommand.setField(event.getGuild(), DatabaseField.LOG_CHANNEL, 0);
+				ConfigCommand.updateField(event.getGuild(), config -> config.logChannel = null);
 				event.reply("Log-Kanal zurückgesetzt").setEphemeral(true).queue();
 				return;
 			}
@@ -53,7 +52,7 @@ public class GuildConfigCommand {
 				return;
 			}
 
-			ConfigCommand.setField(event.getGuild(), DatabaseField.LOG_CHANNEL, channel.getIdLong());
+			ConfigCommand.updateField(event.getGuild(), config -> config.logChannel = channel.getIdLong());
 
 			event.reply("Log-Kanal auf " + channel.getAsMention() + " gesetzt").setEphemeral(true).queue();
 		}
@@ -66,7 +65,7 @@ public class GuildConfigCommand {
 		                           @Option(name = "kanal", description = "Der neue Greetings-Kanal", required = false) GuildMessageChannel channel
 		) {
 			if(channel == null) {
-				ConfigCommand.setField(event.getGuild(), DatabaseField.GREETINGS_CHANNEL, 0);
+				ConfigCommand.updateField(event.getGuild(), config -> config.greetingsChannel = null);
 				event.reply("Greetings-Kanal zurückgesetzt").setEphemeral(true).queue();
 				return;
 			}
@@ -76,7 +75,7 @@ public class GuildConfigCommand {
 				return;
 			}
 
-			ConfigCommand.setField(event.getGuild(), DatabaseField.GREETINGS_CHANNEL, channel.getIdLong());
+			ConfigCommand.updateField(event.getGuild(), config -> config.greetingsChannel = channel.getIdLong());
 
 			event.reply("Greetings-Kanal auf " + channel.getAsMention() + " gesetzt").setEphemeral(true).queue();
 		}
@@ -89,7 +88,7 @@ public class GuildConfigCommand {
 		                           @Option(name = "kanal", description = "Der neue Punishment-Kanal", required = false) GuildMessageChannel channel
 		) {
 			if(channel == null) {
-				ConfigCommand.setField(event.getGuild(), DatabaseField.PUNISHMENT_CHANNEL, 0);
+				ConfigCommand.updateField(event.getGuild(), config -> config.punishmentChannel = null);
 				event.reply("Punishment-Kanal zurückgesetzt").setEphemeral(true).queue();
 				return;
 			}
@@ -99,7 +98,7 @@ public class GuildConfigCommand {
 				return;
 			}
 
-			ConfigCommand.setField(event.getGuild(), DatabaseField.PUNISHMENT_CHANNEL, channel.getIdLong());
+			ConfigCommand.updateField(event.getGuild(), config -> config.punishmentChannel = channel.getIdLong());
 
 			event.reply("Punishment-Kanal auf " + channel.getAsMention() + " gesetzt").setEphemeral(true).queue();
 		}
@@ -112,13 +111,13 @@ public class GuildConfigCommand {
 		                           @Option(name = "rolle", description = "Die neue Staff-Rolle", required = false) Role role
 		) {
 			if(role == null) {
-				ConfigCommand.setField(event.getGuild(), DatabaseField.STAFF_ROLE, 0);
+				ConfigCommand.updateField(event.getGuild(), config -> config.staffRole = null);
 				event.reply("Team-Rolle zurückgesetzt").setEphemeral(true).queue();
 				return;
 			}
 
 
-			ConfigCommand.setField(event.getGuild(), DatabaseField.STAFF_ROLE, role.getIdLong());
+			ConfigCommand.updateField(event.getGuild(), config -> config.staffRole = role.getIdLong());
 
 			event.reply("Team-Rolle auf " + role.getAsMention() + " gesetzt").setEphemeral(true).queue();
 		}
@@ -131,13 +130,12 @@ public class GuildConfigCommand {
 		                           @Option(name = "rolle", description = "Die neue Contributor-Rolle", required = false) Role role
 		) {
 			if(role == null) {
-				ConfigCommand.setField(event.getGuild(), DatabaseField.CONTRIBUTOR_ROLE, 0);
+				ConfigCommand.updateField(event.getGuild(), config -> config.contributorRole = null);
 				event.reply("Contributor-Rolle zurückgesetzt").setEphemeral(true).queue();
 				return;
 			}
 
-
-			ConfigCommand.setField(event.getGuild(), DatabaseField.CONTRIBUTOR_ROLE, role.getIdLong());
+			ConfigCommand.updateField(event.getGuild(), config -> config.contributorRole = role.getIdLong());
 
 			event.reply("Contributor-Rolle auf " + role.getAsMention() + " gesetzt").setEphemeral(true).queue();
 		}

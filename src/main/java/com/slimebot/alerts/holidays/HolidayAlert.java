@@ -1,7 +1,7 @@
 package com.slimebot.alerts.holidays;
 
-import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -38,7 +38,7 @@ public class HolidayAlert implements Runnable {
 		if(holidays.isEmpty()) return;
 
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
-			Main.database.getChannel(guild, DatabaseField.GREETINGS_CHANNEL).ifPresent(channel -> {
+			GuildConfig.getConfig(guild).getGreetingsChannel().ifPresent(channel -> {
 				String states = holidays
 						.stream()
 						.map(h -> h.name.split(" ")[1].toUpperCase())
@@ -49,7 +49,7 @@ public class HolidayAlert implements Runnable {
 
 				channel.sendMessageEmbeds(
 						new EmbedBuilder()
-								.setColor(Main.database.getColor(guild))
+								.setColor(GuildConfig.getColor(guild))
 								.setTitle("ENDLICH FERIEN")
 								.setDescription("**Alle Schüler aus " + states + " haben endlich Ferien!**\nGenießt die Ferien solange sie noch sind...")
 								.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png")

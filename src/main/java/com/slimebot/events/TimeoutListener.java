@@ -1,7 +1,6 @@
 package com.slimebot.events;
 
-import com.slimebot.main.DatabaseField;
-import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
@@ -21,18 +20,18 @@ public class TimeoutListener extends ListenerAdapter {
 				event.getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(
 						new EmbedBuilder()
 								.setTitle("Du wurdest getimeouted")
-								.setColor(Main.database.getColor(event.getGuild()))
+								.setColor(GuildConfig.getColor(event.getGuild()))
 								.setTimestamp(Instant.now())
 								.setDescription("Du wurdest auf dem SlimeCloud Discord getimeouted")
 								.addField("Grund:", entry.getReason(), true)
 								.build()
 				)).queue();
 
-				Main.database.getChannel(event.getGuild(), DatabaseField.PUNISHMENT_CHANNEL).ifPresent(channel ->
+				GuildConfig.getConfig(entry.getGuild()).getPunishmentChannel().ifPresent(channel ->
 						channel.sendMessageEmbeds(
 								new EmbedBuilder()
 										.setTitle("\"" + event.getMember().getEffectiveName() + "\"" + " wurde getimeouted")
-										.setColor(Main.database.getColor(event.getGuild()))
+										.setColor(GuildConfig.getColor(event.getGuild()))
 										.setTimestamp(Instant.now())
 										.addField("Grund:", entry.getReason(), true)
 										.addField("Wer: ", event.getMember().getAsMention(), true)

@@ -1,7 +1,8 @@
 package com.slimebot.message;
 
-import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
+import com.slimebot.main.config.guild.StaffConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -41,43 +42,45 @@ public class StaffMessage extends ListenerAdapter {
 	}
 
 	public static void updateMessage(Guild guild) {
-		Main.database.getChannel(guild, DatabaseField.STAFF_CHANNEL).ifPresent(channel -> {
-			String content = buildMessage(guild);
-			Long message = Main.database.handle(handle -> handle.createQuery("select message from staff_config where guild = :guild")
-					.bind("guild", guild.getIdLong())
-					.mapTo(Long.class)
-					.findOne().orElse(null)
-			);
+		var config = GuildConfig.getConfig(guild);
+		config.getStaffConfig().ifPresent(staff -> {
+			String content = buildMessage(staff, guild);
 
-			if(message == null || message == 0) {
-				channel.sendMessage(content).queue(id -> Main.database.run(handle -> handle.createUpdate("update staff_config set message = :message where guild = :guild")
-						.bind("message", id.getIdLong())
-						.bind("guild", guild.getIdLong())
-						.execute()
-				));
+			if(content.isEmpty()) {
+				return;
+			}
+
+			if(staff.message == null || staff.message == 0) {
+				staff.getChannel().ifPresent(channel -> channel.sendMessage(content).queue(mes -> {
+					staff.message = mes.getIdLong();
+					config.save();
+				}));
 			}
 
 			else {
-				channel.editMessageById(message, content).queue();
+				staff.getChannel().ifPresent(channel -> channel.editMessageById(staff.message, content).queue());
 			}
 		});
 	}
 
-	public static String buildMessage(Guild guild) {
-		List<StaffRole> roles = Main.database.handle(handle -> handle.createQuery("select * from staff_roles where guild = :guild")
-				.bind("guild", guild.getIdLong())
-				.mapTo(StaffRole.class)
-				.list()
-		);
-
+	public static String buildMessage(StaffConfig config, Guild guild) {
 		StringBuilder builder = new StringBuilder();
 
-		for(StaffRole role : roles) {
-			if(role == null) continue;
+		config.roles.forEach((roleId, description) -> {
+			Role role;
 
-			List<Member> members = guild.getMembersWithRoles(role.role);
+			try {
+				role = guild.getRoleById(roleId);
+			} catch(NumberFormatException e) {
+				builder.append(description).append("\n\n");
+				return;
+			}
 
-			builder.append(role.role.getAsMention()).append(" *").append(role.description).append("*\n");
+			if(role == null) return;
+
+			List<Member> members = guild.getMembersWithRoles(role);
+
+			builder.append(role.getAsMention()).append(" **").append(description).append("**\n");
 
 			if(members.isEmpty()) {
 				builder.append("*Keine Mitglieder*").append("\n");
@@ -90,7 +93,7 @@ public class StaffMessage extends ListenerAdapter {
 			}
 
 			builder.append("\n");
-		}
+		});
 
 		return builder.toString();
 	}

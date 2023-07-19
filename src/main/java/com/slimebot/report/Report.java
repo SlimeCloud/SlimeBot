@@ -1,7 +1,7 @@
 package com.slimebot.report;
 
-import com.slimebot.main.DatabaseField;
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.list.ListContext;
 import de.mineking.discord.list.ListEntry;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -72,10 +72,10 @@ public class Report implements ListEntry {
 	}
 
 	public void log() {
-		Main.database.getChannel(Main.jdaInstance.getGuildById(guild), DatabaseField.PUNISHMENT_CHANNEL).ifPresent(channel -> {
+		GuildConfig.getConfig(guild).getPunishmentChannel().ifPresent(channel -> {
 			EmbedBuilder embedBuilder = new EmbedBuilder()
 					.setTimestamp(Instant.now())
-					.setColor(Main.database.getColor(guild))
+					.setColor(GuildConfig.getColor(guild))
 					.setTitle(":exclamation: Neuer Report!")
 					.addField("Report von:", issuer.getAsMention(), true)
 					.addField("Gemeldet:", target.getAsMention(), true);
@@ -107,7 +107,7 @@ public class Report implements ListEntry {
 
 	public MessageEmbed buildEmbed() {
 		EmbedBuilder embed = new EmbedBuilder()
-				.setColor(Main.database.getColor(guild))
+				.setColor(GuildConfig.getColor(guild))
 				.setTimestamp(Instant.now())
 				.setTitle(":exclamation:  Details zu Report #" + id)
 				.addField("Report Typ:", type.str, true)

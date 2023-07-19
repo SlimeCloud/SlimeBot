@@ -1,6 +1,7 @@
 package com.slimebot.main;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.slimebot.alerts.holidays.HolidayAlert;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
@@ -11,6 +12,7 @@ import com.slimebot.commands.report.UserReportCommand;
 import com.slimebot.events.ReadyListener;
 import com.slimebot.events.TimeoutListener;
 import com.slimebot.main.config.Config;
+import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.message.StaffMessage;
 import de.mineking.discord.DiscordUtils;
 import de.mineking.discord.commands.ContextBase;
@@ -38,7 +40,9 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 	public final static Logger logger = LoggerFactory.getLogger(Main.class);
 	public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
-	public final static Gson gson = new Gson();
+	public final static Gson gson = new GsonBuilder()
+			.setPrettyPrinting()
+			.create();
 
 	static {
 		ListCommand.pageOption = new Option(OptionType.INTEGER, "seite", "Startseite").range(1, null);
@@ -55,6 +59,7 @@ public class Main {
 	public static HolidayAlert holiday;
 
 	public static void main(String[] args) throws IOException {
+		config = Config.readFromFile("config");
 		logger.info("Bot Version: {}", BuildInfo.version);
 
 		if(args.length == 0) {
@@ -124,11 +129,7 @@ public class Main {
 
 	public static void updateGuildCommands(Guild guild) {
 		discordUtils.getCommandCache().updateGuildCommands(guild,
-				Map.of("fdmds", database.handle(handle -> handle.createQuery("select count(*) from fdmds where guild = :guild")
-						.bind("guild", guild.getIdLong())
-						.mapTo(int.class)
-						.one()
-				) > 0),
+				Map.of("fdmds", GuildConfig.getConfig(guild).getFdmds().isPresent()),
 				error -> logger.error("Failed to update guild commands for " + guild, error)
 		);
 	}

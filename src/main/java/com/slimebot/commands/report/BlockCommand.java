@@ -3,6 +3,7 @@ package com.slimebot.commands.report;
 import com.slimebot.main.CommandContext;
 import com.slimebot.main.CommandPermission;
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.report.list.ReportBlockSet;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
@@ -41,7 +42,7 @@ public class BlockCommand {
 				event.replyEmbeds(
 						new EmbedBuilder()
 								.setTimestamp(Instant.now())
-								.setColor(Main.database.getColor(event.getGuild()))
+								.setColor(GuildConfig.getColor(event.getGuild()))
 								.setTitle(":exclamation: Error: Already blocked!")
 								.setDescription(user.getAsMention() + " ist bereits blockiert")
 								.build()
@@ -58,7 +59,7 @@ public class BlockCommand {
 			event.replyEmbeds(
 					new EmbedBuilder()
 							.setTimestamp(Instant.now())
-							.setColor(Main.database.getColor(event.getGuild()))
+							.setColor(GuildConfig.getColor(event.getGuild()))
 							.setTitle(":white_check_mark: Erfolgreich Blockiert")
 							.setDescription(user.getAsMention() + " wurde blockiert und kann nun keine Reports mehr erstellen")
 							.build()
@@ -76,7 +77,7 @@ public class BlockCommand {
 				event.replyEmbeds(
 						new EmbedBuilder()
 								.setTimestamp(Instant.now())
-								.setColor(Main.database.getColor(event.getGuild()))
+								.setColor(GuildConfig.getColor(event.getGuild()))
 								.setTitle(":exclamation: Error: Not Found")
 								.setDescription(user.getAsMention() + " konnte nicht in der Blockliste gefunden werden!")
 								.build()
@@ -93,7 +94,7 @@ public class BlockCommand {
 			event.replyEmbeds(
 					new EmbedBuilder()
 							.setTimestamp(Instant.now())
-							.setColor(Main.database.getColor(event.getGuild()))
+							.setColor(GuildConfig.getColor(event.getGuild()))
 							.setTitle(":white_check_mark: Entblockt")
 							.setDescription(user.getAsMention() + " kann nun wieder Reports erstellen")
 							.build()

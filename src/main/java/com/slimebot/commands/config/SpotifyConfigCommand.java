@@ -1,6 +1,5 @@
 package com.slimebot.commands.config;
 
-import com.slimebot.main.DatabaseField;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
@@ -17,7 +16,7 @@ public class SpotifyConfigCommand {
 		                           @Option(name = "kanal", description = "Der neue Music-Alert-Kanal", required = false) GuildMessageChannel channel
 		) {
 			if(channel == null) {
-				ConfigCommand.setField(event.getGuild(), DatabaseField.SPOTIFY_MUSIC_CHANNEL, 0);
+				ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateSpotify().musicChannel = null);
 				event.reply("Music-Kanal zurückgesetzt").setEphemeral(true).queue();
 				return;
 			}
@@ -27,7 +26,7 @@ public class SpotifyConfigCommand {
 				return;
 			}
 
-			ConfigCommand.setField(event.getGuild(), DatabaseField.SPOTIFY_MUSIC_CHANNEL, channel.getIdLong());
+			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateSpotify().musicChannel = channel.getIdLong());
 
 			event.reply("Music-Alert-Kanal auf " + channel.getAsMention() + " gesetzt").setEphemeral(true).queue();
 		}
@@ -40,7 +39,7 @@ public class SpotifyConfigCommand {
 		                           @Option(name = "kanal", description = "Der neue Podcast-Alert-Kanal", required = false) GuildMessageChannel channel
 		) {
 			if(channel == null) {
-				ConfigCommand.setField(event.getGuild(), DatabaseField.SPOTIFY_PODCAST_CHANNEL, 0);
+				ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateSpotify().podcastChannel = null);
 				event.reply("Podcast-Kanal zurückgesetzt").setEphemeral(true).queue();
 				return;
 			}
@@ -50,7 +49,7 @@ public class SpotifyConfigCommand {
 				return;
 			}
 
-			ConfigCommand.setField(event.getGuild(), DatabaseField.SPOTIFY_PODCAST_CHANNEL, channel.getIdLong());
+			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateSpotify().podcastChannel = channel.getIdLong());
 
 			event.reply("Podcast-Alert-Kanal auf " + channel.getAsMention() + " gesetzt").setEphemeral(true).queue();
 		}
@@ -63,12 +62,12 @@ public class SpotifyConfigCommand {
 		                           @Option(name = "rolle", description = "Die neue Spotify-Notification-Rolle", required = false) Role role
 		) {
 			if(role == null) {
-				ConfigCommand.setField(event.getGuild(), DatabaseField.SPOTIFY_NOTIFICATION_ROLE, 0);
+				ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateSpotify().notificationRole = null);
 				event.reply("Spotify-Notification-Rolle zurückgesetzt").setEphemeral(true).queue();
 				return;
 			}
 
-			ConfigCommand.setField(event.getGuild(), DatabaseField.SPOTIFY_NOTIFICATION_ROLE, role.getIdLong());
+			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateSpotify().notificationRole = role.getIdLong());
 
 			event.reply("Spotify-Notification-Rolle auf " + role.getAsMention() + " gesetzt").setEphemeral(true).queue();
 		}

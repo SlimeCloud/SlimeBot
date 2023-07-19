@@ -1,8 +1,8 @@
 package com.slimebot.commands;
 
-import com.slimebot.main.DatabaseField;
-import com.slimebot.main.Main;
 import com.slimebot.main.SlimeEmoji;
+import com.slimebot.main.config.guild.FdmdsConfig;
+import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.events.Listener;
@@ -10,7 +10,6 @@ import de.mineking.discord.events.interaction.ButtonHandler;
 import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
@@ -21,8 +20,6 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
-
-import java.util.Optional;
 
 @ApplicationCommand(name = "fdmds", description = "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!", feature = "fdmds")
 public class FdmdsCommand {
@@ -90,7 +87,7 @@ public class FdmdsCommand {
 				)
 				.setEmbeds(
 						new EmbedBuilder()
-								.setColor(Main.database.getColor(event.getGuild()))
+								.setColor(GuildConfig.getColor(event.getGuild()))
 								.setTitle("Frag doch mal den Schleim")
 								.setFooter("Vorschlag von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")")
 								.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question, false)
@@ -106,7 +103,7 @@ public class FdmdsCommand {
 		}
 
 		else {
-			Main.database.getChannel(event.getGuild(), DatabaseField.FDMDS_LOG_CHANNEL).ifPresentOrElse(
+			GuildConfig.getConfig(event.getGuild()).getFdmds().flatMap(FdmdsConfig::getLogChannel).ifPresentOrElse(
 					channel -> {
 						channel.sendMessage(MessageCreateData.fromEditData(message)).queue();
 						event.reply("Vorschlag erfolgreich verschickt!").setEphemeral(true).queue();
@@ -124,35 +121,35 @@ public class FdmdsCommand {
 
 	@Listener(type = ButtonHandler.class, filter = "fdmds.send")
 	public void sendFdmds(ButtonInteractionEvent event) {
-		Main.database.getChannel(event.getGuild(), DatabaseField.FDMDS_CHANNEL).ifPresentOrElse(
-				channel -> {
+		GuildConfig.getConfig(event.getGuild()).getFdmds().ifPresent(fdmds ->
+				fdmds.getChannel().ifPresentOrElse(
+						channel -> {
 
-					MessageEmbed embed = event.getMessage().getEmbeds().get(0);
-					String question = embed.getFields().get(0).getValue();
-					String choices = embed.getFields().get(1).getValue();
+							MessageEmbed embed = event.getMessage().getEmbeds().get(0);
+							String question = embed.getFields().get(0).getValue();
+							String choices = embed.getFields().get(1).getValue();
 
 
-					StringBuilder text = new StringBuilder()
-							.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
-							.append(question).append("\n\n")
-							.append(choices).append("\n\n");
+							StringBuilder text = new StringBuilder()
+									.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
+									.append(question).append("\n\n")
+									.append(choices).append("\n\n");
 
-					Optional<Role> role = Main.database.getRole(event.getGuild(), DatabaseField.FDMDS_ROLE);
+							fdmds.getRole().ifPresent(value -> text.append(value.getAsMention()));
 
-					role.ifPresent(value -> text.append(value.getAsMention()));
+							// Send and add reactions
+							channel.sendMessage(text).queue(m -> {
+								for(int i = 0; i < choices.lines().count(); i++) {
+									m.addReaction(SlimeEmoji.fromId(i + 1).emoji).queue();
+								}
 
-					// Send and add reactions
-					channel.sendMessage(text).queue(m -> {
-						for(int i = 0; i < choices.lines().count(); i++) {
-							m.addReaction(SlimeEmoji.fromId(i + 1).emoji).queue();
-						}
+								event.reply("Frage verschickt!").setEphemeral(true).queue();
+							});
 
-						event.reply("Frage verschickt!").setEphemeral(true).queue();
-					});
-
-					event.getMessage().delete().queue();
-				},
-				() -> event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue()
+							event.getMessage().delete().queue();
+						},
+						() -> event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue()
+				)
 		);
 	}
 }

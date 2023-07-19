@@ -2,6 +2,7 @@ package com.slimebot.commands;
 
 
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,7 +16,7 @@ public class PingCommand {
 				new EmbedBuilder()
 						.setTitle("Pong")
 						.setDescription(event.getJDA().getGatewayPing() + "ms")
-						.setColor(Main.database.getColor(event.getGuild()))
+						.setColor(GuildConfig.getColor(event.getGuild()))
 						.build()
 		).setEphemeral(true).queue();
 	}
