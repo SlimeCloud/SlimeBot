@@ -41,7 +41,7 @@ public class FdmdsCommand {
 						)
 						.addActionRow(
 								TextInput.create("choices", "Deine Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
-										.setPlaceholder("Antworten mit ; trennen z.B. Erdbeere; Cookie; Schokolade")
+										.setPlaceholder("Jede Antwortmöglichkeit in einer neuen Zeile, z.B:\nErdbeere\nCookie\nSchokolade")
 										.setValue(choices)
 										.setMinLength(10)
 										.setMaxLength(800)
@@ -59,7 +59,7 @@ public class FdmdsCommand {
 		StringBuilder choicesStr = new StringBuilder();
 
 			if(event.getModalId().contains("send")) {
-				String[] choices = event.getValue("choices").getAsString().split(";");
+				String[] choices = event.getValue("choices").getAsString().split("\n");
 
 				if(choices.length <= 1) {
 					event.reply("Du musst **mindestens 2** Antwortmöglichkeiten angeben!\n**Achte darauf jede Antwortmöglichkeit in eine neue Zeile zu schreiben!**").setEphemeral(true).queue();
