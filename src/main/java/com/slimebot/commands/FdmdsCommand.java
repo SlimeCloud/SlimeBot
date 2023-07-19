@@ -64,7 +64,7 @@ public class FdmdsCommand {
 				String[] choices = event.getValue("choices").getAsString().split("\n");
 
 				if(choices.length <= 1) {
-					event.reply("Du musst mindestens 2 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
+					event.reply("Du musst **mindestens 2** Antwortmöglichkeiten angeben!\n**Achte darauf jede Antwortmöglichkeit in eine neue Zeile zu schreiben!**").setEphemeral(true).queue();
 					return;
 				}
 
