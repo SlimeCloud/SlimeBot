@@ -139,6 +139,7 @@ public class FdmdsCommand {
 									.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
 									.append(question).append("\n\n")
 									.append(choices).append("\n\n")
+									.append("Du möchtest selbst eine Umfrage Einreichen? Verwende </fdmds:")
 									.append(manager.getCommandCache().getGuildCommand(event.getGuild().getIdLong(), "fdmds"))
 									.append(">")
 									.append(" oder den Knopf unter dieser Nachricht!");;
