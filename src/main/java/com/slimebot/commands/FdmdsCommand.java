@@ -3,6 +3,7 @@ package com.slimebot.commands;
 import com.slimebot.main.SlimeEmoji;
 import com.slimebot.main.config.guild.FdmdsConfig;
 import com.slimebot.main.config.guild.GuildConfig;
+import de.mineking.discord.DiscordUtils;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.events.Listener;
@@ -10,6 +11,7 @@ import de.mineking.discord.events.interaction.ButtonHandler;
 import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
@@ -23,6 +25,7 @@ import net.dv8tion.jda.api.utils.messages.MessageEditData;
 
 @ApplicationCommand(name = "fdmds", description = "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!", feature = "fdmds")
 public class FdmdsCommand {
+	@Listener(type = ButtonHandler.class, filter = "fdmds:create")
 	@ApplicationCommandMethod
 	public void sendModal(IModalCallback event, String question, String choices) { //Non-@Option parameters will be null when called from DiscordUtils CommandHandler
 		event.replyModal(
@@ -55,17 +58,18 @@ public class FdmdsCommand {
 
 		StringBuilder choicesStr = new StringBuilder();
 
-		if(event.getModalId().contains("send")) {
-			String[] choices = event.getValue("choices").getAsString().split(";");
+			if(event.getModalId().contains("send")) {
+				String[] choices = event.getValue("choices").getAsString().split(";");
 
-			if(choices.length <= 1) {
-				event.reply("Du musst mindestens 2 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
-				return;
-			}
-			if(choices.length > 9) {
-				event.reply("Du kannst maximal 9 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
-				return;
-			}
+				if(choices.length <= 1) {
+					event.reply("Du musst **mindestens 2** Antwortmöglichkeiten angeben!\n**Achte darauf jede Antwortmöglichkeit in eine neue Zeile zu schreiben!**").setEphemeral(true).queue();
+					return;
+				}
+
+				if(choices.length > 9) {
+					event.reply("Du kannst **maximal 9** Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
+					return;
+				}
 
 			for(int i = 0; i < choices.length; i++) {
 				choicesStr
@@ -96,8 +100,8 @@ public class FdmdsCommand {
 				)
 				.build();
 
-		if(event.getMessage() != null) {
-			event.getMessage().editMessage(message).queue();
+			if(event.getModalId().contains("edit")) {
+				event.getMessage().editMessage(message).queue();
 
 			event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
 		}
@@ -120,7 +124,7 @@ public class FdmdsCommand {
 	}
 
 	@Listener(type = ButtonHandler.class, filter = "fdmds.send")
-	public void sendFdmds(ButtonInteractionEvent event) {
+	public void sendFdmds(DiscordUtils manager, ButtonInteractionEvent event) {
 		GuildConfig.getConfig(event.getGuild()).getFdmds().ifPresent(fdmds ->
 				fdmds.getChannel().ifPresentOrElse(
 						channel -> {
@@ -131,20 +135,24 @@ public class FdmdsCommand {
 
 
 							StringBuilder text = new StringBuilder()
+									.append(fdmds.getRole().map(Role::getAsMention).orElse("")).append("\n")
 									.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
 									.append(question).append("\n\n")
-									.append(choices).append("\n\n");
-
-							fdmds.getRole().ifPresent(value -> text.append(value.getAsMention()));
+									.append(choices).append("\n\n")
+									.append(manager.getCommandCache().getGuildCommand(event.getGuild().getIdLong(), "fdmds"))
+									.append(">")
+									.append(" oder den Knopf unter dieser Nachricht!");;
 
 							// Send and add reactions
-							channel.sendMessage(text).queue(m -> {
-								for(int i = 0; i < choices.lines().count(); i++) {
-									m.addReaction(SlimeEmoji.fromId(i + 1).emoji).queue();
-								}
+							channel.sendMessage(text)
+									.addActionRow(Button.secondary("fdmds:create", "Frage erstellen"))
+									.queue(m -> {
+										for(int i = 0; i < choices.lines().count(); i++) {
+											m.addReaction(SlimeEmoji.fromId(i + 1).emoji).queue();
+										}
 
-								event.reply("Frage verschickt!").setEphemeral(true).queue();
-							});
+										event.reply("Frage verschickt!").setEphemeral(true).queue();
+									});
 
 							event.getMessage().delete().queue();
 						},

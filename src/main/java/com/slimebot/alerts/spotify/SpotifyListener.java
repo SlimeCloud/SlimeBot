@@ -16,6 +16,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class SpotifyListener implements Runnable {
 	public final static Logger logger = LoggerFactory.getLogger(SpotifyListener.class);
@@ -27,12 +28,11 @@ public class SpotifyListener implements Runnable {
 		this.spotifyApi = api;
 		this.artistId = artistId;
 
-		run();
-		Main.scheduleDaily(12, this);
+		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this);
 	}
 
 	public void run() {
-		logger.info("Überprüfe auf neue Releases");
+		logger.info("Überprüfe auf neue Alben von {}", artistId);
 
 		Main.database.run(handle -> {
 			List<String> known = handle.createQuery("select id from spotify_known").mapTo(String.class).list();

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class PodcastListener implements Runnable {
 	private final SpotifyApi api;
@@ -25,8 +26,7 @@ public class PodcastListener implements Runnable {
 		this.api = api;
 		this.id = id;
 
-		run();
-		Main.scheduleDaily(12, this);
+		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this);
 	}
 
 	@Override
