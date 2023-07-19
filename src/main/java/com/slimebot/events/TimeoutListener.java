@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEv
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public class TimeoutListener extends ListenerAdapter {
 
@@ -17,13 +18,16 @@ public class TimeoutListener extends ListenerAdapter {
 
 		for(AuditLogEntry entry : event.getGuild().retrieveAuditLogs().type(ActionType.MEMBER_UPDATE)) {
 			if(entry.getTargetId().equals(event.getMember().getId())) {
+				String reason = Optional.ofNullable(entry.getReason()).orElse("N/A");
+
 				event.getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(
 						new EmbedBuilder()
 								.setTitle("Du wurdest getimeouted")
 								.setColor(GuildConfig.getColor(event.getGuild()))
 								.setTimestamp(Instant.now())
 								.setDescription("Du wurdest auf dem SlimeCloud Discord getimeouted")
-								.addField("Grund:", entry.getReason(), true)
+								.addField("Grund:", reason, true)
+								.addField("Teammitglied:", entry.getUser().getAsMention(), true)
 								.build()
 				)).queue();
 
@@ -33,8 +37,9 @@ public class TimeoutListener extends ListenerAdapter {
 										.setTitle("\"" + event.getMember().getEffectiveName() + "\"" + " wurde getimeouted")
 										.setColor(GuildConfig.getColor(event.getGuild()))
 										.setTimestamp(Instant.now())
-										.addField("Grund:", entry.getReason(), true)
+										.addField("Grund:", reason, true)
 										.addField("Wer: ", event.getMember().getAsMention(), true)
+										.addField("Teammitglied:", entry.getUser().getAsMention(), true)
 										.build()
 						).queue()
 				);
