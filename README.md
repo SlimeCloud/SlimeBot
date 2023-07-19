@@ -109,10 +109,18 @@ Bei Konfigurationsfeldern, die für neue Funktionen im bot benötigt werden, sol
 statt dem Initialisieren der Funktion eine Warnung ausgeben.
 
 ## 🗄️ Datenbank
-Wir verwenden eine [PostgreSQL](https://www.postgresql.org/) Datenbank um Server-Konfigurationen und andere Daten zu speichern.
+Wir verwenden eine [PostgreSQL](https://www.postgresql.org/) Datenbank, um große Datenmengen zu speichern.
 Zur Interaktion mit der Datenbank verwenden wir [JDBI-Bibliothek](https://jdbi.org/).<br>
 In der `Database` Klasse werden die Tabellen erstellt, mit denen dann später mit den `handle` und `run` Methoden in der gleichen Klasse interagiert wird.
 Die `handle`-Methode hat dabei einen Rückgabewert, und sollte daher für `select` SQL Befehle verwendet werden, während `run` keinen Rückgabewert hat und ist daher eher für `insert` oder `update` Befehle geeignet.
+
+Um kleinere Datenmengen - wie zum Beispiel für Server Konfigurationen - verwenden wir json-files im `guild` Ordner. 
+In diesem Ordner gibt es für jeden Server eine Datei `<server id>.json`. 
+Sie enthält jegliche Konfiguration für den Server.
+Um die Daten in Java zu verwenden wird - ähnlich wie bei der [Bot Konfiguration](#-konfiguration) - eine Java Klasse mit der gleichen Struktur wie die Datei erstellt, die dann mit den Daten aus der Datei befüllt wird.
+Wenn du selbst ein neues Konfigurationsfeld benötigst, kannst du einfach eine Java Variable in der `GuildConfig` Klasse erstellen. 
+Zusätzlich sollte eine getter-Methode erstellt werden, die ein Optional zurückgibt. 
+Dadurch wird das Handhaben von nicht-gesetzten Konfigurationsfeldern vereinfacht.  
 
 ## 🤖 Befehle und zugehörige Events
 Discord Befehle erstellen und verarbeiten wir mit der [DiscordUtils Bibliothek](https://github.com/MineKingBot/DiscordUtils).
