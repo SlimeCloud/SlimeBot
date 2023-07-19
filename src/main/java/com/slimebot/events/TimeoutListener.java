@@ -20,13 +20,20 @@ public class TimeoutListener extends ListenerAdapter {
 		if(!event.getMember().isTimedOut()) return;
 
 		for(AuditLogEntry entry : event.getGuild().retrieveAuditLogs().type(ActionType.MEMBER_UPDATE)) {
+
+			String reason = entry.getReason();
+			if (reason == null){
+				reason = "N/A";
+			}
+
 			if(entry.getTargetId().equals(event.getMember().getId())) {
 				EmbedBuilder embedBuilder = new EmbedBuilder()
 						.setTitle("Du wurdest getimeouted")
 						.setColor(Main.embedColor(event.getGuild().getId()))
 						.setTimestamp(Instant.now())
 						.setDescription("Du wurdest auf dem SlimeCloud Discord getimeouted")
-						.addField("Grund:", entry.getReason(), true);
+						.addField("Grund:", reason, true)
+						.addField("Teammitglied:", entry.getUser().getAsMention(), true);
 
 				event.getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(embedBuilder.build())).queue();
 
@@ -34,8 +41,9 @@ public class TimeoutListener extends ListenerAdapter {
 						.setTitle("\"" + event.getMember().getEffectiveName() + "\"" + " wurde getimeouted")
 						.setColor(Main.embedColor(event.getGuild().getId()))
 						.setTimestamp(Instant.now())
-						.addField("Grund:", entry.getReason(), true)
-						.addField("Wer: ", event.getMember().getAsMention(), true);
+						.addField("Grund:", reason, true)
+						.addField("Wer: ", event.getMember().getAsMention(), true)
+						.addField("Teammitglied:", entry.getUser().getAsMention(), true);
 
 				YamlFile config = Config.getConfig(event.getGuild().getId(), "mainConfig");
 
