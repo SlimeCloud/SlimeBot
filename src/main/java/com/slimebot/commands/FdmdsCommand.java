@@ -166,7 +166,7 @@ public class FdmdsCommand {
 					.append(choices).append("\n\n").append("Du möchtest selbst eine Umfrage Einreichen? Verwende </fdmds:")
 					.append(manager.getCommandCache().getGlobalCommand("fdmds"))
 					.append(">") //TODO fdmds is a guild command after #46
-					.append(" Oder den Knopf unter dieser Nachricht!");
+					.append(" oder den Knopf unter dieser Nachricht!");
 
 			// Send and add reactions
 			channel.sendMessage(text)
