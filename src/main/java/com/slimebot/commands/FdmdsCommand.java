@@ -42,7 +42,7 @@ public class FdmdsCommand {
 						)
 						.addActionRow(
 								TextInput.create("choices", "Deine Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
-										.setPlaceholder("Antworten mit ; trennen z.B. Erdbeere; Cookie; Schokolade")
+										.setPlaceholder("Jede Antwortmöglichkeit in einer neuen Zeile, z.B:\nErdbeere\nCookie\nSchokolade")
 										.setValue(choices)
 										.setMinLength(10)
 										.setMaxLength(800)
@@ -61,12 +61,13 @@ public class FdmdsCommand {
 			StringBuilder choicesStr = new StringBuilder();
 
 			if(event.getModalId().contains("send")) {
-				String[] choices = event.getValue("choices").getAsString().split(";");
+				String[] choices = event.getValue("choices").getAsString().split("\n");
 
 				if(choices.length <= 1) {
-					event.reply("Du musst mindestens 2 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
+					event.reply("Du musst **mindestens 2** Antwortmöglichkeiten angeben!\n**Achte darauf jede Antwortmöglichkeit in eine neue Zeile zu schreiben!**").setEphemeral(true).queue();
 					return;
 				}
+
 				if(choices.length > 9) {
 					event.reply("Du kannst maximal 9 Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
 					return;
@@ -101,7 +102,7 @@ public class FdmdsCommand {
 					)
 					.build();
 
-			if(event.getMessage() != null) {
+			if(event.getModalId().contains("edit")) {
 				event.getMessage().editMessage(message).queue();
 
 				event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
@@ -127,6 +128,7 @@ public class FdmdsCommand {
 			}
 		}));
 
+		manager.getEventManager().registerHandler(new ButtonHandler("fdmds:create", event -> sendModal(event, null, null)));
 		manager.getEventManager().registerHandler(new ButtonHandler("fdmds.edit", event -> {
 			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 			sendModal(event, embed.getFields().get(0).getValue(), embed.getFields().get(1).getValue());
@@ -158,19 +160,24 @@ public class FdmdsCommand {
 			}
 
 			StringBuilder text = new StringBuilder()
+					.append(role.getAsMention()).append("\n")
 					.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
 					.append(question).append("\n\n")
-					.append(choices).append("\n\n")
-					.append(role.getAsMention());
+					.append(choices).append("\n\n").append("Du möchtest selbst eine Umfrage Einreichen? Verwende </fdmds:")
+					.append(manager.getCommandCache().getGlobalCommand("fdmds"))
+					.append(">") //TODO fdmds is a guild command after #46
+					.append(" oder den Knopf unter dieser Nachricht!");
 
 			// Send and add reactions
-			channel.sendMessage(text).queue(m -> {
-				for(int i = 0; i < choices.lines().count(); i++) {
-					m.addReaction(SlimeEmoji.fromId(i).emoji).queue();
-				}
+			channel.sendMessage(text)
+					.addActionRow(Button.secondary("fdmds:create", "Frage erstellen"))
+					.queue(m -> {
+						for(int i = 0; i < choices.lines().count(); i++) {
+							m.addReaction(SlimeEmoji.fromId(i).emoji).queue();
+						}
 
-				event.reply("Frage verschickt!").setEphemeral(true).queue();
-			});
+						event.reply("Frage verschickt!").setEphemeral(true).queue();
+					});
 			event.getMessage().delete().queue();
 		}));
 	}
