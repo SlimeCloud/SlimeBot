@@ -29,10 +29,14 @@ In GitHub Issues und Pull-Requests gibt es oft ToDo-Listen. Diese haben folgende
 - [ ] Item B
 - [x] Item C
 ```
-Achte darauf, zum Abhaken ein einfaches 'x' zwischen die eckigen Klammern zu setzten. Bitte füge keine weiteren Leerzeichen ein, da die Formatierung von GitHub ansonsten nicht korrekt erkannt wird! 
+Achte darauf, zum Abhaken ein einfaches 'x' zwischen die eckigen Klammern zu setzten. Bitte füge keine weiteren Leerzeichen ein, da die Formatierung von GitHub ansonsten nicht korrekt erkannt wird!
 
 ## 💻 Contributing
 Wenn du die Programmiersprache Java selbst beherrschst und dich mit der [JDA-Bibliothek](https://github.com/discord-jda/JDA) auskennst, kannst du gerne neue Features programmieren oder Fehler reparieren.<br>
+Suche dir entweder einen Issue aus, den du bearbeiten möchtest (und gib ihn in der Pull-request an) oder ändere etwas, das du unabhängig von einem bestehenden Issue ändern möchtest. 
+Beachte jedoch, dass wenn bei einem Issue bereits eine Person als Beauftragter markiert ist, diese Person für den Issue zuständig ist und du dich nicht um diesen Issue kümmern solltest!
+Ein Grund dafür ist zum Beispiel, dass interne Besprechungen mit einem Teammitglied stattgefunden haben, bei deinen Details zur Umsetzung vereinbart wurden.
+Du kannst unter solchen Issues oder dazugehörigen Pull-requests trotzdem gerne kommentieren und deine Vorschläge einbringen.
 Dazu kannst du [die Repository forken](https://github.com/SlimeCloud/java-SlimeBot/fork) und in deiner eigenen Kopie einen neuen Branch für deine Änderungen anlegen (Halte dich dabei an die [Styleguides](#-style-guide)!).
 Sobald du mit deinen Änderungen begonnen hast, kannst du [eine Pull-request erstellen](https://github.com/SlimeCloud/java-SlimeBot/compare).<br>
 Wenn die Änderungen noch nicht fertig sind, solltest du sie als Draft erstellen, um zu zeigen, dass du noch nicht fertig bist.
