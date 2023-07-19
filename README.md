@@ -23,6 +23,14 @@ Auch wenn du nicht selbst programmieren kannst, kannst du gerne [einen Issue ers
 eine Idee für ein Feature hast oder einen Fehler melden möchtest.
 Die Entwickler suchen sich regelmäßig die dringendsten Issues, um diese umzusetzen.
 
+In GitHub Issues und Pull-Requests gibt es oft ToDo-Listen. Diese haben folgendes Format:
+```markdown
+- [ ] Item A
+- [ ] Item B
+- [x] Item C
+```
+Achte darauf, zum Abhaken ein einfaches 'x' zwischen die eckigen Klammern zu setzten. Bitte füge keine weiteren Leerzeichen ein, da die Formatierung von GitHub ansonsten nicht korrekt erkannt wird! 
+
 ## 💻 Contributing
 Wenn du die Programmiersprache Java selbst beherrschst und dich mit der [JDA-Bibliothek](https://github.com/discord-jda/JDA) auskennst, kannst du gerne neue Features programmieren oder Fehler reparieren.<br>
 Dazu kannst du [die Repository forken](https://github.com/SlimeCloud/java-SlimeBot/fork) und in deiner eigenen Kopie einen neuen Branch für deine Änderungen anlegen (Halte dich dabei an die [Styleguides](#-style-guide)!).
