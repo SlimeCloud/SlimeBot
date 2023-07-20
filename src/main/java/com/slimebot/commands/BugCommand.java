@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 
-@ApplicationCommand(name = "bug", description = "Melde einen Bug")
+@ApplicationCommand(name = "bug", description = "Melde einen Bug", guildOnly = true)
 public class BugCommand {
 	public final static Modal modal = Modal.create("bug", "Melde einen Bug")
 			.addActionRow(

@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-@ApplicationCommand(name = "bonk", description = "Bonke eine Person")
+@ApplicationCommand(name = "bonk", description = "Bonke eine Person", guildOnly = true)
 public class BonkCommand {
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event, @Option(name = "user", description = "Wen willst du bonken?") User user) {
