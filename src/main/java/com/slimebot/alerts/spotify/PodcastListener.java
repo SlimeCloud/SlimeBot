@@ -2,9 +2,11 @@ package com.slimebot.alerts.spotify;
 
 import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.Main;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import com.slimebot.main.config.guild.GuildConfig;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import org.apache.hc.core5.http.ParseException;
-import org.simpleyaml.configuration.file.YamlFile;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.EpisodeSimplified;
@@ -12,70 +14,72 @@ import se.michaelthelin.spotify.model_objects.specification.Paging;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class PodcastListener implements Runnable {
-	private final YamlFile config;
 	private final SpotifyApi api;
-	private final String showID;
+	private final String id;
 
-	public PodcastListener(String showID, YamlFile config, SpotifyApi api) {
-		this.config = config;
+	public PodcastListener(SpotifyApi api, String id) {
 		this.api = api;
-		this.showID = showID;
+		this.id = id;
 
 		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this);
 	}
 
 	@Override
 	public void run() {
-		List<String> publishedEpisodes = config.getStringList("show." + showID + ".publishedEpisodes");
+		SpotifyListener.logger.info("Überprüfe auf neue Podcast Episode");
 
-		for(EpisodeSimplified episode : getLatestEpisodes()) {
-			if(!publishedEpisodes.contains(episode.getId())) {
-				publishedEpisodes.add(episode.getId());
+		Main.database.run(handle -> {
+			List<String> known = handle.createQuery("select id from spotify_known").mapTo(String.class).list();
+			PreparedBatch update = handle.prepareBatch("insert into spotify_known values(:id)");
+
+			for(EpisodeSimplified episode : getLatestEpisodes()) {
+				if(known.contains(episode.getId())) continue;
+
 				broadcastEpisode(episode);
+				update.bind("id", episode.getId()).add();
 			}
-		}
 
-		config.set("show." + showID + ".publishedEpisodes", publishedEpisodes);
-
-		try {
-			config.save();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
+			update.execute();
+		});
 	}
 
-	private EpisodeSimplified[] getLatestEpisodes() {
-		SpotifyListener.logger.info("Überprüfe auf neue Episoden bei {}", showID);
+	private List<EpisodeSimplified> getLatestEpisodes() {
+		SpotifyListener.logger.info("Überprüfe auf neue Episoden bei {}", id);
 
 		try {
-			Paging<EpisodeSimplified> episodes = api.getShowEpisodes(showID).market(CountryCode.DE).limit(20).build().execute();
+			Paging<EpisodeSimplified> episodes = api.getShowEpisodes(id).market(CountryCode.DE).limit(20).build().execute();
 
 			if(episodes.getTotal() > 20) {
 				SpotifyListener.logger.warn("Es gibt mehr als 20 Episoden, hole die letzten 20");
-				episodes = api.getShowEpisodes(showID).market(CountryCode.DE).offset(episodes.getTotal() - 20).build().execute();
+				episodes = api.getShowEpisodes(id).market(CountryCode.DE).offset(episodes.getTotal() - 20).build().execute();
 			}
 
-			List<EpisodeSimplified> episodeList = new ArrayList<>(Arrays.asList(episodes.getItems()));
-
-			return episodeList.toArray(EpisodeSimplified[]::new);
+			return Arrays.asList(episodes.getItems());
 		} catch(IOException | SpotifyWebApiException | ParseException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	private void broadcastEpisode(EpisodeSimplified episode) {
-		String message = MessageFormat.format(config.getString("show." + showID + ".message"), episode.getName(), episode.getExternalUrls().get("spotify"));
+		for(Guild guild : Main.jdaInstance.getGuilds()) {
+			GuildConfig.getConfig(guild).getSpotify().ifPresent(spotify ->
+					spotify.getPodcastChannel().ifPresent(channel -> {
+						String notification = spotify.getRole()
+								.map(Role::getAsMention)
+								.orElse("");
 
-		MessageChannel channel = Main.jdaInstance.getChannelById(MessageChannel.class, config.getLong("show." + showID + ".channelId"));
-
-		if(channel == null) throw new RuntimeException("Channel not found");
-
-		channel.sendMessage(message).queue();
+						channel.sendMessage(MessageFormat.format(Main.config.spotify.podcast.message,
+								notification,
+								episode.getName(),
+								episode.getExternalUrls().get("spotify")
+						)).queue();
+					})
+			);
+		}
 	}
 }

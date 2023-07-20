@@ -1,12 +1,13 @@
 package com.slimebot.commands.report;
 
 import com.slimebot.report.Report;
-import com.slimebot.report.Status;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import de.mineking.discord.events.Listener;
+import de.mineking.discord.events.interaction.StringSelectHandler;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 
 @ApplicationCommand(name = "details", description = "Zeigt Details zu einer Meldung an")
 public class DetailsCommand {
@@ -14,20 +15,18 @@ public class DetailsCommand {
 	public void performCommand(SlashCommandInteractionEvent event,
 	                           @Option(name = "id", description = "ID der Meldung") int id
 	) {
-		Report report = Report.get(event.getGuild().getId(), id);
+		Report.get(event.getGuild(), id)
+				.ifPresentOrElse(
+						report -> event.reply(report.buildMessage()).setEphemeral(true).queue(),
+						() -> event.reply("Report nicht gefunden").setEphemeral(true).queue()
+				);
+	}
 
-		if(report == null) {
-			event.reply("Report mit id " + id + " nicht gefunden!").setEphemeral(true).queue();
-			return;
-		}
+	@Listener(type = StringSelectHandler.class, filter = "report:details")
+	public void handleDetailsMenu(StringSelectInteractionEvent event) {
+		event.editComponents(event.getMessage().getComponents()).queue(); //Remove selection
 
-		MessageEmbed embed = report.asEmbed(event.getGuild().getId());
-
-		if(report.status == Status.CLOSED) {
-			event.replyEmbeds(embed).setEphemeral(true).queue();
-		}
-		else {
-			event.replyEmbeds(embed).setActionRow(Report.closeButton(report.id)).setEphemeral(true).queue();
-		}
+		Report.get(event.getGuild(), Integer.parseInt(event.getValues().get(0)))
+				.ifPresent(report -> event.getHook().sendMessage(report.buildMessage()).setEphemeral(true).queue());
 	}
 }
