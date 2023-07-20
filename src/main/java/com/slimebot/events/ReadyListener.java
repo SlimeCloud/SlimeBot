@@ -2,6 +2,7 @@ package com.slimebot.events;
 
 
 import com.slimebot.alerts.spotify.SpotifyListener;
+import com.slimebot.main.BuildInfo;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.message.StaffMessage;
@@ -40,6 +41,8 @@ public class ReadyListener extends ListenerAdapter {
 						new EmbedBuilder()
 								.setTitle("Bot wurde gestartet")
 								.setDescription("Der Bot hat sich mit der DiscordAPI (neu-) verbunden")
+								.addField("Version:", BuildInfo.version, true)
+								.addField("Serveranzahl:", String.valueOf(Main.jdaInstance.getGuilds().size()), true)
 								.setColor(GuildConfig.getColor(event.getGuild()))
 								.setTimestamp(Instant.now())
 								.build()
