@@ -3,6 +3,7 @@ package com.slimebot.main;
 import com.slimebot.alerts.holidays.HolidayAlert;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
+import com.slimebot.commands.level.RankCommand;
 import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
@@ -121,6 +122,8 @@ public class Main {
 							config.registerCommand(UserReportCommand.class);
 							config.registerCommand(MessageReportCommand.class);
 							config.registerCommand(ReportCommand.class);
+
+							config.registerCommand(RankCommand.class);
 						}
 				)
 				.useCommandCache(null);
