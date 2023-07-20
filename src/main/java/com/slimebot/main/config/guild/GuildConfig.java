@@ -47,7 +47,7 @@ public class GuildConfig {
 	}
 
 	public static Color getColor(Guild guild) {
-		return getConfig(guild).getColor().orElse(Color.decode(Main.config.color));
+		return Optional.ofNullable(guild).map(GuildConfig::getConfig).flatMap(GuildConfig::getColor).orElse(Color.decode(Main.config.color));
 	}
 
 	public static GuildConfig getConfig(long guild) {
