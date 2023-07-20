@@ -23,11 +23,11 @@ public class Config {
 			Config config = Main.gson.fromJson(reader, Config.class);
 
 			if(config.activity == null || config.color == null) {
-				throw new IOException("Required database field not set. See https://github.com/SlimeCloud/java-SlimeBot/blob/master/config_preset");
+				throw new IOException("Notwendiges Konfigurationsfeld nicht gesetzt. Siehe https://github.com/SlimeCloud/java-SlimeBot/blob/master/config_preset");
 			}
 
 			if(config.database == null) {
-				Database.logger.warn("No database config provided. Some features will not be available!");
+				Database.logger.warn("Keine Datenbank konfiguriert. Einige Funktionen werden nicht verfügbar sein!");
 			}
 
 			return config;

@@ -107,9 +107,15 @@ public class Main {
 							config.registerCommand(BonkCommand.class);
 							config.registerCommand(ContributorCommand.class);
 
-							config.registerCommand(UserReportCommand.class);
-							config.registerCommand(MessageReportCommand.class);
-							config.registerCommand(ReportCommand.class);
+							if(Main.config.database != null) {
+								config.registerCommand(UserReportCommand.class);
+								config.registerCommand(MessageReportCommand.class);
+								config.registerCommand(ReportCommand.class);
+							}
+
+							else {
+								logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
+							}
 						}
 				)
 				.useCommandCache(null);

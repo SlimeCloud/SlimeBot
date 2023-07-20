@@ -33,7 +33,7 @@ public class Database {
 
 	public <T, U> U handle(Class<T> type, Function<T, U> handler) {
 		if(jdbi == null) {
-			logger.warn("Tried to call database but no configuration provided");
+			logger.warn("Versuchter Datenbankaufruf nicht möglich: Keine Datenbank konfiguriert");
 			return null;
 		}
 
@@ -42,7 +42,7 @@ public class Database {
 
 	public <T> void run(Class<T> type, Consumer<T> handler) {
 		if(jdbi == null) {
-			logger.warn("Tried to call database but no configuration provided");
+			logger.warn("Versuchter Datenbankaufruf nicht möglich: Keine Datenbank konfiguriert");
 			return;
 		}
 
@@ -51,7 +51,7 @@ public class Database {
 
 	public void run(Consumer<Handle> handler) {
 		if(jdbi == null) {
-			logger.warn("Tried to call database but no configuration provided");
+			logger.warn("Versuchter Datenbankaufruf nicht möglich: Keine Datenbank konfiguriert");
 			return;
 		}
 
@@ -60,7 +60,7 @@ public class Database {
 
 	public <T> T handle(Function<Handle, T> handler) {
 		if(jdbi == null) {
-			logger.warn("Tried to call database but no configuration provided");
+			logger.warn("Versuchter Datenbankaufruf nicht möglich: Keine Datenbank konfiguriert");
 			return null;
 		}
 
