@@ -9,6 +9,7 @@ import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
+import com.slimebot.commands.report.UserReportSlashCommand;
 import com.slimebot.events.ReadyListener;
 import com.slimebot.events.TimeoutListener;
 import com.slimebot.main.config.Config;
@@ -110,6 +111,7 @@ public class Main {
 							if(Main.config.database != null) {
 								config.registerCommand(UserReportCommand.class);
 								config.registerCommand(MessageReportCommand.class);
+								config.registerCommand(UserReportSlashCommand.class);
 								config.registerCommand(ReportCommand.class);
 							}
 

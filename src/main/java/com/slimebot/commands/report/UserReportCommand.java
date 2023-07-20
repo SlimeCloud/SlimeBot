@@ -9,9 +9,11 @@ import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.events.Listener;
 import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
@@ -63,26 +65,27 @@ public class UserReportCommand {
 	@Listener(type = ModalHandler.class, filter = "report:user")
 	public void handleReportModal(ModalInteractionEvent event) {
 		try {
-			Main.jdaInstance.retrieveUserById(event.getValue("user").getAsString()).queue(user -> {
-						String description = event.getValue("reason").getAsString();
-
-						Report report = Report.createReport(event.getGuild(), Type.USER, event.getUser(), user, description);
-
-						event.replyEmbeds(
-								new EmbedBuilder()
-										.setTimestamp(Instant.now())
-										.setColor(GuildConfig.getColor(event.getGuild()))
-										.setTitle(":white_check_mark: Report Erfolgreich")
-										.setDescription(user.getAsMention() + " wurde erfolgreich gemeldet")
-										.build()
-						).setEphemeral(true).queue();
-
-						report.log();
-					},
+			Main.jdaInstance.retrieveUserById(event.getValue("user").getAsString()).queue(
+					user -> submitUserReport(event, user, event.getValue("reason").getAsString()),
 					new ErrorHandler().handle(ErrorResponse.UNKNOWN_USER, e -> event.reply("Nutzer nicht gefunden").setEphemeral(true).queue())
 			);
 		} catch(NumberFormatException e) {
 			event.reply("Ungültige Nutzer ID").setEphemeral(true).queue();
 		}
+	}
+
+	public static void submitUserReport(IReplyCallback event, User target, String reason) {
+		Report report = Report.createReport(event.getGuild(), Type.USER, event.getUser(), target, reason);
+
+		event.replyEmbeds(
+				new EmbedBuilder()
+						.setTimestamp(Instant.now())
+						.setColor(GuildConfig.getColor(event.getGuild()))
+						.setTitle(":white_check_mark: Report Erfolgreich")
+						.setDescription(target.getAsMention() + " wurde erfolgreich gemeldet")
+						.build()
+		).setEphemeral(true).queue();
+
+		report.log();
 	}
 }
