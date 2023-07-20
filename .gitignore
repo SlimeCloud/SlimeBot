@@ -9,6 +9,9 @@ logs/
 Slimebot/
 .env
 
+config
+guild/
+
 ### Eclipse ###
 .apt_generated
 .classpath
