@@ -1,6 +1,5 @@
 package com.slimebot.message;
 
-import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.main.config.guild.StaffConfig;
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,15 +29,11 @@ public class StaffMessage extends ListenerAdapter {
 	}
 
 	public static void updateMessage(Guild guild, List<Role> roles) {
-		List<Long> staffRoles = Main.database.handle(handle -> handle.createQuery("select role from staff_roles where guild = :guild")
-				.bind("guild", guild.getIdLong())
-				.mapTo(Long.class)
-				.list()
-		);
+		GuildConfig.getConfig(guild).getStaffConfig().ifPresent(config -> {
+			if(roles.stream().map(Role::getId).noneMatch(config.roles::containsKey)) return;
 
-		if(roles.stream().map(Role::getIdLong).noneMatch(staffRoles::contains)) return;
-
-		updateMessage(guild);
+			updateMessage(guild);
+		});
 	}
 
 	public static void updateMessage(Guild guild) {
