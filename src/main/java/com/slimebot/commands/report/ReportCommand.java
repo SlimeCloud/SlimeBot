@@ -2,7 +2,6 @@ package com.slimebot.commands.report;
 
 import com.slimebot.main.CommandContext;
 import com.slimebot.main.CommandPermission;
-import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.report.Report;
 import de.mineking.discord.commands.CommandManager;

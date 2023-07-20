@@ -1,6 +1,5 @@
 package com.slimebot.commands.report;
 
-import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.report.Report;
 import com.slimebot.report.Type;

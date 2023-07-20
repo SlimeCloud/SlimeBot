@@ -58,18 +58,18 @@ public class FdmdsCommand {
 
 		StringBuilder choicesStr = new StringBuilder();
 
-			if(event.getModalId().contains("send")) {
-				String[] choices = event.getValue("choices").getAsString().split("\n");
+		if(event.getModalId().contains("send")) {
+			String[] choices = event.getValue("choices").getAsString().split("\n");
 
-				if(choices.length <= 1) {
-					event.reply("Du musst **mindestens 2** Antwortmöglichkeiten angeben!\n**Achte darauf jede Antwortmöglichkeit in eine neue Zeile zu schreiben!**").setEphemeral(true).queue();
-					return;
-				}
+			if(choices.length <= 1) {
+				event.reply("Du musst **mindestens 2** Antwortmöglichkeiten angeben!\n**Achte darauf jede Antwortmöglichkeit in eine neue Zeile zu schreiben!**").setEphemeral(true).queue();
+				return;
+			}
 
-				if(choices.length > 9) {
-					event.reply("Du kannst **maximal 9** Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
-					return;
-				}
+			if(choices.length > 9) {
+				event.reply("Du kannst **maximal 9** Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
+				return;
+			}
 
 			for(int i = 0; i < choices.length; i++) {
 				choicesStr
@@ -100,8 +100,8 @@ public class FdmdsCommand {
 				)
 				.build();
 
-			if(event.getModalId().contains("edit")) {
-				event.getMessage().editMessage(message).queue();
+		if(event.getModalId().contains("edit")) {
+			event.getMessage().editMessage(message).queue();
 
 			event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
 		}
@@ -142,7 +142,7 @@ public class FdmdsCommand {
 									.append("Du möchtest selbst eine Umfrage Einreichen? Verwende </fdmds:")
 									.append(manager.getCommandCache().getGuildCommand(event.getGuild().getIdLong(), "fdmds"))
 									.append(">")
-									.append(" oder den Knopf unter dieser Nachricht!");;
+									.append(" oder den Knopf unter dieser Nachricht!");
 
 							// Send and add reactions
 							channel.sendMessage(text)

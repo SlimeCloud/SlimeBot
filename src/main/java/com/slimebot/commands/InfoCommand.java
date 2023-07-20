@@ -1,7 +1,6 @@
 package com.slimebot.commands;
 
 import com.slimebot.main.BuildInfo;
-import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
