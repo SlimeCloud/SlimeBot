@@ -6,9 +6,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public abstract class Game extends ListenerAdapter {
+
+    public final UUID uuid;
     public long gameMaster;
     public List<Long> player;
     public GameStatus status;
@@ -17,28 +20,31 @@ public abstract class Game extends ListenerAdapter {
     public Game(long gameMaster, MessageChannel channel) {
         this.gameMaster = gameMaster;
         this.channel = channel;
+        this.uuid = UUID.randomUUID();
 
         player = new ArrayList<>();
         player.add(gameMaster);
 
-        status = GameStatus.WAITING;
+        status = GameStatus.CREATING;
 
         Main.jdaInstance.addEventListener(this);
 
-        // End the game if its 10min WAITING
+        // End the game if its 15min WAITING or CREATING
         Main.executor.schedule(() -> {
-            if(status == GameStatus.WAITING)end();
-        }, 10, TimeUnit.MINUTES);
+            if(status == GameStatus.CREATING ||status == GameStatus.WAITING)end();
+        }, 15, TimeUnit.MINUTES);
+    }
+
+    public void create() {
+        if(status != GameStatus.CREATING)return;
+        status = GameStatus.WAITING;
     }
 
     public boolean join(long player) {
         if(status != GameStatus.WAITING)return false;
-        if(PlayerGameState.gameStates.containsKey(player)) {
-            if(PlayerGameState.gameStates.get(player).game.status != GameStatus.ENDED)return false;
-            PlayerGameState.gameStates.remove(player);
-        }
+
+        if(!PlayerGameState.setGameState(player, new PlayerGameState(this)))return false;
         if(this.player.contains(player))return false;
-        PlayerGameState.gameStates.put(player, new PlayerGameState(this));
 
         this.player.add(player);
         return true;
@@ -48,9 +54,9 @@ public abstract class Game extends ListenerAdapter {
         cleanupPlayer(player);
     }
 
-    public void cleanupPlayer(long player) {
+    private void cleanupPlayer(long player) {
         if(this.player.contains(player))this.player.remove(player);
-        if(PlayerGameState.gameStates.containsKey(player))PlayerGameState.gameStates.remove(player);
+        if(PlayerGameState.isInGame(player))PlayerGameState.releasePlayer(player);
     }
 
     public void start() {
@@ -65,6 +71,7 @@ public abstract class Game extends ListenerAdapter {
     }
 
     public enum GameStatus {
+        CREATING(),
         WAITING(),
         PLAYING(),
         ENDED();

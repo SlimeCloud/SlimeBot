@@ -114,6 +114,7 @@ public class Main {
 							config.registerCommand(BulkAddRoleCommand.class);
 							config.registerCommand(PingCommand.class);
 							config.registerCommand(FdmdsCommand.class);
+							config.registerCommand(WordchainCommand.class);
 							config.registerCommand(InfoCommand.class);
 							config.registerCommand(BonkCommand.class);
 							config.registerCommand(ContributorCommand.class);
