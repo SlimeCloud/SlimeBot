@@ -22,6 +22,11 @@ public class Database {
 		jdbi = Jdbi.create("jdbc:postgresql://" + Main.config.database.host, Main.config.database.user, Main.config.database.password);
 
 		run(handle -> {
+			/*
+			Hier werden Tabellen erstellt.
+			Wenn du selbst eine Tabelle benötigst, kannst du hier einen 'create table if not exists' SQL Befehl ausführen.
+			.execute() nicht vergessen!
+			 */
 			handle.createUpdate("create table if not exists spotify_known(id text)").execute();
 
 			handle.createUpdate("create table if not exists report_blocks(guild bigint, \"user\" bigint)").execute();

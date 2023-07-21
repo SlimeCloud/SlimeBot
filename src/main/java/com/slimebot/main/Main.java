@@ -98,6 +98,9 @@ public class Main {
 				.useCommandManager(
 						new ContextCreator<>(ContextBase.class, CommandContext::new),
 						config -> {
+							/*
+							Hier kannst du deine Befehle registrieren.
+							 */
 							config.registerCommand(ConfigCommand.class);
 
 							config.registerCommand(BugCommand.class);
@@ -135,6 +138,10 @@ public class Main {
 		holiday = new HolidayAlert();
 	}
 
+	/**
+	 * Updatet die Befehle eines Servers. Diese Methode sollte immer aufgerufen werden, wenn Konfiguration verändert wird, die Befehle aktivieren oder deaktivieren kann.
+	 * @param guild Der server, dessen Befehle geupdatet werden sollen.
+	 */
 	public static void updateGuildCommands(Guild guild) {
 		discordUtils.getCommandCache().updateGuildCommands(guild,
 				Map.of("fdmds", GuildConfig.getConfig(guild).getFdmds().isPresent()),
@@ -142,6 +149,11 @@ public class Main {
 		);
 	}
 
+	/**
+	 * Registriert eine Aufgabe, die täglich ausgeführt wird.
+	 * @param hour Die Stunde, zu der die Aufgabe ausgeführt wird.
+	 * @param task Die Aufgabe
+	 */
 	public static void scheduleDaily(int hour, Runnable task) {
 		ZonedDateTime now = ZonedDateTime.now();
 		ZonedDateTime nextRun = now.withHour(hour).withMinute(0).withSecond(0);
@@ -153,6 +165,12 @@ public class Main {
 		executor.scheduleAtFixedRate(task, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
 	}
 
+	/**
+	 * Registriert eine Aufgabe, die im angegebenen Intervall ausgeführt wird.
+	 * @param amount Das Intervall
+	 * @param unit Die Einheit, in der das Intervall angegeben wurde.
+	 * @param task Die Aufgabe
+	 */
 	public static void scheduleAtFixedRate(int amount, TimeUnit unit, Runnable task) {
 		executor.scheduleAtFixedRate(task, 0, amount, unit);
 	}
