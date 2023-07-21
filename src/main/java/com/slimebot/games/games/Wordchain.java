@@ -3,9 +3,8 @@ package com.slimebot.games.games;
 import com.slimebot.games.Game;
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -48,13 +47,12 @@ public class Wordchain extends Game {
                     )
                     .addActionRow(
                             Button.primary(uuid + ":join", "Join"),
+                            Button.danger(uuid + ":leave", "Leave"),
                             Button.primary(uuid + ":start", "Start")
                     )
                     .queue();
         });
     }
-
-
 
     @Override
     public void start() {
@@ -81,11 +79,9 @@ public class Wordchain extends Game {
         }
 
         round++;
-        if((playerTurn+1) < this.player.size()) {
+        if ((playerTurn + 1) < this.player.size()) {
             playerTurn++;
-        }else {
-            playerTurn = 0;
-        }
+        } else playerTurn = 0;
 
         if(lastWord == null)getChannel().sendMessage(round + ": <@" + this.player.get(playerTurn) + "> ist an der Reihe! Suche dir ein Wort aus!").queue();
         if(lastWord != null)getChannel().sendMessage(round + ": <@" + this.player.get(playerTurn) + "> ist an der Reihe! Das letzte Wort ist \"**" + lastWord + "**\"").queue();
@@ -106,7 +102,7 @@ public class Wordchain extends Game {
         lives--;
         playerLives.put(player, lives);
 
-        getChannel().sendMessage(":x: <@" + player +"> hat ein Fehler gemacht und hat nur noch **"+ lives+"** Versuche!").queue();
+        getChannel().sendMessage(":x: <@" + player + "> hat ein Fehler gemacht und hat nur noch **" + lives + "** Versuche!").queue();
     }
 
     private void kickPlayer(long player, RestAction<?> restAction) {
@@ -115,21 +111,34 @@ public class Wordchain extends Game {
         leave(player);
     }
 
+    public MessageEmbed updateJoinEmbed(MessageEmbed embed) {
+        return new EmbedBuilder()
+                .setColor(Main.embedColor(String.valueOf(guildId)))
+                .setTitle(embed.getTitle())
+                .setDescription("Um zu erfahren wie \"Wortkette\" funktioniert nutze ```/wordchain explanation```") // TODO
+                .addField("Spielleiter:in:", "<@" + gameMaster + ">", true)
+                .addField(":timer: Timeout:", seconds + "s", true)
+                .addField(":x: Max Fehler:", lives + " Fehler", true)
+                .addField("Spieler:", player.stream().map(p -> ("<@" + p + ">")).collect(Collectors.joining("\r\n")), true)
+                .setFooter("GameID: " + uuid)
+                .setTimestamp(Instant.now())
+                .build();
+    }
+
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if(event.getChannel() != getChannel())return;
+        if (event.getChannel() != getChannel()) return;
         long memberID = event.getMember().getIdLong();
-        if(memberID != player.get(playerTurn))return;
+        if (memberID != player.get(playerTurn)) return;
 
         String content = event.getMessage().getContentRaw();
         String lastWord = null;
 
         if(character != null) {
-            if(content.split(" ").length > 1 || Character.toLowerCase(content.toCharArray()[0]) != Character.toLowerCase(character)) {
+            if (content.split(" ").length > 1 || Character.toLowerCase(content.toCharArray()[0]) != Character.toLowerCase(character)) {
                 damage(memberID);
-            }else {
-                lastWord = content.split(" ")[0];
-            }
+            } else lastWord = content.split(" ")[0];
+
         }
 
         character = content.toCharArray()[content.length()-1];
@@ -143,40 +152,48 @@ public class Wordchain extends Game {
         id = id.replace(uuid +":", "");
 
         switch(id) {
-            case "join":
-                if(!join(event.getMember().getIdLong())) {
-                    event.reply(":x: Du bist schon in einem Game!").setEphemeral(true).queue(); // TODO: better message
+            case "join" -> {
+                if (!join(event.getMember().getIdLong())) {
+                    event.reply(":x: Du bist schon in einem Game!").setEphemeral(true).queue();
                     return;
                 }
-                event.editMessageEmbeds(
-                        new EmbedBuilder()
-                                .setColor(Main.embedColor(String.valueOf(guildId)))
-                                .setTitle(event.getMessage().getEmbeds().get(0).getTitle())
-                                .setDescription("Um zu erfahren wie \"Wortkette\" funktioniert nutze ```/wordchain explanation```") // TODO
-                                .addField("Spielleiter:in:", "<@"+gameMaster+">", true)
-                                .addField(":timer: Timeout:", seconds + "s", true)
-                                .addField(":x: Max Fehler:", lives + " Fehler", true)
-                                .addField("Spieler:", player.stream().map(p -> ("<@"+ p + ">")).collect(Collectors.joining("\r\n")), true)
-                                .setFooter("GameID: " + uuid)
-                                .setTimestamp(Instant.now())
-                                .build()
-                ).queue();
-                event.reply("<@"+ event.getMember().getId()+"> ist dem Spiel beigetreten!").queue(); // TODO: better message
+                event.editMessageEmbeds(updateJoinEmbed(event.getMessage().getEmbeds().get(0))).queue();
+
+                event.reply("<@" + event.getMember().getId() + "> ist dem Spiel beigetreten!").queue();
                 return;
+            }
+            case "leave" -> {
+                if (!player.contains(event.getMember().getIdLong())) {
+                    event.reply(":x: Du bist nicht im Game!").setEphemeral(true).queue();
+                    return;
+                }
+                if (event.getMember().getIdLong() == gameMaster) {
+                    event.reply(":x: Du bist Spielleiter:in du kannst nicht verlassen!").setEphemeral(true).queue();
+                    return;
+                }
+
+                leave(event.getMember().getIdLong());
+
+                event.editMessageEmbeds(updateJoinEmbed(event.getMessage().getEmbeds().get(0))).queue();
+
+                event.reply(":x: <@" + event.getMember().getId() + "> ist dem Spiel verlassen!").queue();
+
+            }
         }
 
         if(event.getMember().getIdLong() != gameMaster) {
-            event.reply(":x: Du bist nicht Spielleiter:in! uiashdfuihwesuiafgh").queue(); // TODO: better message
+            event.reply(":x: Du bist nicht Spielleiter:in!").queue();
             return;
         }
         switch(id) {
-            case "start":
-                if(player.size() >= 2) {
-                    event.getMessage().delete().queue();
-                    start();
-                }else {
+            case "start" -> {
+                if (player.size() < 2) {
                     event.reply(":x: Es müssen mindestens 2 Spieler:innen mit machen!").setEphemeral(true).queue();
+                    return;
                 }
+                event.getMessage().delete().queue();
+                start();
+            }
         }
     }
 }

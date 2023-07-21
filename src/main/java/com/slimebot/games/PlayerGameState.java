@@ -12,15 +12,15 @@ public class PlayerGameState {
     }
 
     public static PlayerGameState getGameState(long player) {
-        if(gameStates.containsKey(player))return gameStates.get(player);
+        if (gameStates.containsKey(player)) return gameStates.get(player);
         return null;
     }
 
     public static boolean isInGame(long player) {
         PlayerGameState state = getGameState(player);
-        if(state == null)return false;
-        if(state.game == null)return false;
-        if(state.game.status == Game.GameStatus.ENDED) {
+        if (state == null) return false;
+        if (state.game == null) return false;
+        if (state.game.status == Game.GameStatus.ENDED) {
             releasePlayer(player);
             return false;
         }
@@ -32,8 +32,8 @@ public class PlayerGameState {
     }
 
     public static boolean setGameState(long player, PlayerGameState state) {
-        if(state == null)return false;
-        if(isInGame(player))return false;
+        if (state == null) return false;
+        if (isInGame(player)) return false;
 
         gameStates.put(player, state);
         return true;

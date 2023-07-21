@@ -12,11 +12,11 @@ import java.util.concurrent.TimeUnit;
 public abstract class Game extends ListenerAdapter {
 
     public final UUID uuid;
+    public final long channelId;
+    public final long guildId;
     public long gameMaster;
     public List<Long> player;
     public GameStatus status;
-    public final long channelId;
-    public final long guildId;
 
     public Game(long gameMaster, long channelId, long guildId) {
         this.gameMaster = gameMaster;
@@ -35,15 +35,15 @@ public abstract class Game extends ListenerAdapter {
 
         // End the game if its 15min WAITING
         Main.executor.schedule(() -> {
-            if(status == GameStatus.WAITING)end();
+            if (status == GameStatus.WAITING) end();
         }, 15, TimeUnit.MINUTES);
     }
 
     public boolean join(long player) {
-        if(status != GameStatus.WAITING)return false;
+        if (status != GameStatus.WAITING) return false;
 
-        if(this.player.contains(player))return false;
-        if(!PlayerGameState.setGameState(player, new PlayerGameState(this)))return false;
+        if (this.player.contains(player)) return false;
+        if (!PlayerGameState.setGameState(player, new PlayerGameState(this))) return false;
 
         this.player.add(player);
         return true;
@@ -54,8 +54,8 @@ public abstract class Game extends ListenerAdapter {
     }
 
     private void cleanupPlayer(long player) {
-        if(this.player.contains(player))this.player.remove(player);
-        if(PlayerGameState.isInGame(player))PlayerGameState.releasePlayer(player);
+        this.player.remove(player);
+        if (PlayerGameState.isInGame(player)) PlayerGameState.releasePlayer(player);
     }
 
     public void start() {
@@ -77,6 +77,6 @@ public abstract class Game extends ListenerAdapter {
     public enum GameStatus {
         WAITING(),
         PLAYING(),
-        ENDED();
+        ENDED()
     }
 }

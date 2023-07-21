@@ -1,6 +1,5 @@
 package com.slimebot.commands;
 
-import com.slimebot.games.Game;
 import com.slimebot.games.PlayerGameState;
 import com.slimebot.games.games.Wordchain;
 import com.slimebot.main.Main;
@@ -13,20 +12,17 @@ import de.mineking.discord.ui.components.select.StringSelectComponent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 @ApplicationCommand(name = "wordchain", description = "Spiele das Wordchain Minispiel mit anderen Leuten!", guildOnly = true)
-public class WordchainCommand extends ListenerAdapter {
+public class WordchainCommand {
     @ApplicationCommandMethod
     public void performCommand(SlashCommandInteractionEvent event) {
-        if(PlayerGameState.isInGame(event.getMember().getIdLong())) {
+        if (PlayerGameState.isInGame(event.getMember().getIdLong())) {
             event.reply("Du bist schon in einem Game!").setEphemeral(true).queue();
             return;
         }
@@ -51,7 +47,7 @@ public class WordchainCommand extends ListenerAdapter {
                                         .setRequiredRange(1, 1)
                                         .setDefaultOptions(SelectOption.of("15", "15"))
                                 ).handle((menu, evt) -> {
-                                    menu.update();
+                                    evt.deferEdit().queue();
                                     time.set(Integer.valueOf(evt.getInteraction().getSelectedOptions().get(0).getValue()));
                                 }),
                                 new StringSelectComponent("lives", menu -> menu
@@ -63,7 +59,7 @@ public class WordchainCommand extends ListenerAdapter {
                                         .setRequiredRange(1, 1)
                                         .setDefaultOptions(SelectOption.of("3", "3"))
                                 ).handle((menu, evt) -> {
-                                    menu.update();
+                                    evt.deferEdit().queue();
                                     lives.set(Integer.valueOf(evt.getInteraction().getSelectedOptions().get(0).getValue()));
                                 }),
                                 new ButtonComponent("create", ButtonColor.GREEN, "Erstellen").handle((menu, evt) -> {
