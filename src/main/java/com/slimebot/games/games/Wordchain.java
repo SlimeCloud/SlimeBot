@@ -11,13 +11,15 @@ import net.dv8tion.jda.api.requests.RestAction;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Wordchain extends Game {
-    private Character character;
+    private String lastWord;
+    private List<String> words;
     private int playerTurn;
     private int round;
     private ScheduledFuture<?> scheduledFuture;
@@ -65,10 +67,12 @@ public class Wordchain extends Game {
         round = 0;
         playerTurn = 0;
 
-        nextTurn(null);
+        this.lastWord = null;
+
+        nextTurn();
     }
 
-    private void nextTurn(String lastWord) {
+    private void nextTurn() {
         if(scheduledFuture != null)scheduledFuture.cancel(true);
 
         if(player.size() == 1) {
@@ -88,7 +92,7 @@ public class Wordchain extends Game {
 
         scheduledFuture = Main.executor.schedule(() -> {
             kickPlayer(this.player.get(playerTurn), getChannel().sendMessage(":x: <@" + player +"> ist Ausgeschieden weil die Zeit abgelaufen ist!"));
-            nextTurn(lastWord);
+            nextTurn();
         }, seconds, TimeUnit.SECONDS);
     }
 
@@ -127,22 +131,27 @@ public class Wordchain extends Game {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        if(status != GameStatus.PLAYING) return;
         if (event.getChannel() != getChannel()) return;
         long memberID = event.getMember().getIdLong();
         if (memberID != player.get(playerTurn)) return;
 
         String content = event.getMessage().getContentRaw();
-        String lastWord = null;
 
-        if(character != null) {
-            if (content.split(" ").length > 1 || Character.toLowerCase(content.toCharArray()[0]) != Character.toLowerCase(character)) {
+        if(lastWord != null) {
+            if (content.split(" ").length > 1 ||
+                    Character.toLowerCase(content.toCharArray()[0]) != Character.toLowerCase(lastWord.charAt(lastWord.length()-1)) ||
+                    words.contains(content.split(" ")[0].toLowerCase())) {
                 damage(memberID);
-            } else lastWord = content.split(" ")[0];
-
+            } else {
+                lastWord = content.split(" ")[0].toLowerCase();
+                words.add(lastWord);
+            }
+        } else {
+            lastWord = content.split(" ")[0].toLowerCase();
+            words.add(lastWord);
         }
-
-        character = content.toCharArray()[content.length()-1];
-        nextTurn(lastWord);
+        nextTurn();
     }
 
     @Override
@@ -159,7 +168,7 @@ public class Wordchain extends Game {
                 }
                 event.editMessageEmbeds(updateJoinEmbed(event.getMessage().getEmbeds().get(0))).queue();
 
-                event.reply("<@" + event.getMember().getId() + "> ist dem Spiel beigetreten!").queue();
+                getChannel().sendMessage("<@" + event.getMember().getId() + "> ist dem Spiel beigetreten!").queue();
                 return;
             }
             case "leave" -> {
