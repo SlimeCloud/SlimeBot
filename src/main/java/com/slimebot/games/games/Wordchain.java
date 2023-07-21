@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class Wordchain extends Game {
         this.playerLives = new HashMap<>();
         this.seconds = seconds;
         this.lives = lives;
+        this.words = new ArrayList<>();
 
         Main.jdaInstance.getGuildById(guildId).retrieveMemberById(gameMaster).queue(m -> {
             getChannel().sendMessageEmbeds(
