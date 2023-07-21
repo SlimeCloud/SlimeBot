@@ -11,12 +11,12 @@ public class PlayerGameState {
         this.game = game;
     }
 
-    public static PlayerGameState getGameState(Long player) {
+    public static PlayerGameState getGameState(long player) {
         if(gameStates.containsKey(player))return gameStates.get(player);
         return null;
     }
 
-    public static boolean isInGame(Long player) {
+    public static boolean isInGame(long player) {
         PlayerGameState state = getGameState(player);
         if(state == null)return false;
         if(state.game == null)return false;
@@ -27,12 +27,12 @@ public class PlayerGameState {
         return true;
     }
 
-    public static void releasePlayer(Long player) {
+    public static void releasePlayer(long player) {
         gameStates.remove(player);
     }
 
-    public static boolean setGameState(Long player, PlayerGameState state) {
-        if(player == null || state == null)return false;
+    public static boolean setGameState(long player, PlayerGameState state) {
+        if(state == null)return false;
         if(isInGame(player))return false;
 
         gameStates.put(player, state);

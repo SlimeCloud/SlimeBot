@@ -15,12 +15,12 @@ public abstract class Game extends ListenerAdapter {
     public long gameMaster;
     public List<Long> player;
     public GameStatus status;
-    public final MessageChannel channel;
+    public final long channelId;
     public final long guildId;
 
-    public Game(long gameMaster, MessageChannel channel, long guildId) {
+    public Game(long gameMaster, long channelId, long guildId) {
         this.gameMaster = gameMaster;
-        this.channel = channel;
+        this.channelId = channelId;
         this.guildId = guildId;
         this.uuid = UUID.randomUUID();
 
@@ -29,19 +29,14 @@ public abstract class Game extends ListenerAdapter {
 
         PlayerGameState.setGameState(gameMaster, new PlayerGameState(this));
 
-        status = GameStatus.CREATING;
+        status = GameStatus.WAITING;
 
         Main.jdaInstance.addEventListener(this);
 
-        // End the game if its 15min WAITING or CREATING
+        // End the game if its 15min WAITING
         Main.executor.schedule(() -> {
-            if(status == GameStatus.CREATING ||status == GameStatus.WAITING)end();
+            if(status == GameStatus.WAITING)end();
         }, 15, TimeUnit.MINUTES);
-    }
-
-    public void create() {
-        if(status != GameStatus.CREATING)return;
-        status = GameStatus.WAITING;
     }
 
     public boolean join(long player) {
@@ -75,8 +70,11 @@ public abstract class Game extends ListenerAdapter {
         player = null;
     }
 
+    public MessageChannel getChannel() {
+        return Main.jdaInstance.getChannelById(MessageChannel.class, channelId);
+    }
+
     public enum GameStatus {
-        CREATING(),
         WAITING(),
         PLAYING(),
         ENDED();
