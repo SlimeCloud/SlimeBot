@@ -50,7 +50,7 @@ public class ReportSet implements Listable<Report> {
 		else {
 			builder
 					.setFooter("Insgesamt " + context.entries.size() + " Reports, die dem Filter entsprechen")
-					.setDescription("Nutze </report details:" + context.manager.getCommandCache().getGuildCommand(context.event.getGuild().getIdLong(), "report") + "> oder das Dropdown menu um mehr infos zu einem Report zu bekommen.\n");
+					.setDescription("Nutze </report details:" + context.manager.getCommandCache().getGlobalCommand("report") + "> oder das Dropdown menu um mehr infos zu einem Report zu bekommen.\n");
 		}
 
 		return builder;
