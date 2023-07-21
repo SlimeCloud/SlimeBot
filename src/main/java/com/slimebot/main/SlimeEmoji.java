@@ -1,4 +1,4 @@
-package com.slimebot.utils;
+package com.slimebot.main;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 
