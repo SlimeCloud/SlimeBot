@@ -21,15 +21,12 @@ public class WordchainCommand extends ListenerAdapter {
     @ApplicationCommandMethod
     public void performCommand(SlashCommandInteractionEvent event) {
         Long memberId = event.getMember().getIdLong();
-        if(PlayerGameState.gameStates.containsKey(memberId)) {
-            if(PlayerGameState.gameStates.get(memberId).game.status != Game.GameStatus.ENDED) {
-                event.reply("Du bist bereits in einem Game!").queue();
-                return;
-            }
-            PlayerGameState.gameStates.remove(event.getMember().getIdLong());
+        if(PlayerGameState.isInGame(memberId)) {
+            event.reply("Du bist schon in einem Game!").setEphemeral(true).queue();
+            return;
         }
 
-        new Wordchain(memberId, event.getChannel());
+        Game game = new Wordchain(memberId, event.getChannel(), event.getGuild().getIdLong());
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTitle(event.getMember().getEffectiveName() + "'s Wortkette: Einstellungen")
@@ -39,7 +36,7 @@ public class WordchainCommand extends ListenerAdapter {
 
         event.replyEmbeds(embedBuilder.build())
                 .addActionRow(
-                        StringSelectMenu.create("wordchain:settings:time")
+                        StringSelectMenu.create(game.uuid + ":settings:time")
                                 .addOption("5", "5", Emoji.fromUnicode("U+23F2"))
                                 .addOption("10", "10", Emoji.fromUnicode("U+23F2"))
                                 .addOption("15", "15", Emoji.fromUnicode("U+23F2"))
@@ -50,7 +47,7 @@ public class WordchainCommand extends ListenerAdapter {
                                 .build()
                 )
                 .addActionRow(
-                        StringSelectMenu.create("wordchain:settings:lives")
+                        StringSelectMenu.create(game.uuid + ":settings:lives")
                                 .addOption("1", "1", Emoji.fromUnicode("U+274C"))
                                 .addOption("2", "2", Emoji.fromUnicode("U+274C"))
                                 .addOption("3", "3", Emoji.fromUnicode("U+274C"))
@@ -61,7 +58,7 @@ public class WordchainCommand extends ListenerAdapter {
                                 .build()
                 )
                 .addActionRow(
-                        Button.success("wordchain:settings:create", Emoji.fromUnicode("U+2705"))
+                        Button.success(game.uuid + ":settings:create", Emoji.fromUnicode("U+2705"))
                 )
                 .setEphemeral(true)
                 .queue();

@@ -15,15 +15,19 @@ public abstract class Game extends ListenerAdapter {
     public long gameMaster;
     public List<Long> player;
     public GameStatus status;
-    public MessageChannel channel;
+    public final MessageChannel channel;
+    public final long guildId;
 
-    public Game(long gameMaster, MessageChannel channel) {
+    public Game(long gameMaster, MessageChannel channel, long guildId) {
         this.gameMaster = gameMaster;
         this.channel = channel;
+        this.guildId = guildId;
         this.uuid = UUID.randomUUID();
 
         player = new ArrayList<>();
         player.add(gameMaster);
+
+        PlayerGameState.setGameState(gameMaster, new PlayerGameState(this));
 
         status = GameStatus.CREATING;
 
@@ -43,8 +47,8 @@ public abstract class Game extends ListenerAdapter {
     public boolean join(long player) {
         if(status != GameStatus.WAITING)return false;
 
-        if(!PlayerGameState.setGameState(player, new PlayerGameState(this)))return false;
         if(this.player.contains(player))return false;
+        if(!PlayerGameState.setGameState(player, new PlayerGameState(this)))return false;
 
         this.player.add(player);
         return true;
@@ -67,7 +71,8 @@ public abstract class Game extends ListenerAdapter {
         status = GameStatus.ENDED;
         Main.jdaInstance.removeEventListener(this);
 
-        player.forEach(this::cleanupPlayer);
+        player.forEach(p -> PlayerGameState.releasePlayer(p));
+        player = null;
     }
 
     public enum GameStatus {
