@@ -15,13 +15,13 @@ public class RankCommand {
 
     @ApplicationCommandMethod
     public void performCommand(SlashCommandInteractionEvent event, @Option(name = "user", required = false) User user) {
-        if (user==null) user = event.getUser();
+        if(user == null) user = event.getUser();
         //Level level = Level.getLevel(event.getGuild().getId(), user.getId());
-        Level level = new Level(event.getGuild().getId(), user.getId(), 1, 200.74);
+        Level level = new Level(event.getGuild().getIdLong(), user.getIdLong(), 1, 200);
         event.deferReply().queue();
         try {
             event.getHook().sendFiles(new RankCard(level).getFile()).queue();
-        } catch (IOException e) {
+        } catch(IOException e) {
             e.printStackTrace();
         }
     }
