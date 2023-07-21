@@ -49,26 +49,24 @@ public class LevelListener extends ListenerAdapter implements Runnable {
     @Override
     public void onGenericGuildVoice(GenericGuildVoiceEvent event) {
         Member member = event.getMember();
-        if (canLevel(event.getVoiceState().getChannel(), member)) voiceUsers.add(member.getIdLong());
+        if(canLevel(event.getVoiceState().getChannel(), member)) voiceUsers.add(member.getIdLong());
         else voiceUsers.remove(member.getIdLong());
         System.out.println(canLevel(event.getVoiceState().getChannel(), member));
     }
 
     private boolean canLevel(AudioChannelUnion union, Member member) {
-        return canLevel(union==null ? null : union.asVoiceChannel(), member);
+        return canLevel(union == null ? null : union.asVoiceChannel(), member);
     }
 
     private boolean canLevel(VoiceChannel channel, Member member) {
-        if (channel==null) return false;
+        if(channel == null) return false;
         List<Member> members = channel.getMembers();
         if(members.size() <= 1) return false;
         if(member.getVoiceState().isMuted()) return false;
         boolean flag = true, flag1 = true;
         for(Member m : members) {
             if(m.getIdLong() == member.getIdLong()) flag = false;
-            else {
-                if(!m.getVoiceState().isMuted()) flag1 = false;
-            }
+            else if(!m.getUser().isBot() && !m.getVoiceState().isMuted()) flag1 = false;
         }
         return !flag && !flag1;
     }
