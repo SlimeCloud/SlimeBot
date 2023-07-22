@@ -95,6 +95,7 @@ public class Main {
 				.useCustomRestactionManager(null)
 				.useEventManager(null)
 				.useListCommands(null)
+				.useUIManager(null)
 				.useCommandManager(
 						new ContextCreator<>(ContextBase.class, CommandContext::new),
 						config -> {
@@ -107,6 +108,8 @@ public class Main {
 							config.registerCommand(InfoCommand.class);
 							config.registerCommand(BonkCommand.class);
 							config.registerCommand(ContributorCommand.class);
+
+							config.registerCommand(SetupCommand.class);
 
 							if(Main.config.database != null) {
 								config.registerCommand(UserReportCommand.class);
