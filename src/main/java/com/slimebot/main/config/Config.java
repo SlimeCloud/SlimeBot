@@ -13,8 +13,10 @@ public class Config {
 	public final static Dotenv env = Dotenv.load();
 	public Activity activity;
 
+
 	public DatabaseConfig database;
 	public SpotifyConfig spotify;
+	public GitHubConfig github;
 
 	public String color;
 

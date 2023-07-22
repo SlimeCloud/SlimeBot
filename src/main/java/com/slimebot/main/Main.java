@@ -26,6 +26,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +60,7 @@ public class Main {
 
 	public static SpotifyListenerManager spotify;
 	public static HolidayAlert holiday;
+	public static GitHub github;
 
 	public static void main(String[] args) throws IOException {
 		config = Config.readFromFile("config");
@@ -100,7 +103,22 @@ public class Main {
 						config -> {
 							config.registerCommand(ConfigCommand.class);
 
-							config.registerCommand(BugCommand.class);
+							if(Main.config.github != null) {
+								try {
+									github = new GitHubBuilder()
+											.withOAuthToken(Main.config.github.accessToken)
+											.build();
+
+									config.registerCommand(BugCommand.class);
+								} catch(IOException e) {
+									logger.error("Initialisieren der GitHub API fehlgeschlagen", e);
+								}
+							}
+
+							else {
+								logger.warn("Bug-Reporting aufgrund von fehlender GitHub konfiguration deaktiviert");
+							}
+
 							config.registerCommand(BulkAddRoleCommand.class);
 							config.registerCommand(PingCommand.class);
 							config.registerCommand(FdmdsCommand.class);
