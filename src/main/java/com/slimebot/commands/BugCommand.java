@@ -34,9 +34,9 @@ public class BugCommand {
 			.addActionRow(TextInput.create("reproduction", "Schritte zum Reproduzieren", TextInputStyle.PARAGRAPH)
 					.setMinLength(10)
 					.setPlaceholder("""
-                        1. Gehe zu '....'
-                        2. Klicke auf '....'
-                        3. Scrolle nach unten zu '....'""")
+							1. Gehe zu '....'
+							2. Klicke auf '....'
+							3. Scrolle nach unten zu '....'""")
 					.build()
 			)
 			.addActionRow(TextInput.create("description", "Beschreibung", TextInputStyle.PARAGRAPH)
