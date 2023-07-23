@@ -96,14 +96,28 @@ public class SetupCommand {
 				"\uD83D\uDCDD Wählen einen Gruß-Kanal",
 				"In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet",
 				(config, value) -> config.greetingsChannel = value.getIdLong(),
-				"logChannel", "staffRole"
+				"logChannel", "punishmentChannel"
+		);
+
+		entitySelect(event, menu, "punishmentChannel", EntitySelectMenu.SelectTarget.CHANNEL,
+				"\uD83D\uDCDD Wähle einen Straf-Kanal",
+				"In diesem Kanal werden Informationen über Bestrafungen gesendet",
+				(config, value) -> config.punishmentChannel = value.getIdLong(),
+				"greetingsChannel", "staffRole"
 		);
 
 		entitySelect(event, menu, "staffRole", EntitySelectMenu.SelectTarget.ROLE,
 				"\uD83E\uDDFB Wählen eine Team-Rolle",
 				"Mitglieder mit dieser Rolle haben Zugriff auf beschränkte Befehle",
 				(config, value) -> config.staffRole = value.getIdLong(),
-				"greetingsChannel", "finish"
+				"punishmentChannel", "contributorRole"
+		);
+
+		entitySelect(event, menu, "contributorRole", EntitySelectMenu.SelectTarget.ROLE,
+				"\uD83E\uDDFB Wähle eine Contributor-Rolle",
+				"Diese Rolle kann von Mitgliedern beantragt werden, wenn sie bei diesem Bot auf GitHub mitgearbeitet haben",
+				(config, value) -> config.contributorRole = value.getIdLong(),
+				"staffRole", "finish"
 		);
 
 		menu.start(new CallbackState(event), "color");
