@@ -1,7 +1,8 @@
 package com.slimebot.commands;
 
 import com.slimebot.games.PlayerGameState;
-import com.slimebot.games.games.Wordchain;
+import com.slimebot.games.wordchain.Wordchain;
+import com.slimebot.games.wordchain.WordchainPlayer;
 import com.slimebot.main.Main;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;

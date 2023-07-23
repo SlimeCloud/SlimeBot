@@ -1,31 +1,31 @@
 package com.slimebot.games;
 
 import com.slimebot.main.Main;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
-public abstract class Game extends ListenerAdapter {
-
-    public final UUID uuid;
+public abstract class Game <T extends GamePlayer> extends ListenerAdapter {
+    public final UUID uuid = UUID.randomUUID();
     public final long channelId;
     public final long guildId;
     public long gameMaster;
-    public List<Long> player;
+    public List<T> players = new ArrayList<>();
+    private final Function<Long, T> gamePlayerFunction;
     public GameStatus status;
 
-    public Game(long gameMaster, long channelId, long guildId) {
+    public Game(long gameMaster, long channelId, long guildId, Function<Long, T> gamePlayerFunction) {
         this.gameMaster = gameMaster;
         this.channelId = channelId;
         this.guildId = guildId;
-        this.uuid = UUID.randomUUID();
+        this.gamePlayerFunction = gamePlayerFunction;
 
-        player = new ArrayList<>();
-        player.add(gameMaster);
+        players.add(this.gamePlayerFunction.apply(gameMaster));
 
         PlayerGameState.setGameState(gameMaster, new PlayerGameState(this));
 
@@ -39,23 +39,34 @@ public abstract class Game extends ListenerAdapter {
         }, 15, TimeUnit.MINUTES);
     }
 
-    public boolean join(long player) {
+    public T getPlayerFromId(long id) {
+        return players.stream()
+                .filter(p -> p.id == id)
+                .findAny()
+                .orElse(null);
+
+    }
+
+    public boolean join(long id) {
         if (status != GameStatus.WAITING) return false;
 
-        if (this.player.contains(player)) return false;
-        if (!PlayerGameState.setGameState(player, new PlayerGameState(this))) return false;
+        if (!PlayerGameState.setGameState(id, new PlayerGameState(this))) return false;
+        if (getPlayerFromId(id) != null) return false;
 
-        this.player.add(player);
+        T player = gamePlayerFunction.apply(id);
+
+        this.players.add(player);
         return true;
     }
 
-    public void leave(long player) {
+    public void leave(GamePlayer player) {
+        if(player == null)return;
         cleanupPlayer(player);
     }
 
-    private void cleanupPlayer(long player) {
-        this.player.remove(player);
-        if (PlayerGameState.isInGame(player)) PlayerGameState.releasePlayer(player);
+    private void cleanupPlayer(GamePlayer player) {
+        this.players.remove(player);
+        if (PlayerGameState.isInGame(player.id)) PlayerGameState.releasePlayer(player.id);
     }
 
     public void start() {
@@ -66,12 +77,20 @@ public abstract class Game extends ListenerAdapter {
         status = GameStatus.ENDED;
         Main.jdaInstance.removeEventListener(this);
 
-        player.forEach(p -> PlayerGameState.releasePlayer(p));
-        player = null;
+        players.forEach(p -> PlayerGameState.releasePlayer(p.id));
+        players = null;
     }
 
     public MessageChannel getChannel() {
         return Main.jdaInstance.getChannelById(MessageChannel.class, channelId);
+    }
+
+    public MessageCreateAction sendMessage(String content) {
+        return getChannel().sendMessage(content);
+    }
+
+    public MessageCreateAction sendMessageEmbeds(Collection<MessageEmbed> embeds) {
+        return getChannel().sendMessageEmbeds(embeds);
     }
 
     public enum GameStatus {
