@@ -90,7 +90,7 @@ public class SetupCommand {
 				);
 
 		entitySelect(event, menu, "logChannel", EntitySelectMenu.SelectTarget.CHANNEL,
-				"\uD83D\uDCDD Wählen einen Log-Kanal",
+				"\uD83D\uDCDD Wähle einen Log-Kanal",
 				"In diesem Kanal werden Informationen bezüglich des Bots gesendet",
 				(config, value) -> config.logChannel = value.getIdLong(),
 				GuildConfig::getLogChannel,
@@ -98,7 +98,7 @@ public class SetupCommand {
 		);
 
 		entitySelect(event, menu, "greetingsChannel", EntitySelectMenu.SelectTarget.CHANNEL,
-				"\uD83D\uDCDD Wählen einen Gruß-Kanal",
+				"\uD83D\uDCDD Wähle einen Gruß-Kanal",
 				"In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet",
 				(config, value) -> config.greetingsChannel = value.getIdLong(),
 				GuildConfig::getGreetingsChannel,
@@ -114,7 +114,7 @@ public class SetupCommand {
 		);
 
 		entitySelect(event, menu, "staffRole", EntitySelectMenu.SelectTarget.ROLE,
-				"\uD83E\uDDFB Wählen eine Team-Rolle",
+				"\uD83E\uDDFB Wähle eine Team-Rolle",
 				"Mitglieder mit dieser Rolle haben Zugriff auf beschränkte Befehle",
 				(config, value) -> config.staffRole = value.getIdLong(),
 				GuildConfig::getStaffRole,
