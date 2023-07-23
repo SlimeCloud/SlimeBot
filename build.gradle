@@ -35,17 +35,32 @@ dependencies {
     implementation 'com.github.MineKingBot:DiscordUtils:625de61'
 }
 
+String getVersion() {
+    var version = project.version.toString()
+
+    try {
+        var commit = 'git rev-parse --verify --short HEAD'.execute().text.trim()
+        version += "-" + commit
+    } catch(IOException ignore) {
+        version += "-unknown"
+    }
+
+    return version
+}
+
 tasks.register("prepareSources", Copy) {
     delete("$buildDir/preparedSources")
 
     from("src/main/java") {
         include("**/BuildInfo.java")
-        var tokens = Map.of(
-                "VERSION", version.toString()
-        )
 
-        filter(ReplaceTokens, "tokens": tokens)
+        filter(ReplaceTokens, "tokens":
+                Map.of(
+                        "VERSION", getVersion()
+                )
+        )
     }
+
     into("$buildDir/preparedSources")
 
     includeEmptyDirs = false
