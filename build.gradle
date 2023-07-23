@@ -32,7 +32,20 @@ dependencies {
     implementation 'org.jdbi:jdbi3-sqlobject:3.39.0'
     implementation 'org.jdbi:jdbi3-postgres:3.39.0'
 
-    implementation 'com.github.MineKingBot:DiscordUtils:625de61'
+    implementation 'com.github.MineKingBot:DiscordUtils:3189da7'
+}
+
+String getVersion() {
+    var version = project.version.toString()
+
+    try {
+        var commit = 'git rev-parse --verify --short HEAD'.execute().text.trim()
+        version += "-" + commit
+    } catch(IOException ignore) {
+        version += "-unknown"
+    }
+
+    return version
 }
 
 tasks.register("prepareSources", Copy) {
@@ -40,12 +53,14 @@ tasks.register("prepareSources", Copy) {
 
     from("src/main/java") {
         include("**/BuildInfo.java")
-        var tokens = Map.of(
-                "VERSION", version.toString()
-        )
 
-        filter(ReplaceTokens, "tokens": tokens)
+        filter(ReplaceTokens, "tokens":
+                Map.of(
+                        "VERSION", getVersion()
+                )
+        )
     }
+
     into("$buildDir/preparedSources")
 
     includeEmptyDirs = false
