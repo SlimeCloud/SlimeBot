@@ -9,41 +9,41 @@ import java.util.Map;
 
 public class CustomFont {
 
-    public static Font getFont(String path, int style, float size) throws IOException, FontFormatException {
-        if(path == null) return null;
-        return getFont(path).deriveFont(style, size);
+    public static Font getFont(String name, int style, float size) throws IOException, FontFormatException {
+        if(name == null) return null;
+        return getFont(name).deriveFont(style, size);
     }
 
-    public static Font getFont(String path, Map<? extends AttributedCharacterIterator.Attribute, ?> attributes) throws IOException, FontFormatException {
-        if(path == null) return null;
-        return getFont(path).deriveFont(attributes);
+    public static Font getFont(String name, Map<? extends AttributedCharacterIterator.Attribute, ?> attributes) throws IOException, FontFormatException {
+        if(name == null) return null;
+        return getFont(name).deriveFont(attributes);
     }
 
-    public static Font getFont(String path, int style, AffineTransform trans) throws IOException, FontFormatException {
-        if(path == null) return null;
-        return getFont(path).deriveFont(style, trans);
+    public static Font getFont(String name, int style, AffineTransform trans) throws IOException, FontFormatException {
+        if(name == null) return null;
+        return getFont(name).deriveFont(style, trans);
     }
 
-    public static Font getFont(String path, AffineTransform trans) throws IOException, FontFormatException {
-        if(path == null) return null;
-        return getFont(path).deriveFont(trans);
+    public static Font getFont(String name, AffineTransform trans) throws IOException, FontFormatException {
+        if(name == null) return null;
+        return getFont(name).deriveFont(trans);
     }
 
-    public static Font getFont(String path, float size) throws IOException, FontFormatException {
-        if(path == null) return null;
-        return getFont(path).deriveFont(size);
+    public static Font getFont(String name, float size) throws IOException, FontFormatException {
+        if(name == null) return null;
+        return getFont(name).deriveFont(size);
     }
 
-    public static Font getFont(String path, int style) throws IOException, FontFormatException {
-        if(path == null) return null;
-        return getFont(path).deriveFont(style);
+    public static Font getFont(String name, int style) throws IOException, FontFormatException {
+        if(name == null) return null;
+        return getFont(name).deriveFont(style);
     }
 
-    public static Font getFont(String path) throws IOException, FontFormatException {
-        if(path == null) return null;
-        String[] args = new File(path).getName().split("\\.");
+    public static Font getFont(String name) throws IOException, FontFormatException {
+        if(name == null) return null;
+        String[] args = new File(name).getName().split("\\.");
         String suffix = args[args.length - 1];
-        return Font.createFont(getType(suffix), CustomFont.class.getResourceAsStream(path));
+        return Font.createFont(getType(suffix), CustomFont.class.getClassLoader().getResourceAsStream("font/" + name));
     }
 
     private static int getType(String suffix) {

@@ -29,5 +29,19 @@
         }
     },
 
+    "level": {
+        "levelUpMessage": "Herzlichen Glückwunsch, %user% du bist jetzt %level%!",
+        "leaderboardTemplate": "zm-f838bf17-d82b-4023-92c4-45e481d546a1",
+        "xpMultiplier": 1,
+        "minVoiceXP": 1,
+        "maxVoiceXP": 3,
+        "minMessageXP": 5,
+        "maxMessageXP": 15,
+        "minWordLength": 3,
+        "minWordXP": 0.05,
+        "maxWordXP": 0.1,
+        "messageCooldown": 15000
+    },
+
     "color": "#569d3c"
 }

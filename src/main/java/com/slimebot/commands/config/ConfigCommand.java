@@ -11,6 +11,9 @@ import java.util.function.Consumer;
  * Dieser Befehl wird verwendet, um es dem Team einfach zu ermöglichen, die Konfiguration des Servers anzupassen.
  * Für jede "Kategorie" an Konfiguration gibt es einen eigenen Unterbefehl.
  * Wenn du selbst ein Konfigurationsfeld mit Befehl hinzufügen möchtest, schau dir vorher an, wie dies bei bestehenden Konfigurationsbefehlen gemacht wurde.
+ <p>
+ <p>
+ * Für das Level System existiert kein Config command, weil die Config commands im moment automatisiert werden.
  */
 @ApplicationCommand(name = "config", description = "Verwaltet die Bot-Konfiguration für diesen Server", guildOnly = true, subcommands = {GuildConfigCommand.class, FdmdsConfigCommand.class, StaffConfigCommand.class, SpotifyConfigCommand.class})
 public class ConfigCommand {

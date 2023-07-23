@@ -10,14 +10,19 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 import java.io.IOException;
 
-@ApplicationCommand(name = "rank", guildOnly = true)
+@ApplicationCommand(name = "rank", description = "Zeigt dein Aktuelles Level und XP an", feature = "level")
 public class RankCommand {
 
     @ApplicationCommandMethod
     public void performCommand(SlashCommandInteractionEvent event, @Option(name = "user", required = false) User user) {
         if(user == null) user = event.getUser();
-        //Level level = Level.getLevel(event.getGuild().getId(), user.getId());
-        Level level = new Level(event.getGuild().getIdLong(), user.getIdLong(), 1, 200);
+
+        if (user.isBot()) {
+            event.reply("Bots wie " + user.getAsMention() + " können nicht leveln!").queue();
+            return;
+        }
+
+        Level level = Level.getLevel(event.getGuild().getIdLong(), user.getIdLong());
         event.deferReply().queue();
         try {
             event.getHook().sendFiles(new RankCard(level).getFile()).queue();
