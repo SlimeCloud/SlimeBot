@@ -91,7 +91,7 @@ public class SetupCommand {
 
 		entitySelect(event, menu, "logChannel", EntitySelectMenu.SelectTarget.CHANNEL,
 				"\uD83D\uDCDD Wählen einen Log-Kanal",
-				"In diesem Kanal werden Logs über dem Bot gesendet", //TODO Better description
+				"In diesem Kanal werden Informationen bezüglich des Bots gesendet",
 				(config, value) -> config.logChannel = value.getIdLong(),
 				GuildConfig::getLogChannel,
 				"color", "greetingsChannel"
