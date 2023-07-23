@@ -41,6 +41,10 @@ import java.util.function.Function;
 public class SetupCommand {
 	public CommandPermission permission = CommandPermission.TEAM;
 
+	public final static String roleEmoji = "\uD83E\uDDFB";
+	public final static String channelEmoji = "\uD83D\uDCDD";
+	public final static String commentEmoji = "\uD83D\uDCDD";
+
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event) {
 		showSetupMenu(event);
@@ -149,11 +153,11 @@ public class SetupCommand {
 													try {
 														return SelectOption.of(Main.jdaInstance.getRoleById(e.getKey()).getName(), e.getKey())
 																.withDescription(e.getValue())
-																.withEmoji(Emoji.fromFormatted("\uD83E\uDDFB"));
+																.withEmoji(Emoji.fromFormatted(roleEmoji));
 													} catch(NumberFormatException ex) {
 														return SelectOption.of(e.getKey(), e.getKey())
 																.withDescription(e.getValue())
-																.withEmoji(Emoji.fromFormatted("\uD83D\uDCDD"));
+																.withEmoji(Emoji.fromFormatted(commentEmoji));
 													}
 												})
 												.toList()
@@ -326,7 +330,7 @@ public class SetupCommand {
 		menu.addMessageFrame(id, () ->
 						new EmbedBuilder()
 								.setColor(GuildConfig.getColor(event.getGuild()))
-								.setTitle((target == EntitySelectMenu.SelectTarget.CHANNEL ? "\uD83D\uDCDD" : "\uD83E\uDDFB") + " " + title)
+								.setTitle((target == EntitySelectMenu.SelectTarget.CHANNEL ? channelEmoji : roleEmoji) + " " + title)
 								.setDescription(description)
 								.addField("Aktueller Wert", supplier.apply(GuildConfig.getConfig(event.getGuild())).map(IMentionable::getAsMention).orElse("*Keiner*"), false)
 								.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
