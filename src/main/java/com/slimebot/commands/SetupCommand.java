@@ -4,6 +4,7 @@ import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.main.CommandPermission;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
+import com.slimebot.main.config.guild.SpotifyNotificationConfig;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.ui.CallbackState;
@@ -24,6 +25,8 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -48,15 +51,43 @@ public class SetupCommand {
 										.build(),
 						frame -> frame.addComponents(
 								ComponentRow.of(
-										new FrameButton(ButtonColor.GRAY, "Haupteinstellungen", "color")
+										new FrameButton(ButtonColor.GRAY, "Haupteinstellungen", "color"),
+										new FrameButton(ButtonColor.GRAY, "Spotify Benachrichtigungen", "spotify_music")
 								),
 								new ButtonComponent("finish", ButtonColor.RED, "Schließen").handle((m, evt) -> m.close())
 						)
 				);
 
 		mainConfig(event, menu);
+		spotifyConfig(event, menu);
 
 		menu.start(new CallbackState(event), "main");
+	}
+
+	public static void spotifyConfig(IReplyCallback event, Menu menu) {
+		entitySelect(event, menu, "spotify_music", EntitySelectMenu.SelectTarget.CHANNEL,
+				"Wähle einen Musik-Kanal",
+				"In diesem Kanal werden Benachrichtigungen über neue Musik-Releases gesendet",
+				(config, value) -> config.getOrCreateSpotify().musicChannel = value.getIdLong(),
+				config -> config.getSpotify().flatMap(SpotifyNotificationConfig::getMusicChannel),
+				"main", "spotify_podcast"
+		);
+
+		entitySelect(event, menu, "spotify_podcast", EntitySelectMenu.SelectTarget.CHANNEL,
+				"Wähle einen Podcast-Kanal",
+				"In diesem Kanal werden Benachrichtigungen über neue Podcast Episoden gesendet",
+				(config, value) -> config.getOrCreateSpotify().podcastChannel = value.getIdLong(),
+				config -> config.getSpotify().flatMap(SpotifyNotificationConfig::getPodcastChannel),
+				"spotify_music", "spotify_role"
+		);
+
+		entitySelect(event, menu, "spotify_role", EntitySelectMenu.SelectTarget.CHANNEL,
+				"Wähle eine Benachrichtigungs-Rolle",
+				"Diese Rolle wird bei Spotify Nachrichten erwähnt",
+				(config, value) -> config.getOrCreateSpotify().notificationRole = value.getIdLong(),
+				config -> config.getSpotify().flatMap(SpotifyNotificationConfig::getRole),
+				"spotify_podcast", "main"
+		);
 	}
 
 	public static void mainConfig(IReplyCallback event, Menu menu) {
@@ -138,7 +169,7 @@ public class SetupCommand {
 				"Diese Rolle kann von Mitgliedern beantragt werden, wenn sie bei diesem Bot auf GitHub mitgearbeitet haben",
 				(config, value) -> config.contributorRole = value.getIdLong(),
 				GuildConfig::getContributorRole,
-				"staffRole", "finish"
+				"staffRole", "main"
 		);
 
 	}
@@ -147,6 +178,16 @@ public class SetupCommand {
 	                                 BiConsumer<GuildConfig, ISnowflake> handler, Function<GuildConfig, Optional<? extends IMentionable>> supplier,
 	                                 String previous, String next
 	) {
+		List<ButtonComponent> buttons = new ArrayList<>();
+
+		buttons.add(new FrameButton(ButtonColor.GRAY, "Zurück", previous));
+
+		if(!previous.equals("main") && !next.equals("main")) {
+			buttons.add(new FrameButton(ButtonColor.GRAY, "Hauptmenü", "main"));
+		}
+
+		buttons.add(new FrameButton(ButtonColor.GRAY, "Überspringen", next));
+
 		menu.addMessageFrame(id, () ->
 						new EmbedBuilder()
 								.setColor(GuildConfig.getColor(event.getGuild()))
@@ -163,11 +204,7 @@ public class SetupCommand {
 							ConfigCommand.updateField(evt.getGuild(), config -> handler.accept(config, evt.getValues().get(0)));
 							m.display(next);
 						}),
-						ComponentRow.of(
-								new FrameButton(ButtonColor.GRAY, "Zurück", previous),
-								new FrameButton(ButtonColor.GRAY, "Hauptmenü", "main"),
-								new FrameButton(ButtonColor.GRAY, "Überspringen", next)
-						)
+						ComponentRow.of(buttons)
 				)
 		);
 	}
