@@ -1,11 +1,17 @@
 package com.slimebot.commands.config;
 
 import com.slimebot.main.CommandPermission;
+import com.slimebot.main.Main;
+import com.slimebot.main.config.Config;
 import com.slimebot.main.config.guild.GuildConfig;
+import com.slimebot.main.config.guild.StaffConfig;
+import com.slimebot.message.StaffMessage;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
+import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.WhenFinished;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.util.function.Consumer;
 
@@ -27,6 +33,21 @@ public class ConfigCommand {
 		GuildConfig config = GuildConfig.getConfig(guild);
 		handler.accept(config);
 		config.save();
+	}
+
+	@ApplicationCommand(name = "reload", description = "Lädt alle Konfigurationen neu")
+	public static class ReloadCommand {
+		@ApplicationCommandMethod
+		public void performCommand(SlashCommandInteractionEvent event) throws Exception {
+			Main.config = Config.readFromFile("config");
+
+			Main.jdaInstance.getGuilds().forEach(g -> {
+				GuildConfig.load(g);
+				StaffMessage.updateMessage(g);
+			});
+
+			event.reply("Konfigurationen neu geladen").setEphemeral(true).queue();
+		}
 	}
 
 	@WhenFinished
