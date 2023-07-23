@@ -2,7 +2,9 @@ package com.slimebot.commands.config;
 
 import com.slimebot.main.CommandPermission;
 import com.slimebot.main.config.guild.GuildConfig;
+import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
+import de.mineking.discord.commands.annotated.WhenFinished;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.util.function.Consumer;
@@ -25,5 +27,10 @@ public class ConfigCommand {
 		GuildConfig config = GuildConfig.getConfig(guild);
 		handler.accept(config);
 		config.save();
+	}
+
+	@WhenFinished
+	public void setup(CommandManager<?> cmdMan) {
+
 	}
 }
