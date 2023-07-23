@@ -146,7 +146,8 @@ public class Report implements ListEntry {
 
 	@Override
 	public String build(int index, ListContext<?> context) {
-		return (index + 1) + ". [" + status.emoji + "] " + TimeFormat.DEFAULT.format(time.toInstant()) + ": " + target.getAsMention() + " gemeldet von " + issuer.getAsMention();
+		//Escaping the dot prevents discord from making this a numbered list. The problem with these is, that the numbering is corrected automatically which might cause the displayed ids to be wrong.
+		return id + "\\. [" + status.emoji + "] " + TimeFormat.DEFAULT.format(time.toInstant()) + ": " + target.getAsMention() + " gemeldet von " + issuer.getAsMention();
 	}
 
 	public static class ReportRowMapper implements RowMapper<Report> {
