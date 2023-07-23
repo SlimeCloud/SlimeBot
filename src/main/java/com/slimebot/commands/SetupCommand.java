@@ -90,7 +90,7 @@ public class SetupCommand {
 				);
 
 		entitySelect(event, menu, "logChannel", EntitySelectMenu.SelectTarget.CHANNEL,
-				"\uD83D\uDCDD Wähle einen Log-Kanal",
+				"Wähle einen Log-Kanal",
 				"In diesem Kanal werden Informationen bezüglich des Bots gesendet",
 				(config, value) -> config.logChannel = value.getIdLong(),
 				GuildConfig::getLogChannel,
@@ -98,7 +98,7 @@ public class SetupCommand {
 		);
 
 		entitySelect(event, menu, "greetingsChannel", EntitySelectMenu.SelectTarget.CHANNEL,
-				"\uD83D\uDCDD Wähle einen Gruß-Kanal",
+				"Wähle einen Gruß-Kanal",
 				"In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet",
 				(config, value) -> config.greetingsChannel = value.getIdLong(),
 				GuildConfig::getGreetingsChannel,
@@ -106,7 +106,7 @@ public class SetupCommand {
 		);
 
 		entitySelect(event, menu, "punishmentChannel", EntitySelectMenu.SelectTarget.CHANNEL,
-				"\uD83D\uDCDD Wähle einen Straf-Kanal",
+				"Wähle einen Straf-Kanal",
 				"In diesem Kanal werden Informationen über Bestrafungen gesendet",
 				(config, value) -> config.punishmentChannel = value.getIdLong(),
 				GuildConfig::getPunishmentChannel,
@@ -114,7 +114,7 @@ public class SetupCommand {
 		);
 
 		entitySelect(event, menu, "staffRole", EntitySelectMenu.SelectTarget.ROLE,
-				"\uD83E\uDDFB Wähle eine Team-Rolle",
+				"Wähle eine Team-Rolle",
 				"Mitglieder mit dieser Rolle haben Zugriff auf beschränkte Befehle",
 				(config, value) -> config.staffRole = value.getIdLong(),
 				GuildConfig::getStaffRole,
@@ -122,7 +122,7 @@ public class SetupCommand {
 		);
 
 		entitySelect(event, menu, "contributorRole", EntitySelectMenu.SelectTarget.ROLE,
-				"\uD83E\uDDFB Wähle eine Contributor-Rolle",
+				"Wähle eine Contributor-Rolle",
 				"Diese Rolle kann von Mitgliedern beantragt werden, wenn sie bei diesem Bot auf GitHub mitgearbeitet haben",
 				(config, value) -> config.contributorRole = value.getIdLong(),
 				GuildConfig::getContributorRole,
@@ -139,7 +139,7 @@ public class SetupCommand {
 		menu.addMessageFrame(id, () ->
 						new EmbedBuilder()
 								.setColor(GuildConfig.getColor(event.getGuild()))
-								.setTitle(title)
+								.setTitle((target == EntitySelectMenu.SelectTarget.CHANNEL ? "\uD83D\uDCDD" : "\uD83E\uDDFB") + " " +  title)
 								.setDescription(description)
 								.addField("Aktueller Wert", supplier.apply(GuildConfig.getConfig(event.getGuild())).map(IMentionable::getAsMention).orElse("*Keiner*"), false)
 								.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
