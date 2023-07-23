@@ -21,6 +21,7 @@ import de.mineking.discord.ui.components.select.StringSelectComponent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
@@ -144,9 +145,17 @@ public class SetupCommand {
 							else {
 								select.addOptions(
 										staff.roles.entrySet().stream()
-												.map(e -> SelectOption.of(Main.jdaInstance.getRoleById(e.getKey()).getName(), e.getKey())
-														.withDescription(e.getValue())
-												)
+												.map(e -> {
+													try {
+														return SelectOption.of(Main.jdaInstance.getRoleById(e.getKey()).getName(), e.getKey())
+																.withDescription(e.getValue())
+																.withEmoji(Emoji.fromFormatted("\uD83E\uDDFB"));
+													} catch(NumberFormatException ex) {
+														return SelectOption.of(e.getKey(), e.getKey())
+																.withDescription(e.getValue())
+																.withEmoji(Emoji.fromFormatted("\uD83D\uDCDD"));
+													}
+												})
 												.toList()
 								);
 							}
