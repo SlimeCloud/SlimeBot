@@ -11,6 +11,7 @@ import de.mineking.discord.ui.Menu;
 import de.mineking.discord.ui.components.ComponentRow;
 import de.mineking.discord.ui.components.button.ButtonColor;
 import de.mineking.discord.ui.components.button.ButtonComponent;
+import de.mineking.discord.ui.components.button.FrameButton;
 import de.mineking.discord.ui.components.select.EntitySelectComponent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.IMentionable;
@@ -38,7 +39,28 @@ public class SetupCommand {
 
 	public static void showSetupMenu(IReplyCallback event) {
 		Menu menu = Main.discordUtils.getUIManager().createMenu()
-				.addMessageFrame("color", () ->
+				.addMessageFrame("main", () ->
+								new EmbedBuilder()
+										.setColor(GuildConfig.getColor(event.getGuild()))
+										.setTitle("\uD83D\uDD27 Einstellungs-Menü")
+										.setDescription("Wähle aus, welchen Bereich zu konfigurieren möchtest oder schließe das Menü")
+										.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
+										.build(),
+						frame -> frame.addComponents(
+								ComponentRow.of(
+										new FrameButton(ButtonColor.GRAY, "Haupteinstellungen", "color")
+								),
+								new ButtonComponent("finish", ButtonColor.RED, "Schließen").handle((m, evt) -> m.close())
+						)
+				);
+
+		mainConfig(event, menu);
+
+		menu.start(new CallbackState(event), "main");
+	}
+
+	public static void mainConfig(IReplyCallback event, Menu menu) {
+		menu.addMessageFrame("color", () ->
 								new EmbedBuilder()
 										.setColor(GuildConfig.getColor(event.getGuild()))
 										.setTitle("\uD83C\uDFA8 Farbe")
@@ -47,9 +69,10 @@ public class SetupCommand {
 										.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
 										.build(),
 						frame -> frame.addComponents(
+								new ButtonComponent("color", ButtonColor.BLUE, "Farbe wählen").handle((m, evt) -> m.display("colorModal")),
 								ComponentRow.of(
-										new ButtonComponent("color", ButtonColor.BLUE, "Farbe wählen").handle((m, evt) -> m.display("colorModal")),
-										new ButtonComponent("skip", ButtonColor.GRAY, "Überspringen").handle((m, evt) -> m.display("logChannel"))
+										new FrameButton(ButtonColor.GRAY, "Zurück", "main"),
+										new FrameButton(ButtonColor.GRAY, "Überspringen", "logChannel")
 								)
 						)
 				)
@@ -76,17 +99,6 @@ public class SetupCommand {
 								evt.getHook().sendMessage("Ungültige Farbe!").setEphemeral(true).queue();
 							}
 						}
-				)
-				.addMessageFrame("finish", () ->
-						new EmbedBuilder()
-								.setColor(GuildConfig.getColor(event.getGuild()))
-								.setTitle("☑️ Fertigstellen")
-								.setDescription("Einrichtung abgeschlossen, du kannst das Menü jetzt schließen")
-								.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
-								.build(),
-						frame -> frame.addComponents(
-								new ButtonComponent("finish", ButtonColor.GREEN, "Schließen").handle((m, evt) -> m.close())
-						)
 				);
 
 		entitySelect(event, menu, "logChannel", EntitySelectMenu.SelectTarget.CHANNEL,
@@ -129,7 +141,6 @@ public class SetupCommand {
 				"staffRole", "finish"
 		);
 
-		menu.start(new CallbackState(event), "color");
 	}
 
 	private static void entitySelect(IReplyCallback event, Menu menu, String id, EntitySelectMenu.SelectTarget target, String title, String description,
@@ -139,7 +150,7 @@ public class SetupCommand {
 		menu.addMessageFrame(id, () ->
 						new EmbedBuilder()
 								.setColor(GuildConfig.getColor(event.getGuild()))
-								.setTitle((target == EntitySelectMenu.SelectTarget.CHANNEL ? "\uD83D\uDCDD" : "\uD83E\uDDFB") + " " +  title)
+								.setTitle((target == EntitySelectMenu.SelectTarget.CHANNEL ? "\uD83D\uDCDD" : "\uD83E\uDDFB") + " " + title)
 								.setDescription(description)
 								.addField("Aktueller Wert", supplier.apply(GuildConfig.getConfig(event.getGuild())).map(IMentionable::getAsMention).orElse("*Keiner*"), false)
 								.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
@@ -153,8 +164,9 @@ public class SetupCommand {
 							m.display(next);
 						}),
 						ComponentRow.of(
-								new ButtonComponent("back", ButtonColor.GRAY, "Zurück").handle((m, evt) -> m.display(previous)),
-								new ButtonComponent("skip", ButtonColor.GRAY, "Überspringen").handle((m, evt) -> m.display(next))
+								new FrameButton(ButtonColor.GRAY, "Zurück", previous),
+								new FrameButton(ButtonColor.GRAY, "Hauptmenü", "main"),
+								new FrameButton(ButtonColor.GRAY, "Überspringen", next)
 						)
 				)
 		);
