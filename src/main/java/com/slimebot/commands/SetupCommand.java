@@ -80,7 +80,7 @@ public class SetupCommand {
 				"spotify_music", "spotify_role"
 		);
 
-		entitySelect(event, menu, "spotify_role", EntitySelectMenu.SelectTarget.CHANNEL,
+		entitySelect(event, menu, "spotify_role", EntitySelectMenu.SelectTarget.ROLE,
 				"Wähle eine Benachrichtigungs-Rolle",
 				"Diese Rolle wird bei Spotify Nachrichten erwähnt",
 				(config, value) -> config.getOrCreateSpotify().notificationRole = value,
