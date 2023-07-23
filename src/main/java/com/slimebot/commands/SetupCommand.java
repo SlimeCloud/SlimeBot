@@ -156,7 +156,7 @@ public class SetupCommand {
 																.withEmoji(Emoji.fromFormatted(roleEmoji));
 													} catch(NumberFormatException ex) {
 														return SelectOption.of(e.getKey(), e.getKey())
-																.withDescription(e.getValue())
+																.withDescription(e.getValue().substring(0, Math.min(100, e.getValue().length())))
 																.withEmoji(Emoji.fromFormatted(commentEmoji));
 													}
 												})
