@@ -112,6 +112,13 @@ public class GuildConfig {
 		return Optional.ofNullable(fdmds);
 	}
 
+	public FdmdsConfig getOrCreateFdmds() {
+		return getFdmds().orElseGet(() -> {
+			fdmds = new FdmdsConfig();
+			return fdmds;
+		});
+	}
+
 	public Optional<SpotifyNotificationConfig> getSpotify() {
 		return Optional.ofNullable(spotify);
 	}

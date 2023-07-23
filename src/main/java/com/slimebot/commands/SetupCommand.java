@@ -3,6 +3,7 @@ package com.slimebot.commands;
 import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.main.CommandPermission;
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.FdmdsConfig;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.main.config.guild.SpotifyNotificationConfig;
 import com.slimebot.main.config.guild.StaffConfig;
@@ -57,7 +58,8 @@ public class SetupCommand {
 								ComponentRow.of(
 										new FrameButton(ButtonColor.GRAY, "Haupteinstellungen", "color"),
 										new FrameButton(ButtonColor.GRAY, "Spotify Benachrichtigungen", "spotifyMusic"),
-										new FrameButton(ButtonColor.GRAY, "Team-Nachricht", "staffChannel")
+										new FrameButton(ButtonColor.GRAY, "Team-Nachricht", "staffChannel"),
+										new FrameButton(ButtonColor.GRAY, "Frag doch mal den Schleim", "fdmdsLogChannel")
 								),
 								new ButtonComponent("finish", ButtonColor.RED, "Schließen").handle((m, evt) -> m.close())
 						)
@@ -66,8 +68,35 @@ public class SetupCommand {
 		mainConfig(event, menu);
 		spotifyConfig(event, menu);
 		staffConfig(event, menu);
+		fdmdsConfig(event, menu);
 
 		menu.start(new CallbackState(event), "main");
+	}
+
+	public static void fdmdsConfig(IReplyCallback event, Menu menu) {
+		entitySelect(event, menu, "fdmdsLogChannel", EntitySelectMenu.SelectTarget.CHANNEL,
+				"Wähle einen Log-Kanal",
+				"In diesen Kanal werden alle Fdmds Einreichungen gesendet, um vom Team Bestätigt oder bearbeitet zu werden",
+				(config, value) -> config.getOrCreateFdmds().logChannel = value,
+				config -> config.getFdmds().flatMap(FdmdsConfig::getLogChannel),
+				"main", "fdmdsChannel"
+		);
+
+		entitySelect(event, menu, "fdmdsChannel", EntitySelectMenu.SelectTarget.CHANNEL,
+				"Wähle einen Fdmds-Kanal",
+				"In diesen Kanal werden bestätigte Fragen geschickt",
+				(config, value) -> config.getOrCreateFdmds().channel = value,
+				config -> config.getFdmds().flatMap(FdmdsConfig::getChannel),
+				"fdmdsLogChannel", "fdmdsRole"
+		);
+
+		entitySelect(event, menu, "fdmdsRole", EntitySelectMenu.SelectTarget.ROLE,
+				"Wähle eine Benachrichtigungs-Rolle",
+				"Diese Rolle wird bei bei neuen Fdmds Fragen erwähnt",
+				(config, value) -> config.getOrCreateFdmds().role = value,
+				config -> config.getFdmds().flatMap(FdmdsConfig::getRole),
+				"fdmdsChannel", "main"
+		);
 	}
 
 	public static void staffConfig(IReplyCallback event, Menu menu) {
