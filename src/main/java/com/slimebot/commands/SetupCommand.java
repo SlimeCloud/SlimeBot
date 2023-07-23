@@ -5,6 +5,8 @@ import com.slimebot.main.CommandPermission;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.main.config.guild.SpotifyNotificationConfig;
+import com.slimebot.main.config.guild.StaffConfig;
+import com.slimebot.message.StaffMessage;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.ui.CallbackState;
@@ -14,12 +16,14 @@ import de.mineking.discord.ui.components.button.ButtonColor;
 import de.mineking.discord.ui.components.button.ButtonComponent;
 import de.mineking.discord.ui.components.button.FrameButton;
 import de.mineking.discord.ui.components.select.EntitySelectComponent;
+import de.mineking.discord.ui.components.select.StringSelectComponent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 
@@ -27,6 +31,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -51,7 +56,8 @@ public class SetupCommand {
 						frame -> frame.addComponents(
 								ComponentRow.of(
 										new FrameButton(ButtonColor.GRAY, "Haupteinstellungen", "color"),
-										new FrameButton(ButtonColor.GRAY, "Spotify Benachrichtigungen", "spotify_music")
+										new FrameButton(ButtonColor.GRAY, "Spotify Benachrichtigungen", "spotifyMusic"),
+										new FrameButton(ButtonColor.GRAY, "Team-Nachricht", "staffChannel")
 								),
 								new ButtonComponent("finish", ButtonColor.RED, "Schließen").handle((m, evt) -> m.close())
 						)
@@ -59,33 +65,120 @@ public class SetupCommand {
 
 		mainConfig(event, menu);
 		spotifyConfig(event, menu);
+		staffConfig(event, menu);
 
 		menu.start(new CallbackState(event), "main");
 	}
 
+	public static void staffConfig(IReplyCallback event, Menu menu) {
+		entitySelect(event, menu, "staffChannel", EntitySelectMenu.SelectTarget.CHANNEL,
+				"Wähle einen Kanal für die Team-Nachricht",
+				"In diesem Kanal wird eine Nachricht gesendet, die alle Team-Rollen mit deren Mitgliedern anzeigt",
+				(config, value) -> {
+					config.getStaffConfig().ifPresent(staff ->
+							staff.getChannel().ifPresent(channel -> {
+								if(staff.message != null) {
+									channel.deleteMessageById(staff.message).queue();
+								}
+							})
+					);
+
+					StaffConfig staff = config.getOrCreateStaff();
+					staff.channel = value;
+					staff.message = null;
+
+					StaffMessage.updateMessage(event.getGuild());
+				},
+				config -> config.getStaffConfig().flatMap(StaffConfig::getChannel),
+				"main", "staffRoles"
+		);
+
+		AtomicReference<Long> role = new AtomicReference<>();
+
+		menu.addMessageFrame("staffRoles", () ->
+				new EmbedBuilder()
+						.setColor(GuildConfig.getColor(event.getGuild()))
+						.setTitle("\uD83E\uDDFB Rollen festlegen")
+						.setDescription("Füge mit dem Menü unter der Nachricht Team-Rollen hinzu. Um Die Reihenfolge zu ändern oder Text-Zeilen ein zu fügen, muss der Bot-Administrator manuell die Konfigurationsdatei bearbeiten.")
+						.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
+						.build(),
+				frame -> frame.addComponents(
+						new StringSelectComponent("remove", select -> {
+							select.setPlaceholder("Rolle entfernen");
+
+							StaffConfig staff = GuildConfig.getConfig(event.getGuild()).getOrCreateStaff();
+
+							if(staff.roles.isEmpty()) {
+								select.addOption("---", "---"); //SelectMenus cannot be empty
+							}
+
+							else {
+								select.addOptions(
+										staff.roles.entrySet().stream()
+												.map(e -> SelectOption.of(Main.jdaInstance.getRoleById(e.getKey()).getName(), e.getKey())
+														.withDescription(e.getValue())
+												)
+												.toList()
+								);
+							}
+						}).handle((m, evt) -> {
+							ConfigCommand.updateField(evt.getGuild(), config -> config.getOrCreateStaff().roles.remove(evt.getSelectedOptions().get(0).getValue()));
+							StaffMessage.updateMessage(evt.getGuild());
+
+							m.update();
+						}).asDisabled(() -> GuildConfig.getConfig(event.getGuild()).getStaffConfig().map(staff -> staff.roles.isEmpty()).orElse(true)),
+						new EntitySelectComponent("add",
+								select -> select.setPlaceholder("Rolle hinzufügen"),
+								EntitySelectMenu.SelectTarget.ROLE
+						).handle((m, evt) -> {
+							role.set(evt.getValues().get(0).getIdLong());
+							m.display("staffRoleDescription");
+						}),
+						ComponentRow.of(
+								new FrameButton(ButtonColor.GRAY, "Zurück", "staffChannel"),
+								new FrameButton(ButtonColor.GRAY, "Hauptmenü", "main")
+						)
+				)
+		);
+
+		menu.addModalFrame("staffRoleDescription", "Beschreibung der Rolle",
+				modal -> modal
+						.addActionRow(
+								TextInput.create("description", "Beschreibung", TextInputStyle.SHORT)
+										.build()
+						),
+				(m, evt) -> {
+					ConfigCommand.updateField(evt.getGuild(), config -> config.getOrCreateStaff().roles.put(role.get().toString(), evt.getValue("description").getAsString()));
+					StaffMessage.updateMessage(evt.getGuild());
+
+					m.display("staffRoles");
+				}
+		);
+	}
+
 	public static void spotifyConfig(IReplyCallback event, Menu menu) {
-		entitySelect(event, menu, "spotify_music", EntitySelectMenu.SelectTarget.CHANNEL,
+		entitySelect(event, menu, "spotifyMusic", EntitySelectMenu.SelectTarget.CHANNEL,
 				"Wähle einen Musik-Kanal",
 				"In diesem Kanal werden Benachrichtigungen über neue Musik-Releases gesendet",
 				(config, value) -> config.getOrCreateSpotify().musicChannel = value,
 				config -> config.getSpotify().flatMap(SpotifyNotificationConfig::getMusicChannel),
-				"main", "spotify_podcast"
+				"main", "spotifyPodcast"
 		);
 
-		entitySelect(event, menu, "spotify_podcast", EntitySelectMenu.SelectTarget.CHANNEL,
+		entitySelect(event, menu, "spotifyPodcast", EntitySelectMenu.SelectTarget.CHANNEL,
 				"Wähle einen Podcast-Kanal",
 				"In diesem Kanal werden Benachrichtigungen über neue Podcast Episoden gesendet",
 				(config, value) -> config.getOrCreateSpotify().podcastChannel = value,
 				config -> config.getSpotify().flatMap(SpotifyNotificationConfig::getPodcastChannel),
-				"spotify_music", "spotify_role"
+				"spotifyMusic", "spotifyRole"
 		);
 
-		entitySelect(event, menu, "spotify_role", EntitySelectMenu.SelectTarget.ROLE,
+		entitySelect(event, menu, "spotifyRole", EntitySelectMenu.SelectTarget.ROLE,
 				"Wähle eine Benachrichtigungs-Rolle",
 				"Diese Rolle wird bei Spotify Nachrichten erwähnt",
 				(config, value) -> config.getOrCreateSpotify().notificationRole = value,
 				config -> config.getSpotify().flatMap(SpotifyNotificationConfig::getRole),
-				"spotify_podcast", "main"
+				"spotifyPodcast", "main"
 		);
 	}
 
