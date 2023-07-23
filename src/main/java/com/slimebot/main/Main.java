@@ -95,7 +95,9 @@ public class Main {
 				.useCustomRestactionManager(null)
 				.useEventManager(null)
 				.useListCommands(null)
-				.useUIManager(null)
+				.useUIManager(config -> config.setDefaultHandler(
+						event -> event.reply("Diese Interaktion ist abgelaufen! Führe den Befehl erneut aus um ein neues Menü zu erhalten!").setEphemeral(true).queue()
+				))
 				.useCommandManager(
 						new ContextCreator<>(ContextBase.class, CommandContext::new),
 						config -> {
