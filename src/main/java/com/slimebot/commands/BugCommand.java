@@ -7,6 +7,7 @@ import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.events.Listener;
 import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -25,39 +26,41 @@ import java.util.concurrent.TimeUnit;
 
 @ApplicationCommand(name = "bug", description = "Melde einen Bug", guildOnly = true)
 public class BugCommand {
-	public final static Modal modal = Modal.create("bug", "Melde einen Bug")
-			.addActionRow(TextInput.create("title", "Titel", TextInputStyle.SHORT)
-					.setMinLength(5)
-					.setPlaceholder("Eine kurze präzise Beschreibung des Bugs")
-					.build()
-			)
-			.addActionRow(TextInput.create("reproduction", "Schritte zum Reproduzieren", TextInputStyle.PARAGRAPH)
-					.setMinLength(10)
-					.setPlaceholder("""
+	public static Modal createModal(Message target) {
+		return Modal.create("bug" + (target == null ? "" : ":" + target.getJumpUrl()), "Melde einen Bug")
+				.addActionRow(TextInput.create("title", "Titel", TextInputStyle.SHORT)
+						.setMinLength(5)
+						.setPlaceholder("Eine kurze präzise Beschreibung des Bugs")
+						.build()
+				)
+				.addActionRow(TextInput.create("reproduction", "Schritte zum Reproduzieren", TextInputStyle.PARAGRAPH)
+						.setMinLength(10)
+						.setPlaceholder("""
 							1. Gehe zu '....'
 							2. Klicke auf '....'
 							3. Scrolle nach unten zu '....'"""
-					)
-					.build()
-			)
-			.addActionRow(TextInput.create("description", "Beschreibung", TextInputStyle.PARAGRAPH)
-					.setMinLength(10)
-					.setPlaceholder("Eine ausführliche Beschreibung des Bugs")
-					.build()
-			)
-			.addActionRow(TextInput.create("expected", "Erwartetes Verhalten", TextInputStyle.PARAGRAPH)
-					.setMinLength(10)
-					.setPlaceholder("Ich erwarte, dass '....' passiert")
-					.build()
-			)
-			.addActionRow(TextInput.create("solution", "Lösung", TextInputStyle.PARAGRAPH)
-					.setPlaceholder("Ich würde '....' ändern, damit '....' passiert")
-					.setRequired(false)
-					.build()
-			)
-			.build();
+						)
+						.build()
+				)
+				.addActionRow(TextInput.create("description", "Beschreibung", TextInputStyle.PARAGRAPH)
+						.setMinLength(10)
+						.setPlaceholder("Eine ausführliche Beschreibung des Bugs")
+						.build()
+				)
+				.addActionRow(TextInput.create("expected", "Erwartetes Verhalten", TextInputStyle.PARAGRAPH)
+						.setMinLength(10)
+						.setPlaceholder("Ich erwarte, dass '....' passiert")
+						.build()
+				)
+				.addActionRow(TextInput.create("solution", "Lösung", TextInputStyle.PARAGRAPH)
+						.setPlaceholder("Ich würde '....' ändern, damit '....' passiert")
+						.setRequired(false)
+						.build()
+				)
+				.build();
+	}
 
-	private final Map<Long, Long> timeout = new HashMap<>();
+	public static final Map<Long, Long> timeout = new HashMap<>();
 
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event) {
@@ -68,18 +71,24 @@ public class BugCommand {
 			}
 		}
 
-		event.replyModal(modal).queue();
+		event.replyModal(createModal(null)).queue();
 	}
 
-	@Listener(type = ModalHandler.class, filter = "bug")
+	@Listener(type = ModalHandler.class, filter = "bug(:.*)?")
 	public void handleModal(ModalInteractionEvent event) throws IOException {
 		timeout.put(event.getUser().getIdLong(), System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5));
+
+		var id = event.getModalId().split(":", 2);
+
+		String context = id.length == 1 ? "N/A" : id[1];
+		String solution = event.getValue("solution").getAsString();
 
 		String text = IOUtils.resourceToString("/github_issue_template", StandardCharsets.UTF_8)
 				.replace("%description%", event.getValue("description").getAsString())
 				.replace("%reproduction%", event.getValue("reproduction").getAsString())
 				.replace("%expected%", event.getValue("expected").getAsString())
-				.replace("%solution%", event.getValue("solution").getAsString());
+				.replace("%solution%", solution.isEmpty() ? "N/A" : solution)
+				.replace("%context%", context);
 
 		GHIssue issue = Main.github.getRepository(Main.config.github.repository)
 				.createIssue(event.getValue("title").getAsString())

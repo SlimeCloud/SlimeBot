@@ -110,6 +110,7 @@ public class Main {
 											.build();
 
 									config.registerCommand(BugCommand.class);
+									config.registerCommand(BugContextCommand.class);
 								} catch(IOException e) {
 									logger.error("Initialisieren der GitHub API fehlgeschlagen", e);
 								}
