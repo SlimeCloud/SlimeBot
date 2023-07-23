@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +45,7 @@ public class GuildConfig {
 				file.createNewFile();
 			}
 
-			try(Reader reader = new FileReader(file)) {
+			try(Reader reader = new FileReader(file, StandardCharsets.UTF_8)) {
 				GuildConfig config = Main.gson.fromJson(reader, GuildConfig.class);
 
 				if(config == null) {
@@ -97,7 +98,7 @@ public class GuildConfig {
 	 * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField(Guild, Consumer)}
 	 */
 	public synchronized void save() {
-		try(Writer writer = new FileWriter("guild/" + guild + ".json")) {
+		try(Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
 			Main.gson.toJson(this, writer);
 		} catch(Exception e) {
 			logger.error("Failed to save config for guild " + guild, e);
