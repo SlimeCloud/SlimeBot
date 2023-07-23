@@ -1,6 +1,8 @@
 package com.slimebot.main.config.guild;
 
+import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.main.Main;
+import com.slimebot.main.config.Config;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -12,12 +14,27 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
+/**
+ * Diese Klasse wird verwendet, um die Konfiguration eines Servers zu verwalten.
+ * Alle Variablen in dieser Klasse haben Getter-Methoden, die ein {@link Optional} zurückgeben. Dadurch wird der handhaben von nicht gesetzten Konfigurationsfeldern vereinfacht.
+ * Wenn du hier eigene Felder hinzufügst, solltest du ebenfalls einen entsprechenden Getter hinzufügen.
+ * Falls das Feld ein Kanal- oder Rollenid ist, kannst du für deinen Getter {@link #getChannel(Long)} oder {@link #getRole(Long)} verwenden. Siehe dir dazu an, wie dies bei bereits bestehenden Feldern gemacht wurde.
+ * <p>
+ * Alle Konfigurationsfelder sollten mit den {@link ConfigCommand} (zurück-) setzbar sein. Wenn du also ein Konfigurationsfeld hinzufügst, solltest du auch einen dazugehörigen Unterbefehl erstellen.
+ */
 public class GuildConfig {
 	public static final Logger logger = LoggerFactory.getLogger(GuildConfig.class);
 
 	private static final Map<Long, GuildConfig> guildConfig = new HashMap<>();
 
+	/**
+	 * VERWENDE NICHT DIESE METHODE!
+	 * Die Konfiguration für Server wird automatisch geladen.
+	 * Um auf sie zuzugreifen, verwende die {@link #getConfig(Guild)}-Methode.
+	 * @see #getConfig(Guild) 
+	 */
 	public static void load(Guild guild) {
 		try {
 			File file = new File("guild/" + guild.getIdLong() + ".json");
@@ -42,23 +59,44 @@ public class GuildConfig {
 		}
 	}
 
+	/**
+	 * @param guild Ein Server
+	 * @return Die Konfiguration dieses Servers
+	 */
 	public static GuildConfig getConfig(Guild guild) {
 		return guildConfig.get(guild.getIdLong());
 	}
 
+	/**
+	 * @param guild Ein Server
+	 * @return Die Farbe, die für diesen Server konfiguriert ist. Falls der Server {@code null} ist oder für ihn keine Farbe konfiguriert ist, wird {@link Config#color} zurückgegeben.
+	 */
 	public static Color getColor(Guild guild) {
 		return Optional.ofNullable(guild).map(GuildConfig::getConfig).flatMap(GuildConfig::getColor).orElse(Color.decode(Main.config.color));
 	}
 
+	/**
+	 * @param guild Die ID eines Servers
+	 * @return Die Konfiguration für diesen Server
+	 */
 	public static GuildConfig getConfig(long guild) {
 		return guildConfig.get(guild);
 	}
 
+	/**
+	 * @param guild Die ID eines Servers
+	 * @return Die Farbe, die für diesen Server konfiguriert ist. Falls für den Server keine Farbe konfiguriert ist, wird {@link Config#color} zurückgegeben.
+	 */
 	public static Color getColor(long guild) {
 		return getConfig(guild).getColor().orElse(Color.decode(Main.config.color));
 	}
 
-	public void save() {
+	/**
+	 * Speichert die Konfiguration in der Datei.
+	 * Diese Methode sollte vermieden werden.
+	 * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField(Guild, Consumer)}
+	 */
+	public synchronized void save() {
 		try(Writer writer = new FileWriter("guild/" + guild + ".json")) {
 			Main.gson.toJson(this, writer);
 		} catch(Exception e) {
@@ -110,6 +148,13 @@ public class GuildConfig {
 
 	public Optional<FdmdsConfig> getFdmds() {
 		return Optional.ofNullable(fdmds);
+	}
+
+	public FdmdsConfig getOrCreateFdmds() {
+		return getFdmds().orElseGet(() -> {
+			fdmds = new FdmdsConfig();
+			return fdmds;
+		});
 	}
 
 	public Optional<SpotifyNotificationConfig> getSpotify() {

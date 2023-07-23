@@ -5,19 +5,15 @@ import com.google.gson.GsonBuilder;
 import com.slimebot.alerts.holidays.HolidayAlert;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
-import com.slimebot.commands.level.*;
 import com.slimebot.commands.config.ConfigCommand;
-import com.slimebot.commands.report.MessageReportCommand;
-import com.slimebot.commands.report.ReportCommand;
-import com.slimebot.commands.report.UserReportCommand;
-import com.slimebot.commands.report.UserReportSlashCommand;
+import com.slimebot.commands.level.*;
+import com.slimebot.commands.report.*;
 import com.slimebot.events.ReadyListener;
 import com.slimebot.events.TimeoutListener;
+import com.slimebot.level.LevelListener;
 import com.slimebot.main.config.Config;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.message.StaffMessage;
-import com.slimebot.level.Level;
-import com.slimebot.level.LevelListener;
 import de.mineking.discord.DiscordUtils;
 import de.mineking.discord.commands.ContextBase;
 import de.mineking.discord.commands.ContextCreator;
@@ -100,9 +96,15 @@ public class Main {
 				.useCustomRestactionManager(null)
 				.useEventManager(null)
 				.useListCommands(null)
+				.useUIManager(config -> config.setDefaultHandler(
+						event -> event.reply("Diese Interaktion ist abgelaufen! Führe den Befehl erneut aus um ein neues Menü zu erhalten!").setEphemeral(true).queue()
+				))
 				.useCommandManager(
 						new ContextCreator<>(ContextBase.class, CommandContext::new),
 						config -> {
+							/*
+							Hier kannst du deine Befehle registrieren.
+							 */
 							config.registerCommand(ConfigCommand.class);
 
 							config.registerCommand(BugCommand.class);
@@ -113,18 +115,19 @@ public class Main {
 							config.registerCommand(BonkCommand.class);
 							config.registerCommand(ContributorCommand.class);
 
-							if (dbAvailable) {
+							config.registerCommand(SetupCommand.class);
+
+							if (dbAvailable){
 								config.registerCommand(RankCommand.class);
 								config.registerCommand(LeaderboardCommand.class);
 							} else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
 
-							if(dbAvailable) {
+							if(dbAvailable){
 								config.registerCommand(UserReportCommand.class);
 								config.registerCommand(MessageReportCommand.class);
 								config.registerCommand(UserReportSlashCommand.class);
 								config.registerCommand(ReportCommand.class);
 							} else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
-
 						}
 				)
 				.useCommandCache(null);
@@ -145,6 +148,10 @@ public class Main {
 		holiday = new HolidayAlert();
 	}
 
+	/**
+	 * Updatet die Befehle eines Servers. Diese Methode sollte immer aufgerufen werden, wenn Konfiguration verändert wird, die Befehle aktivieren oder deaktivieren kann.
+	 * @param guild Der server, dessen Befehle geupdatet werden sollen.
+	 */
 	public static void updateGuildCommands(Guild guild) {
 		discordUtils.getCommandCache().updateGuildCommands(guild,
 				Map.of("fdmds", GuildConfig.getConfig(guild).getFdmds().isPresent()),
@@ -152,6 +159,11 @@ public class Main {
 		);
 	}
 
+	/**
+	 * Registriert eine Aufgabe, die täglich ausgeführt wird.
+	 * @param hour Die Stunde, zu der die Aufgabe ausgeführt wird.
+	 * @param task Die Aufgabe
+	 */
 	public static void scheduleDaily(int hour, Runnable task) {
 		ZonedDateTime now = ZonedDateTime.now();
 		ZonedDateTime nextRun = now.withHour(hour).withMinute(0).withSecond(0);
@@ -163,6 +175,12 @@ public class Main {
 		executor.scheduleAtFixedRate(task, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
 	}
 
+	/**
+	 * Registriert eine Aufgabe, die im angegebenen Intervall ausgeführt wird.
+	 * @param amount Das Intervall
+	 * @param unit Die Einheit, in der das Intervall angegeben wurde.
+	 * @param task Die Aufgabe
+	 */
 	public static void scheduleAtFixedRate(int amount, TimeUnit unit, Runnable task) {
 		executor.scheduleAtFixedRate(task, 0, amount, unit);
 	}

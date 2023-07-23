@@ -1,6 +1,8 @@
 package com.slimebot.commands.config;
 
 import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
+import com.slimebot.main.config.guild.StaffConfig;
 import com.slimebot.message.StaffMessage;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
@@ -34,7 +36,20 @@ public class StaffConfigCommand {
 					return;
 				}
 
-				ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateStaff().channel = channel.getIdLong());
+				GuildConfig.getConfig(event.getGuild()).getStaffConfig().ifPresent(staff ->
+						staff.getChannel().ifPresent(ch -> {
+							if(staff.message != null) {
+								ch.deleteMessageById(staff.message).queue();
+							}
+						})
+				);
+
+				ConfigCommand.updateField(event.getGuild(), config -> {
+					StaffConfig staff = config.getOrCreateStaff();
+
+					staff.channel = channel.getIdLong();
+					staff.message = null;
+				});
 
 				StaffMessage.updateMessage(event.getGuild());
 
