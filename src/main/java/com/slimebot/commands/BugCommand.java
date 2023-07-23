@@ -11,10 +11,12 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.utils.TimeFormat;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.github.GHIssue;
 
@@ -62,14 +64,20 @@ public class BugCommand {
 
 	public static final Map<Long, Long> timeout = new HashMap<>();
 
-	@ApplicationCommandMethod
-	public void performCommand(SlashCommandInteractionEvent event) {
+	public static boolean checkTimeout(IReplyCallback event) {
 		if(timeout.containsKey(event.getUser().getIdLong())) {
 			if(timeout.get(event.getUser().getIdLong()) > System.currentTimeMillis()) {
-				event.reply("Du kannst nur alle 5 Minuten einen Bug Melden!").setEphemeral(true).queue();
-				return;
+				event.reply("Du kannst nur alle 5 Minuten einen Bug Melden!\nWieder freigegeben: " + TimeFormat.RELATIVE.format(timeout.get(event.getUser().getIdLong()))).setEphemeral(true).queue();
+				return false;
 			}
 		}
+
+		return true;
+	}
+
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event) {
+		if(!checkTimeout(event)) return;
 
 		event.replyModal(createModal(null)).queue();
 	}
