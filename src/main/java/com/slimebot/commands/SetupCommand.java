@@ -16,7 +16,6 @@ import de.mineking.discord.ui.components.button.FrameButton;
 import de.mineking.discord.ui.components.select.EntitySelectComponent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.IMentionable;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
@@ -68,7 +67,7 @@ public class SetupCommand {
 		entitySelect(event, menu, "spotify_music", EntitySelectMenu.SelectTarget.CHANNEL,
 				"Wähle einen Musik-Kanal",
 				"In diesem Kanal werden Benachrichtigungen über neue Musik-Releases gesendet",
-				(config, value) -> config.getOrCreateSpotify().musicChannel = value.getIdLong(),
+				(config, value) -> config.getOrCreateSpotify().musicChannel = value,
 				config -> config.getSpotify().flatMap(SpotifyNotificationConfig::getMusicChannel),
 				"main", "spotify_podcast"
 		);
@@ -76,7 +75,7 @@ public class SetupCommand {
 		entitySelect(event, menu, "spotify_podcast", EntitySelectMenu.SelectTarget.CHANNEL,
 				"Wähle einen Podcast-Kanal",
 				"In diesem Kanal werden Benachrichtigungen über neue Podcast Episoden gesendet",
-				(config, value) -> config.getOrCreateSpotify().podcastChannel = value.getIdLong(),
+				(config, value) -> config.getOrCreateSpotify().podcastChannel = value,
 				config -> config.getSpotify().flatMap(SpotifyNotificationConfig::getPodcastChannel),
 				"spotify_music", "spotify_role"
 		);
@@ -84,7 +83,7 @@ public class SetupCommand {
 		entitySelect(event, menu, "spotify_role", EntitySelectMenu.SelectTarget.CHANNEL,
 				"Wähle eine Benachrichtigungs-Rolle",
 				"Diese Rolle wird bei Spotify Nachrichten erwähnt",
-				(config, value) -> config.getOrCreateSpotify().notificationRole = value.getIdLong(),
+				(config, value) -> config.getOrCreateSpotify().notificationRole = value,
 				config -> config.getSpotify().flatMap(SpotifyNotificationConfig::getRole),
 				"spotify_podcast", "main"
 		);
@@ -135,7 +134,7 @@ public class SetupCommand {
 		entitySelect(event, menu, "logChannel", EntitySelectMenu.SelectTarget.CHANNEL,
 				"Wähle einen Log-Kanal",
 				"In diesem Kanal werden Informationen bezüglich des Bots gesendet",
-				(config, value) -> config.logChannel = value.getIdLong(),
+				(config, value) -> config.logChannel = value,
 				GuildConfig::getLogChannel,
 				"color", "greetingsChannel"
 		);
@@ -143,7 +142,7 @@ public class SetupCommand {
 		entitySelect(event, menu, "greetingsChannel", EntitySelectMenu.SelectTarget.CHANNEL,
 				"Wähle einen Gruß-Kanal",
 				"In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet",
-				(config, value) -> config.greetingsChannel = value.getIdLong(),
+				(config, value) -> config.greetingsChannel = value,
 				GuildConfig::getGreetingsChannel,
 				"logChannel", "punishmentChannel"
 		);
@@ -151,7 +150,7 @@ public class SetupCommand {
 		entitySelect(event, menu, "punishmentChannel", EntitySelectMenu.SelectTarget.CHANNEL,
 				"Wähle einen Straf-Kanal",
 				"In diesem Kanal werden Informationen über Bestrafungen gesendet",
-				(config, value) -> config.punishmentChannel = value.getIdLong(),
+				(config, value) -> config.punishmentChannel = value,
 				GuildConfig::getPunishmentChannel,
 				"greetingsChannel", "staffRole"
 		);
@@ -159,7 +158,7 @@ public class SetupCommand {
 		entitySelect(event, menu, "staffRole", EntitySelectMenu.SelectTarget.ROLE,
 				"Wähle eine Team-Rolle",
 				"Mitglieder mit dieser Rolle haben Zugriff auf beschränkte Befehle",
-				(config, value) -> config.staffRole = value.getIdLong(),
+				(config, value) -> config.staffRole = value,
 				GuildConfig::getStaffRole,
 				"punishmentChannel", "contributorRole"
 		);
@@ -167,7 +166,7 @@ public class SetupCommand {
 		entitySelect(event, menu, "contributorRole", EntitySelectMenu.SelectTarget.ROLE,
 				"Wähle eine Contributor-Rolle",
 				"Diese Rolle kann von Mitgliedern beantragt werden, wenn sie bei diesem Bot auf GitHub mitgearbeitet haben",
-				(config, value) -> config.contributorRole = value.getIdLong(),
+				(config, value) -> config.contributorRole = value,
 				GuildConfig::getContributorRole,
 				"staffRole", "main"
 		);
@@ -175,10 +174,15 @@ public class SetupCommand {
 	}
 
 	private static void entitySelect(IReplyCallback event, Menu menu, String id, EntitySelectMenu.SelectTarget target, String title, String description,
-	                                 BiConsumer<GuildConfig, ISnowflake> handler, Function<GuildConfig, Optional<? extends IMentionable>> supplier,
+	                                 BiConsumer<GuildConfig, Long> handler, Function<GuildConfig, Optional<? extends IMentionable>> supplier,
 	                                 String previous, String next
 	) {
 		List<ButtonComponent> buttons = new ArrayList<>();
+
+		buttons.add(new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").handle((m, evt) -> {
+			ConfigCommand.updateField(evt.getGuild(), config -> handler.accept(config, null));
+			m.update();
+		}));
 
 		buttons.add(new FrameButton(ButtonColor.GRAY, "Zurück", previous));
 
@@ -201,7 +205,7 @@ public class SetupCommand {
 								select -> select.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS),
 								target
 						).handle((m, evt) -> {
-							ConfigCommand.updateField(evt.getGuild(), config -> handler.accept(config, evt.getValues().get(0)));
+							ConfigCommand.updateField(evt.getGuild(), config -> handler.accept(config, evt.getValues().get(0).getIdLong()));
 							m.display(next);
 						}),
 						ComponentRow.of(buttons)
