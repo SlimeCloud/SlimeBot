@@ -6,6 +6,7 @@ import com.slimebot.commands.config.StaffConfigCommand;
 import com.slimebot.commands.config.engine.ConfigCategory;
 import com.slimebot.commands.config.engine.ConfigField;
 import com.slimebot.commands.config.engine.ConfigFieldType;
+import com.slimebot.commands.config.engine.FieldVerification;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
 import net.dv8tion.jda.api.entities.Guild;
@@ -113,7 +114,7 @@ public class GuildConfig {
 
 	private transient long guild;
 
-	@ConfigField(type = ConfigFieldType.STRING, command = "color", title = "\uD83C\uDFA8 Farbe", description = "Die Farbe, die für Embeds verwendet wird")
+	@ConfigField(type = ConfigFieldType.STRING, command = "color", title = "\uD83C\uDFA8 Farbe", description = "Die Farbe, die für Embeds verwendet wird", verifier = FieldVerification.COLOR)
 	public String color;
 
 	@ConfigField(type = ConfigFieldType.CHANNEL, command = "log_channel", title = "Log-Kanal", description = "In diesem Kanal werden Informationen bezüglich des Bots gesendet")

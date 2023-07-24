@@ -43,6 +43,15 @@ public class ConfigCommand {
 	 * @param handler Der handler, in dem du die Konfiguration anpassen kannst.
 	 */
 	public static void updateField(Guild guild, Consumer<GuildConfig> handler) {
+		updateField(guild.getIdLong(), handler);
+	}
+
+	/**
+	 * Gibt dir im `handler` Zugriff auf die Konfiguration eines Servers und speichert sie anschließend.
+	 * @param guild Der Server, dessen Konfiguration du verändern möchtest
+	 * @param handler Der handler, in dem du die Konfiguration anpassen kannst.
+	 */
+	public static void updateField(long guild, Consumer<GuildConfig> handler) {
 		GuildConfig config = GuildConfig.getConfig(guild);
 		handler.accept(config);
 		config.save();

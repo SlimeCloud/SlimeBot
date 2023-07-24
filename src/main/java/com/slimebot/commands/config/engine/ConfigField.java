@@ -12,4 +12,5 @@ public @interface ConfigField {
 	String title();
 	String description();
 	ConfigFieldType type();
+	FieldVerification verifier() default FieldVerification.ALL;
 }
