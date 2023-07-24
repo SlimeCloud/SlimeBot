@@ -31,7 +31,7 @@
 
     "github": {
         "repository": "SlimeCloud/java-SlimeBot",
-        "token": "-- your personal access token --"
+        "accessToken": "-- your personal access token --"
     }
 
     "color": "#569d3c"
