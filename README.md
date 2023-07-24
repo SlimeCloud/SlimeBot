@@ -55,10 +55,10 @@ Beginne damit, eines Projekt zu erstellen. Nutze dazu das Menü `File->New->Poje
 Gib dort als URL die URL deines Forks der Repository an. Dadurch wird ein Projekt erstellt, das den Sourcecode sowie die Buildscripts der aktuellen Version des SlimeBallBots enthält.
 In der `Project Structure` des Projekts muss das JDK 17 angeben werden. 
 
-Um den Bot zu starten, musst du zunächst das Token deines Test-Bots in die `.env` Datei als `TEST` token eintragen. 
+Um den Bot zu starten, musst du zunächst das Token deines Test-Bots in die `.env` Datei als `TEST` token eintragen. Ein Preset für die Datei findest du in der `.env_template` Datei.
 Es wird vorausgesetzt, dass du bereits einen Bot Account im [Developer Portal](https://discord.com/developers) erstellt hast, und weißt, wie du das Token kopieren kannst.
 
-Anschließend muss die Datei `config_preset` nach `config` kopiert werden. 
+Anschließend muss die Datei `config_template` nach `config` kopiert werden. 
 In dieser Datei müssen nun die Credentials der Datenbank eingetragen werden, die du zum Testen verwenden möchtest. 
 Es wird vorausgesetzt, dass du bereits eine PostgreSQL Datenbank zur Verfügung und einen Nutzer erstellt hast, den du Nutzen kannst.
 
@@ -99,7 +99,7 @@ Als gute Richtlinie lassen sich die intelliJ Standard-Vorgaben verwenden. Wenn d
 
 ## 🔧 Konfiguration
 Allgemeine Konfiguration für den Bot wird in der `config`-Datei im gleichen Ordner wie der Bot durchgeführt.
-Eine Vorlage für die Konfiguration ist in der `config_preset`-Datei zu finden.<br>
+Eine Vorlage für die Konfiguration ist in der `config_template`-Datei zu finden.<br>
 Zum Lesen der Konfiguration verwenden wir [Gson](https://github.com/google/gson).
 Im code sind die Konfigurationsfelder in der `Config`-Klasse lesbar.
 Eine Instanz dieser Klasse, die verwendet werden sollte befindet sich in `Main.config`.<br>
