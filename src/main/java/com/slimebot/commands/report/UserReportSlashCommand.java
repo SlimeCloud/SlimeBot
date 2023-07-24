@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 public class UserReportSlashCommand {
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event,
-                               @Option(name = "nutzer") User user,
-                               @Option(name = "begründung") String reason
+	                           @Option(name = "nutzer") User user,
+	                           @Option(name = "begründung") String reason
 	) {
 		UserReportCommand.submitUserReport(event, user, reason);
 	}
