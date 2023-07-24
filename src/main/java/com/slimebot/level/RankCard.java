@@ -36,7 +36,7 @@ public class RankCard extends Graphic {
         this.user = Main.jdaInstance.getUserById(level.userId());
         this.level = level.level();
         this.xp = level.xp();
-        constructorEnd();
+        finish();
     }
 
     @Override

@@ -41,19 +41,6 @@ public record Level(long guildId, long userId, int level, int xp) implements Com
         return String.format("%s {guildId: %s, userId: %s, level: %s, xp: %s}", getClass(), guildId(), userId(), level(), xp());
     }
 
-    public static class LevelMapper implements RowMapper<Level> {
-
-        @Override
-        public Level map(ResultSet rs, StatementContext ctx) throws SQLException {
-            return new Level(
-                    rs.getLong("guild"),
-                    rs.getLong("user"),
-                    rs.getInt("level"),
-                    rs.getInt("xp")
-            );
-        }
-    }
-
     public static Level load(long guildId, long userId) {
         return Main.database.handle(handle -> handle.createQuery("select * from levels where guild = :guild and \"user\" = :user")
                 .bind("guild", guildId)
@@ -68,16 +55,11 @@ public record Level(long guildId, long userId, int level, int xp) implements Com
         return (int) (5*Math.pow(level, 2)+(50*level)+100);
     }
 
-    public static void addUser(long guildId, long userId) {
-        if(getLevel(guildId, userId) != null) return;
-        new Level(guildId, userId, 0, 0).save();
-    }
-
     public static Level getLevel(long guildId, long userId) {
         return load(guildId, userId);
     }
 
-    public static void setLevel(Level level) {
+    public static void setLevel(@NotNull Level level) {
         setLevel(level.guildId(), level.userId(), level.level(), level.xp());
     }
 
@@ -106,7 +88,7 @@ public record Level(long guildId, long userId, int level, int xp) implements Com
         );
     }
 
-    public static List<Level> getTop(long guildId, int limit) {
+    public static @NotNull List<Level> getTop(long guildId, int limit) {
         List<Level> data = new ArrayList<>();
         if(limit <= 0) return data;
         data.addAll(getLevels(guildId));
@@ -126,5 +108,19 @@ public record Level(long guildId, long userId, int level, int xp) implements Com
         TextChannel channel = Main.jdaInstance.getTextChannelById(GuildConfig.getConfig(guild.getIdLong()).level.notificationChannel);
         if (channel==null) return;
         channel.sendMessage(Main.config.level.levelUpMessage.replace("%user%", member.getAsMention()).replace("%level%", String.valueOf(newLevel))).queue();
+    }
+
+
+    public static class LevelMapper implements RowMapper<Level> {
+
+        @Override
+        public Level map(ResultSet rs, StatementContext ctx) throws SQLException {
+            return new Level(
+                    rs.getLong("guild"),
+                    rs.getLong("user"),
+                    rs.getInt("level"),
+                    rs.getInt("xp")
+            );
+        }
     }
 }

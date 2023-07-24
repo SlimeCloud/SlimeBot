@@ -2,14 +2,12 @@ package com.slimebot.commands.level;
 
 import com.slimebot.level.Level;
 import com.slimebot.main.Main;
-import com.slimebot.main.config.LevelConfig;
 import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
 import de.mineking.discord.commands.annotated.option.defaultValue.IntegerDefault;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.util.List;
@@ -34,10 +32,9 @@ public class LeaderboardCommand {
 
 
         String url = String.format("https://quickchart.io/chart/render/%s?data1=%s&labels=%s", Main.config.level.leaderboardTemplate, data, labels).replace(" ", "%20");
-        MessageEmbed embed = new EmbedBuilder()
+        event.replyEmbeds(new EmbedBuilder()
                 .setImage(url)
                 .setColor(GuildConfig.getColor(event.getGuild()))
-                .build();
-        event.replyEmbeds(embed).queue();
+                .build()).queue();
     }
 }

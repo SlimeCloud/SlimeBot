@@ -21,7 +21,7 @@ public abstract class Graphic {
         this.graphics2D = image.createGraphics();
     }
 
-    protected void constructorEnd() {
+    protected void finish() {
         try {
             drawGraphic(graphics2D);
         } catch(Exception e) {

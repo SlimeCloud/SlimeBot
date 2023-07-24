@@ -3,7 +3,6 @@ package com.slimebot.level;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.LevelConfig;
 import com.slimebot.util.MathUtil;
-import com.slimebot.util.Pair;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -11,21 +10,21 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class LevelListener extends ListenerAdapter implements Runnable {
 
     private final static LevelConfig config = Main.config.level;
 
-    public LevelListener() {
-        try {
-            Main.jdaInstance.awaitReady();
-        } catch(InterruptedException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void onReady(@NotNull ReadyEvent event) {
         //check all voice channels
         Main.jdaInstance.getGuilds().forEach(guild -> guild.getVoiceChannels().forEach(voice -> voice.getMembers().forEach(member -> testLeveling(voice, guild, member))));
         run();
@@ -33,7 +32,7 @@ public class LevelListener extends ListenerAdapter implements Runnable {
     }
 
     private final static Map<Long, Long> chatTimeoutMap = new HashMap<>();
-    private final static Set<Pair<Long, Long>> voiceUsers = new HashSet<>();
+    private final static Map<Long, Long> voiceUsers = new HashMap<>();
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -63,13 +62,13 @@ public class LevelListener extends ListenerAdapter implements Runnable {
     }
 
     private void testLeveling(VoiceChannel voice, Guild guild, Member member) {
-        if(canLevel(voice, member)) voiceUsers.add(new Pair<>(guild.getIdLong(), member.getIdLong()));
-        else voiceUsers.removeIf(p -> p.first() == guild.getIdLong() && p.second() == member.getIdLong());
+        if(canLevel(voice, member)) voiceUsers.put(member.getIdLong(), guild.getIdLong());
+        else voiceUsers.remove(member.getIdLong());
     }
 
     private void testLeveling(AudioChannelUnion union, Guild guild, Member member) {
-        if(canLevel(union, member)) voiceUsers.add(new Pair<>(guild.getIdLong(), member.getIdLong()));
-        else voiceUsers.removeIf(p -> p.first() == guild.getIdLong() && p.second() == member.getIdLong());
+        if(canLevel(union, member)) voiceUsers.put(member.getIdLong(), guild.getIdLong());
+        else voiceUsers.remove(member.getIdLong());
     }
 
     private boolean canLevel(AudioChannelUnion union, Member member) {
@@ -91,6 +90,6 @@ public class LevelListener extends ListenerAdapter implements Runnable {
 
     @Override
     public void run() {
-        voiceUsers.forEach(u -> Level.addLevel(u.first(), u.second(), 0, MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP)));
+        voiceUsers.forEach((k, v) -> Level.addLevel(v, k, 0, MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP)));
     }
 }
