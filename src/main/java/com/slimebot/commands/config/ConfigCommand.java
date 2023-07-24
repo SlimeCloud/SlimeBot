@@ -1,19 +1,26 @@
 package com.slimebot.commands.config;
 
+import com.slimebot.commands.config.engine.ConfigCategory;
+import com.slimebot.commands.config.engine.ConfigCategoryCommand;
+import com.slimebot.commands.config.engine.InstanceProvider;
+import com.slimebot.main.CommandContext;
 import com.slimebot.main.CommandPermission;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
 import com.slimebot.main.config.guild.GuildConfig;
-import com.slimebot.main.config.guild.engine.ConfigCategory;
 import com.slimebot.message.StaffMessage;
+import de.mineking.discord.commands.CommandImplementation;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.WhenFinished;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +33,8 @@ import java.util.function.Consumer;
  */
 @ApplicationCommand(name = "config", description = "Verwaltet die Bot-Konfiguration für diesen Server", guildOnly = true)
 public class ConfigCommand {
+	public final static Logger logger = LoggerFactory.getLogger(ConfigCommand.class);
+
 	public CommandPermission permission = CommandPermission.TEAM;
 
 	/**
@@ -55,14 +64,27 @@ public class ConfigCommand {
 	}
 
 	@WhenFinished
-	public void setup(CommandManager<?> cmdMan) {
+	public void setup(CommandManager<CommandContext> cmdMan) {
 		List<Field> mainFields = new ArrayList<>();
 
 		for(Field field : GuildConfig.class.getFields()) {
 			if(Modifier.isTransient(field.getModifiers())) continue;
 
 			if(field.isAnnotationPresent(ConfigCategory.class)) {
-				registerConfigSubcommand(field.getAnnotation(ConfigCategory.class), field.getType().getFields());
+				registerCategory(cmdMan, field.getAnnotation(ConfigCategory.class), field.getType().getFields(), (create, config) -> {
+					try {
+						Object temp = field.get(config);
+
+						if(temp == null && create) {
+							temp = field.getType().getConstructor().newInstance();
+							field.set(config, temp);
+						}
+
+						return temp;
+					} catch (IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
+						throw new RuntimeException(e);
+					}
+				});
 			}
 
 			else {
@@ -70,10 +92,16 @@ public class ConfigCommand {
 			}
 		}
 
-		registerConfigSubcommand(GuildConfig.class.getAnnotation(ConfigCategory.class), mainFields.toArray(Field[]::new));
+		registerCategory(cmdMan, GuildConfig.class.getAnnotation(ConfigCategory.class), mainFields.toArray(Field[]::new), (create, config) -> config);
 	}
 
-	protected void registerConfigSubcommand(ConfigCategory category, Field[] fields) {
+	private void registerCategory(CommandManager<CommandContext> cmdMan, ConfigCategory category, Field[] fields, InstanceProvider instanceProvider) {
+		cmdMan.registerCommand("config " + category.name(), new ConfigCategoryCommand(category, fields, instanceProvider));
 
+		CommandImplementation group = cmdMan.getCommands().get("config " + category.name());
+
+		for(Class<?> sc : category.subcommands()) {
+			cmdMan.registerCommand(group, sc);
+		}
 	}
 }

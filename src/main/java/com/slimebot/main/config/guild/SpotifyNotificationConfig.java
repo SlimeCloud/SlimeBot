@@ -1,19 +1,19 @@
 package com.slimebot.main.config.guild;
 
-import com.slimebot.main.config.guild.engine.ChannelField;
-import com.slimebot.main.config.guild.engine.RoleField;
+import com.slimebot.commands.config.engine.ConfigField;
+import com.slimebot.commands.config.engine.ConfigFieldType;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 import java.util.Optional;
 
 public class SpotifyNotificationConfig {
-	@RoleField(title = "Spotify Rolle", description = "Die Rolle, die bei neuen Spotify-Releases erwähnt wird")
+	@ConfigField(type = ConfigFieldType.ROLE, command = "notification_role", title = "Spotify Rolle", description = "Die Rolle, die bei neuen Spotify-Releases erwähnt wird")
 	public Long notificationRole;
 
-	@ChannelField(title = "Musik-Kanal", description = "In diesen Kanal werden neue Musik-Releases gesendet")
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "music_channel", title = "Musik-Kanal", description = "In diesen Kanal werden neue Musik-Releases gesendet")
 	public Long musicChannel;
-	@ChannelField(title = "Podcast Kanal", description = "In diesen Kanal werden neue Podcast Folgen gesendet")
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "podcast_channel", title = "Podcast Kanal", description = "In diesen Kanal werden neue Podcast Folgen gesendet")
 	public Long podcastChannel;
 
 	public Optional<GuildMessageChannel> getMusicChannel() {

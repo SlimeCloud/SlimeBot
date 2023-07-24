@@ -1,12 +1,13 @@
 package com.slimebot.main.config.guild;
 
 import com.slimebot.commands.config.ConfigCommand;
+import com.slimebot.commands.config.FdmdsConfigCommand;
+import com.slimebot.commands.config.StaffConfigCommand;
+import com.slimebot.commands.config.engine.ConfigCategory;
+import com.slimebot.commands.config.engine.ConfigField;
+import com.slimebot.commands.config.engine.ConfigFieldType;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
-import com.slimebot.main.config.guild.engine.ChannelField;
-import com.slimebot.main.config.guild.engine.ConfigCategory;
-import com.slimebot.main.config.guild.engine.RoleField;
-import com.slimebot.main.config.guild.engine.StringField;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -112,26 +113,26 @@ public class GuildConfig {
 
 	private transient long guild;
 
-	@StringField(title = "\uD83C\uDFA8 Farbe", description = "Die Farbe, die für Embeds verwendet wird")
+	@ConfigField(type = ConfigFieldType.STRING, command = "color", title = "\uD83C\uDFA8 Farbe", description = "Die Farbe, die für Embeds verwendet wird")
 	public String color;
 
-	@ChannelField(title = "Log-Kanal", description = "In diesem Kanal werden Informationen bezüglich des Bots gesendet")
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "log_channel", title = "Log-Kanal", description = "In diesem Kanal werden Informationen bezüglich des Bots gesendet")
 	public Long logChannel;
-	@ChannelField(title = "Gruß-Kanal", description = "In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet")
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "greetings_channel", title = "Gruß-Kanal", description = "In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet")
 	public Long greetingsChannel;
-	@ChannelField(title = "Straf-Kanal", description = "In diesem Kanal werden Informationen über Bestrafungen gesendet")
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "punishment_channel", title = "Straf-Kanal", description = "In diesem Kanal werden Informationen über Bestrafungen gesendet")
 	public Long punishmentChannel;
 
-	@RoleField(title = "Contributor Rolle", description = "Diese Rollen können Mitglieder beantragen, die an diesem Bot auf GitHub mitgearbeitet haben")
+	@ConfigField(type = ConfigFieldType.ROLE, command = "contributor_role", title = "Contributor Rolle", description = "Diese Rollen können Mitglieder beantragen, die an diesem Bot auf GitHub mitgearbeitet haben")
 	public Long contributorRole;
-	@RoleField(title = "Team Rolle", description = "Diese Rolle hat Zugang zu beschränkten Befehlen")
+	@ConfigField(type = ConfigFieldType.ROLE, command = "staff_role", title = "Team Rolle", description = "Diese Rolle hat Zugang zu beschränkten Befehlen")
 	public Long staffRole;
 
 	@ConfigCategory(name = "spotify", description = "Spotify Benachrichtigungen")
 	public SpotifyNotificationConfig spotify;
-	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim")
+	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim", updateCommands = true, subcommands = FdmdsConfigCommand.DisableCommand.class)
 	public FdmdsConfig fdmds;
-	@ConfigCategory(name = "staff_message", description = "Team-Nachricht")
+	@ConfigCategory(name = "staff", description = "Team-Nachricht", subcommands = {StaffConfigCommand.ChannelCommand.class, StaffConfigCommand.AddRoleCommand.class, StaffConfigCommand.RemoveRoleCommand.class})
 	public StaffConfig staffMessage;
 
 	public Optional<Color> getColor() {

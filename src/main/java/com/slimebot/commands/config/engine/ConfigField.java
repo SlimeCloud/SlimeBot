@@ -1,4 +1,4 @@
-package com.slimebot.main.config.guild.engine;
+package com.slimebot.commands.config.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,7 +7,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface StringField {
+public @interface ConfigField {
+	String command();
 	String title();
 	String description();
+	ConfigFieldType type();
 }
