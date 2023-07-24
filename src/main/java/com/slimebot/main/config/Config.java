@@ -21,8 +21,10 @@ public class Config {
 
 	public Activity activity;
 
+
 	public DatabaseConfig database;
 	public SpotifyConfig spotify;
+	public GitHubConfig github;
 
 	public String color;
 
