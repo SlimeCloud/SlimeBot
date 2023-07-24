@@ -55,6 +55,10 @@ Beginne damit, eines Projekt zu erstellen. Nutze dazu das Menü `File->New->Poje
 Gib dort als URL die URL deines Forks der Repository an. Dadurch wird ein Projekt erstellt, das den Sourcecode sowie die Buildscripts der aktuellen Version des SlimeBallBots enthält.
 In der `Project Structure` des Projekts muss das JDK 17 angeben werden. 
 
+Das Projekt hat Start-Konfigurationen vordefiniert, die verwendet werden können, um den Bot mit IntelliJ zu starten. 
+Um runtime daten vom Code zu trennen, führt die Konfiguration den Code im Ordner `run` aus.
+Falls du diese Konfiguration verwenden möchtest, musst du zunächst den Ordner `run` im Projekt erstellen und die Dateien der Folgenden Anleitungen in diesen ordner kopieren.
+
 Um den Bot zu starten, musst du zunächst das Token deines Test-Bots in die `.env` Datei als `TEST` token eintragen. Ein Preset für die Datei findest du in der `.env_template` Datei.
 Es wird vorausgesetzt, dass du bereits einen Bot Account im [Developer Portal](https://discord.com/developers) erstellt hast, und weißt, wie du das Token kopieren kannst.
 
