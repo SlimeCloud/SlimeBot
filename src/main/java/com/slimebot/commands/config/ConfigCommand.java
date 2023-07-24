@@ -4,6 +4,7 @@ import com.slimebot.main.CommandPermission;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
 import com.slimebot.main.config.guild.GuildConfig;
+import com.slimebot.main.config.guild.engine.ConfigCategory;
 import com.slimebot.message.StaffMessage;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
@@ -13,6 +14,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -20,7 +24,7 @@ import java.util.function.Consumer;
  * Für jede "Kategorie" an Konfiguration gibt es einen eigenen Unterbefehl.
  * Wenn du selbst ein Konfigurationsfeld mit Befehl hinzufügen möchtest, schau dir vorher an, wie dies bei bestehenden Konfigurationsbefehlen gemacht wurde.
  */
-@ApplicationCommand(name = "config", description = "Verwaltet die Bot-Konfiguration für diesen Server", guildOnly = true, subcommands = {GuildConfigCommand.class, FdmdsConfigCommand.class, StaffConfigCommand.class, SpotifyConfigCommand.class})
+@ApplicationCommand(name = "config", description = "Verwaltet die Bot-Konfiguration für diesen Server", guildOnly = true)
 public class ConfigCommand {
 	public CommandPermission permission = CommandPermission.TEAM;
 
@@ -52,8 +56,24 @@ public class ConfigCommand {
 
 	@WhenFinished
 	public void setup(CommandManager<?> cmdMan) {
-		for(Field field : GuildConfig.class.getFields()) {
+		List<Field> mainFields = new ArrayList<>();
 
+		for(Field field : GuildConfig.class.getFields()) {
+			if(Modifier.isTransient(field.getModifiers())) continue;
+
+			if(field.isAnnotationPresent(ConfigCategory.class)) {
+				registerConfigSubcommand(field.getAnnotation(ConfigCategory.class), field.getType().getFields());
+			}
+
+			else {
+				mainFields.add(field);
+			}
 		}
+
+		registerConfigSubcommand(GuildConfig.class.getAnnotation(ConfigCategory.class), mainFields.toArray(Field[]::new));
+	}
+
+	protected void registerConfigSubcommand(ConfigCategory category, Field[] fields) {
+
 	}
 }

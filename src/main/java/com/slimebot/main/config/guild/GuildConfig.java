@@ -29,6 +29,7 @@ import java.util.function.Consumer;
  * <p>
  * Alle Konfigurationsfelder sollten mit den {@link ConfigCommand} (zurück-) setzbar sein. Wenn du also ein Konfigurationsfeld hinzufügst, solltest du auch einen dazugehörigen Unterbefehl erstellen.
  */
+@ConfigCategory(name = "guild", description = "Haupteinstellungen")
 public class GuildConfig {
 	public static final Logger logger = LoggerFactory.getLogger(GuildConfig.class);
 
@@ -126,11 +127,11 @@ public class GuildConfig {
 	@RoleField(title = "Team Rolle", description = "Diese Rolle hat Zugang zu beschränkten Befehlen")
 	public Long staffRole;
 
-	@ConfigCategory("Spotify Benachrichtigungen")
+	@ConfigCategory(name = "spotify", description = "Spotify Benachrichtigungen")
 	public SpotifyNotificationConfig spotify;
-	@ConfigCategory("Frag doch mal den Schleim")
+	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim")
 	public FdmdsConfig fdmds;
-	@ConfigCategory("Team-Nachricht")
+	@ConfigCategory(name = "staff_message", description = "Team-Nachricht")
 	public StaffConfig staffMessage;
 
 	public Optional<Color> getColor() {
