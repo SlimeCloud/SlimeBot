@@ -100,7 +100,7 @@ public class BugCommand {
 
 		GHIssue issue = Main.github.getRepository(Main.config.github.repository)
 				.createIssue(event.getValue("title").getAsString())
-				.body(text + "\n\n" + "Reported from Discord Member " + event.getUser().getName() + " (" + event.getUser().getIdLong() + ")")
+				.body(text + "\n\n" + "Reported by Discord Member " + event.getUser().getName() + " (" + event.getUser().getIdLong() + ")")
 				.label("bug")
 				.create();
 
