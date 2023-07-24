@@ -3,6 +3,10 @@ package com.slimebot.main.config.guild;
 import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
+import com.slimebot.main.config.guild.engine.ChannelField;
+import com.slimebot.main.config.guild.engine.ConfigCategory;
+import com.slimebot.main.config.guild.engine.RoleField;
+import com.slimebot.main.config.guild.engine.StringField;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -107,18 +111,26 @@ public class GuildConfig {
 
 	private transient long guild;
 
+	@StringField(title = "\uD83C\uDFA8 Farbe", description = "Die Farbe, die für Embeds verwendet wird")
 	public String color;
 
+	@ChannelField(title = "Log-Kanal", description = "In diesem Kanal werden Informationen bezüglich des Bots gesendet")
 	public Long logChannel;
+	@ChannelField(title = "Gruß-Kanal", description = "In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet")
 	public Long greetingsChannel;
+	@ChannelField(title = "Straf-Kanal", description = "In diesem Kanal werden Informationen über Bestrafungen gesendet")
 	public Long punishmentChannel;
 
+	@RoleField(title = "Contributor Rolle", description = "Diese Rollen können Mitglieder beantragen, die an diesem Bot auf GitHub mitgearbeitet haben")
 	public Long contributorRole;
-
+	@RoleField(title = "Team Rolle", description = "Diese Rolle hat Zugang zu beschränkten Befehlen")
 	public Long staffRole;
 
+	@ConfigCategory("Spotify Benachrichtigungen")
 	public SpotifyNotificationConfig spotify;
+	@ConfigCategory("Frag doch mal den Schleim")
 	public FdmdsConfig fdmds;
+	@ConfigCategory("Team-Nachricht")
 	public StaffConfig staffMessage;
 
 	public Optional<Color> getColor() {

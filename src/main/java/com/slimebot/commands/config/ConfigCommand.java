@@ -4,7 +4,6 @@ import com.slimebot.main.CommandPermission;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
 import com.slimebot.main.config.guild.GuildConfig;
-import com.slimebot.main.config.guild.StaffConfig;
 import com.slimebot.message.StaffMessage;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
@@ -13,6 +12,7 @@ import de.mineking.discord.commands.annotated.WhenFinished;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
+import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
 /**
@@ -52,6 +52,8 @@ public class ConfigCommand {
 
 	@WhenFinished
 	public void setup(CommandManager<?> cmdMan) {
+		for(Field field : GuildConfig.class.getFields()) {
 
+		}
 	}
 }
