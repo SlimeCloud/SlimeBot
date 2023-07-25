@@ -12,6 +12,7 @@ import de.mineking.discord.ui.components.button.FrameButton;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -28,7 +29,7 @@ public class SetupMenu extends Menu {
 		return this;
 	}
 
-	public FrameButton addCategoryFrame(ConfigCategory category, Field[] fields, InstanceProvider instanceProvider) {
+	public FrameButton addCategoryFrames(ConfigCategory category, Field[] fields, InstanceProvider instanceProvider) {
 		FrameButton button = null;
 
 		List<Field> configFields = Stream.of(fields)
@@ -49,6 +50,20 @@ public class SetupMenu extends Menu {
 
 			if(button == null) {
 				button = new FrameButton(ButtonColor.GRAY, category.description(), name);
+			}
+		}
+
+		for(Class<? extends CustomSetupFrame> type : category.customFrames()) {
+			try {
+				CustomSetupFrame instance = type.getConstructor(Menu.class, long.class).newInstance(this, guild);
+
+				addFrame(instance.name, instance);
+
+				if(button == null) {
+					button = new FrameButton(ButtonColor.GRAY, category.description(), instance.name);
+				}
+			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+				logger.error("Failed to initialize " + type.getName(), e);
 			}
 		}
 

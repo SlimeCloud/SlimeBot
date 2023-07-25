@@ -1,6 +1,5 @@
 package com.slimebot.commands.config;
 
-import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.main.config.guild.StaffConfig;
 import com.slimebot.message.StaffMessage;
@@ -21,10 +20,6 @@ public class StaffConfigCommand {
 		) {
 			if (channel == null) {
 				ConfigCommand.updateField(event.getGuild(), config -> config.getStaffConfig().ifPresent(staff -> staff.channel = null)); //Keep role configuration to make it easier to re-enable the feature
-				Main.database.run(handle -> handle.createUpdate("delete from staff_config where guild = :guild")
-						.bind("guild", event.getGuild().getIdLong())
-						.execute()
-				);
 
 				event.reply("Kanal erfolgreich zurückgesetzt").setEphemeral(true).queue();
 			}

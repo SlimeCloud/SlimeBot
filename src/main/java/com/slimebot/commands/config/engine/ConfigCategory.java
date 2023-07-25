@@ -1,5 +1,7 @@
 package com.slimebot.commands.config.engine;
 
+import com.slimebot.commands.config.setup.engine.CustomSetupFrame;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,4 +14,5 @@ public @interface ConfigCategory {
 	String description();
 	Class<?>[] subcommands() default {};
 	boolean updateCommands() default false;
+	Class<? extends CustomSetupFrame>[] customFrames() default {};
 }

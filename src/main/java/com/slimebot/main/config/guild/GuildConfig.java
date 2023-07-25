@@ -7,6 +7,7 @@ import com.slimebot.commands.config.engine.ConfigCategory;
 import com.slimebot.commands.config.engine.ConfigField;
 import com.slimebot.commands.config.engine.ConfigFieldType;
 import com.slimebot.commands.config.engine.FieldVerification;
+import com.slimebot.commands.config.setup.StaffFrame;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
 import net.dv8tion.jda.api.entities.Guild;
@@ -131,9 +132,14 @@ public class GuildConfig {
 
 	@ConfigCategory(name = "spotify", description = "Spotify Benachrichtigungen")
 	public SpotifyNotificationConfig spotify;
-	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim", updateCommands = true, subcommands = FdmdsConfigCommand.DisableCommand.class)
+	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim", updateCommands = true,
+			subcommands = FdmdsConfigCommand.DisableCommand.class
+	)
 	public FdmdsConfig fdmds;
-	@ConfigCategory(name = "staff", description = "Team-Nachricht", subcommands = {StaffConfigCommand.ChannelCommand.class, StaffConfigCommand.AddRoleCommand.class, StaffConfigCommand.RemoveRoleCommand.class})
+	@ConfigCategory(name = "staff", description = "Team-Nachricht",
+			subcommands = {StaffConfigCommand.ChannelCommand.class, StaffConfigCommand.AddRoleCommand.class, StaffConfigCommand.RemoveRoleCommand.class},
+			customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
+	)
 	public StaffConfig staffMessage;
 
 	public Optional<Color> getColor() {
@@ -166,22 +172,8 @@ public class GuildConfig {
 		return Optional.ofNullable(fdmds);
 	}
 
-	public FdmdsConfig getOrCreateFdmds() {
-		return getFdmds().orElseGet(() -> {
-			fdmds = new FdmdsConfig();
-			return fdmds;
-		});
-	}
-
 	public Optional<SpotifyNotificationConfig> getSpotify() {
 		return Optional.ofNullable(spotify);
-	}
-
-	public SpotifyNotificationConfig getOrCreateSpotify() {
-		return getSpotify().orElseGet(() -> {
-			spotify = new SpotifyNotificationConfig();
-			return spotify;
-		});
 	}
 
 	public Optional<StaffConfig> getStaffConfig() {

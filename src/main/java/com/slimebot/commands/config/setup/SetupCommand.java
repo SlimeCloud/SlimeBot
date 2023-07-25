@@ -41,7 +41,7 @@ public class SetupCommand {
 			if(Modifier.isTransient(field.getModifiers())) continue;
 
 			if(field.isAnnotationPresent(ConfigCategory.class)) {
-				buttons.add(menu.addCategoryFrame(field.getAnnotation(ConfigCategory.class), field.getType().getFields(), (create, config) -> {
+				buttons.add(menu.addCategoryFrames(field.getAnnotation(ConfigCategory.class), field.getType().getFields(), (create, config) -> {
 					try {
 						Object temp = field.get(config);
 
@@ -62,7 +62,7 @@ public class SetupCommand {
 			}
 		}
 
-		buttons.add(0, menu.addCategoryFrame(GuildConfig.class.getAnnotation(ConfigCategory.class), mainFields.toArray(Field[]::new), (create, config) -> config));
+		buttons.add(0, menu.addCategoryFrames(GuildConfig.class.getAnnotation(ConfigCategory.class), mainFields.toArray(Field[]::new), (create, config) -> config));
 
 		AtomicInteger counter = new AtomicInteger();
 		menu.addMainFrame(
