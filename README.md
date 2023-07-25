@@ -70,8 +70,9 @@ Dieses Vorgehen gilt auch für andere Konfigurationseinträge.
 Beachte jedoch, dass durch das Entfernen von Konfigurationen einige Funktionen deaktiviert werden.
 Dazu bekommt du auch eine Informationsnachricht in den Logs beim Starten.
 
-Du kannst nun die Run Konfiguration `Run` auswählen und starten. Der SlimeBallBot sollte starten und auf deine Befehle reagieren. Wenn du den Bot außerhalb deiner IDE verwenden möchtest, musst du ihn als `jar` exportieren.
-Verwende dazu die `Package` Run Konfiguration.
+Du kannst nun die Run Konfiguration `Run` auswählen und starten. Der SlimeBallBot sollte starten und auf deine Befehle reagieren. 
+Wenn du den Bot außerhalb deiner IDE verwenden möchtest, musst du ihn als `jar` exportieren.
+Verwende dazu die `Package` Run Konfiguration. Es sollte eine Datei in `build/libs` erstellt werden. Diese kannst du nun mit `java -jar` ausführen.
 
 ## 🪞 Style-Guide
 Um den Code übersichtlich und einheitlich zu halten, sollten sich alle an einen Codestyle halten. Im Folgenden werden die wichtigsten Richtlinien aufgezählt.
