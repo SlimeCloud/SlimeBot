@@ -124,7 +124,12 @@ Sie enthält jegliche Konfiguration für den Server.
 Um die Daten in Java zu verwenden wird - ähnlich wie bei der [Bot Konfiguration](#-konfiguration) - eine Java Klasse mit der gleichen Struktur wie die Datei erstellt, die dann mit den Daten aus der Datei befüllt wird.
 Wenn du selbst ein neues Konfigurationsfeld benötigst, kannst du einfach eine Java Variable in der `GuildConfig` Klasse erstellen. 
 Zusätzlich sollte eine getter-Methode erstellt werden, die ein Optional zurückgibt. 
-Dadurch wird das Handhaben von nicht-gesetzten Konfigurationsfeldern vereinfacht.  
+Dadurch wird das Handhaben von nicht-gesetzten Konfigurationsfeldern vereinfacht. 
+Wenn du eine neue Konfigurationskategorie hinzufügst, kannst du eine neue Klasse im package `com.slimebot.main.config.guild` erstellen und ein Feld mit dieser Klasse als Typ in `GuildConfig` hinzufügen.
+Dieses Feld sollte die Annotation `ConfigCategory` haben, damit automatisch ein Konfigurationsbefehl erstellt wird.
+Die tatsächlichen Konfigurationsfelder, entweder in einer Kategorie oder in `GuildConfig` selber, sollten die Annotation `ConfigField` haben, ebenfalls um automatisch die Konfigurationsbefehle zu erstellen.
+
+Um auf die Konfiguration eines Servers zuzugreifen, kann die Methode `GuildConfig#getConfig` verwendet werden.
 
 ## 🤖 Befehle und zugehörige Events
 Discord Befehle erstellen und verarbeiten wir mit der [DiscordUtils Bibliothek](https://github.com/MineKingBot/DiscordUtils).
