@@ -57,17 +57,18 @@ In der `Project Structure` des Projekts muss das JDK 17 angeben werden.
 
 Das Projekt hat Start-Konfigurationen vordefiniert, die verwendet werden können, um den Bot mit IntelliJ zu starten. 
 Um runtime daten vom Code zu trennen, führt die Konfiguration den Code im Ordner `run` aus.
-Falls du diese Konfiguration verwenden möchtest, musst du zunächst den Ordner `run` im Projekt erstellen und die Dateien der Folgenden Anleitungen in diesen ordner kopieren.
-
-Um den Bot zu starten, musst du zunächst das Token deines Test-Bots in die `.env` Datei als `TEST` token eintragen. Ein Preset für die Datei findest du in der `.env_template` Datei.
+Im Projekt befindet sich ein Ordner `run_template`. 
+In diesem Ordner findest du eine standard `config` Datei sowie eine `.env` Datei.
+Bevor du startest, muss der `run_template` Order mit dem Namen `run` kopiert werden.
+In diesem `run` Ordner kannst du die Konfiguration nach deinen wünschen anpassen.
+Trage dazu zunächst dein Bot-Token in der `.env` Datei als `TEST_TOKEN` ein.
 Es wird vorausgesetzt, dass du bereits einen Bot Account im [Developer Portal](https://discord.com/developers) erstellt hast, und weißt, wie du das Token kopieren kannst.
 
-Anschließend muss die Datei `config_template` nach `config` kopiert werden. 
-In dieser Datei müssen nun die Credentials der Datenbank eingetragen werden, die du zum Testen verwenden möchtest. 
-Es wird vorausgesetzt, dass du bereits eine PostgreSQL Datenbank zur Verfügung und einen Nutzer erstellt hast, den du Nutzen kannst.
-
-Wenn du keine Spotify Application hast und die mit Spotify zusammenhängenden Features nicht nutzen möchtest, kannst du das `spotify` Objekt aus der `config` Datei löschen. 
-Dadurch wird nicht versucht, die Spotify Listener zu starten und somit werden keine Fehlermeldungen bezüglich ungültiger spotify Tokens ausgegeben.
+In der `config` Datei kannst du nun die Werte so anpassen, dass sie für deine Test-Umgebung funktionieren.
+Falls du Beispielsweise keine Datenbank hast, kannst du das Element `database` einfach löschen oder zu `-database` umbenennen, um keine Datenbank zu verwenden.
+Dieses Vorgehen gilt auch für andere Konfigurationseinträge.
+Beachte jedoch, dass durch das Entfernen von Konfigurationen einige Funktionen deaktiviert werden.
+Dazu bekommt du auch eine Informationsnachricht in den Logs beim Starten.
 
 Du kannst nun die Run Konfiguration `Run` auswählen und starten. Der SlimeBallBot sollte starten und auf deine Befehle reagieren. Wenn du den Bot außerhalb deiner IDE verwenden möchtest, musst du ihn als `jar` exportieren.
 Verwende dazu die `Package` Run Konfiguration.
