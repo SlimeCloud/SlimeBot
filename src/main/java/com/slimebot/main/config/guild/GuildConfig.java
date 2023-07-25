@@ -30,7 +30,8 @@ import java.util.function.Consumer;
  * Wenn du hier eigene Felder hinzufügst, solltest du ebenfalls einen entsprechenden Getter hinzufügen.
  * Falls das Feld ein Kanal- oder Rollenid ist, kannst du für deinen Getter {@link #getChannel(Long)} oder {@link #getRole(Long)} verwenden. Siehe dir dazu an, wie dies bei bereits bestehenden Feldern gemacht wurde.
  * <p>
- * Alle Konfigurationsfelder sollten mit den {@link ConfigCommand} (zurück-) setzbar sein. Wenn du also ein Konfigurationsfeld hinzufügst, solltest du auch einen dazugehörigen Unterbefehl erstellen.
+ * Damit unser system automatisch Konfigurationsbefehle für die Felder erstellen kann, müssen Kategorien mit {@link ConfigCategory} und Felder mit {@link ConfigField} annotiert sein.
+ * Anhand der bereits vorhandenden Beispiele sollte erkennbar sein, wie diese Annotationen zu verwenden sind.
  */
 @ConfigCategory(name = "guild", description = "Haupteinstellungen")
 public class GuildConfig {

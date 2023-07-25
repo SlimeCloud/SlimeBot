@@ -2,6 +2,7 @@ package com.slimebot.commands.config;
 
 import com.slimebot.commands.config.engine.ConfigCategory;
 import com.slimebot.commands.config.engine.ConfigCategoryCommand;
+import com.slimebot.commands.config.engine.ConfigField;
 import com.slimebot.commands.config.engine.InstanceProvider;
 import com.slimebot.main.CommandContext;
 import com.slimebot.main.CommandPermission;
@@ -27,9 +28,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Dieser Befehl wird verwendet, um es dem Team einfach zu ermöglichen, die Konfiguration des Servers anzupassen.
- * Für jede "Kategorie" an Konfiguration gibt es einen eigenen Unterbefehl.
- * Wenn du selbst ein Konfigurationsfeld mit Befehl hinzufügen möchtest, schau dir vorher an, wie dies bei bestehenden Konfigurationsbefehlen gemacht wurde.
+ * Dieser Befehl ist der Hauptbefehl für die Konfiguration. Wenn du in {@link GuildConfig} Felder mit den korrekten Annotationen {@link ConfigCategory} und {@link ConfigField} erstellst, werden die Unterbefehle automatisch generiert.
  */
 @ApplicationCommand(name = "config", description = "Verwaltet die Bot-Konfiguration für diesen Server", guildOnly = true)
 public class ConfigCommand {
