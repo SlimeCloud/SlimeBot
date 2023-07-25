@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -28,7 +29,7 @@ public class LevelListener extends ListenerAdapter implements Runnable {
         //check all voice channels
         Main.jdaInstance.getGuilds().forEach(guild -> guild.getVoiceChannels().forEach(voice -> voice.getMembers().forEach(member -> testLeveling(voice, guild, member))));
         run();
-        Main.scheduleAtFixedRate(30, TimeUnit.SECONDS, this);
+        Main.scheduleAtFixedRate(5, TimeUnit.SECONDS, this);
     }
 
     private final static Map<Long, Long> chatTimeoutMap = new HashMap<>();
@@ -48,7 +49,7 @@ public class LevelListener extends ListenerAdapter implements Runnable {
                 xp += MathUtil.randomDouble(config.minWordXP, config.maxWordXP);
             }
         }
-        Level.addLevel(event.getGuild().getIdLong(), author.getIdLong(), 0, MathUtil.round(xp));
+        Level.addLevel(event.getGuild().getIdLong(), author.getIdLong(), 0, MathUtil.round(xp), 1);
 
     }
 
@@ -58,7 +59,22 @@ public class LevelListener extends ListenerAdapter implements Runnable {
         Guild guild = event.getGuild();
         Member member = event.getMember();
         testLeveling(union, guild, member);
-        if (union!=null) union.asVoiceChannel().getMembers().forEach(m -> testLeveling(union, guild, m));
+        if (union!=null) {
+            AudioChannelUnion finalUnion = union;
+            union.asVoiceChannel().getMembers().forEach(m -> testLeveling(finalUnion, guild, m));
+        }
+        if (event instanceof GuildVoiceUpdateEvent updateEvent) {
+            union = updateEvent.getChannelJoined();
+            if (union!=null) {
+                AudioChannelUnion finalUnion = union;
+                union.asVoiceChannel().getMembers().forEach(m -> testLeveling(finalUnion, guild, m));
+            }
+            union = updateEvent.getChannelLeft();
+            if (union!=null) {
+                AudioChannelUnion finalUnion = union;
+                union.asVoiceChannel().getMembers().forEach(m -> testLeveling(finalUnion, guild, m));
+            }
+        }
     }
 
     private void testLeveling(VoiceChannel voice, Guild guild, Member member) {
@@ -90,6 +106,6 @@ public class LevelListener extends ListenerAdapter implements Runnable {
 
     @Override
     public void run() {
-        voiceUsers.forEach((k, v) -> Level.addLevel(v, k, 0, MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP)));
+        voiceUsers.forEach((k, v) -> Level.addLevel(v, k, 0, MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP), 0));
     }
 }

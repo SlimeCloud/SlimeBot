@@ -7,6 +7,7 @@ import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
 import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.commands.level.LeaderboardCommand;
+import com.slimebot.commands.level.LevelCommand;
 import com.slimebot.commands.level.RankCommand;
 import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
@@ -127,6 +128,7 @@ public class Main {
                                 if(Main.config.level != null) {
                                     config.registerCommand(RankCommand.class);
                                     config.registerCommand(LeaderboardCommand.class);
+                                    config.registerCommand(LevelCommand.class);
                                 } else logger.warn("Level System aufgrund fehlender Config deaktiviert");
                             } else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
 

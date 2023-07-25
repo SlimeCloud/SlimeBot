@@ -9,6 +9,21 @@ import java.util.Map;
 
 public class CustomFont {
 
+    public static Font getFont(Font font, int style) {
+        if (font==null) return null;
+        return font.deriveFont(style);
+    }
+
+    public static Font getFont(Font font, float size) {
+        if (font==null) return null;
+        return font.deriveFont(size);
+    }
+
+    public static Font getFont(Font font, int style, float size) {
+        if (font==null) return null;
+        return font.deriveFont(style).deriveFont(size);
+    }
+
     public static Font getFont(String name, int style, float size) throws IOException, FontFormatException {
         if(name == null) return null;
         return getFont(name).deriveFont(style, size);

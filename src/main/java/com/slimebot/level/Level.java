@@ -15,30 +15,32 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Level(long guildId, long userId, int level, int xp) implements Comparable<Level> {
+public record Level(long guildId, long userId, int level, int xp, int messages) implements Comparable<Level> {
 
     public void save() {
-        Main.database.run(handle -> handle.createUpdate("insert into levels values(:guild, :user, :level, :xp) on conflict(guild, \"user\") do update set level = :level, xp = :xp")
+        Main.database.run(handle -> handle.createUpdate("insert into levels values(:guild, :user, :level, :xp, :messages) on conflict(guild, \"user\") do update set level = :level, xp = :xp, messages = :messages")
                 .bind("guild", guildId())
                 .bind("user", userId())
                 .bind("level", level())
                 .bind("xp", xp())
+                .bind("messages", messages())
                 .execute());
     }
 
-    public Level add(int level, int xp) {
-        return new Level(guildId(), userId(), level()+level, xp()+xp);
+    public Level add(int level, int xp, int messages) {
+        return new Level(guildId(), userId(), level()+level, xp()+xp, messages()+messages);
     }
 
     @Override
     public int compareTo(@NotNull Level o) {
-        int levelComp = Integer.compare(o.level, this.level);
-        return levelComp != 0 ? levelComp : Double.compare(o.xp, this.xp);
+        int levelComp = Integer.compare(o.level(), this.level());
+        int xpComp = levelComp != 0 ? levelComp : Integer.compare(o.xp(), this.xp());
+        return xpComp != 0 ? xpComp : Integer.compare(o.messages(), this.messages());
     }
 
     @Override
     public String toString() {
-        return String.format("%s {guildId: %s, userId: %s, level: %s, xp: %s}", getClass(), guildId(), userId(), level(), xp());
+        return String.format("%s {guildId: %s, userId: %s, level: %s, xp: %s, messages: %s}", getClass(), guildId(), userId(), level(), xp(), messages());
     }
 
     public static Level load(long guildId, long userId) {
@@ -47,7 +49,7 @@ public record Level(long guildId, long userId, int level, int xp) implements Com
                 .bind("user", userId)
                 .mapTo(Level.class)
                 .findOne()
-                .orElseGet(() -> new Level(guildId, userId, 0, 0))
+                .orElseGet(() -> new Level(guildId, userId, 0, 0, 0))
         );
     }
 
@@ -60,10 +62,10 @@ public record Level(long guildId, long userId, int level, int xp) implements Com
     }
 
     public static void setLevel(@NotNull Level level) {
-        setLevel(level.guildId(), level.userId(), level.level(), level.xp());
+        setLevel(level.guildId(), level.userId(), level.level(), level.xp(), level.messages());
     }
 
-    public static void setLevel(long guildId, long userId, int level, int xp) {
+    public static void setLevel(long guildId, long userId, int level, int xp, int messages) {
         Member member = Main.jdaInstance.getGuildById(guildId).getMemberById(userId);
 
         int reqXp = calculateRequiredXP(level+1);
@@ -71,11 +73,11 @@ public record Level(long guildId, long userId, int level, int xp) implements Com
             onLevelUp(member.getGuild(), member, level, ++level, xp, xp-=reqXp);
             reqXp = calculateRequiredXP(level+1);
         }
-        new Level(guildId, userId, level, xp).save();
+        new Level(guildId, userId, level, xp, messages).save();
     }
 
-    public static void addLevel(long guildId, long userId, int level, int xp) {
-        setLevel(getLevel(guildId, userId).add(level, MathUtil.round(xp*Main.config.level.xpMultiplier)));
+    public static void addLevel(long guildId, long userId, int level, int xp, int messages) {
+        setLevel(getLevel(guildId, userId).add(level, MathUtil.round(xp*Main.config.level.xpMultiplier), messages));
     }
 
     public static List<Level> getLevels(long guildId) {
@@ -119,7 +121,8 @@ public record Level(long guildId, long userId, int level, int xp) implements Com
                     rs.getLong("guild"),
                     rs.getLong("user"),
                     rs.getInt("level"),
-                    rs.getInt("xp")
+                    rs.getInt("xp"),
+                    rs.getInt("messages")
             );
         }
     }
