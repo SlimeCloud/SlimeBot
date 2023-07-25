@@ -1,28 +1,39 @@
 package com.slimebot.games;
 
 import com.slimebot.main.Main;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class Game <T extends GamePlayer> extends ListenerAdapter {
     public final UUID uuid = UUID.randomUUID();
-    public final long channelId;
+    public long channelId;
     public final long guildId;
+    public final boolean playersCanJoin;
+    public short minPlayers, maxPlayers;
     public long gameMaster;
     public List<T> players = new ArrayList<>();
     private final Function<Long, T> gamePlayerFunction;
     public GameStatus status;
 
-    public Game(long gameMaster, long channelId, long guildId, Function<Long, T> gamePlayerFunction) {
+    public Game(long gameMaster, long guildId, boolean playersCanJoin, Function<Long, T> gamePlayerFunction) {
         this.gameMaster = gameMaster;
-        this.channelId = channelId;
         this.guildId = guildId;
+        this.playersCanJoin = playersCanJoin;
         this.gamePlayerFunction = gamePlayerFunction;
 
         players.add(this.gamePlayerFunction.apply(gameMaster));
@@ -39,12 +50,27 @@ public abstract class Game <T extends GamePlayer> extends ListenerAdapter {
         }, 15, TimeUnit.MINUTES);
     }
 
-    public T getPlayerFromId(long id) {
+    public void sendJoinMessageInThread(ThreadChannelAction action) {
+        action.flatMap(channel -> {
+            this.channelId = channel.getIdLong();
+
+            return sendMessageEmbeds(buildJoinEmbed()
+                    .addField(":alarm_clock: ....", " ", true)
+                    .build())
+                    .setActionRow(
+                            playersCanJoin
+                                    ? Button.primary(uuid + ":join", "Join")
+                                    : Button.primary(uuid + ":join", "Join").asDisabled(),
+                            Button.danger(uuid + ":leave", "Leave"),
+                            Button.primary(uuid + ":start", "Start")
+                    );
+        }).queue();
+    }
+
+    public Optional<T> getPlayerFromId(long id) {
         return players.stream()
                 .filter(p -> p.id == id)
-                .findAny()
-                .orElse(null);
-
+                .findAny();
     }
 
     public boolean join(long id) {
@@ -81,8 +107,8 @@ public abstract class Game <T extends GamePlayer> extends ListenerAdapter {
         players = null;
     }
 
-    public MessageChannel getChannel() {
-        return Main.jdaInstance.getChannelById(MessageChannel.class, channelId);
+    public ThreadChannel getChannel() {
+        return Main.jdaInstance.getChannelById(ThreadChannel.class, channelId);
     }
 
     public MessageCreateAction sendMessage(String content) {
@@ -91,6 +117,68 @@ public abstract class Game <T extends GamePlayer> extends ListenerAdapter {
 
     public MessageCreateAction sendMessageEmbeds(Collection<MessageEmbed> embeds) {
         return getChannel().sendMessageEmbeds(embeds);
+    }
+
+    public MessageCreateAction sendMessageEmbeds(MessageEmbed embed) {
+        return getChannel().sendMessageEmbeds(embed);
+    }
+
+    protected abstract EmbedBuilder buildJoinEmbed();
+
+    @Override
+    public void onButtonInteraction(ButtonInteractionEvent event) {
+        String id = event.getButton().getId();
+        if(!id.startsWith(uuid.toString()))return;
+        id = id.replace(uuid +":", "");
+
+        switch(id) {
+            case "join" -> {
+                if(players.size() >= maxPlayers) {
+                    event.reply(":x: Das Spiel ist bereits voll!").setEphemeral(true).queue();
+                    return;
+                }
+                if (!join(event.getMember().getIdLong())) {
+                    event.reply(":x: Du bist schon in einem Game!").setEphemeral(true).queue();
+                    return;
+                }
+                event.editMessageEmbeds(buildJoinEmbed().build()).queue();
+
+                sendMessage("<@" + event.getMember().getId() + "> ist dem Spiel beigetreten!").queue();
+                return;
+            }
+            case "leave" -> {
+                if (!players.contains(event.getMember().getIdLong())) {
+                    event.reply(":x: Du bist nicht im Game!").setEphemeral(true).queue();
+                    return;
+                }
+                if (event.getMember().getIdLong() == gameMaster) {
+                    event.reply(":x: Du bist Spielleiter:in du kannst nicht verlassen!").setEphemeral(true).queue();
+                    return;
+                }
+
+                leave(getPlayerFromId(event.getMember().getIdLong()).orElse(null));
+
+                event.editMessageEmbeds(buildJoinEmbed().build()).queue();
+
+                event.reply(":x: <@" + event.getMember().getId() + "> hat das Spiel verlassen!").queue();
+
+            }
+        }
+
+        if(event.getMember().getIdLong() != gameMaster) {
+            event.reply(":x: Du bist nicht Spielleiter:in!").queue();
+            return;
+        }
+        switch(id) {
+            case "start" -> {
+                if (players.size() < minPlayers) {
+                    event.reply(":x: Es müssen mindestens " + minPlayers + " Spieler:innen mit machen!").setEphemeral(true).queue();
+                    return;
+                }
+                event.editComponents(event.getMessage().getComponents().stream().map(c -> c.asDisabled()).collect(Collectors.toList())).queue();
+                start();
+            }
+        }
     }
 
     public enum GameStatus {
