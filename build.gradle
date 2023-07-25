@@ -24,6 +24,7 @@ dependencies {
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.0.0'
     implementation 'ch.qos.logback:logback-classic:1.4.8'
     implementation 'io.github.cdimascio:java-dotenv:5.1.1'
+    implementation 'org.kohsuke:github-api:1.315'
 
     implementation 'com.google.code.gson:gson:2.10.1'
 
