@@ -8,22 +8,20 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class CommandContext extends ContextBase {
-	public final SlashCommandInteractionEvent event;
-	public final Guild guild;
-	public final User user;
-	public final Member member;
+    public final SlashCommandInteractionEvent event;
+    public final Guild guild;
+    public final User user;
+    public final Member member;
 
-	public CommandContext(GenericInteractionCreateEvent event) {
-		if(event instanceof SlashCommandInteractionEvent evt) {
-			this.event = evt;
-		}
+    public CommandContext(GenericInteractionCreateEvent event) {
+        if(event instanceof SlashCommandInteractionEvent evt) {
+            this.event = evt;
+        } else {
+            this.event = null;
+        }
 
-		else {
-			this.event = null;
-		}
-
-		this.guild = event.getGuild();
-		this.user = event.getUser();
-		this.member = event.getMember();
-	}
+        this.guild = event.getGuild();
+        this.user = event.getUser();
+        this.member = event.getMember();
+    }
 }
