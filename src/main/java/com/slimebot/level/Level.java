@@ -108,7 +108,7 @@ public record Level(long guildId, long userId, int level, int xp, int messages) 
 
     private static void onLevelUp(Guild guild, Member member, int oldLevel, int newLevel, int oldXp, int newXp) {
         TextChannel channel = Main.jdaInstance.getTextChannelById(GuildConfig.getConfig(guild.getIdLong()).level.notificationChannel);
-        if (channel==null) return;
+        if (channel==null || member.getUser().isBot()) return;
         channel.sendMessage(Main.config.level.levelUpMessage.replace("%user%", member.getAsMention()).replace("%level%", String.valueOf(newLevel))).queue();
     }
 
