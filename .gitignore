@@ -5,6 +5,13 @@ build/
 !**/src/test/**/build/
 
 /run
+out
+logs/
+Slimebot/
+.env
+
+config
+guild/
 
 ### Eclipse ###
 .apt_generated
