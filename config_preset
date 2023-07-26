@@ -30,7 +30,7 @@
     },
 
     "level": {
-        "levelUpMessage": "Herzlichen Glückwunsch, %user% du bist jetzt %level%!",
+        "levelUpMessage": "Herzlichen Glückwunsch, %user% du bist jetzt level %level%!",
         "leaderboardTemplate": "zm-f838bf17-d82b-4023-92c4-45e481d546a1",
         "xpMultiplier": 1,
         "minVoiceXP": 1,
