@@ -20,7 +20,7 @@ public class RemoveXPCommand {
             return;
         }
         Level.addLevel(guildId, userId, 0, xp*-1, 0);
-        event.reply(member.getAsMention() + " (" + member.getEffectiveName() + ") wurden erfolgreich " + xp + " XP entfernt!\nEr hat jetzt" + (lvl.xp()-xp) + "xp!").setEphemeral(true).queue();
+        event.reply(member.getAsMention() + " (" + member.getEffectiveName() + ") wurden erfolgreich " + xp + " XP entfernt!\nEr hat jetzt " + (lvl.xp()-xp) + " xp!").setEphemeral(true).queue();
     }
 
 }
