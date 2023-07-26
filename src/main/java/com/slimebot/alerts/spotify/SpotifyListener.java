@@ -75,11 +75,11 @@ public class SpotifyListener implements Runnable {
 								.map(Role::getAsMention)
 								.orElse("");
 
-						channel.sendMessage(MessageFormat.format(Main.config.spotify.music.message,
-								notification,
-								album.getName(),
-								album.getExternalUrls().get("spotify")
-						)).queue();
+						channel.sendMessage(Main.config.spotify.music.message
+								.replace("%mention%", notification)
+								.replace("%name%", album.getName())
+								.replace("%url%", album.getExternalUrls().get("spotify"))
+						).queue();
 					})
 			);
 		}

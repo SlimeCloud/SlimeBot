@@ -11,8 +11,10 @@ Dieses Projekt steht unter der [GNU Affero General Public License v3.0](https://
 1. [Issues](#-issues)
 2. [Mitmachen](#-contributing)
 3. [Style-Guide](#-style-guide)
-4. [Datenbank](#-datenbank)
-5. [Befehle](#-befehle-und-zugehörige-events)
+4. [Konfiguration](#-konfiguration)
+   1. [Konfiguration hinzufügen](#konfiguration-hinzufügen) 
+5. [Datenbank](#-datenbank)
+6. [Befehle](#-befehle-und-zugehörige-events)
    1. [Grundlagen](#befehle)
    2. [Zusätzlicher Registrationscode](#setup)
    3. [Events](#events)
@@ -55,18 +57,24 @@ Beginne damit, eines Projekt zu erstellen. Nutze dazu das Menü `File->New->Poje
 Gib dort als URL die URL deines Forks der Repository an. Dadurch wird ein Projekt erstellt, das den Sourcecode sowie die Buildscripts der aktuellen Version des SlimeBallBots enthält.
 In der `Project Structure` des Projekts muss das JDK 17 angeben werden. 
 
-Um den Bot zu starten, musst du zunächst das Token deines Test-Bots in die `.env` Datei als `TEST` token eintragen. 
+Das Projekt hat Start-Konfigurationen vordefiniert, die verwendet werden können, um den Bot mit IntelliJ zu starten. 
+Um runtime daten vom Code zu trennen, führt die Konfiguration den Code im Ordner `run` aus.
+Im Projekt befindet sich ein Ordner `run_template`. 
+In diesem Ordner findest du eine standard `config` Datei sowie eine `.env` Datei.
+Bevor du startest, muss der `run_template` Order kopiert und die Kopie in `run` umbenannt werden.
+In diesem `run` Ordner kannst du die Konfiguration nach deinen wünschen anpassen.
+Trage dazu zunächst dein Bot-Token in der `.env` Datei als `TEST_TOKEN` ein.
 Es wird vorausgesetzt, dass du bereits einen Bot Account im [Developer Portal](https://discord.com/developers) erstellt hast, und weißt, wie du das Token kopieren kannst.
 
-Anschließend muss die Datei `config_preset` nach `config` kopiert werden. 
-In dieser Datei müssen nun die Credentials der Datenbank eingetragen werden, die du zum Testen verwenden möchtest. 
-Es wird vorausgesetzt, dass du bereits eine PostgreSQL Datenbank zur Verfügung und einen Nutzer erstellt hast, den du Nutzen kannst.
+In der `config` Datei kannst du nun die Werte so anpassen, dass sie für deine Test-Umgebung funktionieren.
+Falls du Beispielsweise keine Datenbank hast, kannst du das Element `database` einfach löschen oder zu `-database` umbenennen, um keine Datenbank zu verwenden.
+Dieses Vorgehen gilt auch für andere Konfigurationseinträge.
+Beachte jedoch, dass durch das Entfernen von Konfigurationen einige Funktionen deaktiviert werden.
+Dazu bekommt du auch eine Informationsnachricht in den Logs beim Starten.
 
-Wenn du keine Spotify Application hast und die mit Spotify zusammenhängenden Features nicht nutzen möchtest, kannst du das `spotify` Objekt aus der `config` Datei löschen. 
-Dadurch wird nicht versucht, die Spotify Listener zu starten und somit werden keine Fehlermeldungen bezüglich ungültiger spotify Tokens ausgegeben.
-
-Du kannst nun die Run Konfiguration `Run` auswählen und starten. Der SlimeBallBot sollte starten und auf deine Befehle reagieren. Wenn du den Bot außerhalb deiner IDE verwenden möchtest, musst du ihn als `jar` exportieren.
-Verwende dazu die `Package` Run Konfiguration.
+Du kannst nun die Run Konfiguration `Run` auswählen und starten. Der SlimeBallBot sollte starten und auf deine Befehle reagieren. 
+Wenn du den Bot außerhalb deiner IDE verwenden möchtest, musst du ihn als `jar` exportieren.
+Verwende dazu die `Package` Run Konfiguration. Es sollte eine Datei in `build/libs` erstellt werden. Diese kannst du nun mit `java -jar` ausführen.
 
 ## 🪞 Style-Guide
 Um den Code übersichtlich und einheitlich zu halten, sollten sich alle an einen Codestyle halten. Im Folgenden werden die wichtigsten Richtlinien aufgezählt.
@@ -99,7 +107,7 @@ Als gute Richtlinie lassen sich die intelliJ Standard-Vorgaben verwenden. Wenn d
 
 ## 🔧 Konfiguration
 Allgemeine Konfiguration für den Bot wird in der `config`-Datei im gleichen Ordner wie der Bot durchgeführt.
-Eine Vorlage für die Konfiguration ist in der `config_preset`-Datei zu finden.<br>
+Eine Vorlage für die Konfiguration ist in der `config_template`-Datei zu finden.<br>
 Zum Lesen der Konfiguration verwenden wir [Gson](https://github.com/google/gson).
 Im code sind die Konfigurationsfelder in der `Config`-Klasse lesbar.
 Eine Instanz dieser Klasse, die verwendet werden sollte befindet sich in `Main.config`.<br>
@@ -118,9 +126,16 @@ Um kleinere Datenmengen - wie zum Beispiel für Server Konfigurationen - verwend
 In diesem Ordner gibt es für jeden Server eine Datei `<server id>.json`. 
 Sie enthält jegliche Konfiguration für den Server.
 Um die Daten in Java zu verwenden wird - ähnlich wie bei der [Bot Konfiguration](#-konfiguration) - eine Java Klasse mit der gleichen Struktur wie die Datei erstellt, die dann mit den Daten aus der Datei befüllt wird.
+
+### Konfiguration hinzufügen
 Wenn du selbst ein neues Konfigurationsfeld benötigst, kannst du einfach eine Java Variable in der `GuildConfig` Klasse erstellen. 
-Zusätzlich sollte eine getter-Methode erstellt werden, die ein Optional zurückgibt. 
-Dadurch wird das Handhaben von nicht-gesetzten Konfigurationsfeldern vereinfacht.  
+Zusätzlich sollte eine getter-Methode erstellt werden, die ein Optional zurückgibt. Dadurch wird das Handhaben von nicht-gesetzten Konfigurationsfeldern vereinfacht.
+
+Wenn du eine neue Konfigurationskategorie hinzufügst, kannst du eine neue Klasse im package `com.slimebot.main.config.guild` erstellen und ein Feld mit dieser Klasse als Typ in `GuildConfig` hinzufügen.
+Dieses Feld sollte die Annotation `ConfigCategory` haben, damit automatisch ein Konfigurationsbefehl erstellt wird.
+Die tatsächlichen Konfigurationsfelder, entweder in einer Kategorie oder in `GuildConfig` selber, sollten die Annotation `ConfigField` haben, ebenfalls um automatisch die Konfigurationsbefehle zu erstellen.
+
+Um auf die Konfiguration eines Servers zuzugreifen, kann die Methode `GuildConfig#getConfig` verwendet werden.
 
 ## 🤖 Befehle und zugehörige Events
 Discord Befehle erstellen und verarbeiten wir mit der [DiscordUtils Bibliothek](https://github.com/MineKingBot/DiscordUtils).

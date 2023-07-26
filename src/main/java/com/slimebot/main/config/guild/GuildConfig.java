@@ -1,6 +1,13 @@
 package com.slimebot.main.config.guild;
 
 import com.slimebot.commands.config.ConfigCommand;
+import com.slimebot.commands.config.FdmdsConfigCommand;
+import com.slimebot.commands.config.StaffConfigCommand;
+import com.slimebot.commands.config.engine.ConfigCategory;
+import com.slimebot.commands.config.engine.ConfigField;
+import com.slimebot.commands.config.engine.ConfigFieldType;
+import com.slimebot.commands.config.engine.FieldVerification;
+import com.slimebot.commands.config.setup.StaffFrame;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,8 +30,10 @@ import java.util.function.Consumer;
  * Wenn du hier eigene Felder hinzufügst, solltest du ebenfalls einen entsprechenden Getter hinzufügen.
  * Falls das Feld ein Kanal- oder Rollenid ist, kannst du für deinen Getter {@link #getChannel(Long)} oder {@link #getRole(Long)} verwenden. Siehe dir dazu an, wie dies bei bereits bestehenden Feldern gemacht wurde.
  * <p>
- * Alle Konfigurationsfelder sollten mit den {@link ConfigCommand} (zurück-) setzbar sein. Wenn du also ein Konfigurationsfeld hinzufügst, solltest du auch einen dazugehörigen Unterbefehl erstellen.
+ * Damit unser system automatisch Konfigurationsbefehle für die Felder erstellen kann, müssen Kategorien mit {@link ConfigCategory} und Felder mit {@link ConfigField} annotiert sein.
+ * Anhand der bereits vorhandenden Beispiele sollte erkennbar sein, wie diese Annotationen zu verwenden sind.
  */
+@ConfigCategory(name = "guild", description = "Haupteinstellungen")
 public class GuildConfig {
 	public static final Logger logger = LoggerFactory.getLogger(GuildConfig.class);
 
@@ -107,19 +116,34 @@ public class GuildConfig {
 
 	private transient long guild;
 
+	@ConfigField(type = ConfigFieldType.STRING, command = "color", title = "\uD83C\uDFA8 Farbe", description = "Die Farbe, die für Embeds verwendet wird", verifier = FieldVerification.COLOR)
 	public String color;
 
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "log_channel", title = "Log-Kanal", description = "In diesem Kanal werden Informationen bezüglich des Bots gesendet")
 	public Long logChannel;
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "greetings_channel", title = "Gruß-Kanal", description = "In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet")
 	public Long greetingsChannel;
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "punishment_channel", title = "Straf-Kanal", description = "In diesem Kanal werden Informationen über Bestrafungen gesendet")
 	public Long punishmentChannel;
 
+	@ConfigField(type = ConfigFieldType.ROLE, command = "contributor_role", title = "Contributor Rolle", description = "Diese Rollen können Mitglieder beantragen, die an diesem Bot auf GitHub mitgearbeitet haben")
 	public Long contributorRole;
-
+	@ConfigField(type = ConfigFieldType.ROLE, command = "staff_role", title = "Team Rolle", description = "Diese Rolle hat Zugang zu beschränkten Befehlen")
 	public Long staffRole;
 
+	@ConfigCategory(name = "spotify", description = "Spotify Benachrichtigungen")
 	public SpotifyNotificationConfig spotify;
+	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim", updateCommands = true,
+			subcommands = FdmdsConfigCommand.DisableCommand.class
+	)
 	public FdmdsConfig fdmds;
+	@ConfigCategory(name = "staff", description = "Team-Nachricht",
+			subcommands = {StaffConfigCommand.ChannelCommand.class, StaffConfigCommand.AddRoleCommand.class, StaffConfigCommand.RemoveRoleCommand.class},
+			customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
+	)
 	public StaffConfig staffMessage;
+
+	@ConfigCategory(name = "level", description = "Level-System")
 	public LevelGuildConfig level;
 
 	public Optional<Color> getColor() {
@@ -152,16 +176,8 @@ public class GuildConfig {
 		return Optional.ofNullable(fdmds);
 	}
 
-	public FdmdsConfig getOrCreateFdmds() {
-		return getFdmds().orElseGet(() -> fdmds = new FdmdsConfig());
-	}
-
 	public Optional<SpotifyNotificationConfig> getSpotify() {
 		return Optional.ofNullable(spotify);
-	}
-
-	public SpotifyNotificationConfig getOrCreateSpotify() {
-		return getSpotify().orElseGet(() -> spotify = new SpotifyNotificationConfig());
 	}
 
 	public Optional<StaffConfig> getStaffConfig() {
@@ -169,15 +185,10 @@ public class GuildConfig {
 	}
 
 	public StaffConfig getOrCreateStaff() {
-		return getStaffConfig().orElseGet(() -> staffMessage = new StaffConfig());
-	}
-
-	public Optional<LevelGuildConfig> getLevelConfig() {
-		return Optional.ofNullable(level);
-	}
-
-	public LevelGuildConfig getOrCreateLevel() {
-		return getLevelConfig().orElseGet(() -> level = new LevelGuildConfig());
+		return getStaffConfig().orElseGet(() -> {
+			staffMessage = new StaffConfig();
+			return staffMessage;
+		});
 	}
 
 	//Internal helper methods

@@ -7,7 +7,7 @@
     "database": {
         "host": "localhost/slime",
         "user": "slime",
-        "password": "test123"
+        "password": "-- your database password"
     },
 
     "spotify": {
@@ -15,14 +15,14 @@
         "clientSecret": "-- your client secret --",
 
         "music": {
-            "message": "{0}\n## 🎶 ALARM ALARM 🎶\nNeuer Musik Release. 🥳\nGönn dir unbedingt das neue Album: [**{1}**]({2})",
+            "message": "%notification%\n## 🎶 ALARM ALARM 🎶\nNeuer Musik Release. 🥳\nGönn dir unbedingt das neue Album: [**%name%**](%url%)",
             "artistIds": [
                 "0ZzsW7JiW4Ok3H7nFl4yV1"
             ]
         },
 
         "podcast": {
-            "message": "{0}\n## 🎙️ ALARM ALARM 🎙️\nNeue Podcast-Folge!\nRein da!In der heutigen Folge: [**{1}**]({2})",
+            "message": "%notification%\n## 🎙️ ALARM ALARM 🎙️\nNeue Podcast-Folge!\nRein da!In der heutigen Folge: [**%name%**](%url%)",
             "artistIds": [
                 "0HNYFHg2WNq1P56qK6defn"
             ]

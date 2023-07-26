@@ -1,6 +1,5 @@
 package com.slimebot.commands.config;
 
-import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.main.config.guild.StaffConfig;
 import com.slimebot.message.StaffMessage;
@@ -12,7 +11,6 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-@ApplicationCommand(name = "staff", description = "Konfiguration der automatischen Staff-Nachricht")
 public class StaffConfigCommand {
 	@ApplicationCommand(name = "channel", description = "Setzt den Kanal der Staff-Nachricht")
 	public static class ChannelCommand {
@@ -20,25 +18,21 @@ public class StaffConfigCommand {
 		public void performCommand(SlashCommandInteractionEvent event,
 		                           @Option(name = "kanal", description = "Der neue Kanal für die Staff-Nachricht", channelTypes = {ChannelType.TEXT, ChannelType.NEWS}, required = false) GuildMessageChannel channel
 		) {
-			if(channel == null) {
+			if (channel == null) {
 				ConfigCommand.updateField(event.getGuild(), config -> config.getStaffConfig().ifPresent(staff -> staff.channel = null)); //Keep role configuration to make it easier to re-enable the feature
-				Main.database.run(handle -> handle.createUpdate("delete from staff_config where guild = :guild")
-						.bind("guild", event.getGuild().getIdLong())
-						.execute()
-				);
 
 				event.reply("Kanal erfolgreich zurückgesetzt").setEphemeral(true).queue();
 			}
 
 			else {
-				if(!channel.getGuild().equals(event.getGuild())) {
+				if (!channel.getGuild().equals(event.getGuild())) {
 					event.reply("Der Kanal ist nicht auf diesem Server!").setEphemeral(true).queue();
 					return;
 				}
 
 				GuildConfig.getConfig(event.getGuild()).getStaffConfig().ifPresent(staff ->
 						staff.getChannel().ifPresent(ch -> {
-							if(staff.message != null) {
+							if (staff.message != null) {
 								ch.deleteMessageById(staff.message).queue();
 							}
 						})

@@ -73,11 +73,11 @@ public class PodcastListener implements Runnable {
 								.map(Role::getAsMention)
 								.orElse("");
 
-						channel.sendMessage(MessageFormat.format(Main.config.spotify.podcast.message,
-								notification,
-								episode.getName(),
-								episode.getExternalUrls().get("spotify")
-						)).queue();
+						channel.sendMessage(Main.config.spotify.podcast.message
+								.replace("%mention%", notification)
+								.replace("%name%", episode.getName())
+								.replace("%url%", episode.getExternalUrls().get("spotify"))
+						).queue();
 					})
 			);
 		}

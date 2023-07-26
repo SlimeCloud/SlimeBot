@@ -33,7 +33,7 @@ dependencies {
     implementation 'org.jdbi:jdbi3-sqlobject:3.39.0'
     implementation 'org.jdbi:jdbi3-postgres:3.39.0'
 
-    implementation 'com.github.MineKingBot:DiscordUtils:3189da7'
+    implementation 'com.github.MineKingBot:DiscordUtils:2d6148f'
 }
 
 String getVersion() {

@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
