@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 public class ResetLevelCommand {
 
 
-    public static String execute(SlashCommandInteractionEvent event, @Option(name = "member") Member member) {
+    public static String execute(SlashCommandInteractionEvent event, Member member) {
         try {
             long userId = member.getIdLong();
             long guildId = event.getGuild().getIdLong();
@@ -26,7 +26,7 @@ public class ResetLevelCommand {
 
 
     @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, Member member) {
+    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "member") Member member) {
         event.reply(execute(event, member)).setEphemeral(true).queue();
     }
 

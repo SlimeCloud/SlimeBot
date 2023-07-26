@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 @ApplicationCommand(name = "messages", description = "Resete die Nachrichten Statistiken eines nutzers")
 public class ResetMessagesCommand {
 
-    public static String execute(SlashCommandInteractionEvent event, @Option(name = "member") Member member) {
+    public static String execute(SlashCommandInteractionEvent event, Member member) {
         try {
             long userId = member.getIdLong();
             long guildId = event.getGuild().getIdLong();
@@ -25,7 +25,7 @@ public class ResetMessagesCommand {
 
 
     @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, Member member) {
+    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "member") Member member) {
         event.reply(execute(event, member)).setEphemeral(true).queue();
     }
 
