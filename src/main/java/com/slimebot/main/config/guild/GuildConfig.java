@@ -143,7 +143,7 @@ public class GuildConfig {
 	)
 	public StaffConfig staffMessage;
 
-	@ConfigCategory(name = "Level", description = "Level-System")
+	@ConfigCategory(name = "level", description = "Level-System")
 	public LevelGuildConfig level;
 
 	public Optional<Color> getColor() {
