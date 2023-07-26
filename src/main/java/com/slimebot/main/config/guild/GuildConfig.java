@@ -142,6 +142,7 @@ public class GuildConfig {
 			customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
 	)
 	public StaffConfig staffMessage;
+	public LevelGuildConfig level;
 
 	public Optional<Color> getColor() {
 		return Optional.ofNullable(color).map(Color::decode);

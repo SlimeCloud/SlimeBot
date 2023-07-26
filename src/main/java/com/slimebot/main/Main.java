@@ -6,13 +6,16 @@ import com.slimebot.alerts.holidays.HolidayAlert;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
 import com.slimebot.commands.config.ConfigCommand;
-import com.slimebot.commands.config.setup.SetupCommand;
+import com.slimebot.commands.level.LeaderboardCommand;
+import com.slimebot.commands.level.LevelCommand;
+import com.slimebot.commands.level.RankCommand;
 import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
 import com.slimebot.commands.report.UserReportSlashCommand;
 import com.slimebot.events.ReadyListener;
 import com.slimebot.events.TimeoutListener;
+import com.slimebot.level.LevelListener;
 import com.slimebot.main.config.Config;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.message.StaffMessage;
@@ -83,6 +86,10 @@ public class Main {
 
 		database = new Database();
 
+		boolean dbAvailable = Main.config.database != null;
+
+		holiday = new HolidayAlert();
+
 		JDABuilder jdaBuilder = JDABuilder.createDefault(token)
 				.setActivity(config.activity.build())
 
@@ -136,31 +143,30 @@ public class Main {
 
 							config.registerCommand(SetupCommand.class);
 
-							if(Main.config.database != null) {
+							if(dbAvailable) {
+								if(Main.config.level != null) {
+									config.registerCommand(RankCommand.class);
+									config.registerCommand(LeaderboardCommand.class);
+									config.registerCommand(LevelCommand.class);
+								} else logger.warn("Level System aufgrund fehlender Config deaktiviert");
+							} else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
+
+							if(dbAvailable) {
 								config.registerCommand(UserReportCommand.class);
 								config.registerCommand(MessageReportCommand.class);
 								config.registerCommand(UserReportSlashCommand.class);
 								config.registerCommand(ReportCommand.class);
-							}
-
-							else {
-								logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
-							}
+							} else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
 						}
 				)
 				.useCommandCache(null);
 
 		jdaInstance = discordUtils.build();
 
-		if(config.spotify != null) {
-			spotify = new SpotifyListenerManager();
-		}
+        if(dbAvailable && Main.config.level != null) jdaInstance.addEventListener(new LevelListener());
 
-		else {
-			logger.info("No spotify configuration found - Disabled spotify notifications");
-		}
-
-		holiday = new HolidayAlert();
+        if(config.spotify != null) spotify = new SpotifyListenerManager();
+        else logger.info("No spotify configuration found - Disabled spotify notifications");
 	}
 
 	/**
