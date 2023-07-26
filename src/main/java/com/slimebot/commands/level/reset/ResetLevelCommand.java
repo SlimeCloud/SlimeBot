@@ -16,7 +16,7 @@ public class ResetLevelCommand {
             long userId = member.getIdLong();
             long guildId = event.getGuild().getIdLong();
             Level lvl = Level.getLevel(guildId, userId);
-            Level.addLevel(guildId, userId, lvl.level()*-1, 0, 0);
+            Level.addLevel(guildId, userId, lvl.level() * -1, 0, 0);
             return "Level von " + member.getAsMention() + " (" + member.getEffectiveName() + ") erfolgreich zurückgesetzt!";
         } catch (Exception e) {
             e.printStackTrace();

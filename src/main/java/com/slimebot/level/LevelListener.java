@@ -38,14 +38,15 @@ public class LevelListener extends ListenerAdapter implements Runnable {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         User author = event.getAuthor();
-        if(chatTimeoutMap.getOrDefault(author.getIdLong(), 0L) + config.messageCooldown >= System.currentTimeMillis()) return;
+        if (chatTimeoutMap.getOrDefault(author.getIdLong(), 0L) + config.messageCooldown >= System.currentTimeMillis())
+            return;
 
         chatTimeoutMap.put(author.getIdLong(), System.currentTimeMillis());
         String message = event.getMessage().getContentRaw();
         String[] words = message.split(" ");
         double xp = MathUtil.randomInt(config.minMessageXP, config.maxMessageXP);
-        for(String word : words) {
-            if(word.length() >= config.minWordLength) {
+        for (String word : words) {
+            if (word.length() >= config.minWordLength) {
                 xp += MathUtil.randomDouble(config.minWordXP, config.maxWordXP);
             }
         }
@@ -59,18 +60,18 @@ public class LevelListener extends ListenerAdapter implements Runnable {
         Guild guild = event.getGuild();
         Member member = event.getMember();
         testLeveling(union, guild, member);
-        if (union!=null) {
+        if (union != null) {
             AudioChannelUnion finalUnion = union;
             union.asVoiceChannel().getMembers().forEach(m -> testLeveling(finalUnion, guild, m));
         }
         if (event instanceof GuildVoiceUpdateEvent updateEvent) {
             union = updateEvent.getChannelJoined();
-            if (union!=null) {
+            if (union != null) {
                 AudioChannelUnion finalUnion = union;
                 union.asVoiceChannel().getMembers().forEach(m -> testLeveling(finalUnion, guild, m));
             }
             union = updateEvent.getChannelLeft();
-            if (union!=null) {
+            if (union != null) {
                 AudioChannelUnion finalUnion = union;
                 union.asVoiceChannel().getMembers().forEach(m -> testLeveling(finalUnion, guild, m));
             }
@@ -78,12 +79,12 @@ public class LevelListener extends ListenerAdapter implements Runnable {
     }
 
     private void testLeveling(VoiceChannel voice, Guild guild, Member member) {
-        if(canLevel(voice, member)) voiceUsers.put(member.getIdLong(), guild.getIdLong());
+        if (canLevel(voice, member)) voiceUsers.put(member.getIdLong(), guild.getIdLong());
         else voiceUsers.remove(member.getIdLong());
     }
 
     private void testLeveling(AudioChannelUnion union, Guild guild, Member member) {
-        if(canLevel(union, member)) voiceUsers.put(member.getIdLong(), guild.getIdLong());
+        if (canLevel(union, member)) voiceUsers.put(member.getIdLong(), guild.getIdLong());
         else voiceUsers.remove(member.getIdLong());
     }
 
@@ -92,14 +93,14 @@ public class LevelListener extends ListenerAdapter implements Runnable {
     }
 
     private boolean canLevel(VoiceChannel channel, Member member) {
-        if(channel == null) return false;
+        if (channel == null) return false;
         List<Member> members = channel.getMembers();
-        if(members.size() <= 1) return false;
-        if(member.getVoiceState().isMuted()) return false;
+        if (members.size() <= 1) return false;
+        if (member.getVoiceState().isMuted()) return false;
         boolean flag = true, flag1 = true;
-        for(Member m : members) {
-            if(m.getIdLong() == member.getIdLong()) flag = false;
-            else if(!m.getUser().isBot() && !m.getVoiceState().isMuted()) flag1 = false;
+        for (Member m : members) {
+            if (m.getIdLong() == member.getIdLong()) flag = false;
+            else if (!m.getUser().isBot() && !m.getVoiceState().isMuted()) flag1 = false;
         }
         return !flag && !flag1;
     }

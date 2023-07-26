@@ -28,7 +28,7 @@ public record Level(long guildId, long userId, int level, int xp, int messages) 
     }
 
     public Level add(int level, int xp, int messages) {
-        return new Level(guildId(), userId(), level()+level, xp()+xp, messages()+messages);
+        return new Level(guildId(), userId(), level() + level, xp() + xp, messages() + messages);
     }
 
     @Override
@@ -54,7 +54,7 @@ public record Level(long guildId, long userId, int level, int xp, int messages) 
     }
 
     public static int calculateRequiredXP(int level) {
-        return (int) (5*Math.pow(level, 2)+(50*level)+100);
+        return (int) (5 * Math.pow(level, 2) + (50 * level) + 100);
     }
 
     public static Level getLevel(long guildId, long userId) {
@@ -68,16 +68,16 @@ public record Level(long guildId, long userId, int level, int xp, int messages) 
     public static void setLevel(long guildId, long userId, int level, int xp, int messages) {
         Member member = Main.jdaInstance.getGuildById(guildId).getMemberById(userId);
 
-        int reqXp = calculateRequiredXP(level+1);
-        while (reqXp<=xp) {
-            onLevelUp(member.getGuild(), member, level, ++level, xp, xp-=reqXp);
-            reqXp = calculateRequiredXP(level+1);
+        int reqXp = calculateRequiredXP(level + 1);
+        while (reqXp <= xp) {
+            onLevelUp(member.getGuild(), member, level, ++level, xp, xp -= reqXp);
+            reqXp = calculateRequiredXP(level + 1);
         }
         new Level(guildId, userId, level, xp, messages).save();
     }
 
     public static void addLevel(long guildId, long userId, int level, int xp, int messages) {
-        setLevel(getLevel(guildId, userId).add(level, MathUtil.round(xp*Main.config.level.xpMultiplier), messages));
+        setLevel(getLevel(guildId, userId).add(level, MathUtil.round(xp * Main.config.level.xpMultiplier), messages));
     }
 
     public static List<Level> getLevels(long guildId) {
@@ -92,7 +92,7 @@ public record Level(long guildId, long userId, int level, int xp, int messages) 
 
     public static @NotNull List<Level> getTop(long guildId, int limit) {
         List<Level> data = new ArrayList<>();
-        if(limit <= 0) return data;
+        if (limit <= 0) return data;
         data.addAll(getLevels(guildId));
         data.sort(null);
         return data.subList(0, Math.max(1, Math.min(data.size(), limit)));
@@ -100,15 +100,15 @@ public record Level(long guildId, long userId, int level, int xp, int messages) 
 
     public static int getPosition(long guildId, long userId) {
         List<Level> data = getTop(guildId, 0);
-        for(int i = 0; i < data.size(); i++) {
-            if(data.get(i).userId() == userId) return i + 1;
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).userId() == userId) return i + 1;
         }
         throw new RuntimeException();
     }
 
     private static void onLevelUp(Guild guild, Member member, int oldLevel, int newLevel, int oldXp, int newXp) {
         TextChannel channel = Main.jdaInstance.getTextChannelById(GuildConfig.getConfig(guild.getIdLong()).level.notificationChannel);
-        if (channel==null || member.getUser().isBot()) return;
+        if (channel == null || member.getUser().isBot()) return;
         channel.sendMessage(Main.config.level.levelUpMessage.replace("%user%", member.getAsMention()).replace("%level%", String.valueOf(newLevel))).queue();
     }
 

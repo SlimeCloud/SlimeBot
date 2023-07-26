@@ -20,7 +20,7 @@ public class RankCard extends Graphic {
         Font font_;
         try {
             font_ = CustomFont.getFont("Ubuntu.ttf", Font.BOLD, 80);
-        } catch(IOException | FontFormatException e) {
+        } catch (IOException | FontFormatException e) {
             e.printStackTrace();
             font_ = new Font("Arial", Font.BOLD, 80);
         }
@@ -70,6 +70,6 @@ public class RankCard extends Graphic {
 
     private String getAvatarURL(User user) {
         String url = user.getAvatarUrl();
-        return url==null ? user.getDefaultAvatarUrl() : url;
+        return url == null ? user.getDefaultAvatarUrl() : url;
     }
 }

@@ -16,11 +16,11 @@ public class MathUtil {
     }
 
     public static double randomDouble(double min, double max) {
-        return Math.random()* range(min, max)+min;
+        return Math.random() * range(min, max) + min;
     }
 
     public static int randomInt(int min, int max) {
-        return (int) (Math.random()* range(min, max)+min);
+        return (int) (Math.random() * range(min, max) + min);
     }
 
 }

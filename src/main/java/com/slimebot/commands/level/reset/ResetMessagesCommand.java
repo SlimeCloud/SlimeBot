@@ -15,7 +15,7 @@ public class ResetMessagesCommand {
             long userId = member.getIdLong();
             long guildId = event.getGuild().getIdLong();
             Level lvl = Level.getLevel(guildId, userId);
-            Level.addLevel(guildId, userId, 0, 0, lvl.messages()*-1);
+            Level.addLevel(guildId, userId, 0, 0, lvl.messages() * -1);
             return "Nachrichten Statistik von " + member.getAsMention() + " (" + member.getEffectiveName() + ") erfolgreich zurückgesetzt!";
         } catch (Exception e) {
             e.printStackTrace();

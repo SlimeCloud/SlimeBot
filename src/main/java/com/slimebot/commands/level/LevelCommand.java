@@ -4,7 +4,10 @@ import com.slimebot.commands.level.add.AddLevelCommand;
 import com.slimebot.commands.level.add.AddXPCommand;
 import com.slimebot.commands.level.remove.RemoveLevelCommand;
 import com.slimebot.commands.level.remove.RemoveXPCommand;
-import com.slimebot.commands.level.reset.*;
+import com.slimebot.commands.level.reset.ResetAllCommand;
+import com.slimebot.commands.level.reset.ResetLevelCommand;
+import com.slimebot.commands.level.reset.ResetMessagesCommand;
+import com.slimebot.commands.level.reset.ResetXPCommand;
 import com.slimebot.level.Level;
 import com.slimebot.main.CommandPermission;
 import com.slimebot.main.config.guild.GuildConfig;
@@ -22,13 +25,16 @@ public class LevelCommand {
 
 
     @ApplicationCommand(name = "add", description = "Füge einem nutzer XP oder Level hinzu", subcommands = {AddLevelCommand.class, AddXPCommand.class})
-    public static class AddCommand {}
+    public static class AddCommand {
+    }
 
     @ApplicationCommand(name = "remove", description = "Entferne von einem nutzer XP oder Level", subcommands = {RemoveLevelCommand.class, RemoveXPCommand.class})
-    public static class RemoveCommand {}
+    public static class RemoveCommand {
+    }
 
     @ApplicationCommand(name = "reset", description = "Resete Level, XP oder Nachrichten anzahl eines nutzers", subcommands = {ResetAllCommand.class, ResetLevelCommand.class, ResetMessagesCommand.class, ResetXPCommand.class})
-    public static class ResetCommand {}
+    public static class ResetCommand {
+    }
 
     @ApplicationCommand(name = "stats", description = "zeigt die nutzer Statistiken an")
     public static class StatsCommand {

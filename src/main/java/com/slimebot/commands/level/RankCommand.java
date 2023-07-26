@@ -15,7 +15,7 @@ public class RankCommand {
 
     @ApplicationCommandMethod
     public void performCommand(SlashCommandInteractionEvent event, @Option(name = "user", required = false) User user) {
-        if(user == null) user = event.getUser();
+        if (user == null) user = event.getUser();
 
         if (user.isBot()) {
             event.reply("Bots wie " + user.getAsMention() + " können nicht leveln!").queue();
@@ -26,7 +26,7 @@ public class RankCommand {
         event.deferReply().queue();
         try {
             event.getHook().sendFiles(new RankCard(level).getFile()).queue();
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -15,7 +15,7 @@ public class ResetXPCommand {
             long userId = member.getIdLong();
             long guildId = event.getGuild().getIdLong();
             Level lvl = Level.getLevel(guildId, userId);
-            Level.addLevel(guildId, userId, 0, lvl.xp()*-1, 0);
+            Level.addLevel(guildId, userId, 0, lvl.xp() * -1, 0);
             return "XP von " + member.getAsMention() + " (" + member.getEffectiveName() + ") erfolgreich zurückgesetzt!";
         } catch (Exception e) {
             e.printStackTrace();
