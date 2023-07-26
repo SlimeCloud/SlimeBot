@@ -6,6 +6,7 @@ import com.slimebot.alerts.holidays.HolidayAlert;
 import com.slimebot.alerts.spotify.SpotifyListenerManager;
 import com.slimebot.commands.*;
 import com.slimebot.commands.config.ConfigCommand;
+import com.slimebot.commands.config.setup.SetupCommand;
 import com.slimebot.commands.level.LeaderboardCommand;
 import com.slimebot.commands.level.LevelCommand;
 import com.slimebot.commands.level.RankCommand;

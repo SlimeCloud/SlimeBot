@@ -142,6 +142,8 @@ public class GuildConfig {
 			customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
 	)
 	public StaffConfig staffMessage;
+
+	@ConfigCategory(name = "Level", description = "Level-System")
 	public LevelGuildConfig level;
 
 	public Optional<Color> getColor() {

@@ -26,6 +26,7 @@ public class Config {
 	public DatabaseConfig database;
 	public SpotifyConfig spotify;
 	public GitHubConfig github;
+	public LevelConfig level;
 
 	public String color;
 
