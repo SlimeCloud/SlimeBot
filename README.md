@@ -11,8 +11,9 @@ Dieses Projekt steht unter der [GNU Affero General Public License v3.0](https://
 1. [Issues](#-issues)
 2. [Mitmachen](#-contributing)
 3. [Style-Guide](#-style-guide)
-4. [Datenbank](#-datenbank)
-5. [Befehle](#-befehle-und-zugehörige-events)
+4. [Konfiguration](#-konfiguration)
+5. [Datenbank](#-datenbank)
+6. [Befehle](#-befehle-und-zugehörige-events)
    1. [Grundlagen](#befehle)
    2. [Zusätzlicher Registrationscode](#setup)
    3. [Events](#events)
@@ -59,7 +60,7 @@ Das Projekt hat Start-Konfigurationen vordefiniert, die verwendet werden können
 Um runtime daten vom Code zu trennen, führt die Konfiguration den Code im Ordner `run` aus.
 Im Projekt befindet sich ein Ordner `run_template`. 
 In diesem Ordner findest du eine standard `config` Datei sowie eine `.env` Datei.
-Bevor du startest, muss der `run_template` Order mit dem Namen `run` kopiert werden.
+Bevor du startest, muss der `run_template` Order kopiert und die Kopie in `run` umbenannt werden.
 In diesem `run` Ordner kannst du die Konfiguration nach deinen wünschen anpassen.
 Trage dazu zunächst dein Bot-Token in der `.env` Datei als `TEST_TOKEN` ein.
 Es wird vorausgesetzt, dass du bereits einen Bot Account im [Developer Portal](https://discord.com/developers) erstellt hast, und weißt, wie du das Token kopieren kannst.
