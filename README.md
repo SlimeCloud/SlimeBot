@@ -12,6 +12,7 @@ Dieses Projekt steht unter der [GNU Affero General Public License v3.0](https://
 2. [Mitmachen](#-contributing)
 3. [Style-Guide](#-style-guide)
 4. [Konfiguration](#-konfiguration)
+   1. [Konfiguration hinzufügen](#konfiguration-hinzufügen) 
 5. [Datenbank](#-datenbank)
 6. [Befehle](#-befehle-und-zugehörige-events)
    1. [Grundlagen](#befehle)
@@ -125,9 +126,11 @@ Um kleinere Datenmengen - wie zum Beispiel für Server Konfigurationen - verwend
 In diesem Ordner gibt es für jeden Server eine Datei `<server id>.json`. 
 Sie enthält jegliche Konfiguration für den Server.
 Um die Daten in Java zu verwenden wird - ähnlich wie bei der [Bot Konfiguration](#-konfiguration) - eine Java Klasse mit der gleichen Struktur wie die Datei erstellt, die dann mit den Daten aus der Datei befüllt wird.
+
+### Konfiguration hinzufügen
 Wenn du selbst ein neues Konfigurationsfeld benötigst, kannst du einfach eine Java Variable in der `GuildConfig` Klasse erstellen. 
-Zusätzlich sollte eine getter-Methode erstellt werden, die ein Optional zurückgibt. 
-Dadurch wird das Handhaben von nicht-gesetzten Konfigurationsfeldern vereinfacht. 
+Zusätzlich sollte eine getter-Methode erstellt werden, die ein Optional zurückgibt. Dadurch wird das Handhaben von nicht-gesetzten Konfigurationsfeldern vereinfacht.
+
 Wenn du eine neue Konfigurationskategorie hinzufügst, kannst du eine neue Klasse im package `com.slimebot.main.config.guild` erstellen und ein Feld mit dieser Klasse als Typ in `GuildConfig` hinzufügen.
 Dieses Feld sollte die Annotation `ConfigCategory` haben, damit automatisch ein Konfigurationsbefehl erstellt wird.
 Die tatsächlichen Konfigurationsfelder, entweder in einer Kategorie oder in `GuildConfig` selber, sollten die Annotation `ConfigField` haben, ebenfalls um automatisch die Konfigurationsbefehle zu erstellen.
