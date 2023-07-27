@@ -140,7 +140,11 @@ public class ConfigFieldFrame extends MessageFrame {
 
 		ConfigCommand.updateField(guild, config -> {
 			try {
-				field.set(instanceProvider.getInstance(false, config), value);
+				Object instance = instanceProvider.getInstance(false, config);
+
+				if(instance == null) return;
+
+				field.set(instance, value);
 			} catch (Exception e) {
 				ConfigCommand.logger.error("Fehler beim setzten von " + field.getName(), e);
 			}
