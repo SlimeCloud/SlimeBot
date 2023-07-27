@@ -68,6 +68,7 @@ public class Main {
 	public static GitHub github;
 
 	public static void main(String[] args) throws IOException {
+		System.out.println("just a test");
 		config = Config.readFromFile("config");
 		logger.info("Bot Version: {}", BuildInfo.version);
 
