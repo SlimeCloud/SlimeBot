@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-@ApplicationCommand(name = "level", description = "Bearbeite die Level daten eines nutzers", guildOnly = true)
+@ApplicationCommand(name = "level", description = "Bearbeite die Level daten eines nutzers", feature = "level")
 public class LevelCommand {
 
     public final CommandPermission permission = CommandPermission.TEAM;
