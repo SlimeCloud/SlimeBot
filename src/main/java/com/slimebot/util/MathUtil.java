@@ -1,6 +1,9 @@
 package com.slimebot.util;
 
+import java.util.Random;
+
 public class MathUtil {
+    public final static Random random = new Random();
 
     public static double round(double value, int places) {
         int scale = (int) Math.pow(10, places);
@@ -11,16 +14,11 @@ public class MathUtil {
         return (int) round(value, 0);
     }
 
-    public static double range(double d1, double d2) {
-        return Math.max(d1, d2) - Math.min(d1, d2);
+    public static int randomInt(int lowerBound, int upperBound) {
+        return lowerBound + random.nextInt(upperBound - lowerBound);
     }
 
-    public static double randomDouble(double min, double max) {
-        return Math.random() * range(min, max) + min;
+    public static double randomDouble(double lowerBound, double upperBound) {
+        return lowerBound + random.nextDouble(upperBound - lowerBound);
     }
-
-    public static int randomInt(int min, int max) {
-        return (int) (Math.random() * range(min, max) + min);
-    }
-
 }

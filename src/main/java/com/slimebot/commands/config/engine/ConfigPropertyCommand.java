@@ -38,7 +38,7 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 
 					if(instance == null) return;
 
-					field.set(instanceProvider, null);
+					field.set(instance, null);
 				} catch (Exception e) {
 					ConfigCommand.logger.error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
 				}

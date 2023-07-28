@@ -142,13 +142,13 @@ public class GuildConfig {
 	)
 	public FdmdsConfig fdmds;
 
-	@ConfigCategory(name = "staff", description = "Team-Nachricht", updateCommands = true,
+	@ConfigCategory(name = "staff", description = "Team-Nachricht",
 			subcommands = {StaffConfigCommand.ChannelCommand.class, StaffConfigCommand.AddRoleCommand.class, StaffConfigCommand.RemoveRoleCommand.class},
 			customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
 	)
 	public StaffConfig staffMessage;
 
-	@ConfigCategory(name = "level", description = "Level-System")
+	@ConfigCategory(name = "level", description = "Level-System", updateCommands = true)
 	public LevelGuildConfig level;
 
 	public Optional<Color> getColor() {
@@ -187,6 +187,10 @@ public class GuildConfig {
 
 	public Optional<StaffConfig> getStaffConfig() {
 		return Optional.ofNullable(staffMessage);
+	}
+
+	public Optional<LevelGuildConfig> getLevelConfig() {
+		return Optional.ofNullable(level);
 	}
 
 	public StaffConfig getOrCreateStaff() {

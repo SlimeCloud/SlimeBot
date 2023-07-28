@@ -20,9 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 @ApplicationCommand(name = "level", description = "Bearbeite die Level daten eines nutzers", feature = "level")
 public class LevelCommand {
-
     public final CommandPermission permission = CommandPermission.TEAM;
-
 
     @ApplicationCommand(name = "add", description = "Füge einem nutzer XP oder Level hinzu", subcommands = {AddLevelCommand.class, AddXPCommand.class})
     public static class AddCommand {
@@ -38,17 +36,18 @@ public class LevelCommand {
 
     @ApplicationCommand(name = "stats", description = "zeigt die nutzer Statistiken an")
     public static class StatsCommand {
-
         @ApplicationCommandMethod
         public void processCommand(SlashCommandInteractionEvent event, @Option(name = "member") Member member) {
-            Level lvl = Level.getLevel(event.getGuild().getIdLong(), member.getIdLong());
+            Level level = Level.getLevel(member);
+
             event.replyEmbeds(new EmbedBuilder()
                     .setTitle(member.getEffectiveName() + "`s Stats")
-                    .addField("Level", String.valueOf(lvl.level()), false)
-                    .addField("XP", String.valueOf(lvl.xp()), false)
-                    .addField("Nachrichten", String.valueOf(lvl.messages()), false)
+                    .addField("Level", String.valueOf(level.level()), false)
+                    .addField("XP", String.valueOf(level.xp()), false)
+                    .addField("Nachrichten", String.valueOf(level.messages()), false)
                     .setColor(GuildConfig.getColor(event.getGuild()))
-                    .build()).setEphemeral(true).queue();
+                    .build()
+            ).setEphemeral(true).queue();
         }
     }
 }

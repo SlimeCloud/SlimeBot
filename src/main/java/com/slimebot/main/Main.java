@@ -16,7 +16,7 @@ import com.slimebot.commands.report.UserReportCommand;
 import com.slimebot.commands.report.UserReportSlashCommand;
 import com.slimebot.events.ReadyListener;
 import com.slimebot.events.TimeoutListener;
-import com.slimebot.level.LevelListener;
+import com.slimebot.events.LevelListener;
 import com.slimebot.main.config.Config;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.message.StaffMessage;
@@ -176,7 +176,10 @@ public class Main {
 	 */
 	public static void updateGuildCommands(Guild guild) {
 		discordUtils.getCommandCache().updateGuildCommands(guild,
-				Map.of("fdmds", GuildConfig.getConfig(guild).getFdmds().isPresent()),
+				Map.of(
+						"fdmds", GuildConfig.getConfig(guild).getFdmds().isPresent(),
+						"level", GuildConfig.getConfig(guild).getLevelConfig().isPresent()
+				),
 				error -> logger.error("Failed to update guild commands for " + guild, error)
 		);
 	}
