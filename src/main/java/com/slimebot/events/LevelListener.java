@@ -7,6 +7,7 @@ import com.slimebot.util.MathUtil;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -32,6 +33,13 @@ public class LevelListener extends ListenerAdapter {
         Main.scheduleAtFixedRate(5, TimeUnit.SECONDS, () -> voiceUsers.forEach((user, guild) ->
                 Level.getLevel(guild, user).addXp(0, MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP))
         ));
+    }
+
+    @Override
+    public void onGuildBan(@NotNull GuildBanEvent event) {
+        Level.getLevel(event.getGuild().getIdLong(), event.getUser().getIdLong())
+                .setXp(0, 0)
+                .save();
     }
 
     @Override
