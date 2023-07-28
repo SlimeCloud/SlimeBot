@@ -10,9 +10,10 @@ public class ConfigCategoryCommand extends BaseCommand<CommandContext> {
 		description = category.description();
 
 		for(Field field : fields) {
-			if(!field.isAnnotationPresent(ConfigField.class)) continue;
-
 			ConfigField info = field.getAnnotation(ConfigField.class);
+
+			if(info == null || info.title().isEmpty()) continue;
+
 			addSubcommand(info.command(), new ConfigPropertyCommand(field, info, category, instanceProvider));
 		}
 	}

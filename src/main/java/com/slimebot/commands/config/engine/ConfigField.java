@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface ConfigField {
 	String command();
-	String title();
+	String title() default "";
 	String description();
 	ConfigFieldType type();
 	FieldVerification verifier() default FieldVerification.ALL;

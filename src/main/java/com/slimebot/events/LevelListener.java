@@ -3,6 +3,7 @@ package com.slimebot.events;
 import com.slimebot.level.Level;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.LevelConfig;
+import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.util.MathUtil;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -31,7 +32,7 @@ public class LevelListener extends ListenerAdapter {
         Main.jdaInstance.getVoiceChannels().forEach(this::updateChannel);
 
         Main.scheduleAtFixedRate(5, TimeUnit.SECONDS, () -> voiceUsers.forEach((user, guild) ->
-                Level.getLevel(guild, user).addXp(0, (int) (MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP) * config.xpMultiplier))
+                Level.getLevel(guild, user).addXp(0, (int) (MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP) * GuildConfig.getConfig(guild).getLevelConfig().map(config -> config.xpMultiplier).orElse(1.0)))
         ));
     }
 
@@ -44,6 +45,8 @@ public class LevelListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        if(!event.isFromGuild()) return;
+
         User author = event.getAuthor();
 
         if (messageTimeout.getOrDefault(author.getIdLong(), 0L) + config.messageCooldown >= System.currentTimeMillis()) return;
@@ -58,7 +61,7 @@ public class LevelListener extends ListenerAdapter {
         }
 
         Level.getLevel(event.getMember())
-                .addXp(0, (int) (MathUtil.round(xp) * config.xpMultiplier))
+                .addXp(0, (int) (MathUtil.round(xp) * GuildConfig.getConfig(event.getGuild()).getLevelConfig().map(config -> config.xpMultiplier).orElse(1.0)))
                 .addMessages(1)
                 .save();
     }
