@@ -48,7 +48,7 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
         if (limit <= 0) return Collections.emptyList();
 
         return getLevels(guild).stream()
-                .sorted()
+                .sorted(Comparator.reverseOrder())
                 .limit(limit)
                 .toList();
     }
