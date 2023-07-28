@@ -54,25 +54,7 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
     }
 
     public Level addXp(int level, int xp) {
-        Member member = Main.jdaInstance.getGuildById(guild).getMemberById(user);
-
-        int newLevel = this.level + level;
-        int newXp = this.xp + xp;
-
-        while(true) {
-            int requiredXp = calculateRequiredXP(level + 1);
-
-            if(newXp < requiredXp) break;
-
-            newXp -= requiredXp;
-            level++;
-        }
-
-        if(newLevel > this.level) {
-            onLevelUp(member, newLevel);
-        }
-
-        return new Level(guild, user, newLevel, newXp, messages);
+        return setXp(this.level + level, this.xp + xp);
     }
 
     public Level addMessages(int messages) {
@@ -80,8 +62,25 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
     }
 
     public Level setXp(Integer level, Integer xp) {
-        if(level != null) updateLevelRoles(guild, user, level);
-        return new Level(guild, user, level == null ? this.level : level, xp == null ? this.xp : xp, messages);
+        Member member = Main.jdaInstance.getGuildById(guild).getMemberById(user);
+
+        if(level == null) level = this.level;
+        if(xp == null) xp = this.xp;
+
+        while(true) {
+            int requiredXp = calculateRequiredXP(level + 1);
+
+            if(xp < requiredXp) break;
+
+            xp -= requiredXp;
+            level++;
+        }
+
+        if(level > this.level) {
+            onLevelUp(member, level);
+        }
+
+        return new Level(guild, user, level, xp, messages);
     }
 
     public Level setMessages(int messages) {
