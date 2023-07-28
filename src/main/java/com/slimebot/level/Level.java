@@ -118,7 +118,7 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
 
 
     public static int calculateRequiredXP(int level) {
-        return (int) (5 * Math.pow(level, 2) + (50 * level) + 100);
+        return (5 * level*level + 50 * level + 100);
     }
 
     private static void onLevelUp(Member member, int newLevel) {
