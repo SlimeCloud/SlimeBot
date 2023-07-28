@@ -31,7 +31,7 @@ public class LevelListener extends ListenerAdapter {
         Main.jdaInstance.getVoiceChannels().forEach(this::updateChannel);
 
         Main.scheduleAtFixedRate(5, TimeUnit.SECONDS, () -> voiceUsers.forEach((user, guild) ->
-                Level.getLevel(guild, user).addXp(0, MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP))
+                Level.getLevel(guild, user).addXp(0, (int) (MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP) * config.xpMultiplier))
         ));
     }
 
@@ -58,7 +58,7 @@ public class LevelListener extends ListenerAdapter {
         }
 
         Level.getLevel(event.getMember())
-                .addXp(0, MathUtil.round(xp))
+                .addXp(0, (int) (MathUtil.round(xp) * config.xpMultiplier))
                 .addMessages(1)
                 .save();
     }
