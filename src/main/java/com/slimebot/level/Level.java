@@ -111,6 +111,21 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
     }
 
     @Override
+    public boolean equals(Object o) {
+        return o instanceof Level l && l.guild == guild && l.user == user && l.level == level && l.xp == xp && l.messages == messages();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (guild ^ (guild >>> 32));
+        result = 31 * result + (int) (user ^ (user >>> 32));
+        result = 31 * result + level;
+        result = 31 * result + xp;
+        result = 31 * result + messages;
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "Level{" +
                 "level=" + level +
