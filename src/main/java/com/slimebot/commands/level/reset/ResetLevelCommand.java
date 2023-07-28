@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 @ApplicationCommand(name = "level", description = "Setzt die Level eines Nutzers zurück")
 public class ResetLevelCommand {
     public static String execute(Member member) {
-        Level.getLevel(member).setXp(0, null);
+        Level.getLevel(member).setXp(0, 0);
         return "Level von " + member.getAsMention() + " zurückgesetzt";
     }
 

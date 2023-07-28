@@ -14,8 +14,7 @@ public class ResetAllCommand {
 	) {
 		event.reply(
 				ResetLevelCommand.execute(member) + "\n\n" +
-						ResetMessagesCommand.execute(member) + "\n\n" +
-						ResetXPCommand.execute(member)
+						ResetMessagesCommand.execute(member)
 		).setEphemeral(true).queue();
 	}
 }
