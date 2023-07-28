@@ -2,6 +2,7 @@ package com.slimebot.main.config.guild;
 
 import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.commands.config.FdmdsConfigCommand;
+import com.slimebot.commands.config.LevelConfigCommand;
 import com.slimebot.commands.config.StaffConfigCommand;
 import com.slimebot.commands.config.engine.ConfigCategory;
 import com.slimebot.commands.config.engine.ConfigField;
@@ -148,7 +149,9 @@ public class GuildConfig {
 	)
 	public StaffConfig staffMessage;
 
-	@ConfigCategory(name = "level", description = "Level-System", updateCommands = true)
+	@ConfigCategory(name = "level", description = "Level-System", updateCommands = true,
+			subcommands = {LevelConfigCommand.AddRoleCommand.class, LevelConfigCommand.RemoveRoleCommand.class}
+	)
 	public LevelGuildConfig level;
 
 	public Optional<Color> getColor() {
@@ -194,10 +197,11 @@ public class GuildConfig {
 	}
 
 	public StaffConfig getOrCreateStaff() {
-		return getStaffConfig().orElseGet(() -> {
-			staffMessage = new StaffConfig();
-			return staffMessage;
-		});
+		return getStaffConfig().orElseGet(() -> staffMessage = new StaffConfig());
+	}
+
+	public LevelGuildConfig getOrCreateLevel() {
+		return getLevelConfig().orElseGet(() -> level = new LevelGuildConfig());
 	}
 
 	//Internal helper methods

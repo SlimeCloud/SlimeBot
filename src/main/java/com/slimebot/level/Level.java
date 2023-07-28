@@ -137,6 +137,10 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
         );
     }
 
+    public void updateRoles() {
+        updateLevelRoles(guild, user, level);
+    }
+
     @SuppressWarnings("unchecked")
     private static void updateLevelRoles(long guildId, long userId, int level) {
         Guild guild = Main.jdaInstance.getGuildById(guildId);
