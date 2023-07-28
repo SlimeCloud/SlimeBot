@@ -3,7 +3,7 @@ package com.slimebot.main;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.slimebot.alerts.holidays.HolidayAlert;
-import com.slimebot.alerts.spotify.SpotifyListenerManager;
+import com.slimebot.alerts.spotify.SpotifyListener;
 import com.slimebot.commands.*;
 import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.commands.config.setup.SetupCommand;
@@ -63,7 +63,7 @@ public class Main {
 	public static Database database;
 	public static DiscordUtils discordUtils;
 
-	public static SpotifyListenerManager spotify;
+	public static SpotifyListener spotify;
 	public static HolidayAlert holiday;
 	public static GitHub github;
 
@@ -166,7 +166,7 @@ public class Main {
 
         if(dbAvailable && Main.config.level != null) jdaInstance.addEventListener(new LevelListener());
 
-        if(config.spotify != null) spotify = new SpotifyListenerManager();
+        if(config.spotify != null) spotify = new SpotifyListener();
         else logger.info("No spotify configuration found - Disabled spotify notifications");
 	}
 
