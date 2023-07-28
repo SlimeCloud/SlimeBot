@@ -3,15 +3,17 @@ package com.slimebot.level;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.main.config.guild.LevelGuildConfig;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public record Level(long guild, long user, int level, int xp, int messages) implements Comparable<Level> {
     public Level(long guild, long user) {
@@ -54,8 +56,6 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
     public Level addXp(int level, int xp) {
         Member member = Main.jdaInstance.getGuildById(guild).getMemberById(user);
 
-        System.out.println(member + " + " + level + "," + xp);
-
         int newLevel = this.level + level;
         int newXp = this.xp + xp;
 
@@ -66,8 +66,10 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
 
             newXp -= requiredXp;
             level++;
+        }
 
-            onLevelUp(member, level);
+        if(newLevel > this.level) {
+            onLevelUp(member, newLevel);
         }
 
         return new Level(guild, user, newLevel, newXp, messages);
@@ -78,6 +80,7 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
     }
 
     public Level setXp(Integer level, Integer xp) {
+        if(level != null) updateLevelRoles(guild, user, level);
         return new Level(guild, user, level == null ? this.level : level, xp == null ? this.xp : xp, messages);
     }
 
@@ -116,13 +119,14 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
                 '}';
     }
 
-
     public static int calculateRequiredXP(int level) {
         return (5 * level*level + 50 * level + 100);
     }
 
     private static void onLevelUp(Member member, int newLevel) {
         if(member.getUser().isBot()) return;
+
+        updateLevelRoles(member.getGuild().getIdLong(), member.getIdLong(), newLevel);
 
         GuildConfig.getConfig(member.getGuild().getIdLong()).getLevelConfig().flatMap(LevelGuildConfig::getChannel).ifPresent(
                 channel -> channel.sendMessage(
@@ -131,6 +135,31 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
                                 .replace("%level%", String.valueOf(newLevel))
                 ).queue()
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void updateLevelRoles(long guildId, long userId, int level) {
+        Guild guild = Main.jdaInstance.getGuildById(guildId);
+        UserSnowflake user = UserSnowflake.fromId(userId);
+
+        GuildConfig.getConfig(guild).getLevelConfig().map(config -> config.levelRoles).ifPresent(roles -> {
+            Optional<Long> levelRoleId = roles.entrySet().stream()
+                    .filter(e -> level >= e.getKey())
+                    .sorted(Comparator.comparingInt(e -> ((Map.Entry<Integer, Long>)e).getKey()).reversed())
+                    .limit(1)
+                    .map(Map.Entry::getValue)
+                    .findAny();
+
+            roles.forEach((l, roleId) -> {
+                Role role = guild.getRoleById(roleId);
+
+                if (levelRoleId.isPresent() && roleId.equals(levelRoleId.get())) {
+                    guild.addRoleToMember(user, role).queue();
+                } else {
+                    guild.removeRoleFromMember(user, role).queue();
+                }
+            });
+        });
     }
 
     public static class LevelMapper implements RowMapper<Level> {
