@@ -110,7 +110,7 @@ public class FdmdsCommand {
 			GuildConfig.getConfig(event.getGuild()).getFdmds().flatMap(FdmdsConfig::getLogChannel).ifPresentOrElse(
 					channel -> {
 						channel.sendMessage(MessageCreateData.fromEditData(message)).queue();
-						event.reply("Vorschlag erfolgreich verschickt!").setEphemeral(true).queue();
+						event.reply("Frage erfolgreich eingereicht! Das Team wird die Frage kontrollieren und anschließend veröffentlicht.").setEphemeral(true).queue();
 					},
 					() -> event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue()
 			);
@@ -146,7 +146,7 @@ public class FdmdsCommand {
 
 							// Send and add reactions
 							channel.sendMessage(text)
-									.addActionRow(Button.secondary("fdmds:create", "Frage erstellen"))
+									.addActionRow(Button.secondary("fdmds:create", "Frage einreichen"))
 									.queue(m -> {
 										for(int i = 0; i < choices.lines().count(); i++) {
 											m.addReaction(SlimeEmoji.fromId(i + 1).emoji).queue();
