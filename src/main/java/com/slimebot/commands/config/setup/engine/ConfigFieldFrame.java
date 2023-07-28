@@ -49,6 +49,8 @@ public class ConfigFieldFrame extends MessageFrame {
 				ConfigCommand.logger.error("Fehler beim auslesen des aktuellen Konfigurationswerts für " + field.getName(), e);
 			}
 
+			if(info.title().isEmpty())  System.out.println(field.getName());
+
 			return new EmbedBuilder()
 					.setTitle(info.type().emoji + info.title())
 					.setColor(GuildConfig.getColor(guild))

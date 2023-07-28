@@ -34,6 +34,7 @@ public class SetupMenu extends Menu {
 
 		List<Field> configFields = Stream.of(fields)
 				.filter(f -> f.isAnnotationPresent(ConfigField.class))
+				.filter(f -> !f.getAnnotation(ConfigField.class).title().isEmpty())
 				.toList();
 
 		for(int i = 0; i < configFields.size(); i++) {
