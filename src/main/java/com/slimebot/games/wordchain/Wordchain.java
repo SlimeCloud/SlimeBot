@@ -3,6 +3,7 @@ package com.slimebot.games.wordchain;
 import com.slimebot.games.Game;
 import com.slimebot.main.Main;
 import com.slimebot.games.GamePlayer;
+import com.slimebot.main.config.guild.GuildConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.Channel;
@@ -61,7 +62,7 @@ public class Wordchain extends Game<WordchainPlayer> {
     @Override
     protected EmbedBuilder buildJoinEmbed() {
         return new EmbedBuilder()
-                .setColor(Main.embedColor(String.valueOf(guildId)))
+                .setColor(GuildConfig.getColor(guildId))
                 .setTitle("Neues Wortketten Spiel erstellt!")
                 .setDescription("Um zu erfahren wie \"Wortkette\" funktioniert nutze ```/wordchain explanation```") // TODO
                 .addField("Spielleiter:in:", "<@"+gameMaster+">", true)
