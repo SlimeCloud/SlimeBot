@@ -1,5 +1,6 @@
 package com.slimebot.commands;
 
+import com.slimebot.games.GamePlayer;
 import com.slimebot.games.PlayerGameState;
 import com.slimebot.games.wordchain.Wordchain;
 import com.slimebot.games.wordchain.WordchainPlayer;
@@ -23,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class WordchainCommand {
     @ApplicationCommandMethod
     public void performCommand(SlashCommandInteractionEvent event) {
-        if (PlayerGameState.isInGame(event.getMember().getIdLong())) {
+        if (GamePlayer.isInGame(event.getMember().getIdLong())) {
             event.reply("Du bist schon in einem Game!").setEphemeral(true).queue();
             return;
         }
@@ -64,8 +65,11 @@ public class WordchainCommand {
                                     lives.set(Integer.valueOf(evt.getInteraction().getSelectedOptions().get(0).getValue()));
                                 }),
                                 new ButtonComponent("create", ButtonColor.GREEN, "Erstellen").handle((menu, evt) -> {
+                                    if (GamePlayer.isInGame(event.getMember().getIdLong())) {
+                                        event.reply("Du bist schon in einem Game!").setEphemeral(true).queue();
+                                        return;
+                                    }
                                     menu.close();
-
                                     new Wordchain(event.getMember().getIdLong(), event.getChannel().getIdLong(), event.getGuild().getIdLong(), time.shortValue(), lives.shortValue());
                                 })
                         )

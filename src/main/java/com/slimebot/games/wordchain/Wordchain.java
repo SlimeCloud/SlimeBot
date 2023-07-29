@@ -32,7 +32,7 @@ public class Wordchain extends Game<WordchainPlayer> {
     private final short lives;
 
     public Wordchain(long gameMaster, long channel, long guildId, short seconds, short lives) {
-        super(gameMaster, guildId, true, id -> new WordchainPlayer(id, lives));
+        super(gameMaster, guildId, true, (game, id) -> new WordchainPlayer(id, lives, game));
         this.seconds = seconds;
         this.lives = lives;
 
@@ -72,7 +72,7 @@ public class Wordchain extends Game<WordchainPlayer> {
                 .setTimestamp(Instant.now());
     }
 
-    private void nextTurn() {
+    public void nextTurn() {
         if(scheduledFuture != null)scheduledFuture.cancel(true);
 
         if(players.size() == 1) {
@@ -93,44 +93,10 @@ public class Wordchain extends Game<WordchainPlayer> {
         if(lastWord != null)sendMessage(round + ": " + this.players.get(playerTurn).getAsMention() + " ist an der Reihe! Das letzte Wort ist \"**" + lastWord + "**\"").queue();
 
         scheduledFuture = Main.executor.schedule(() -> {
-            damage(this.players.get(playerTurn), (p, l) -> {
+            this.players.get(playerTurn).damage((p, l) -> {
                 sendMessage(":x: Die Zeit von "+ p.getAsMention() + " ist abgelaufen und hat nur noch **" + l + "** Versuche!").queue();
             });
         }, seconds, TimeUnit.SECONDS);
-    }
-
-    private void damage(WordchainPlayer player, BiConsumer<WordchainPlayer, Short> messageConsumer) {
-        short lives = player.lives;
-        if(lives <= 1) {
-            kickPlayer(player, sendMessage(":x: " + player.getAsMention() +" ist Ausgeschieden!"));
-            nextTurn();
-            return;
-        }
-        lives--;
-        player.lives = lives;
-
-        messageConsumer.accept(player, lives);
-        nextTurn();
-    }
-
-    private void kickPlayer(GamePlayer player, RestAction<?> restAction) {
-        restAction.queue();
-
-        leave(player);
-    }
-
-    public MessageEmbed updateJoinEmbed(MessageEmbed embed) {
-        return new EmbedBuilder()
-                .setColor(Main.embedColor(String.valueOf(guildId)))
-                .setTitle(embed.getTitle())
-                .setDescription("Um zu erfahren wie \"Wortkette\" funktioniert nutze ```/wordchain explanation```") // TODO
-                .addField("Spielleiter:in:", "<@" + gameMaster + ">", true)
-                .addField(":timer: Timeout:", seconds + "s", true)
-                .addField(":x: Max Fehler:", lives + " Fehler", true)
-                .addField("Spieler:", players.stream().map(p -> p.getAsMention()).collect(Collectors.joining("\r\n")), true)
-                .setFooter("GameID: " + uuid)
-                .setTimestamp(Instant.now())
-                .build();
     }
 
     @Override
@@ -166,7 +132,7 @@ public class Wordchain extends Game<WordchainPlayer> {
         char character = content.toLowerCase().charAt(0);
 
         if(character != Character.toLowerCase(lastWord.charAt(lastWord.length()-1))) {
-            damage(player, (p, l) -> {
+            player.damage((p, l) -> {
                 sendMessage(":x: " + player.getAsMention() + " hat ein Fehler gemacht und hat nur noch **" + l + "** Versuche!").queue();
             });
             return;
