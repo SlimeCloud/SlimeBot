@@ -1,0 +1,52 @@
+{
+    "activity": {
+        "type": "PLAYING",
+        "text": "mit Slimebällen"
+    },
+
+    "database": {
+        "host": "localhost/slime",
+        "user": "slime",
+        "password": "-- your database password"
+    },
+
+    "spotify": {
+        "clientId": "-- your client id --",
+        "clientSecret": "-- your client secret --",
+
+        "music": {
+            "message": "%notification%\n## 🎶 ALARM ALARM 🎶\nNeuer Musik Release. 🥳\nGönn dir unbedingt das neue Album: [**%name%**](%url%)",
+            "artistIds": [
+                "0ZzsW7JiW4Ok3H7nFl4yV1"
+            ]
+        },
+
+        "podcast": {
+            "message": "%notification%\n## 🎙️ ALARM ALARM 🎙️\nNeue Podcast-Folge!\nRein da!In der heutigen Folge: [**%name%**](%url%)",
+            "artistIds": [
+                "0HNYFHg2WNq1P56qK6defn"
+            ]
+        }
+    },
+
+    "level": {
+        "levelUpMessage": "Herzlichen Glückwunsch, %user% du bist jetzt level %level%!",
+        "leaderboardTemplate": "zm-f838bf17-d82b-4023-92c4-45e481d546a1",
+        "xpMultiplier": 1,
+        "minVoiceXP": 1,
+        "maxVoiceXP": 3,
+        "minMessageXP": 5,
+        "maxMessageXP": 15,
+        "minWordLength": 3,
+        "minWordXP": 0.05,
+        "maxWordXP": 0.1,
+        "messageCooldown": 15000
+    },
+
+    "github": {
+        "repository": "SlimeCloud/java-SlimeBot",
+        "accessToken": "-- your personal access token --"
+    },
+
+    "color": "#569d3c"
+}

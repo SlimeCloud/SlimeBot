@@ -1,8 +1,7 @@
 package com.slimebot.commands;
 
 import com.slimebot.main.BuildInfo;
-import com.slimebot.main.Main;
-import com.slimebot.utils.Config;
+import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,7 +16,7 @@ public class InfoCommand {
 		event.replyEmbeds(
 				new EmbedBuilder()
 						.setTitle("Informationen über den SlimeBall bot")
-						.setColor(Main.embedColor(event.getGuild().getId()))
+						.setColor(GuildConfig.getColor(event.getGuild()))
 						.setTimestamp(Instant.now())
 						.setDescription("Dieser Bot ist ein Custom bot des SlimeCloud Discords und stellt Features bereit die so von keinem anderen Bot gelöst werden können.")
 						.addField("Gecodet von:", "[SlimeCloud DevTeam](https://github.com/SlimeCloud)", true)

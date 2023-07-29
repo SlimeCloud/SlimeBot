@@ -1,192 +1,169 @@
 package com.slimebot.report;
 
 import com.slimebot.main.Main;
-import com.slimebot.utils.Config;
+import com.slimebot.main.config.guild.GuildConfig;
+import de.mineking.discord.list.ListContext;
+import de.mineking.discord.list.ListEntry;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.simpleyaml.configuration.file.YamlFile;
+import net.dv8tion.jda.api.utils.TimeFormat;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.jdbi.v3.core.mapper.RowMapper;
+import org.jdbi.v3.core.statement.StatementContext;
 
-import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.function.IntFunction;
+import java.util.Optional;
 
-public class Report {
-	public int id;
-	public Type type;
-	public User user;
-	public User by;
-	public LocalDateTime time;
-	public Status status = Status.OPEN;
-	public String msgContent;
-	public String closeReason = "None";
+public class Report implements ListEntry {
+	private final long guild;
+	private final int id;
+	private final Type type;
+	private final UserSnowflake issuer;
+	private final UserSnowflake target;
 
-	public Report(int id, Type type, User user, User by, String msgContent) {
+	private final Timestamp time;
+
+	private final Status status;
+	private final String reason;
+	private final String closeReason;
+
+	private Report(long guild, int id, Type type, UserSnowflake issuer, UserSnowflake target, Timestamp timestamp, Status status, String reason, String closeReason) {
+		this.guild = guild;
 		this.id = id;
 		this.type = type;
-		this.user = user;
-		this.by = by;
-		this.msgContent = msgContent;
-		this.time = LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		this.issuer = issuer;
+		this.target = target;
+		this.time = timestamp;
+		this.status = status;
+		this.reason = reason;
+		this.closeReason = closeReason;
 	}
 
-	public static Button closeButton(int reportID) {
-		return Button.danger("report:close", "Close #" + reportID).withEmoji(Emoji.fromUnicode("\uD83D\uDD12"));
-	}
-
-	public static void createReport(IReplyCallback event, IntFunction<Report> creator, User target) {
-		YamlFile reportFile = Config.getConfig(event.getGuild().getId(), "reports");
-		try {
-			reportFile.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		int reportID = reportFile.getConfigurationSection("reports").size() + 1;
-		Report report = creator.apply(reportID);
-
-		save(event.getGuild().getId(), report);
-		report.log(event.getGuild());
-
-		event.replyEmbeds(
-				new EmbedBuilder()
-						.setTimestamp(Instant.now())
-						.setColor(Main.embedColor(event.getGuild().getId()))
-						.setTitle(":white_check_mark: Report Erfolgreich")
-						.setDescription(target.getAsMention() + " wurde erfolgreich gemeldet")
-						.build()
-		).setEphemeral(true).queue();
-	}
-
-
-	public static Report get(String guildID, int reportID) {
-		YamlFile reportFile = Config.getConfig(guildID, "reports");
-
-		try {
-			reportFile.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		if(!reportFile.contains("reports." + reportID + ".id")) {
-			return null;
-		}
-
-		Report report = new Report(
-				reportFile.getInt("reports." + reportID + ".id"),
-				Type.valueOf(reportFile.getString("reports." + reportID + ".type")),
-				Main.jdaInstance.getUserById(reportFile.getString("reports." + reportID + ".user")),
-				Main.jdaInstance.getUserById(reportFile.getString("reports." + reportID + ".by")),
-				reportFile.getString("reports." + reportID + ".msgContent")
+	public static Report createReport(Guild guild, Type type, User issuer, User target, String reason) {
+		int id = Main.database.handle(handle -> handle.createUpdate("insert into reports(guild, issuer, target, type, message) values(:guild, :issuer, :target, :type, :message)")
+				.bind("guild", guild.getIdLong())
+				.bind("issuer", issuer.getIdLong())
+				.bind("target", target.getIdLong())
+				.bind("type", type.toString())
+				.bind("message", reason)
+				.executeAndReturnGeneratedKeys("id")
+				.mapTo(int.class).one()
 		);
 
-		report.time = LocalDateTime.parse(reportFile.getString("reports." + reportID + ".time"));
-		report.status = Status.valueOf(reportFile.getString("reports." + reportID + ".status"));
-		report.closeReason = reportFile.getString("reports." + reportID + ".closeReason");
-
-		return report;
+		return get(guild, id).orElseThrow();
 	}
 
-	public static void save(String guildID, Report report) {
-		YamlFile reportFile = Config.getConfig(guildID, "reports");
+	public static Optional<Report> get(Guild guild, int id) {
+		return Main.database.handle(handle -> handle.createQuery("select * from reports where guild = :guild and id = :id")
+				.bind("guild", guild.getIdLong())
+				.bind("id", id)
+				.mapTo(Report.class)
+				.findOne()
+		);
+	}
 
-		if(!reportFile.exists()) {
-			try {
-				reportFile.createNewFile();
-			} catch(IOException e) {
-				throw new RuntimeException(e);
+	public void log() {
+		GuildConfig.getConfig(guild).getPunishmentChannel().ifPresent(channel -> {
+			EmbedBuilder embedBuilder = new EmbedBuilder()
+					.setTimestamp(Instant.now())
+					.setColor(GuildConfig.getColor(guild))
+					.setTitle(":exclamation: Neuer Report!")
+					.addField("Report von:", issuer.getAsMention(), true)
+					.addField("Gemeldet:", target.getAsMention(), true);
+
+			if(type == Type.MESSAGE) {
+				embedBuilder
+						.setDescription("Es wurde eine Nachricht gemeldet!")
+						.addField("Nachricht:", reason, false);
 			}
-		}
 
-		try {
-			reportFile.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
+			else {
+				embedBuilder
+						.setDescription("Es wurde eine Person gemeldet!")
+						.addField("Begründung:", reason, false);
+			}
 
-		reportFile.set("reports." + report.id + ".id", report.id);
-		reportFile.set("reports." + report.id + ".type", report.type.toString());
-		reportFile.set("reports." + report.id + ".user", report.user.getId());
-		reportFile.set("reports." + report.id + ".by", report.by.getId());
-		reportFile.set("reports." + report.id + ".time", report.time.toString());
-		reportFile.set("reports." + report.id + ".status", report.status.toString());
-		reportFile.set("reports." + report.id + ".msgContent", report.msgContent);
-		reportFile.set("reports." + report.id + ".closeReason", report.closeReason);
-
-		try {
-			reportFile.save();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
+			channel.sendMessage(buildMessage()).queue();
+		});
 	}
 
-	public void log(Guild guild) {
-		YamlFile config = Config.getConfig(guild.getId(), "mainConfig");
-
-		try {
-			config.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		MessageChannel logChannel = Main.jdaInstance.getChannelById(MessageChannel.class, config.getString("punishmentChannelID"));
-
-		EmbedBuilder embedBuilder = new EmbedBuilder()
-				.setTimestamp(Instant.now())
-				.setColor(Main.embedColor(guild.getId()))
-				.setTitle(":exclamation: Neuer Report!")
-				.addField("Report von:", by.getAsMention(), true)
-				.addField("Gemeldet:", user.getAsMention(), true);
-
-		if(type == Type.MSG) {
-			embedBuilder
-					.setDescription("Es wurde eine Nachricht gemeldet!")
-					.addField("Nachricht:", msgContent, false);
-		}
-
-		else {
-			embedBuilder
-					.setDescription("Es wurde eine Person gemeldet!")
-					.addField("Begründung:", msgContent, false);
-		}
-
-		logChannel.sendMessageEmbeds(embedBuilder.build()).addActionRow(closeButton(id)).queue();
+	public void close(String reason) {
+		Main.database.run(handle -> handle.createUpdate("update reports set status = 'CLOSED', closeReason = :reason where guild = :guild and id = :id")
+				.bind("reason", reason)
+				.bind("guild", guild)
+				.bind("id", id)
+				.execute()
+		);
 	}
 
-	public MessageEmbed asEmbed(String guildID) {
+	public MessageEmbed buildEmbed() {
 		EmbedBuilder embed = new EmbedBuilder()
-				.setColor(Main.embedColor(guildID))
+				.setColor(GuildConfig.getColor(guild))
 				.setTimestamp(Instant.now())
 				.setTitle(":exclamation:  Details zu Report #" + id)
 				.addField("Report Typ:", type.str, true)
-				.addField("Gemeldeter User:", user.getAsMention(), true)
-				.addField("Gemeldet von:", by.getAsMention(), true)
-				.addField("Gemeldet am:", time.format(Main.dtf) + "Uhr", true)
+				.addField("Gemeldeter User:", target.getAsMention(), true)
+				.addField("Gemeldet von:", issuer.getAsMention(), true)
+				.addField("Gemeldet am:", TimeFormat.DEFAULT.format(time.toInstant()), true)
 				.addField("Status:", status.str, true);
 
-		if(type == Type.MSG) {
-			embed.addField("Gemeldete Nachricht:", msgContent, false);
-		}
+		embed.addField(type == Type.MESSAGE ? "Gemeldete Nachricht:" : "Meldegrund:", reason, false);
 
-		else if(type == Type.USER) {
-			embed.addField("Meldegrund:", msgContent, true);
-		}
-
-		if(status == Status.CLOSED) {
+		if(!isOpen()) {
 			embed.addField("Verfahren:", closeReason, true);
 		}
 
 		return embed.build();
 	}
+
+	public MessageCreateData buildMessage() {
+		MessageCreateBuilder builder = new MessageCreateBuilder()
+				.setEmbeds(buildEmbed());
+
+		if(isOpen()) {
+			builder.setActionRow(Button.danger("report:close", "Close #" + id).withEmoji(Emoji.fromUnicode("\uD83D\uDD12")));
+		}
+
+		return builder.build();
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public boolean isOpen() {
+		return status == Status.OPEN;
+	}
+
+	@Override
+	public String build(int index, ListContext<?> context) {
+		//Escaping the dot prevents discord from making this a numbered list. The problem with these is, that the numbering is corrected automatically which might cause the displayed ids to be wrong.
+		return id + "\\. [" + status.emoji + "] " + TimeFormat.DEFAULT.format(time.toInstant()) + ": " + target.getAsMention() + " gemeldet von " + issuer.getAsMention();
+	}
+
+	public static class ReportRowMapper implements RowMapper<Report> {
+		@Override
+		public Report map(ResultSet rs, StatementContext ctx) throws SQLException {
+			return new Report(
+					rs.getLong("guild"),
+					rs.getInt("id"),
+					Type.valueOf(rs.getString("type")),
+					UserSnowflake.fromId(rs.getLong("issuer")),
+					UserSnowflake.fromId(rs.getLong("target")),
+					rs.getTimestamp("time"),
+					Status.valueOf(rs.getString("status")),
+					rs.getString("message"),
+					rs.getString("closeReason")
+			);
+		}
+	}
 }
-
-
-
-

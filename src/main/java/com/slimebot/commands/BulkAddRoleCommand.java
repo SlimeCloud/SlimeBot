@@ -2,7 +2,7 @@ package com.slimebot.commands;
 
 
 import com.slimebot.main.CommandPermission;
-import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
@@ -12,9 +12,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 import java.time.Instant;
 
-@ApplicationCommand(name = "role_check", description = "[TEAM BEFEHL] Geht ALLE Mitglieder durch und gibt ihnen eine Rolle", guildOnly = true)
+@ApplicationCommand(name = "role_check", description = "Geht ALLE Mitglieder durch und gibt ihnen eine Rolle", guildOnly = true)
 public class BulkAddRoleCommand {
-	public final CommandPermission permission = CommandPermission.TEAM;
+	public final CommandPermission permission = CommandPermission.ROLE_MANAGE;
 
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event,
@@ -31,7 +31,7 @@ public class BulkAddRoleCommand {
 		event.replyEmbeds(
 				new EmbedBuilder()
 						.setTimestamp(Instant.now())
-						.setColor(Main.embedColor(event.getGuild().getId()))
+						.setColor(GuildConfig.getColor(event.getGuild()))
 						.setTitle(":white_check_mark: Rollen Verteilt")
 						.setDescription("Die Rolle " + role.getAsMention() + " wurde " + members.size() + " Membern gegeben!")
 						.build()

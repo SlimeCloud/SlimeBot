@@ -1,137 +1,79 @@
 package com.slimebot.alerts.holidays;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.slimebot.main.Main;
-import com.slimebot.utils.Config;
+import com.slimebot.main.config.guild.GuildConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.ParseException;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.simpleyaml.configuration.file.YamlFile;
+import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.Route;
+import net.dv8tion.jda.api.utils.data.DataArray;
+import net.dv8tion.jda.api.utils.data.DataObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class HolidayAlert implements Runnable {
-	private final URL apiUrl;
-	private final CloseableHttpClient httpClient = HttpClients.createDefault();
+	public final static Logger logger = LoggerFactory.getLogger(HolidayAlert.class);
 
-	public HolidayAlert(URL apiURL) {
-		this.apiUrl = apiURL;
-		try {
-			Main.jdaInstance.awaitReady();
-			run();
-		} catch(InterruptedException e) {
-			throw new RuntimeException(e);
-		}
+	public final static String apiHost = "https://ferien-api.de";
+	public final static Route apiRoute = Route.get("api/v1/holidays");
 
+	private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	public HolidayAlert() {
 		Main.scheduleDaily(6, this);
 	}
 
-
 	@Override
 	public void run() {
-		LocalDate localDate = LocalDate.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-		try {
-			String date = localDate.format(formatter);
-			getObjectsAtDate(date, objects -> {
-				if(objects.isEmpty()) return;
-				sendMessage(objects);
-			});
-		} catch(URISyntaxException | IOException | ParseException e) {
-			throw new RuntimeException(e);
-		}
+		retrieveHolidays(LocalDate.now().format(formatter))
+				.queue(this::sendMessage);
 	}
 
-	private void sendMessage(List<JsonObject> objects) {
+	private void sendMessage(List<Holiday> holidays) {
+		if(holidays.isEmpty()) return;
+
 		for(Guild guild : Main.jdaInstance.getGuilds()) {
-			MessageChannel channel = getChannelFromConfig(guild.getId(), "greetingsChannel");
+			GuildConfig.getConfig(guild).getGreetingsChannel().ifPresent(channel -> {
+				String states = holidays
+						.stream()
+						.map(h -> h.name.split(" ")[1].toUpperCase())
+						.collect(Collectors.joining(", "))
+						.replaceFirst(",(?=[^,]*$)", " und");
 
-			if(channel == null) return;
+				if(holidays.size() > 3) states = holidays.size() + " Bundesländern";
 
-			String states = objects
-					.stream()
-					.map(o -> o.get("name").getAsString().split(" ")[1].toUpperCase())
-					.collect(Collectors.joining(", "));
-
-			//
-			if(objects.size() > 3)states = objects.size() + " Bundesländern";
-
-			channel.sendMessageEmbeds(
-					new EmbedBuilder()
-							.setColor(Main.embedColor(guild.getId()))
-							.setTitle("ENDLICH FERIEN")
-							.setDescription("**Alle Schüler aus " + states + " haben endlich Ferien!**\nGenießt die Ferien solange sie noch sind...")
-							.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png")
-							.build()
-			).queue();
+				channel.sendMessageEmbeds(
+						new EmbedBuilder()
+								.setColor(GuildConfig.getColor(guild))
+								.setTitle("ENDLICH FERIEN")
+								.setDescription("**Alle Schüler aus " + states + " haben endlich Ferien!**\nGenießt die Ferien solange sie noch sind...")
+								.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png")
+								.build()
+				).queue();
+			});
 		}
 	}
 
-
-	// date = yyyy-MM-dd
-	private void getObjectsAtDate(String date, Consumer<List<JsonObject>> consumer) throws URISyntaxException, IOException, ParseException {
-		HttpGet request = new HttpGet(apiUrl.toURI());
-
-		httpClient.execute(request, response -> {
-
-			HttpEntity entity = response.getEntity();
-
-			JsonArray array = JsonParser.parseString(EntityUtils.toString(entity)).getAsJsonArray();
-
-			List<JsonObject> jsonObjects = IntStream
-					.range(0, array.size())
-					// get only the holidays at the right date
-					.filter(i -> array.get(i).getAsJsonObject().get("start").getAsString().equalsIgnoreCase(date))
-					// get only "real" holidays
-					.filter(i -> !(array.get(i).getAsJsonObject().get("name").getAsString().contains("(")))
-					// map to JsonObject
-					.mapToObj(i -> array.get(i).getAsJsonObject())
-					.collect(Collectors.toList());
-
-			consumer.accept(jsonObjects);
-			return response;
-		});
+	private RestAction<List<Holiday>> retrieveHolidays(String date) {
+		return Main.discordUtils.getCustomRestActionManager().request(apiHost, apiRoute.compile(), null, (response, request) ->
+				response.getArray().stream(DataArray::getObject)
+						.map(Holiday::new)
+						.filter(h -> h.start().equalsIgnoreCase(date)) // get only the holidays at the right date
+						.filter(h -> !h.name().contains("(")) // get only "real" holidays
+						.peek(h -> logger.info("Ferien erkannt: " + h))
+						.toList()
+		);
 	}
 
-	private MessageChannel getChannelFromConfig(String guildId, String path) {
-		if(guildId == null || path == null) return null;
-
-		YamlFile config = Config.getConfig(guildId, "mainConfig");
-
-		try {
-			config.load();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		try {
-			return Main.jdaInstance.getGuildById(guildId).getChannelById(MessageChannel.class, config.getString(path));
-		} catch(IllegalArgumentException n) {
-			config.set(path, 0);
-			try {
-				config.save();
-			} catch(IOException e) {
-				throw new RuntimeException(e);
-			}
-			return null;
+	public record Holiday(int year, String start, String name, String end, String stateCode, String slug) {
+		public Holiday(DataObject data) {
+			this(data.getInt("year"), data.getString("start"), data.getString("name"), data.getString("end"), data.getString("stateCode"), data.getString("slug"));
 		}
 	}
+
 }
