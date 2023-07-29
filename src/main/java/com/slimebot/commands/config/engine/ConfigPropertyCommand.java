@@ -4,9 +4,7 @@ import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.main.CommandContext;
 import com.slimebot.main.Main;
 import de.mineking.discord.commands.inherited.BaseCommand;
-import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.lang.reflect.Field;
 
@@ -53,27 +51,12 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 			return;
 		}
 
-		OptionMapping option = event.getOptions().get(0);
-
-		String text;
-		Object value;
-
-		try {
-			//Role and Channel
-			IMentionable temp = option.getAsMentionable();
-			text = temp.getAsMention();
-			value = temp.getIdLong();
-		} catch(IllegalStateException e) {
-			//String
-			text = option.getAsString();
-			value = text;
-		}
-
-		final Object finalValue = value; //Because java
+		Object value = info.type().data.apply(event.getOptions().get(0));
+		String text = info.type().formatter.apply(value);
 
 		ConfigCommand.updateField(event.getGuild(), config -> {
 			try {
-				field.set(instanceProvider.getInstance(true, config), finalValue);
+				field.set(instanceProvider.getInstance(true, config), value);
 			} catch (Exception e) {
 				ConfigCommand.logger.error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
 			}

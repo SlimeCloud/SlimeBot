@@ -12,8 +12,8 @@ public class LevelGuildConfig {
     @ConfigField(type = ConfigFieldType.CHANNEL, command = "notification_channel", title = "Notification Channel", description = "In diesem Channel wird für das neue Level Gratuliert")
     public Long notificationChannel;
 
-    @ConfigField(type = ConfigFieldType.NUMBER, command = "multiplier", description = "Multiplier für XP")
-    public double xpMultiplier = 1;
+    @ConfigField(type = ConfigFieldType.NUMBER, command = "multiplier", title = "XP-Multiplier", description = "Multiplier für XP", menu = false)
+    public Double xpMultiplier;
 
     public Map<Integer, Long> levelRoles = new HashMap<>();
 
