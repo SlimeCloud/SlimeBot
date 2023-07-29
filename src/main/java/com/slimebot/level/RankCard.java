@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.net.URL;
 
 public class RankCard extends Graphic {
-    public final static Color barBackground = new Color(66, 155, 46, 200);
+    public final static int rankPadding = 60;
+
+    public final static Color barBackground = new Color(150, 150, 150, 50);
+    public final static Color barOutline = new Color(68, 140, 41, 255);
     public final static Color barForeground = new Color(105, 227, 73, 200);
 
     private final static Font font;
@@ -29,7 +32,7 @@ public class RankCard extends Graphic {
     private final Level level;
 
     public RankCard(Level level) {
-        super(2400, 400);
+        super(3800, 600);
         this.level = level;
         finish();
     }
@@ -54,21 +57,38 @@ public class RankCard extends Graphic {
         int barSize = (int) (maxBarSize * percentage);
 
         graphics2D.setColor(barBackground);
-        graphics2D.drawRoundRect(avatarWidth + 80, height - 120, maxBarSize, height - 360, height - 360, height - 360);
+        graphics2D.fillRoundRect(avatarWidth + 80, height - 120, maxBarSize, height - 500, height - 500, height - 500);
+
+        graphics2D.setColor(barOutline);
+        graphics2D.setStroke(new BasicStroke(15));
+        graphics2D.drawRoundRect(avatarWidth + 80, height - 120, maxBarSize, height - 500, height - 500, height - 500);
 
         graphics2D.setColor(barForeground);
-        graphics2D.fillRoundRect(avatarWidth + 80, height - 120, barSize, height - 360, height - 360, height - 360);
+        graphics2D.fillRoundRect(avatarWidth + 80, height - 120, barSize, height - 500, height - 500, height - 500);
 
         graphics2D.setColor(Color.WHITE);
-        graphics2D.setFont(CustomFont.getFont(font, 104F));
+        graphics2D.setFont(CustomFont.getFont(font, 150F));
         graphics2D.drawString(user.getEffectiveName(), avatarWidth + 100, height - 160);
 
-        graphics2D.setFont(CustomFont.getFont(font, 80F));
+        graphics2D.setFont(CustomFont.getFont(font, 120F));
 
-        String s = level.xp() + "/" + xpRequired + " xp";
-        graphics2D.drawString(s, width - graphics2D.getFontMetrics().stringWidth(s) - 80, height - 160);
+        String xp = level.xp() + "/" + xpRequired + " XP";
+        graphics2D.drawString(xp, width - graphics2D.getFontMetrics().stringWidth(xp) - 80, height - 160);
 
-        s = "Level: " + level.level();
-        graphics2D.drawString(s, width - graphics2D.getFontMetrics().stringWidth(s) - 80, height - 320);
+        graphics2D.setFont(CustomFont.getFont(font, 150F));
+
+        String levelString = "Level " + level.level();
+        String rank = "#" + level.getRank().map(i -> String.valueOf(i + 1)).orElse("Keiner");
+
+        int levelWidth = graphics2D.getFontMetrics().stringWidth(levelString);
+        int rankWidth = graphics2D.getFontMetrics().stringWidth(rank);
+
+        graphics2D.drawString(levelString, width - levelWidth - 80, height - 430);
+
+        graphics2D.setColor(Color.decode("#222222"));
+        graphics2D.fillRoundRect(width - rankWidth - levelWidth - 330 - rankPadding, height - 430 - 100 - rankPadding, rankWidth + rankPadding, 150 + rankPadding, height - 500, height - 500);
+
+        graphics2D.setColor(Color.WHITE);
+        graphics2D.drawString(rank, width - graphics2D.getFontMetrics().stringWidth(rank) - graphics2D.getFontMetrics().stringWidth(levelString) - 350, height - 430);
     }
 }

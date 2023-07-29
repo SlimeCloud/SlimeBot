@@ -12,18 +12,19 @@ public abstract class Graphic {
 
     protected final int width, height;
     private final BufferedImage image;
-    private final Graphics2D graphics2D;
 
     public Graphic(int width, int height) {
         this.width = width;
         this.height = height;
         this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        this.graphics2D = image.createGraphics();
     }
 
     protected void finish() {
         try {
-            drawGraphic(graphics2D);
+            Graphics2D graphics = image.createGraphics();
+            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            drawGraphic(graphics);
+            graphics.dispose();
         } catch(Exception e) {
             e.printStackTrace();
         }

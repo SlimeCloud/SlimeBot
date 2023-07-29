@@ -7,6 +7,7 @@ import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.message.StaffMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,11 @@ public class ReadyListener extends ListenerAdapter {
 		}
 
 		Main.discordUtils.getCommandCache().updateGlobalCommands(error -> Main.logger.error("Failed to update commands", error));
+	}
+
+	@Override
+	public void onGuildJoin(@NotNull GuildJoinEvent event) {
+		Main.updateGuildCommands(event.getGuild());
 	}
 
 	@Override

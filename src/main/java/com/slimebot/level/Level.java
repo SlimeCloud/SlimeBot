@@ -53,6 +53,13 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
                 .toList();
     }
 
+    public Optional<Integer> getRank() {
+        return Optional.of(
+                getTopList(guild, Integer.MAX_VALUE)
+                        .indexOf(this)
+        ).filter(i -> i != -1);
+    }
+
     public Level addXp(int level, int xp) {
         return setXp(this.level + level, this.xp + xp);
     }
