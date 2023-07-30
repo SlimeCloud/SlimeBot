@@ -38,7 +38,7 @@ public class RankCard extends Graphic {
 	}
 
 	@Override
-	public void drawGraphic(Graphics2D graphics2D) throws Exception {
+	public void drawGraphic(Graphics2D graphics2D) throws IOException {
 		User user = Main.jdaInstance.getUserById(level.user());
 
 		int avatarWidth = height - 80;

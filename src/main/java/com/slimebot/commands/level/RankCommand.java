@@ -8,8 +8,6 @@ import de.mineking.discord.commands.annotated.option.Option;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-import java.io.IOException;
-
 @ApplicationCommand(name = "rank", description = "Zeigt dein Aktuelles Level und XP an", feature = "level")
 public class RankCommand {
 	@ApplicationCommandMethod
@@ -23,11 +21,7 @@ public class RankCommand {
 
 		event.deferReply().queue();
 
-		try {
-			event.getHook().sendFiles(new RankCard(Level.getLevel(user)).getFile()).queue();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		event.getHook().sendFiles(new RankCard(Level.getLevel(user)).getFile()).queue();
 	}
 
 }
