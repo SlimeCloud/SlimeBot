@@ -39,7 +39,7 @@ public class SpotifyListener {
 	}
 
 	public void register() {
-		Main.scheduleAtFixedRate(1, TimeUnit.MINUTES, this::check);
+		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this::check);
 	}
 
 	public void check() {
