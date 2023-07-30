@@ -2,6 +2,7 @@ package com.slimebot.main.config.guild;
 
 import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.commands.config.FdmdsConfigCommand;
+import com.slimebot.commands.config.LevelConfigCommand;
 import com.slimebot.commands.config.StaffConfigCommand;
 import com.slimebot.commands.config.engine.ConfigCategory;
 import com.slimebot.commands.config.engine.ConfigField;
@@ -121,29 +122,36 @@ public class GuildConfig {
 
 	@ConfigField(type = ConfigFieldType.CHANNEL, command = "log_channel", title = "Log-Kanal", description = "In diesem Kanal werden Informationen bezüglich des Bots gesendet")
 	public Long logChannel;
+
 	@ConfigField(type = ConfigFieldType.CHANNEL, command = "greetings_channel", title = "Gruß-Kanal", description = "In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet")
 	public Long greetingsChannel;
+
 	@ConfigField(type = ConfigFieldType.CHANNEL, command = "punishment_channel", title = "Straf-Kanal", description = "In diesem Kanal werden Informationen über Bestrafungen gesendet")
 	public Long punishmentChannel;
 
 	@ConfigField(type = ConfigFieldType.ROLE, command = "contributor_role", title = "Contributor Rolle", description = "Diese Rollen können Mitglieder beantragen, die an diesem Bot auf GitHub mitgearbeitet haben")
 	public Long contributorRole;
+
 	@ConfigField(type = ConfigFieldType.ROLE, command = "staff_role", title = "Team Rolle", description = "Diese Rolle hat Zugang zu beschränkten Befehlen")
 	public Long staffRole;
 
 	@ConfigCategory(name = "spotify", description = "Spotify Benachrichtigungen")
 	public SpotifyNotificationConfig spotify;
+
 	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim", updateCommands = true,
 			subcommands = FdmdsConfigCommand.DisableCommand.class
 	)
 	public FdmdsConfig fdmds;
+
 	@ConfigCategory(name = "staff", description = "Team-Nachricht",
 			subcommands = {StaffConfigCommand.ChannelCommand.class, StaffConfigCommand.AddRoleCommand.class, StaffConfigCommand.RemoveRoleCommand.class},
 			customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
 	)
 	public StaffConfig staffMessage;
 
-	@ConfigCategory(name = "level", description = "Level-System")
+	@ConfigCategory(name = "level", description = "Level-System", updateCommands = true,
+			subcommands = {LevelConfigCommand.AddRoleCommand.class, LevelConfigCommand.RemoveRoleCommand.class}
+	)
 	public LevelGuildConfig level;
 
 	public Optional<Color> getColor() {
@@ -184,11 +192,16 @@ public class GuildConfig {
 		return Optional.ofNullable(staffMessage);
 	}
 
+	public Optional<LevelGuildConfig> getLevelConfig() {
+		return Optional.ofNullable(level);
+	}
+
 	public StaffConfig getOrCreateStaff() {
-		return getStaffConfig().orElseGet(() -> {
-			staffMessage = new StaffConfig();
-			return staffMessage;
-		});
+		return getStaffConfig().orElseGet(() -> staffMessage = new StaffConfig());
+	}
+
+	public LevelGuildConfig getOrCreateLevel() {
+		return getLevelConfig().orElseGet(() -> level = new LevelGuildConfig());
 	}
 
 	//Internal helper methods

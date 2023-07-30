@@ -7,20 +7,22 @@ import de.mineking.discord.commands.annotated.option.Option;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-@ApplicationCommand(name = "xp", description = "Entferne xp von einem nutzer")
+@ApplicationCommand(name = "xp", description = "Entferne xp von einem Nutzer")
 public class RemoveXPCommand {
-
     @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "member") Member member, @Option(name = "xp", minValue = 1) int xp) {
-        long userId = member.getIdLong();
-        long guildId = event.getGuild().getIdLong();
-        Level lvl = Level.getLevel(guildId, userId);
-        if (xp>lvl.xp()) {
-            event.reply(member.getAsMention() + " (" + member.getEffectiveName() + ") hat nur " + lvl.xp() + " XP. du kannst ihm also maximal " + lvl.xp() + " XP entfernen!").setEphemeral(true).queue();
+    public void performCommand(SlashCommandInteractionEvent event,
+                               @Option(name = "member") Member member,
+                               @Option(name = "xp", minValue = 1) int xp
+    ) {
+        Level current = Level.getLevel(member);
+
+        if (xp > current.xp()) {
+            event.reply(member.getAsMention() + " hat nur " + current.xp() + " XP. du kannst ihm also maximal " + current.xp() + " XP entfernen!").setEphemeral(true).queue();
             return;
         }
-        Level.addLevel(guildId, userId, 0, xp*-1, 0);
-        event.reply(member.getAsMention() + " (" + member.getEffectiveName() + ") wurden erfolgreich " + xp + " XP entfernt!\nEr hat jetzt " + (lvl.xp()-xp) + " xp!").setEphemeral(true).queue();
-    }
 
+        current = current.addXp(0, -1 * xp).save();
+
+        event.reply(member.getAsMention() + " wurden erfolgreich " + xp + " XP entfernt!\nEr hat jetzt " + current.xp() + " xp!").setEphemeral(true).queue();
+    }
 }

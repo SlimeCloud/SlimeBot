@@ -5,7 +5,7 @@ import com.slimebot.level.RankCard;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.io.IOException;
@@ -14,18 +14,18 @@ import java.io.IOException;
 public class RankCommand {
 
     @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "user", required = false) User user) {
-        if (user == null) user = event.getUser();
+    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "user", required = false) Member member) {
+        if (member == null) member = event.getMember();
 
-        if (user.isBot()) {
-            event.reply("Bots wie " + user.getAsMention() + " können nicht leveln!").queue();
+        if (member.getUser().isBot()) {
+            event.reply("Bots wie " + member.getAsMention() + " können nicht leveln!").queue();
             return;
         }
 
-        Level level = Level.getLevel(event.getGuild().getIdLong(), user.getIdLong());
         event.deferReply().queue();
+
         try {
-            event.getHook().sendFiles(new RankCard(level).getFile()).queue();
+            event.getHook().sendFiles(new RankCard(Level.getLevel(member)).getFile()).queue();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -13,4 +13,5 @@ public @interface ConfigField {
 	String description();
 	ConfigFieldType type();
 	FieldVerification verifier() default FieldVerification.ALL;
+	boolean menu() default true;
 }

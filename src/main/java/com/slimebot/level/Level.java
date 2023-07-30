@@ -2,119 +2,192 @@ package com.slimebot.level;
 
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
-import com.slimebot.util.MathUtil;
+import com.slimebot.main.config.guild.LevelGuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public record Level(long guildId, long userId, int level, int xp, int messages) implements Comparable<Level> {
-
-    public void save() {
-        Main.database.run(handle -> handle.createUpdate("insert into levels values(:guild, :user, :level, :xp, :messages) on conflict(guild, \"user\") do update set level = :level, xp = :xp, messages = :messages")
-                .bind("guild", guildId())
-                .bind("user", userId())
-                .bind("level", level())
-                .bind("xp", xp())
-                .bind("messages", messages())
-                .execute());
+public record Level(long guild, long user, int level, int xp, int messages) implements Comparable<Level> {
+    public Level(long guild, long user) {
+        this(guild, user, 0, 0, 0);
     }
 
-    public Level add(int level, int xp, int messages) {
-        return new Level(guildId(), userId(), level() + level, xp() + xp, messages() + messages);
-    }
-
-    @Override
-    public int compareTo(@NotNull Level o) {
-        int levelComp = Integer.compare(o.level(), this.level());
-        int xpComp = levelComp != 0 ? levelComp : Integer.compare(o.xp(), this.xp());
-        return xpComp != 0 ? xpComp : Integer.compare(o.messages(), this.messages());
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s {guildId: %s, userId: %s, level: %s, xp: %s, messages: %s}", getClass(), guildId(), userId(), level(), xp(), messages());
-    }
-
-    public static Level load(long guildId, long userId) {
+    public static Level getLevel(long guild, long user) {
         return Main.database.handle(handle -> handle.createQuery("select * from levels where guild = :guild and \"user\" = :user")
-                .bind("guild", guildId)
-                .bind("user", userId)
+                .bind("guild", guild)
+                .bind("user", user)
                 .mapTo(Level.class)
                 .findOne()
-                .orElseGet(() -> new Level(guildId, userId, 0, 0, 0))
+                .orElseGet(() -> new Level(guild, user))
         );
     }
 
-    public static int calculateRequiredXP(int level) {
-        return (int) (5 * Math.pow(level, 2) + (50 * level) + 100);
+    public static Level getLevel(Member member) {
+        return getLevel(member.getGuild().getIdLong(), member.getIdLong());
     }
 
-    public static Level getLevel(long guildId, long userId) {
-        return load(guildId, userId);
-    }
-
-    public static void setLevel(@NotNull Level level) {
-        setLevel(level.guildId(), level.userId(), level.level(), level.xp(), level.messages());
-    }
-
-    public static void setLevel(long guildId, long userId, int level, int xp, int messages) {
-        Member member = Main.jdaInstance.getGuildById(guildId).getMemberById(userId);
-
-        int reqXp = calculateRequiredXP(level + 1);
-        while (reqXp <= xp) {
-            onLevelUp(member.getGuild(), member, level, ++level, xp, xp -= reqXp);
-            reqXp = calculateRequiredXP(level + 1);
-        }
-        new Level(guildId, userId, level, xp, messages).save();
-    }
-
-    public static void addLevel(long guildId, long userId, int level, int xp, int messages) {
-        setLevel(getLevel(guildId, userId).add(level, MathUtil.round(xp * Main.config.level.xpMultiplier), messages));
-    }
-
-    public static List<Level> getLevels(long guildId) {
+    public static List<Level> getLevels(long guild) {
         return Main.database.handle(handle -> handle.createQuery("select * from levels where guild = :guild")
-                .bind("guild", guildId)
+                .bind("guild", guild)
                 .mapTo(Level.class)
                 .stream()
-                .filter(level -> !Main.jdaInstance.getUserById(level.userId()).isBot())
+                .filter(level -> !Main.jdaInstance.getUserById(level.user()).isBot())
                 .toList()
         );
     }
 
-    public static @NotNull List<Level> getTop(long guildId, int limit) {
-        List<Level> data = new ArrayList<>();
-        if (limit <= 0) return data;
-        data.addAll(getLevels(guildId));
-        data.sort(null);
-        return data.subList(0, Math.max(1, Math.min(data.size(), limit)));
+    public static @NotNull List<Level> getTopList(long guild, int limit) {
+        if (limit <= 0) return Collections.emptyList();
+
+        return getLevels(guild).stream()
+                .sorted(Comparator.reverseOrder())
+                .limit(limit)
+                .toList();
     }
 
-    public static int getPosition(long guildId, long userId) {
-        List<Level> data = getTop(guildId, 0);
-        for (int i = 0; i < data.size(); i++) {
-            if (data.get(i).userId() == userId) return i + 1;
+    public Optional<Integer> getRank() {
+        return Optional.of(
+                getTopList(guild, Integer.MAX_VALUE)
+                        .indexOf(this)
+        ).filter(i -> i != -1);
+    }
+
+    public Level addXp(int level, int xp) {
+        return setXp(this.level + level, this.xp + xp);
+    }
+
+    public Level addMessages(int messages) {
+        return new Level(guild, user, level, xp, this.messages + messages);
+    }
+
+    public Level setXp(Integer level, Integer xp) {
+        Member member = Main.jdaInstance.getGuildById(guild).getMemberById(user);
+
+        if(level == null) level = this.level;
+        if(xp == null) xp = this.xp;
+
+        while(true) {
+            int requiredXp = calculateRequiredXP(level + 1);
+
+            if(xp < requiredXp) break;
+
+            xp -= requiredXp;
+            level++;
         }
-        throw new RuntimeException();
+
+        if(level > this.level) {
+            onLevelUp(member, level);
+        }
+
+        return new Level(guild, user, level, xp, messages);
     }
 
-    private static void onLevelUp(Guild guild, Member member, int oldLevel, int newLevel, int oldXp, int newXp) {
-        TextChannel channel = Main.jdaInstance.getTextChannelById(GuildConfig.getConfig(guild.getIdLong()).level.notificationChannel);
-        if (channel == null || member.getUser().isBot()) return;
-        channel.sendMessage(Main.config.level.levelUpMessage.replace("%user%", member.getAsMention()).replace("%level%", String.valueOf(newLevel))).queue();
+    public Level setMessages(int messages) {
+        return new Level(guild, user, level, xp, messages);
     }
 
+    public Level save() {
+        Main.database.run(handle -> handle.createUpdate("insert into levels values(:guild, :user, :level, :xp, :messages) on conflict(guild, \"user\") do update set level = :level, xp = :xp, messages = :messages")
+                .bind("guild", guild)
+                .bind("user", user)
+                .bind("level", level())
+                .bind("xp", xp())
+                .bind("messages", messages())
+                .execute()
+        );
+
+        return this;
+    }
+
+    @Override
+    public int compareTo(@NotNull Level o) {
+        int levelCompare = Integer.compare(this.level, o.level);
+
+        if(levelCompare != 0) return levelCompare;
+
+        return Integer.compare(this.xp, o.xp);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Level l && l.guild == guild && l.user == user && l.level == level && l.xp == xp && l.messages == messages();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (guild ^ (guild >>> 32));
+        result = 31 * result + (int) (user ^ (user >>> 32));
+        result = 31 * result + level;
+        result = 31 * result + xp;
+        result = 31 * result + messages;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Level{" +
+                "level=" + level +
+                ", xp=" + xp +
+                ", messages=" + messages +
+                '}';
+    }
+
+    public static int calculateRequiredXP(int level) {
+        return (5 * level*level + 50 * level + 100);
+    }
+
+    private static void onLevelUp(Member member, int newLevel) {
+        if(member.getUser().isBot()) return;
+
+        updateLevelRoles(member.getGuild().getIdLong(), member.getIdLong(), newLevel);
+
+        GuildConfig.getConfig(member.getGuild().getIdLong()).getLevelConfig().flatMap(LevelGuildConfig::getChannel).ifPresent(
+                channel -> channel.sendMessage(
+                        Main.config.level.levelUpMessage
+                                .replace("%user%", member.getAsMention())
+                                .replace("%level%", String.valueOf(newLevel))
+                ).queue()
+        );
+    }
+
+    public void updateRoles() {
+        updateLevelRoles(guild, user, level);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void updateLevelRoles(long guildId, long userId, int level) {
+        Guild guild = Main.jdaInstance.getGuildById(guildId);
+        UserSnowflake user = UserSnowflake.fromId(userId);
+
+        GuildConfig.getConfig(guild).getLevelConfig().map(config -> config.levelRoles).ifPresent(roles -> {
+            Optional<Long> levelRoleId = roles.entrySet().stream()
+                    .filter(e -> level >= e.getKey())
+                    .sorted(Comparator.comparingInt(e -> ((Map.Entry<Integer, Long>)e).getKey()).reversed())
+                    .limit(1)
+                    .map(Map.Entry::getValue)
+                    .findAny();
+
+            roles.forEach((l, roleId) -> {
+                Role role = guild.getRoleById(roleId);
+
+                if (levelRoleId.isPresent() && roleId.equals(levelRoleId.get())) {
+                    guild.addRoleToMember(user, role).queue();
+                } else {
+                    guild.removeRoleFromMember(user, role).queue();
+                }
+            });
+        });
+    }
 
     public static class LevelMapper implements RowMapper<Level> {
-
         @Override
         public Level map(ResultSet rs, StatementContext ctx) throws SQLException {
             return new Level(
