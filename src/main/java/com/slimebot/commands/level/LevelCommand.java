@@ -37,11 +37,11 @@ public class LevelCommand {
     @ApplicationCommand(name = "stats", description = "zeigt die nutzer Statistiken an")
     public static class StatsCommand {
         @ApplicationCommandMethod
-        public void processCommand(SlashCommandInteractionEvent event, @Option(name = "member") Member member) {
-            Level level = Level.getLevel(member);
+        public void processCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, dessen Statistiken angezeigt werden sollen") Member user) {
+            Level level = Level.getLevel(user);
 
             event.replyEmbeds(new EmbedBuilder()
-                    .setTitle(member.getEffectiveName() + "`s Stats")
+                    .setTitle(user.getEffectiveName() + "`s Stats")
                     .addField("Level", String.valueOf(level.level()), false)
                     .addField("XP", String.valueOf(level.xp()), false)
                     .addField("Nachrichten", String.valueOf(level.messages()), false)

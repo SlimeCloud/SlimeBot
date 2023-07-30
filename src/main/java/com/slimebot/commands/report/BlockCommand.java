@@ -35,9 +35,7 @@ public class BlockCommand {
 	@ApplicationCommand(name = "add", description = "Fügt einen Nutzer zur Block-Liste hinzu, sodass er keine Meldungen mehr machen kann")
 	public static class AddCommand {
 		@ApplicationCommandMethod
-		public void performCommand(SlashCommandInteractionEvent event,
-		                           @Option(name = "user", description = "Der Nutzer, der blockiert werden soll") Member user
-		) {
+		public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, der blockiert werden soll") Member user) {
 			if(isBlocked(user)) {
 				event.replyEmbeds(
 						new EmbedBuilder()
@@ -70,9 +68,7 @@ public class BlockCommand {
 	@ApplicationCommand(name = "remove", description = "Gibt einen Nutzer wieder für Meldungen frei")
 	public static class RemoveCommand {
 		@ApplicationCommandMethod
-		public void performCommand(SlashCommandInteractionEvent event,
-		                           @Option(name = "user", description = "Der Nutzer, der ent-blockiert werden soll") Member user
-		) {
+		public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, der ent-blockiert werden soll") Member user) {
 			if(!isBlocked(user)) {
 				event.replyEmbeds(
 						new EmbedBuilder()

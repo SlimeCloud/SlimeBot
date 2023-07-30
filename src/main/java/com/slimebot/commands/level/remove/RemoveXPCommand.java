@@ -11,18 +11,18 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 public class RemoveXPCommand {
     @ApplicationCommandMethod
     public void performCommand(SlashCommandInteractionEvent event,
-                               @Option(name = "member") Member member,
-                               @Option(name = "xp", minValue = 1) int xp
+                               @Option(description = "Der Nutzer, vom dem XP entfernt werden sollen") Member user,
+                               @Option(description = "Die Anzahl an XP", minValue = 1) int xp
     ) {
-        Level current = Level.getLevel(member);
+        Level current = Level.getLevel(user);
 
         if (xp > current.xp()) {
-            event.reply(member.getAsMention() + " hat nur " + current.xp() + " XP. du kannst ihm also maximal " + current.xp() + " XP entfernen!").setEphemeral(true).queue();
+            event.reply(user.getAsMention() + " hat nur " + current.xp() + " XP. du kannst ihm also maximal " + current.xp() + " XP entfernen!").setEphemeral(true).queue();
             return;
         }
 
         current = current.addXp(0, -1 * xp).save();
 
-        event.reply(member.getAsMention() + " wurden erfolgreich " + xp + " XP entfernt!\nEr hat jetzt " + current.xp() + " xp!").setEphemeral(true).queue();
+        event.reply(user.getAsMention() + " wurden erfolgreich " + xp + " XP entfernt!\nEr hat jetzt " + current.xp() + " xp!").setEphemeral(true).queue();
     }
 }

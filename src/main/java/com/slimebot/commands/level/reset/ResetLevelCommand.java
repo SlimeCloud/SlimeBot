@@ -15,7 +15,7 @@ public class ResetLevelCommand {
     }
 
     @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "member") Member member) {
-        event.reply(execute(member)).setEphemeral(true).queue();
+    public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, dessen Level zurückgesetzt werden soll") Member user) {
+        event.reply(execute(user)).setEphemeral(true).queue();
     }
 }
