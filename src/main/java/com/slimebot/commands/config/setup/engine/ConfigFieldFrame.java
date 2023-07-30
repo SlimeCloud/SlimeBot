@@ -93,8 +93,6 @@ public class ConfigFieldFrame extends MessageFrame {
 						(m, evt) -> setValue(m, evt, evt.getValue("value").getAsString())
 				);
 			}
-			default -> {
-			}
 		}
 
 		List<ButtonComponent> components = new ArrayList<>();
