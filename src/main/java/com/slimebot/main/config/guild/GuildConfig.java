@@ -23,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Diese Klasse wird verwendet, um die Konfiguration eines Servers zu verwalten.
@@ -106,7 +105,7 @@ public class GuildConfig {
 	/**
 	 * Speichert die Konfiguration in der Datei.
 	 * Diese Methode sollte vermieden werden.
-	 * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField(Guild, Consumer)}
+	 * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField}
 	 */
 	public synchronized void save() {
 		try (Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
