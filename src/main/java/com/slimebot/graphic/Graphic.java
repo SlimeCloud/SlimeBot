@@ -9,8 +9,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public abstract class Graphic {
-
-	protected final int width, height;
+	protected final int width;
+	protected final int height;
 	private final BufferedImage image;
 
 	public Graphic(int width, int height) {
@@ -38,6 +38,4 @@ public abstract class Graphic {
 			return FileUpload.fromData(bos.toByteArray(), "image.png");
 		}
 	}
-
-
 }
