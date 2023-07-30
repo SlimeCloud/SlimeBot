@@ -12,8 +12,8 @@ public class LevelConfigCommand {
 	public static class AddRoleCommand {
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event,
-								   @Option(name = "level", description = "Das Level") int level,
-								   @Option(name = "rolle", description = "Die Rolle, die vergeben wird") Role role
+		                           @Option(name = "level", description = "Das Level") int level,
+		                           @Option(name = "rolle", description = "Die Rolle, die vergeben wird") Role role
 		) {
 			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateLevel().levelRoles.put(level, role.getIdLong()));
 
@@ -27,7 +27,7 @@ public class LevelConfigCommand {
 	public static class RemoveRoleCommand {
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event,
-								   @Option(name = "level", description = "Das Level") int level
+		                           @Option(name = "level", description = "Das Level") int level
 		) {
 			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateLevel().levelRoles.remove(level));
 

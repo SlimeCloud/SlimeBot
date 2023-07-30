@@ -15,7 +15,7 @@ import java.time.Instant;
 public class MessageReportCommand {
 	@ApplicationCommandMethod
 	public void performCommand(MessageContextInteractionEvent event) {
-		if(BlockCommand.isBlocked(event.getMember())) {
+		if (BlockCommand.isBlocked(event.getMember())) {
 			event.replyEmbeds(
 					new EmbedBuilder()
 							.setTimestamp(Instant.now())
@@ -29,7 +29,7 @@ public class MessageReportCommand {
 
 		String messageContent = event.getTarget().getContentRaw();
 
-		if(messageContent.length() > 800) {
+		if (messageContent.length() > 800) {
 			messageContent = messageContent.substring(0, 800) + "...";
 		}
 

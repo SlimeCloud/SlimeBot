@@ -44,28 +44,29 @@ public class GuildConfig {
 	 * VERWENDE NICHT DIESE METHODE!
 	 * Die Konfiguration für Server wird automatisch geladen.
 	 * Um auf sie zuzugreifen, verwende die {@link #getConfig(Guild)}-Methode.
-	 * @see #getConfig(Guild) 
+	 *
+	 * @see #getConfig(Guild)
 	 */
 	public static void load(Guild guild) {
 		try {
 			File file = new File("guild/" + guild.getIdLong() + ".json");
 
-			if(!file.exists()) {
+			if (!file.exists()) {
 				file.getParentFile().mkdirs();
 				file.createNewFile();
 			}
 
-			try(Reader reader = new FileReader(file, StandardCharsets.UTF_8)) {
+			try (Reader reader = new FileReader(file, StandardCharsets.UTF_8)) {
 				GuildConfig config = Main.gson.fromJson(reader, GuildConfig.class);
 
-				if(config == null) {
+				if (config == null) {
 					config = new GuildConfig();
 				}
 
 				config.guild = guild.getIdLong();
 				guildConfig.put(guild.getIdLong(), config);
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			logger.error("Failed to load config for guild " + guild, e);
 		}
 	}
@@ -108,9 +109,9 @@ public class GuildConfig {
 	 * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField(Guild, Consumer)}
 	 */
 	public synchronized void save() {
-		try(Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
+		try (Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
 			Main.gson.toJson(this, writer);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			logger.error("Failed to save config for guild " + guild, e);
 		}
 	}

@@ -71,7 +71,7 @@ public class Main {
 		config = Config.readFromFile("config");
 		logger.info("Bot Version: {}", BuildInfo.version);
 
-		if(args.length == 0) {
+		if (args.length == 0) {
 			logger.error("BITTE EIN TOKEN NAME ALS COMMAND-LINE-PARAMETER ÜBERGEBEN (.env im bot-ordner)");
 			System.exit(420);
 		}
@@ -80,7 +80,7 @@ public class Main {
 
 		logger.info("{}-Bot wird gestartet...", tokenName);
 		String token = Config.env.get("TOKEN_" + tokenName.toUpperCase());
-		if(token == null || token.isEmpty()) {
+		if (token == null || token.isEmpty()) {
 			logger.error("BITTE EIN TOKEN ANGEBEN (.env im bot-ordner)");
 			System.exit(421);
 		}
@@ -118,7 +118,7 @@ public class Main {
 							 */
 							config.registerCommand(ConfigCommand.class);
 
-							if(Main.config.github != null) {
+							if (Main.config.github != null) {
 								try {
 									github = new GitHubBuilder()
 											.withOAuthToken(Main.config.github.accessToken)
@@ -126,7 +126,7 @@ public class Main {
 
 									config.registerCommand(BugCommand.class);
 									config.registerCommand(BugContextCommand.class);
-								} catch(IOException e) {
+								} catch (IOException e) {
 									logger.error("Initialisieren der GitHub API fehlgeschlagen", e);
 								}
 							}
@@ -144,34 +144,38 @@ public class Main {
 
 							config.registerCommand(SetupCommand.class);
 
-							if(dbAvailable) {
-								if(Main.config.level != null) {
+							if (dbAvailable) {
+								if (Main.config.level != null) {
 									config.registerCommand(RankCommand.class);
 									config.registerCommand(LeaderboardCommand.class);
 									config.registerCommand(LevelCommand.class);
-								} else logger.warn("Level System aufgrund fehlender Config deaktiviert");
-							} else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
+								}
+								else logger.warn("Level System aufgrund fehlender Config deaktiviert");
+							}
+							else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
 
-							if(dbAvailable) {
+							if (dbAvailable) {
 								config.registerCommand(UserReportCommand.class);
 								config.registerCommand(MessageReportCommand.class);
 								config.registerCommand(UserReportSlashCommand.class);
 								config.registerCommand(ReportCommand.class);
-							} else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
+							}
+							else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
 						}
 				)
 				.useCommandCache(null);
 
 		jdaInstance = discordUtils.build();
 
-        if(dbAvailable && Main.config.level != null) jdaInstance.addEventListener(new LevelListener());
+		if (dbAvailable && Main.config.level != null) jdaInstance.addEventListener(new LevelListener());
 
-        if(config.spotify != null) spotify = new SpotifyListener();
-        else logger.info("No spotify configuration found - Disabled spotify notifications");
+		if (config.spotify != null) spotify = new SpotifyListener();
+		else logger.info("No spotify configuration found - Disabled spotify notifications");
 	}
 
 	/**
 	 * Updatet die Befehle eines Servers. Diese Methode sollte immer aufgerufen werden, wenn Konfiguration verändert wird, die Befehle aktivieren oder deaktivieren kann.
+	 *
 	 * @param guild Der server, dessen Befehle geupdatet werden sollen.
 	 */
 	public static void updateGuildCommands(Guild guild) {
@@ -186,13 +190,14 @@ public class Main {
 
 	/**
 	 * Registriert eine Aufgabe, die täglich ausgeführt wird.
+	 *
 	 * @param hour Die Stunde, zu der die Aufgabe ausgeführt wird.
 	 * @param task Die Aufgabe
 	 */
 	public static void scheduleDaily(int hour, Runnable task) {
 		ZonedDateTime now = ZonedDateTime.now();
 		ZonedDateTime nextRun = now.withHour(hour).withMinute(0).withSecond(0);
-		if(now.compareTo(nextRun) > 0)
+		if (now.compareTo(nextRun) > 0)
 			nextRun = nextRun.plusDays(1);
 
 		long initialDelay = Duration.between(now, nextRun).getSeconds();
@@ -202,9 +207,10 @@ public class Main {
 
 	/**
 	 * Registriert eine Aufgabe, die im angegebenen Intervall ausgeführt wird.
+	 *
 	 * @param amount Das Intervall
-	 * @param unit Die Einheit, in der das Intervall angegeben wurde.
-	 * @param task Die Aufgabe
+	 * @param unit   Die Einheit, in der das Intervall angegeben wurde.
+	 * @param task   Die Aufgabe
 	 */
 	public static void scheduleAtFixedRate(int amount, TimeUnit unit, Runnable task) {
 		executor.scheduleAtFixedRate(task, 0, amount, unit);

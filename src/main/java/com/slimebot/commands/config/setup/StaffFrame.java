@@ -81,7 +81,7 @@ public class StaffFrame {
 							.map(e -> {
 								try {
 									return "> " + Main.jdaInstance.getRoleById(e.getKey()).getAsMention() + " " + e.getValue();
-								} catch(NumberFormatException x) {
+								} catch (NumberFormatException x) {
 									return "> " + e.getValue();
 								}
 							}).collect(Collectors.joining("\n"))
@@ -108,7 +108,7 @@ public class StaffFrame {
 
 						StaffConfig staff = GuildConfig.getConfig(guild).getOrCreateStaff();
 
-						if(staff.roles.isEmpty()) {
+						if (staff.roles.isEmpty()) {
 							select.addOption("---", "---"); //SelectMenus cannot be empty
 						}
 
@@ -120,7 +120,7 @@ public class StaffFrame {
 													return SelectOption.of(Main.jdaInstance.getRoleById(e.getKey()).getName(), e.getKey())
 															.withDescription(e.getValue())
 															.withEmoji(Emoji.fromFormatted(ConfigFieldType.ROLE.emoji));
-												} catch(NumberFormatException ex) {
+												} catch (NumberFormatException ex) {
 													return SelectOption.of(e.getKey(), e.getKey())
 															.withDescription(e.getValue().substring(0, Math.min(100, e.getValue().length())))
 															.withEmoji(Emoji.fromFormatted("\uD83D\uDCDD"));

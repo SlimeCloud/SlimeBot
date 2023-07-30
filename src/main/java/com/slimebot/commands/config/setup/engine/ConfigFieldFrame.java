@@ -42,14 +42,14 @@ public class ConfigFieldFrame extends MessageFrame {
 				Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(guild));
 				Object value = instance == null ? null : field.get(instance);
 
-				if(value != null) {
+				if (value != null) {
 					formattedValue = info.type().formatter.apply(value);
 				}
-			} catch(Exception e) {
+			} catch (Exception e) {
 				ConfigCommand.logger.error("Fehler beim auslesen des aktuellen Konfigurationswerts für " + field.getName(), e);
 			}
 
-			if(info.title().isEmpty())  System.out.println(field.getName());
+			if (info.title().isEmpty()) System.out.println(field.getName());
 
 			return new EmbedBuilder()
 					.setTitle(info.type().emoji + info.title())
@@ -68,7 +68,7 @@ public class ConfigFieldFrame extends MessageFrame {
 		this.instanceProvider = instanceProvider;
 		this.guild = guild;
 
-		switch(info.type()) {
+		switch (info.type()) {
 			case ROLE -> addComponents(
 					new EntitySelectComponent("role",
 							config -> config.setPlaceholder("Rolle festlegen"),
@@ -107,7 +107,7 @@ public class ConfigFieldFrame extends MessageFrame {
 								field.set(instance, null);
 							}
 
-							if(category.updateCommands()) {
+							if (category.updateCommands()) {
 								Main.updateGuildCommands(evt.getGuild());
 							}
 
@@ -122,11 +122,11 @@ public class ConfigFieldFrame extends MessageFrame {
 
 		components.add(new FrameButton(ButtonColor.GRAY, "Zurück", last));
 
-		if(!last.equals("main") && next != null) {
+		if (!last.equals("main") && next != null) {
 			components.add(new FrameButton(ButtonColor.GRAY, "Hauptmenü", "main"));
 		}
 
-		if(!(last.equals("main") && next == null)) {
+		if (!(last.equals("main") && next == null)) {
 			components.add(new FrameButton(ButtonColor.GRAY, "Weiter", next == null ? "main" : next));
 		}
 
@@ -134,7 +134,7 @@ public class ConfigFieldFrame extends MessageFrame {
 	}
 
 	private void setValue(MenuBase menu, IReplyCallback event, Object value) {
-		if(!info.verifier().verifier.test(value)) {
+		if (!info.verifier().verifier.test(value)) {
 			menu.display(name);
 			event.getHook().sendMessage("Ungültiger Wert").setEphemeral(true).queue();
 			return;
@@ -144,7 +144,7 @@ public class ConfigFieldFrame extends MessageFrame {
 			try {
 				Object instance = instanceProvider.getInstance(false, config);
 
-				if(instance == null) return;
+				if (instance == null) return;
 
 				field.set(instance, value);
 			} catch (Exception e) {
@@ -152,7 +152,7 @@ public class ConfigFieldFrame extends MessageFrame {
 			}
 		});
 
-		if(category.updateCommands()) {
+		if (category.updateCommands()) {
 			Main.updateGuildCommands(event.getGuild());
 		}
 

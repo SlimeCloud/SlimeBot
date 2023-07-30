@@ -12,22 +12,22 @@ import java.io.IOException;
 
 @ApplicationCommand(name = "rank", description = "Zeigt dein Aktuelles Level und XP an", feature = "level")
 public class RankCommand {
-    @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, dessen Platzierung die ansehen möchtest", required = false) Member user) {
-        if (user == null) user = event.getMember();
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, dessen Platzierung die ansehen möchtest", required = false) Member user) {
+		if (user == null) user = event.getMember();
 
-        if (user.getUser().isBot()) {
-            event.reply("Bots wie " + user.getAsMention() + " können nicht leveln!").queue();
-            return;
-        }
+		if (user.getUser().isBot()) {
+			event.reply("Bots wie " + user.getAsMention() + " können nicht leveln!").queue();
+			return;
+		}
 
-        event.deferReply().queue();
+		event.deferReply().queue();
 
-        try {
-            event.getHook().sendFiles(new RankCard(Level.getLevel(user)).getFile()).queue();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+		try {
+			event.getHook().sendFiles(new RankCard(Level.getLevel(user)).getFile()).queue();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 }

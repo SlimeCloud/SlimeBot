@@ -36,7 +36,7 @@ public class BlockCommand {
 	public static class AddCommand {
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, der blockiert werden soll") Member user) {
-			if(isBlocked(user)) {
+			if (isBlocked(user)) {
 				event.replyEmbeds(
 						new EmbedBuilder()
 								.setTimestamp(Instant.now())
@@ -69,7 +69,7 @@ public class BlockCommand {
 	public static class RemoveCommand {
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, der ent-blockiert werden soll") Member user) {
-			if(!isBlocked(user)) {
+			if (!isBlocked(user)) {
 				event.replyEmbeds(
 						new EmbedBuilder()
 								.setTimestamp(Instant.now())
