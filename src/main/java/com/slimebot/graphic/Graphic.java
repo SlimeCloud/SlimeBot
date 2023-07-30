@@ -13,7 +13,7 @@ public abstract class Graphic {
 	protected final int height;
 	private final BufferedImage image;
 
-	public Graphic(int width, int height) {
+	protected Graphic(int width, int height) {
 		this.width = width;
 		this.height = height;
 		this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
