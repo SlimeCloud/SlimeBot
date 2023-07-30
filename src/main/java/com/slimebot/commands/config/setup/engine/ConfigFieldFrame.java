@@ -142,7 +142,7 @@ public class ConfigFieldFrame extends MessageFrame {
 
 		ConfigCommand.updateField(guild, config -> {
 			try {
-				Object instance = instanceProvider.getInstance(false, config);
+				Object instance = instanceProvider.getInstance(true, config);
 
 				if (instance == null) return;
 
