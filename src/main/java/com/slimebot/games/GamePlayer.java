@@ -5,27 +5,28 @@ import net.dv8tion.jda.api.entities.Member;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class GamePlayer {
     public final long id;
-    public final Game game;
+    public final Game<? extends GamePlayer> game;
     public static List<GamePlayer> players = new ArrayList<>();
 
-    public GamePlayer(long id, Game game) {
+    protected GamePlayer(long id, Game game) {
         this.id = id;
         this.game = game;
 
         players.add(this);
     }
 
-    public Member getAsMember() {
+    public Optional<Member> getAsMember() {
         AtomicReference<Member> member = new AtomicReference<>();
-        Main.jdaInstance.getGuildById(game.guildId)
+        Objects.requireNonNull(Main.jdaInstance.getGuildById(game.guildId))
                 .retrieveMemberById(id)
-                .queue(m -> member.set(m));
-        return member.get();
+                .queue(member::set);
+        return Optional.of(member.get());
     }
 
     public String getAsMention() {
@@ -52,7 +53,7 @@ public abstract class GamePlayer {
     public static <T extends GamePlayer> Optional<T> getFromId(Class<T> gamePlayerClass, long id) {
         return players.stream()
                 .filter(p -> p.id == id)
-                .map(p -> gamePlayerClass.cast(p))
+                .map(gamePlayerClass::cast)
                 .findAny();
     }
 
@@ -60,7 +61,7 @@ public abstract class GamePlayer {
      * Removes the player from the game
      */
     public void kill() {
-        if (game instanceof MultiPlayerGame<?>) ((MultiPlayerGame) game).players.remove(this);
+        if (game instanceof MultiPlayerGame<?>) ((MultiPlayerGame<?>) game).players.remove(this);
         players.remove(this);
     }
 }

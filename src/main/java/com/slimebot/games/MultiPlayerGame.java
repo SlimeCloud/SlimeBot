@@ -27,7 +27,7 @@ public abstract class MultiPlayerGame<T extends GamePlayer> extends Game {
      * @param playersCanJoin     disables or enables the join button
      * @param gamePlayerFunction BiFunction that calls the constructor of your player class
      */
-    public MultiPlayerGame(long gameMaster, long guildId, long channelId, boolean playersCanJoin, BiFunction<Game, Long, T> gamePlayerFunction) {
+    protected MultiPlayerGame(long gameMaster, long guildId, long channelId, boolean playersCanJoin, BiFunction<Game, Long, T> gamePlayerFunction) {
         super(guildId, channelId);
 
         this.gameMaster = gameMaster;

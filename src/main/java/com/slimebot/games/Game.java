@@ -17,13 +17,14 @@ public abstract class Game <T extends GamePlayer> extends ListenerAdapter {
     public final UUID uuid = UUID.randomUUID();
     public long channelId;
     public final long guildId;
-    public short minPlayers, maxPlayers;
+    public short minPlayers;
+    public short maxPlayers;
     public GameStatus status;
 
     /**
      * @param guildId id of the guild
      */
-    public Game(long guildId, long channelId) {
+    protected Game(long guildId, long channelId) {
         this.guildId = guildId;
         this.channelId = channelId;
 

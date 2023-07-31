@@ -9,7 +9,7 @@ public abstract class SinglePlayerGame<T extends GamePlayer> extends Game {
      * @param channelId id of the thread Channel
      * @param player
      */
-    public SinglePlayerGame(long guildId, long channelId, T player) {
+    protected SinglePlayerGame(long guildId, long channelId, T player) {
         super(guildId, channelId);
         this.player = player;
 

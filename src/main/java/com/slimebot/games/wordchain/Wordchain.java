@@ -129,9 +129,4 @@ public class Wordchain extends MultiPlayerGame<WordchainPlayer> {
             });
         }, seconds, TimeUnit.SECONDS);
     }
-
-    @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-
-    }
 }
