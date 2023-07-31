@@ -3,10 +3,10 @@ package com.slimebot.level;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.main.config.guild.LevelGuildConfig;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.utils.Result;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +39,6 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
                 .bind("guild", guild)
                 .mapTo(Level.class)
                 .stream()
-                .filter(level -> !Main.jdaInstance.getUserById(level.user()).isBot())
                 .toList()
         );
     }
@@ -179,9 +178,9 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
                 Role role = guild.getRoleById(roleId);
 
                 if (levelRoleId.isPresent() && roleId.equals(levelRoleId.get())) {
-                    guild.addRoleToMember(user, role).queue();
+                    guild.addRoleToMember(user, role).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MEMBER));
                 } else {
-                    guild.removeRoleFromMember(user, role).queue();
+                    guild.removeRoleFromMember(user, role).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MEMBER));
                 }
             });
         });

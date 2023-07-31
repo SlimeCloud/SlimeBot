@@ -45,9 +45,9 @@ public class LevelListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if(!event.isFromGuild()) return;
-
         User author = event.getAuthor();
+
+        if(!event.isFromGuild() || author.isBot()) return;
 
         if (messageTimeout.getOrDefault(author.getIdLong(), 0L) + config.messageCooldown >= System.currentTimeMillis()) return;
         messageTimeout.put(author.getIdLong(), System.currentTimeMillis());
@@ -87,7 +87,7 @@ public class LevelListener extends ListenerAdapter {
                 .toList();
 
         if(validMembers.size() >= 2) {
-            channel.getMembers().forEach(m -> voiceUsers.put(m.getIdLong(), channel.getGuild().getIdLong()));
+            validMembers.forEach(m -> voiceUsers.put(m.getIdLong(), channel.getGuild().getIdLong()));
         }
 
         else {
