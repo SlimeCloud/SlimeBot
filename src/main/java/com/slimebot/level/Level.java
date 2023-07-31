@@ -43,11 +43,14 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
         );
     }
 
-    public static @NotNull List<Level> getTopList(long guild, int limit) {
+    public static @NotNull List<Level> getTopList(long guildId, int limit) {
         if (limit <= 0) return Collections.emptyList();
 
-        return getLevels(guild).stream()
+        Guild guild = Main.jdaInstance.getGuildById(guildId);
+
+        return getLevels(guildId).stream()
                 .sorted(Comparator.reverseOrder())
+                .filter(l -> guild.getMemberById(l.user()) != null)
                 .limit(limit)
                 .toList();
     }
