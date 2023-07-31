@@ -1,9 +1,7 @@
 package com.slimebot.commands;
 
 import com.slimebot.games.GamePlayer;
-import com.slimebot.games.PlayerGameState;
 import com.slimebot.games.wordchain.Wordchain;
-import com.slimebot.games.wordchain.WordchainPlayer;
 import com.slimebot.main.Main;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
@@ -70,7 +68,11 @@ public class WordchainCommand {
                                         return;
                                     }
                                     menu.close();
-                                    new Wordchain(event.getMember().getIdLong(), event.getChannel().getIdLong(), event.getGuild().getIdLong(), time.shortValue(), lives.shortValue());
+                                    event.getChannel().sendMessage(event.getMember().getAsMention() + " hat ein neues Wortketten Minispiel erstellt!").queue(message -> {
+                                        message.createThreadChannel("Wordchain").queue(channel -> {
+                                            new Wordchain(event.getMember().getIdLong(), channel.getIdLong(), event.getGuild().getIdLong(), time.shortValue(), lives.shortValue());
+                                        });
+                                    });
                                 })
                         )
                 )

@@ -33,20 +33,12 @@ public abstract class GamePlayer {
     }
 
     /**
-     * Removes the player from the game
-     */
-    public void kill() {
-        game.players.remove(this);
-        players.remove(this);
-    }
-
-    /**
      *
      * @param id
      * @return true if the player is in a game
      */
     public static boolean isInGame(long id) {
-        Optional<GamePlayer> player = getFromId(id);
+        Optional<GamePlayer> player = getFromId(GamePlayer.class, id);
         if(player.isPresent()) {
             if(player.get().game.status == Game.GameStatus.ENDED) {
                 player.get().kill();
@@ -57,9 +49,18 @@ public abstract class GamePlayer {
         return false;
     }
 
-    public static Optional<GamePlayer> getFromId(long id) {
+    public static <T extends GamePlayer> Optional<T> getFromId(Class<T> gamePlayerClass, long id) {
         return players.stream()
                 .filter(p -> p.id == id)
+                .map(p -> gamePlayerClass.cast(p))
                 .findAny();
+    }
+
+    /**
+     * Removes the player from the game
+     */
+    public void kill() {
+        if (game instanceof MultiPlayerGame<?>) ((MultiPlayerGame) game).players.remove(this);
+        players.remove(this);
     }
 }
