@@ -7,6 +7,7 @@ import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.util.MathUtil;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
@@ -49,7 +50,7 @@ public class LevelListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         User author = event.getAuthor();
 
-        if(!event.isFromGuild() || author.isBot()) return;
+        if(!event.isFromGuild() || author.isBot() || isBlacklisted((ICategorizableChannel) event.getChannel())) return;
 
         if (messageTimeout.getOrDefault(author.getIdLong(), 0L) + config.messageCooldown >= System.currentTimeMillis()) return;
         messageTimeout.put(author.getIdLong(), System.currentTimeMillis());
@@ -88,12 +89,17 @@ public class LevelListener extends ListenerAdapter {
                 .filter(m -> !m.getVoiceState().isMuted())
                 .toList();
 
-        if(validMembers.size() >= 2) {
+        if(validMembers.size() >= 2 && !isBlacklisted(channel)) {
             validMembers.forEach(m -> voiceUsers.put(m.getIdLong(), channel.getGuild().getIdLong()));
         }
 
         else {
             channel.getMembers().forEach(m -> voiceUsers.remove(m.getIdLong()));
         }
+    }
+
+    private boolean isBlacklisted(ICategorizableChannel cc) {
+        List<Long> blacklist = GuildConfig.getConfig(cc.getGuild()).getOrCreateLevel().blacklist;
+        return blacklist.contains(cc.getIdLong()) || blacklist.contains(cc.getParentCategoryIdLong());
     }
 }
