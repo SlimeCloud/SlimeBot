@@ -150,7 +150,7 @@ public class GuildConfig {
 	public StaffConfig staffMessage;
 
 	@ConfigCategory(name = "level", description = "Level-System", updateCommands = true,
-			subcommands = {LevelConfigCommand.AddRoleCommand.class, LevelConfigCommand.RemoveRoleCommand.class}
+			subcommands = {LevelConfigCommand.AddRoleCommand.class, LevelConfigCommand.RemoveRoleCommand.class, LevelConfigCommand.BlacklistChannelCommand.class, LevelConfigCommand.UnblacklistChannelCommand.class}
 	)
 	public LevelGuildConfig level;
 

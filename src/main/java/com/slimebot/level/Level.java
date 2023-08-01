@@ -3,10 +3,12 @@ package com.slimebot.level;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.main.config.guild.LevelGuildConfig;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
-import net.dv8tion.jda.api.utils.Result;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +34,10 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
 
     public static Level getLevel(Member member) {
         return getLevel(member.getGuild().getIdLong(), member.getIdLong());
+    }
+
+    public static List<Level> getLevels(Guild guild) {
+        return guild==null ? Collections.emptyList() : getLevels(guild.getIdLong());
     }
 
     public static List<Level> getLevels(long guild) {
@@ -85,9 +91,7 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
             level++;
         }
 
-        if(level > this.level) {
-            onLevelUp(member, level);
-        }
+        if(level > this.level) onLevelUp(member, level);
 
         return new Level(guild, user, level, xp, messages);
     }
