@@ -37,7 +37,7 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
     }
 
     public static List<Level> getLevels(Guild guild) {
-        return guild==null ? Collections.emptyList() : getLevels(guild.getIdLong());
+        return guild == null ? Collections.emptyList() : getLevels(guild.getIdLong());
     }
 
     public static List<Level> getLevels(long guild) {
@@ -79,19 +79,19 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
     public Level setXp(Integer level, Integer xp) {
         Member member = Main.jdaInstance.getGuildById(guild).getMemberById(user);
 
-        if(level == null) level = this.level;
-        if(xp == null) xp = this.xp;
+        if (level == null) level = this.level;
+        if (xp == null) xp = this.xp;
 
-        while(true) {
+        while (true) {
             int requiredXp = calculateRequiredXP(level + 1);
 
-            if(xp < requiredXp) break;
+            if (xp < requiredXp) break;
 
             xp -= requiredXp;
             level++;
         }
 
-        if(level > this.level) onLevelUp(member, level);
+        if (level > this.level) onLevelUp(member, level);
 
         return new Level(guild, user, level, xp, messages);
     }
@@ -117,7 +117,7 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
     public int compareTo(@NotNull Level o) {
         int levelCompare = Integer.compare(this.level, o.level);
 
-        if(levelCompare != 0) return levelCompare;
+        if (levelCompare != 0) return levelCompare;
 
         return Integer.compare(this.xp, o.xp);
     }
@@ -147,11 +147,11 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
     }
 
     public static int calculateRequiredXP(int level) {
-        return (5 * level*level + 50 * level + 100);
+        return (5 * level * level + 50 * level + 100);
     }
 
     private static void onLevelUp(Member member, int newLevel) {
-        if(member.getUser().isBot()) return;
+        if (member.getUser().isBot()) return;
 
         updateLevelRoles(member.getGuild().getIdLong(), member.getIdLong(), newLevel);
 
@@ -176,7 +176,7 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
         GuildConfig.getConfig(guild).getLevelConfig().map(config -> config.levelRoles).ifPresent(roles -> {
             Optional<Long> levelRoleId = roles.entrySet().stream()
                     .filter(e -> level >= e.getKey())
-                    .sorted(Comparator.comparingInt(e -> ((Map.Entry<Integer, Long>)e).getKey()).reversed())
+                    .sorted(Comparator.comparingInt(e -> ((Map.Entry<Integer, Long>) e).getKey()).reversed())
                     .limit(1)
                     .map(Map.Entry::getValue)
                     .findAny();
