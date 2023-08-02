@@ -83,7 +83,7 @@ compileJava {
     dependsOn "prepareSources"
 
     options.encoding = 'UTF-8'
-    options.compilerArgs << '-parameters' << '-ea'
+    options.compilerArgs << '-parameters'
 }
 
 jar {
