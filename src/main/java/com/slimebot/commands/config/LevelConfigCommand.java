@@ -42,7 +42,7 @@ public class LevelConfigCommand {
 	public static class BlacklistChannelCommand {
 
 		@ApplicationCommandMethod
-		public void performCommand(SlashCommandInteractionEvent event, @Option(name = "channel", description = "Der Kanal") GuildChannel channel) {
+		public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Kanal") GuildChannel channel) {
 			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateLevel().blacklist.add(channel.getIdLong()));
 
 			event.reply("Kanal " + channel.getAsMention() + " zur Level Blacklist hinzugefügt").setEphemeral(true).queue();
@@ -50,11 +50,11 @@ public class LevelConfigCommand {
 
 	}
 
-	@ApplicationCommand(name = "un_blacklist_channel", description = "Aktiviere das Leveling für einen Kanal")
+	@ApplicationCommand(name = "unblacklist_channel", description = "Aktiviere das Leveling für einen Kanal")
 	public static class UnblacklistChannelCommand {
 
 		@ApplicationCommandMethod
-		public void performCommand(SlashCommandInteractionEvent event, @Option(name = "channel", description = "Der Kanal") GuildChannel channel) {
+		public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Kanal") GuildChannel channel) {
 			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateLevel().blacklist.remove(channel.getIdLong()));
 
 			event.reply("Kanal " + channel.getAsMention() + " von der Level Blacklist entfernt").setEphemeral(true).queue();
