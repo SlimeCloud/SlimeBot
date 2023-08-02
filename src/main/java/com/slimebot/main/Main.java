@@ -25,8 +25,6 @@ import de.mineking.discord.commands.ContextBase;
 import de.mineking.discord.commands.ContextCreator;
 import de.mineking.discord.commands.inherited.Option;
 import de.mineking.discord.list.ListCommand;
-import lombok.CustomLog;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -48,7 +46,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@Getter
 public class Main {
 	public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
 	public final static Gson gson = new GsonBuilder()

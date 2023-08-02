@@ -9,7 +9,6 @@ import de.mineking.discord.ui.UIManager;
 import de.mineking.discord.ui.components.ComponentRow;
 import de.mineking.discord.ui.components.button.ButtonColor;
 import de.mineking.discord.ui.components.button.FrameButton;
-import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import java.lang.reflect.Field;

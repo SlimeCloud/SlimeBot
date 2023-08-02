@@ -6,7 +6,6 @@ import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import org.jdbi.v3.core.argument.ObjectMethodArguments;
 
 import java.util.function.Function;
 
