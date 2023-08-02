@@ -149,7 +149,7 @@ public class FdmdsCommand {
 									.addActionRow(Button.secondary("fdmds:create", "Frage einreichen"))
 									.queue(m -> {
 										for(int i = 0; i < choices.lines().count(); i++) {
-											m.addReaction(SlimeEmoji.fromId(i + 1).emoji).queue();
+											m.addReaction(SlimeEmoji.fromId(i + 1).getEmoji()).queue();
 										}
 
 										event.reply("Frage verschickt!").setEphemeral(true).queue();

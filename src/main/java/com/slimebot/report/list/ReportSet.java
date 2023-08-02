@@ -6,6 +6,7 @@ import com.slimebot.report.Filter;
 import com.slimebot.report.Report;
 import de.mineking.discord.list.ListContext;
 import de.mineking.discord.list.Listable;
+import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -16,14 +17,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+@AllArgsConstructor
 public class ReportSet implements Listable<Report> {
 	private final Guild guild;
 	private final Filter filter;
-
-	public ReportSet(Guild guild, Filter filter) {
-		this.guild = guild;
-		this.filter = filter;
-	}
 
 	@Override
 	public List<Report> getEntries() {
@@ -31,7 +28,7 @@ public class ReportSet implements Listable<Report> {
 				.bind("guild", guild.getIdLong())
 				.mapTo(Report.class)
 				.stream()
-				.filter(filter.filter)
+				.filter(filter.getFilter())
 				.toList()
 		);
 	}

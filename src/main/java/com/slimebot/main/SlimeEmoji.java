@@ -1,9 +1,11 @@
 package com.slimebot.main;
 
+import lombok.Getter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 import java.util.stream.Stream;
 
+@Getter
 public enum SlimeEmoji {
 	SLIME0(0, "<:slime0:1080225248076632064>"),
 	SLIME1(1, "<:slime1:1080225250400280788>"),
@@ -16,8 +18,8 @@ public enum SlimeEmoji {
 	SLIME8(8, "<:slime8:1080225263809474610>"),
 	SLIME9(9, "<:slime9:1080225265420075168>");
 
-	public final int id;
-	public final Emoji emoji;
+	private final int id;
+	private final Emoji emoji;
 
 	SlimeEmoji(int id, String emoji) {
 		this.id = id;

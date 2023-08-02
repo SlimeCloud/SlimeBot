@@ -9,6 +9,7 @@ import de.mineking.discord.ui.UIManager;
 import de.mineking.discord.ui.components.ComponentRow;
 import de.mineking.discord.ui.components.button.ButtonColor;
 import de.mineking.discord.ui.components.button.FrameButton;
+import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import java.lang.reflect.Field;
@@ -58,10 +59,10 @@ public class SetupMenu extends Menu {
 			try {
 				CustomSetupFrame instance = type.getConstructor(Menu.class, long.class).newInstance(this, guild);
 
-				addFrame(instance.name, instance);
+				addFrame(instance.getName(), instance);
 
 				if(button == null) {
-					button = new FrameButton(ButtonColor.GRAY, category.description(), instance.name);
+					button = new FrameButton(ButtonColor.GRAY, category.description(), instance.getName());
 				}
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 				logger.error("Failed to initialize " + type.getName(), e);

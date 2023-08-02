@@ -11,6 +11,7 @@ import com.slimebot.commands.config.engine.FieldVerification;
 import com.slimebot.commands.config.setup.StaffFrame;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
+import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -35,6 +36,7 @@ import java.util.function.Consumer;
  * Anhand der bereits vorhandenden Beispiele sollte erkennbar sein, wie diese Annotationen zu verwenden sind.
  */
 @ConfigCategory(name = "guild", description = "Haupteinstellungen")
+@Getter
 public class GuildConfig {
 	public static final Logger logger = LoggerFactory.getLogger(GuildConfig.class);
 

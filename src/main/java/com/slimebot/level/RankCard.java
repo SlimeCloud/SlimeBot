@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.net.URL;
 
 public class RankCard extends Graphic {
-    public final static int rankPadding = 60;
+    private final static int rankPadding = 60;
 
-    public final static Color barBackground = new Color(150, 150, 150, 50);
-    public final static Color barOutline = new Color(68, 140, 41, 255);
-    public final static Color barForeground = new Color(105, 227, 73, 200);
+    private final static Color barBackground = new Color(150, 150, 150, 50);
+    private final static Color barOutline = new Color(68, 140, 41, 255);
+    private final static Color barForeground = new Color(105, 227, 73, 200);
 
     private final static Font font;
 
@@ -40,6 +40,8 @@ public class RankCard extends Graphic {
     @Override
     public void drawGraphic(Graphics2D graphics2D) throws Exception {
         User user = Main.jdaInstance.getUserById(level.user());
+
+        assert user!=null;
 
         int avatarWidth = height - 80;
 
