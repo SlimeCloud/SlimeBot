@@ -10,21 +10,21 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 @ApplicationCommand(name = "level", description = "Entferne level von einem Nutzer")
 public class RemoveLevelCommand {
 
-    @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event,
-                               @Option(name = "member") Member member,
-                               @Option(name = "level", minValue = 1) int level
-    ) {
-        Level current = Level.getLevel(member);
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event,
+	                           @Option(description = "Der Nutzer, von dem Level entfernt werden sollen") Member user,
+	                           @Option(description = "Die Anzahl an Leveln", minValue = 1) int level
+	) {
+		Level current = Level.getLevel(user);
 
-        if (level > current.level()) {
-            event.reply(member.getAsMention() + "   hat nur " + current.level() + " Level. du kannst ihm also maximal " + current.level() + " Level entfernen!").setEphemeral(true).queue();
-            return;
-        }
+		if (level > current.level()) {
+			event.reply(user.getAsMention() + "   hat nur " + current.level() + " Level. du kannst ihm also maximal " + current.level() + " Level entfernen!").setEphemeral(true).queue();
+			return;
+		}
 
-        current = current.addXp(-1 * level, 0).save();
+		current = current.addXp(-1 * level, 0).save();
 
-        event.reply(member.getAsMention() + " wurden erfolgreich " + level + " level entfernt!\nEr ist jetzt level " + current.level() + "!").setEphemeral(true).queue();
-    }
+		event.reply(user.getAsMention() + " wurden erfolgreich " + level + " level entfernt!\nEr ist jetzt level " + current.level() + "!").setEphemeral(true).queue();
+	}
 
 }

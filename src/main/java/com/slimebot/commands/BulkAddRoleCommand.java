@@ -18,8 +18,8 @@ public class BulkAddRoleCommand {
 
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event,
-	                           @Option(name = "rolle", description = "Auf welche Rolle sollen die User überprüft werden?") Role role,
-	                           @Option(name = "bots", description = "Sollen Bots mit überprüft werden?") boolean bots
+	                           @Option(description = "Auf welche Rolle sollen die User überprüft werden?") Role role,
+	                           @Option(description = "Sollen Bots mit überprüft werden?") boolean bots
 	) {
 		var members = event.getGuild().getMembers().stream()
 				.filter(m -> !m.getUser().isBot() || bots)

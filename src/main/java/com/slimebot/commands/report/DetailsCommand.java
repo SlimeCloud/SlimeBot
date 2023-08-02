@@ -12,9 +12,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 @ApplicationCommand(name = "details", description = "Zeigt Details zu einer Meldung an")
 public class DetailsCommand {
 	@ApplicationCommandMethod
-	public void performCommand(SlashCommandInteractionEvent event,
-	                           @Option(name = "id", description = "ID der Meldung") int id
-	) {
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "ID der Meldung") int id) {
 		Report.get(event.getGuild(), id)
 				.ifPresentOrElse(
 						report -> event.reply(report.buildMessage()).setEphemeral(true).queue(),

@@ -29,12 +29,12 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 
 	@Override
 	public void performCommand(CommandContext context, GenericCommandInteractionEvent event) {
-		if(event.getOptions().isEmpty()) {
+		if (event.getOptions().isEmpty()) {
 			ConfigCommand.updateField(event.getGuild(), config -> {
 				try {
 					Object instance = instanceProvider.getInstance(false, config);
 
-					if(instance == null) return;
+					if (instance == null) return;
 
 					field.set(instance, null);
 				} catch (Exception e) {
@@ -44,7 +44,7 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 
 			event.reply(info.title() + " zurückgesetzt").setEphemeral(true).queue();
 
-			if(category.updateCommands()) {
+			if (category.updateCommands()) {
 				Main.updateGuildCommands(event.getGuild());
 			}
 
@@ -62,7 +62,7 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 			}
 		});
 
-		if(category.updateCommands()) {
+		if (category.updateCommands()) {
 			Main.updateGuildCommands(event.getGuild());
 		}
 

@@ -16,7 +16,7 @@ public class Database {
 	public Jdbi jdbi;
 
 	public Database() {
-		if(Main.config.database == null) {
+		if (Main.config.database == null) {
 			return;
 		}
 
@@ -49,10 +49,11 @@ public class Database {
 	 * <pre>{@code
 	 * Main.database.run(handle -> handle.createUpdate("insert into test values('test', 5)").execute());
 	 * }</pre>
+	 *
 	 * @param handler Ein handler, in dem du deinen Datenbank-Code ausführst.
 	 */
 	public void run(Consumer<Handle> handler) {
-		if(jdbi == null) {
+		if (jdbi == null) {
 			logger.warn("Versuchter Datenbankaufruf nicht möglich: Keine Datenbank konfiguriert");
 			return;
 		}
@@ -66,11 +67,12 @@ public class Database {
 	 * <pre>{@code
 	 * Main.database.run(handle -> handle.createUpdate("insert into test values('test', 5)").execute());
 	 * }</pre>
+	 *
 	 * @param handler Eine Funktion, die Daten aus der Datenbank umwandelt.
 	 * @return Den Rückgabewert der handler-Funktion
 	 */
 	public <T> T handle(Function<Handle, T> handler) {
-		if(jdbi == null) {
+		if (jdbi == null) {
 			logger.warn("Versuchter Datenbankaufruf nicht möglich: Keine Datenbank konfiguriert");
 			return null;
 		}

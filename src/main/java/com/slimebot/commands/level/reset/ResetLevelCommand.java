@@ -9,13 +9,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 @ApplicationCommand(name = "level", description = "Setzt die Level eines Nutzers zurück")
 public class ResetLevelCommand {
-    public static String execute(Member member) {
-        Level.getLevel(member).setXp(0, 0);
-        return "Level von " + member.getAsMention() + " zurückgesetzt";
-    }
+	public static String execute(Member member) {
+		Level.getLevel(member).setXp(0, 0);
+		return "Level von " + member.getAsMention() + " zurückgesetzt";
+	}
 
-    @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "member") Member member) {
-        event.reply(execute(member)).setEphemeral(true).queue();
-    }
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, dessen Level zurückgesetzt werden soll") Member user) {
+		event.reply(execute(user)).setEphemeral(true).queue();
+	}
 }
