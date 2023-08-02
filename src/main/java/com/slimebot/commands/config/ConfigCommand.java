@@ -10,6 +10,7 @@ import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.message.StaffMessage;
+import com.slimebot.util.ReflectionUtil;
 import de.mineking.discord.commands.CommandImplementation;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
@@ -26,6 +27,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Dieser Befehl ist der Hauptbefehl für die Konfiguration. Wenn du in {@link GuildConfig} Felder mit den korrekten Annotationen {@link ConfigCategory} und {@link ConfigField} erstellst, werden die Unterbefehle automatisch generiert.
@@ -110,8 +112,9 @@ public class ConfigCommand {
 
 		CommandImplementation group = cmdMan.getCommands().get("config " + category.name());
 
-		for (Class<?> sc : category.subcommands()) {
-			cmdMan.registerCommand(group, sc);
-		}
+		Stream.of(category.subcommands())
+				.flatMap(ReflectionUtil::getDeclaredClasses)
+				.filter(sc -> sc.isAnnotationPresent(ApplicationCommand.class))
+				.forEach(sc -> cmdMan.registerCommand(group, sc));
 	}
 }
