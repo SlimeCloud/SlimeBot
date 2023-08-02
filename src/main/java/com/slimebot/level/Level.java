@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jetbrains.annotations.NotNull;
@@ -34,24 +36,26 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
 		return getLevel(member.getGuild().getIdLong(), member.getIdLong());
 	}
 
-	public static List<Level> getLevels(long guild) {
-		return Main.database.handle(handle -> handle.createQuery("select * from levels where guild = :guild")
-				.bind("guild", guild)
-				.mapTo(Level.class)
-				.stream()
-				.filter(level -> !Main.jdaInstance.getUserById(level.user()).isBot())
-				.toList()
-		);
-	}
+    public static List<Level> getLevels(long guild) {
+        return Main.database.handle(handle -> handle.createQuery("select * from levels where guild = :guild")
+                .bind("guild", guild)
+                .mapTo(Level.class)
+                .stream()
+                .toList()
+        );
+    }
 
-	public static @NotNull List<Level> getTopList(long guild, int limit) {
-		if (limit <= 0) return Collections.emptyList();
+    public static @NotNull List<Level> getTopList(long guildId, int limit) {
+        if (limit <= 0) return Collections.emptyList();
 
-		return getLevels(guild).stream()
-				.sorted(Comparator.reverseOrder())
-				.limit(limit)
-				.toList();
-	}
+        Guild guild = Main.jdaInstance.getGuildById(guildId);
+
+        return getLevels(guildId).stream()
+                .sorted(Comparator.reverseOrder())
+                .filter(l -> guild.getMemberById(l.user()) != null)
+                .limit(limit)
+                .toList();
+    }
 
 	public Optional<Integer> getRank() {
 		return Optional.of(
@@ -178,15 +182,14 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
 			roles.forEach((l, roleId) -> {
 				Role role = guild.getRoleById(roleId);
 
-				if (levelRoleId.isPresent() && roleId.equals(levelRoleId.get())) {
-					guild.addRoleToMember(user, role).queue();
-				}
-				else {
-					guild.removeRoleFromMember(user, role).queue();
-				}
-			});
-		});
-	}
+                if (levelRoleId.isPresent() && roleId.equals(levelRoleId.get())) {
+                    guild.addRoleToMember(user, role).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MEMBER));
+                } else {
+                    guild.removeRoleFromMember(user, role).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MEMBER));
+                }
+            });
+        });
+    }
 
 	public static class LevelMapper implements RowMapper<Level> {
 		@Override
