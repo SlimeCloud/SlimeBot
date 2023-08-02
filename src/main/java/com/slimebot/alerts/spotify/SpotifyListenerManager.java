@@ -18,7 +18,7 @@ public class SpotifyListenerManager {
 		try {
 			api.setAccessToken(api.clientCredentials().build().execute().getAccessToken());
 		} catch(IOException | SpotifyWebApiException | ParseException e) {
-			SpotifyListener.logger.error("Spotify login fehlgeshlagen", e);
+			SpotifyListener.getLogger().error("Spotify login fehlgeshlagen", e);
 		}
 	}
 

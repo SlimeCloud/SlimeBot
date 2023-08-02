@@ -38,7 +38,7 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 
 					field.set(instance, null);
 				} catch (Exception e) {
-					ConfigCommand.logger.error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
+					ConfigCommand.getLogger().error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
 				}
 			});
 
@@ -58,7 +58,7 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 			try {
 				field.set(instanceProvider.getInstance(true, config), value);
 			} catch (Exception e) {
-				ConfigCommand.logger.error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
+				ConfigCommand.getLogger().error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
 			}
 		});
 

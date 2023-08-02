@@ -1,5 +1,6 @@
 package com.slimebot.graphic;
 
+import lombok.Cleanup;
 import net.dv8tion.jda.api.utils.FileUpload;
 
 import javax.imageio.ImageIO;
@@ -33,10 +34,10 @@ public abstract class Graphic {
     protected abstract void drawGraphic(Graphics2D graphics2D) throws Exception;
 
     public FileUpload getFile() throws IOException {
-        try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            ImageIO.write(image, "png", bos);
-            return FileUpload.fromData(bos.toByteArray(), "image.png");
-        }
+        @Cleanup
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", bos);
+        return FileUpload.fromData(bos.toByteArray(), "image.png");
     }
 
 

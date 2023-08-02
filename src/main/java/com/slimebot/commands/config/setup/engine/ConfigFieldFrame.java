@@ -46,7 +46,7 @@ public class ConfigFieldFrame extends MessageFrame {
 					formattedValue = info.type().getFormatter().apply(value);
 				}
 			} catch(Exception e) {
-				ConfigCommand.logger.error("Fehler beim auslesen des aktuellen Konfigurationswerts für " + field.getName(), e);
+				ConfigCommand.getLogger().error("Fehler beim auslesen des aktuellen Konfigurationswerts für " + field.getName(), e);
 			}
 
 			if(info.title().isEmpty())  System.out.println(field.getName());
@@ -112,7 +112,7 @@ public class ConfigFieldFrame extends MessageFrame {
 							}
 
 						} catch (Exception e) {
-							ConfigCommand.logger.error("Fehler beim zurücksetzten von " + field.getName(), e);
+							ConfigCommand.getLogger().error("Fehler beim zurücksetzten von " + field.getName(), e);
 						}
 					});
 
@@ -148,7 +148,7 @@ public class ConfigFieldFrame extends MessageFrame {
 
 				field.set(instance, value);
 			} catch (Exception e) {
-				ConfigCommand.logger.error("Fehler beim setzten von " + field.getName(), e);
+				ConfigCommand.getLogger().error("Fehler beim setzten von " + field.getName(), e);
 			}
 		});
 

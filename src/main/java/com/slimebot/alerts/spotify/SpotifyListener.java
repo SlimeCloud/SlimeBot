@@ -3,24 +3,22 @@ package com.slimebot.alerts.spotify;
 import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class SpotifyListener implements Runnable {
-	public final static Logger logger = LoggerFactory.getLogger(SpotifyListener.class);
-
 	private final String artistId;
 	private final SpotifyApi spotifyApi;
 
@@ -83,5 +81,9 @@ public class SpotifyListener implements Runnable {
 					})
 			);
 		}
+	}
+
+	public static Logger getLogger() {
+		return logger;
 	}
 }

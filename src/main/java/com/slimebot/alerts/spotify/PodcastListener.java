@@ -31,7 +31,7 @@ public class PodcastListener implements Runnable {
 
 	@Override
 	public void run() {
-		SpotifyListener.logger.info("Überprüfe auf neue Podcast Episode");
+		SpotifyListener.getLogger().info("Überprüfe auf neue Podcast Episode");
 
 		Main.database.run(handle -> {
 			List<String> known = handle.createQuery("select id from spotify_known").mapTo(String.class).list();
@@ -49,13 +49,13 @@ public class PodcastListener implements Runnable {
 	}
 
 	private List<EpisodeSimplified> getLatestEpisodes() {
-		SpotifyListener.logger.info("Überprüfe auf neue Episoden bei {}", id);
+		SpotifyListener.getLogger().info("Überprüfe auf neue Episoden bei {}", id);
 
 		try {
 			Paging<EpisodeSimplified> episodes = api.getShowEpisodes(id).market(CountryCode.DE).limit(20).build().execute();
 
 			if(episodes.getTotal() > 20) {
-				SpotifyListener.logger.warn("Es gibt mehr als 20 Episoden, hole die letzten 20");
+				SpotifyListener.getLogger().warn("Es gibt mehr als 20 Episoden, hole die letzten 20");
 				episodes = api.getShowEpisodes(id).market(CountryCode.DE).offset(episodes.getTotal() - 20).build().execute();
 			}
 
