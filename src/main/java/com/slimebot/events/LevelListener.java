@@ -31,12 +31,12 @@ public class LevelListener extends ListenerAdapter {
 	public void onReady(@NotNull ReadyEvent event) {
 		Main.jdaInstance.getVoiceChannels().forEach(this::updateChannel);
 
-        Main.scheduleAtFixedRate(60, TimeUnit.SECONDS, () ->
-                voiceUsers.forEach((user, guild) ->
-                        Level.getLevel(guild, user).addXp(0, (int) (MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP) * GuildConfig.getConfig(guild).getLevelConfig().map(config -> config.xpMultiplier).orElse(1.0))).save()
-                )
-        );
-    }
+		Main.scheduleAtFixedRate(60, TimeUnit.SECONDS, () ->
+				voiceUsers.forEach((user, guild) ->
+						Level.getLevel(guild, user).addXp(0, (int) (MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP) * GuildConfig.getConfig(guild).getLevelConfig().map(config -> config.xpMultiplier).orElse(1.0))).save()
+				)
+		);
+	}
 
 	@Override
 	public void onGuildBan(@NotNull GuildBanEvent event) {
@@ -45,14 +45,14 @@ public class LevelListener extends ListenerAdapter {
 				.save();
 	}
 
-    @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-        User author = event.getAuthor();
+	@Override
+	public void onMessageReceived(MessageReceivedEvent event) {
+		User author = event.getAuthor();
 
-        if(!event.isFromGuild() || author.isBot()) return;
+		if (!event.isFromGuild() || author.isBot()) return;
 
-        if (messageTimeout.getOrDefault(author.getIdLong(), 0L) + config.messageCooldown >= System.currentTimeMillis()) return;
-        messageTimeout.put(author.getIdLong(), System.currentTimeMillis());
+		if (messageTimeout.getOrDefault(author.getIdLong(), 0L) + config.messageCooldown >= System.currentTimeMillis()) return;
+		messageTimeout.put(author.getIdLong(), System.currentTimeMillis());
 
 		double xp = MathUtil.randomInt(config.minMessageXP, config.maxMessageXP);
 
@@ -88,9 +88,9 @@ public class LevelListener extends ListenerAdapter {
 				.filter(m -> !m.getVoiceState().isMuted())
 				.toList();
 
-        if(validMembers.size() >= 2) {
-            validMembers.forEach(m -> voiceUsers.put(m.getIdLong(), channel.getGuild().getIdLong()));
-        }
+		if (validMembers.size() >= 2) {
+			validMembers.forEach(m -> voiceUsers.put(m.getIdLong(), channel.getGuild().getIdLong()));
+		}
 
 		else {
 			channel.getMembers().forEach(m -> voiceUsers.remove(m.getIdLong()));

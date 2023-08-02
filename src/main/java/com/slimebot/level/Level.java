@@ -36,26 +36,26 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
 		return getLevel(member.getGuild().getIdLong(), member.getIdLong());
 	}
 
-    public static List<Level> getLevels(long guild) {
-        return Main.database.handle(handle -> handle.createQuery("select * from levels where guild = :guild")
-                .bind("guild", guild)
-                .mapTo(Level.class)
-                .stream()
-                .toList()
-        );
-    }
+	public static List<Level> getLevels(long guild) {
+		return Main.database.handle(handle -> handle.createQuery("select * from levels where guild = :guild")
+				.bind("guild", guild)
+				.mapTo(Level.class)
+				.stream()
+				.toList()
+		);
+	}
 
-    public static @NotNull List<Level> getTopList(long guildId, int limit) {
-        if (limit <= 0) return Collections.emptyList();
+	public static @NotNull List<Level> getTopList(long guildId, int limit) {
+		if (limit <= 0) return Collections.emptyList();
 
-        Guild guild = Main.jdaInstance.getGuildById(guildId);
+		Guild guild = Main.jdaInstance.getGuildById(guildId);
 
-        return getLevels(guildId).stream()
-                .sorted(Comparator.reverseOrder())
-                .filter(l -> guild.getMemberById(l.user()) != null)
-                .limit(limit)
-                .toList();
-    }
+		return getLevels(guildId).stream()
+				.sorted(Comparator.reverseOrder())
+				.filter(l -> guild.getMemberById(l.user()) != null)
+				.limit(limit)
+				.toList();
+	}
 
 	public Optional<Integer> getRank() {
 		return Optional.of(
@@ -182,14 +182,15 @@ public record Level(long guild, long user, int level, int xp, int messages) impl
 			roles.forEach((l, roleId) -> {
 				Role role = guild.getRoleById(roleId);
 
-                if (levelRoleId.isPresent() && roleId.equals(levelRoleId.get())) {
-                    guild.addRoleToMember(user, role).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MEMBER));
-                } else {
-                    guild.removeRoleFromMember(user, role).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MEMBER));
-                }
-            });
-        });
-    }
+				if (levelRoleId.isPresent() && roleId.equals(levelRoleId.get())) {
+					guild.addRoleToMember(user, role).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MEMBER));
+				}
+				else {
+					guild.removeRoleFromMember(user, role).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MEMBER));
+				}
+			});
+		});
+	}
 
 	public static class LevelMapper implements RowMapper<Level> {
 		@Override
