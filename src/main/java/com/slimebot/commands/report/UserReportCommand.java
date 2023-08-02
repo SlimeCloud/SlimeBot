@@ -47,7 +47,7 @@ public class UserReportCommand {
 
 	@ApplicationCommandMethod
 	public void performCommand(UserContextInteractionEvent event) {
-		if(BlockCommand.isBlocked(event.getMember())) {
+		if (BlockCommand.isBlocked(event.getMember())) {
 			event.replyEmbeds(
 					new EmbedBuilder()
 							.setTimestamp(Instant.now())
@@ -69,7 +69,7 @@ public class UserReportCommand {
 					user -> submitUserReport(event, user, event.getValue("reason").getAsString()),
 					new ErrorHandler().handle(ErrorResponse.UNKNOWN_USER, e -> event.reply("Nutzer nicht gefunden").setEphemeral(true).queue())
 			);
-		} catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			event.reply("Ungültige Nutzer ID").setEphemeral(true).queue();
 		}
 	}

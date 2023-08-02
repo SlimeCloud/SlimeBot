@@ -17,27 +17,29 @@ import java.util.stream.Collectors;
 public class LeaderboardCommand {
 
 
-    @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "limit", required = false, minValue = 2, maxValue = 10) @IntegerDefault(10) Integer limit) {
-        List<Level> top = Level.getTopList(event.getGuild().getIdLong(), limit);
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Die maximale Anzahl a Nutzern, die angezeigt werden sollen", required = false, minValue = 2, maxValue = 10) @IntegerDefault(10) Integer limit) {
+		List<Level> top = Level.getTopList(event.getGuild().getIdLong(), limit).stream()
+				.filter(l -> l.level() > 0)
+				.toList();
 
-        String labels = top.stream()
-                .map(s -> event.getGuild().getMemberById(s.user()).getEffectiveName().replaceAll("[,&]]", " "))
-                .collect(Collectors.joining(","));
+		String labels = top.stream()
+				.map(s -> event.getGuild().getMemberById(s.user()).getEffectiveName().replaceAll("[,&]", " "))
+				.collect(Collectors.joining(","));
 
-        String data = top.stream()
-                .map(Level::level)
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
+		String data = top.stream()
+				.map(Level::level)
+				.map(String::valueOf)
+				.collect(Collectors.joining(","));
 
-        event.replyEmbeds(new EmbedBuilder()
-                .setImage(String.format("https://quickchart.io/chart/render/%s?data1=%s&labels=%s",
-                        Main.config.level.leaderboardTemplate,
-                        data,
-                        labels
-                ).replace(" ", "%20"))
-                .setColor(GuildConfig.getColor(event.getGuild()))
-                .build()
-        ).queue();
-    }
+		event.replyEmbeds(new EmbedBuilder()
+				.setImage(String.format("https://quickchart.io/chart/render/%s?data1=%s&labels=%s",
+						Main.config.level.leaderboardTemplate,
+						data,
+						labels
+				).replace(" ", "%20"))
+				.setColor(GuildConfig.getColor(event.getGuild()))
+				.build()
+		).queue();
+	}
 }

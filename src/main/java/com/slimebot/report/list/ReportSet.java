@@ -43,7 +43,7 @@ public class ReportSet implements Listable<Report> {
 				.setTimestamp(Instant.now())
 				.setTitle("Reports mit Filter **" + filter.toString() + "**");
 
-		if(context.entries.isEmpty()) {
+		if (context.entries.isEmpty()) {
 			builder.setDescription("*Keine Einträge*");
 		}
 
@@ -60,10 +60,10 @@ public class ReportSet implements Listable<Report> {
 	public List<ActionRow> getComponents(ListContext<Report> context) {
 		List<ActionRow> components = new ArrayList<>(Listable.super.getComponents(context));
 
-		if(!context.entries.isEmpty()) {
+		if (!context.entries.isEmpty()) {
 			List<SelectOption> options = new ArrayList<>();
 
-			for(int i = ((context.page - 1) * entriesPerPage()); i < (context.page * entriesPerPage()) && i < context.entries.size(); i++) {
+			for (int i = ((context.page - 1) * entriesPerPage()); i < (context.page * entriesPerPage()) && i < context.entries.size(); i++) {
 				Report report = context.entries.get(i);
 
 				options.add(SelectOption.of("Report #" + report.getId(), String.valueOf(report.getId()))

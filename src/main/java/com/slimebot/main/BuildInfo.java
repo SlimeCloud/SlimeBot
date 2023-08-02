@@ -4,5 +4,5 @@ public class BuildInfo {
 	/**
 	 * Die Version wird vor dem Kompilieren automatisch von gradle ersetzt.
 	 */
-    public final static String version = "@VERSION@";
+	public final static String version = "@VERSION@";
 }

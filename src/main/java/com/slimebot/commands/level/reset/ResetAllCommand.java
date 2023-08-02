@@ -9,12 +9,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 @ApplicationCommand(name = "all", description = "Setzt alle Statistiken eines Nutzers zurück")
 public class ResetAllCommand {
 	@ApplicationCommandMethod
-	public void performCommand(SlashCommandInteractionEvent event,
-							   @Option(name = "member") Member member
-	) {
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, dessen Statistiken zurückgesetzt werden sollen") Member user) {
 		event.reply(
-				ResetLevelCommand.execute(member) + "\n\n" +
-						ResetMessagesCommand.execute(member)
+				ResetLevelCommand.execute(user) + "\n\n" +
+						ResetMessagesCommand.execute(user)
 		).setEphemeral(true).queue();
 	}
 }
