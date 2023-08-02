@@ -108,8 +108,16 @@ public class ConfigCommand {
 
 		CommandImplementation group = cmdMan.getCommands().get("config " + category.name());
 
-		for(Class<?> sc : category.subcommands()) {
-			cmdMan.registerCommand(group, sc);
-		}
+		List<Class<?>> subcommands = new ArrayList<>();
+		for(Class<?> sc : category.subcommands()) subcommands.addAll(getDeclaredClasses(sc));
+		subcommands.removeIf(sc -> !sc.isAnnotationPresent(ApplicationCommand.class));
+		subcommands.forEach(sc -> cmdMan.registerCommand(group, sc));
+	}
+
+	private List<Class<?>> getDeclaredClasses(Class<?> clazz) {
+		List<Class<?>> classes = new ArrayList<>();
+		classes.add(clazz);
+		for (Class<?> dc : clazz.getDeclaredClasses()) classes.addAll(getDeclaredClasses(dc));
+		return classes;
 	}
 }
