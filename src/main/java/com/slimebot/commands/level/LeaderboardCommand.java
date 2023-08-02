@@ -24,7 +24,7 @@ public class LeaderboardCommand {
 				.toList();
 
 		String labels = top.stream()
-				.map(s -> event.getGuild().getMemberById(s.user()).getEffectiveName().replaceAll("[,&]]", " "))
+				.map(s -> event.getGuild().getMemberById(s.user()).getEffectiveName().replaceAll("[,&]", " "))
 				.collect(Collectors.joining(","));
 
 		String data = top.stream()
