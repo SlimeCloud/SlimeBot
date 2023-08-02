@@ -139,18 +139,18 @@ public class GuildConfig {
 	public SpotifyNotificationConfig spotify;
 
 	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim", updateCommands = true,
-			subcommands = FdmdsConfigCommand.DisableCommand.class
+			subcommands = FdmdsConfigCommand.class
 	)
 	public FdmdsConfig fdmds;
 
 	@ConfigCategory(name = "staff", description = "Team-Nachricht",
-			subcommands = {StaffConfigCommand.ChannelCommand.class, StaffConfigCommand.AddRoleCommand.class, StaffConfigCommand.RemoveRoleCommand.class},
+			subcommands = StaffConfigCommand.class,
 			customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
 	)
 	public StaffConfig staffMessage;
 
 	@ConfigCategory(name = "level", description = "Level-System", updateCommands = true,
-			subcommands = {LevelConfigCommand.AddRoleCommand.class, LevelConfigCommand.RemoveRoleCommand.class, LevelConfigCommand.BlacklistChannelCommand.class, LevelConfigCommand.UnblacklistChannelCommand.class}
+			subcommands = LevelConfigCommand.class
 	)
 	public LevelGuildConfig level;
 
