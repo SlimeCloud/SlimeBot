@@ -24,7 +24,7 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 
 		description = info.description();
 
-		addOption(info.type().builder.apply(info));
+		addOption(info.type().getBuilder().apply(info));
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 
 					field.set(instance, null);
 				} catch (Exception e) {
-					ConfigCommand.logger.error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
+					ConfigCommand.getLogger().error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
 				}
 			});
 
@@ -51,14 +51,14 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 			return;
 		}
 
-		Object value = info.type().data.apply(event.getOptions().get(0));
-		String text = info.type().formatter.apply(value);
+		Object value = info.type().getData().apply(event.getOptions().get(0));
+		String text = info.type().getFormatter().apply(value);
 
 		ConfigCommand.updateField(event.getGuild(), config -> {
 			try {
 				field.set(instanceProvider.getInstance(true, config), value);
 			} catch (Exception e) {
-				ConfigCommand.logger.error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
+				ConfigCommand.getLogger().error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
 			}
 		});
 

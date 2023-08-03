@@ -1,8 +1,13 @@
 package com.slimebot.commands.config.engine;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.awt.*;
 import java.util.function.Predicate;
 
+@Getter
+@AllArgsConstructor
 public enum FieldVerification {
 	ALL(x -> true),
 	COLOR(x -> {
@@ -16,9 +21,5 @@ public enum FieldVerification {
 		}
 	});
 
-	public final Predicate<Object> verifier;
-
-	FieldVerification(Predicate<Object> verifier) {
-		this.verifier = verifier;
-	}
+	private final Predicate<Object> verifier;
 }

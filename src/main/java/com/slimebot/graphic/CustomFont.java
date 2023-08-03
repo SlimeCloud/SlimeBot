@@ -1,8 +1,5 @@
 package com.slimebot.graphic;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.io.File;
@@ -11,12 +8,10 @@ import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
 public class CustomFont {
-	public final static Logger logger = LoggerFactory.getLogger(CustomFont.class);
-
-	public static Font getFont(Font font, int style) {
-		if (font == null) return null;
-		return font.deriveFont(style);
-	}
+    public static Font getFont(Font font, int style) {
+        if (font == null) return null;
+        return font.deriveFont(style);
+    }
 
 	public static Font getFont(Font font, float size) {
 		if (font == null) return null;

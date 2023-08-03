@@ -1,8 +1,7 @@
 package com.slimebot.graphic;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -10,8 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+@Slf4j
 public abstract class Graphic {
-	private Logger logger;
 
 	protected final int width;
 	protected final int height;
@@ -21,8 +20,6 @@ public abstract class Graphic {
 		this.width = width;
 		this.height = height;
 		this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-		this.logger = LoggerFactory.getLogger(getClass());
 	}
 
 	protected void finish() {

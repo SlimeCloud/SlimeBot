@@ -25,6 +25,7 @@ import de.mineking.discord.commands.ContextBase;
 import de.mineking.discord.commands.ContextCreator;
 import de.mineking.discord.commands.inherited.Option;
 import de.mineking.discord.list.ListCommand;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -34,7 +35,6 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -45,8 +45,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class Main {
-	public final static Logger logger = LoggerFactory.getLogger(Main.class);
 	public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
 	public final static Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
@@ -69,6 +69,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 		config = Config.readFromFile("config");
+
 		logger.info("Bot Version: {}", BuildInfo.version);
 
 		if (args.length == 0) {
@@ -214,5 +215,9 @@ public class Main {
 	 */
 	public static void scheduleAtFixedRate(int amount, TimeUnit unit, Runnable task) {
 		executor.scheduleAtFixedRate(task, 0, amount, unit);
+	}
+
+	public static Logger getLogger() {
+		return logger;
 	}
 }

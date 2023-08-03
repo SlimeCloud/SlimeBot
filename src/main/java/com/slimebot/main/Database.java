@@ -2,16 +2,16 @@ package com.slimebot.main;
 
 import com.slimebot.level.Level;
 import com.slimebot.report.Report;
+import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Slf4j
 public class Database {
-	public final static Logger logger = LoggerFactory.getLogger(Database.class);
 
 	public Jdbi jdbi;
 
@@ -78,5 +78,9 @@ public class Database {
 		}
 
 		return jdbi.withHandle(handler::apply);
+	}
+
+	public static Logger getLogger() {
+		return logger;
 	}
 }

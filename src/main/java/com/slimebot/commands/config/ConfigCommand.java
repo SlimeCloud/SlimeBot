@@ -16,10 +16,10 @@ import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.WhenFinished;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -32,9 +32,9 @@ import java.util.stream.Stream;
 /**
  * Dieser Befehl ist der Hauptbefehl für die Konfiguration. Wenn du in {@link GuildConfig} Felder mit den korrekten Annotationen {@link ConfigCategory} und {@link ConfigField} erstellst, werden die Unterbefehle automatisch generiert.
  */
+@Slf4j
 @ApplicationCommand(name = "config", description = "Verwaltet die Bot-Konfiguration für diesen Server", guildOnly = true)
 public class ConfigCommand {
-	public final static Logger logger = LoggerFactory.getLogger(ConfigCommand.class);
 
 	public CommandPermission permission = CommandPermission.TEAM;
 
@@ -116,5 +116,9 @@ public class ConfigCommand {
 				.flatMap(ReflectionUtil::getDeclaredClasses)
 				.filter(sc -> sc.isAnnotationPresent(ApplicationCommand.class))
 				.forEach(sc -> cmdMan.registerCommand(group, sc));
+	}
+
+	public static Logger getLogger() {
+		return logger;
 	}
 }

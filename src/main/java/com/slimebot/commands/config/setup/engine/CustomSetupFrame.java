@@ -4,13 +4,15 @@ import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.ui.Menu;
 import de.mineking.discord.ui.MessageFrame;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import java.util.Optional;
 import java.util.function.Function;
 
+@Getter
 public abstract class CustomSetupFrame extends MessageFrame {
-	public final String name;
+	private final String name;
 
 	protected CustomSetupFrame(String name, Menu menu, long guild, String title, String description, Function<GuildConfig, Optional<String>> value) {
 		super(menu, () -> new EmbedBuilder()

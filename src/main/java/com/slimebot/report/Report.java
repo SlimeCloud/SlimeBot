@@ -4,6 +4,8 @@ import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.list.ListContext;
 import de.mineking.discord.list.ListEntry;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -23,30 +25,21 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
 
+@AllArgsConstructor
 public class Report implements ListEntry {
 	private final long guild;
+	@Getter
 	private final int id;
 	private final Type type;
 	private final UserSnowflake issuer;
 	private final UserSnowflake target;
 
-	private final Timestamp time;
+	private final Timestamp timestamp;
 
 	private final Status status;
 	private final String reason;
 	private final String closeReason;
 
-	private Report(long guild, int id, Type type, UserSnowflake issuer, UserSnowflake target, Timestamp timestamp, Status status, String reason, String closeReason) {
-		this.guild = guild;
-		this.id = id;
-		this.type = type;
-		this.issuer = issuer;
-		this.target = target;
-		this.time = timestamp;
-		this.status = status;
-		this.reason = reason;
-		this.closeReason = closeReason;
-	}
 
 	public static Report createReport(Guild guild, Type type, User issuer, User target, String reason) {
 		int id = Main.database.handle(handle -> handle.createUpdate("insert into reports(guild, issuer, target, type, message) values(:guild, :issuer, :target, :type, :message)")
@@ -110,11 +103,11 @@ public class Report implements ListEntry {
 				.setColor(GuildConfig.getColor(guild))
 				.setTimestamp(Instant.now())
 				.setTitle(":exclamation:  Details zu Report #" + id)
-				.addField("Report Typ:", type.str, true)
+				.addField("Report Typ:", type.getStr(), true)
 				.addField("Gemeldeter User:", target.getAsMention(), true)
 				.addField("Gemeldet von:", issuer.getAsMention(), true)
-				.addField("Gemeldet am:", TimeFormat.DEFAULT.format(time.toInstant()), true)
-				.addField("Status:", status.str, true);
+				.addField("Gemeldet am:", TimeFormat.DEFAULT.format(timestamp.toInstant()), true)
+				.addField("Status:", status.getStr(), true);
 
 		embed.addField(type == Type.MESSAGE ? "Gemeldete Nachricht:" : "Meldegrund:", reason, false);
 
@@ -136,10 +129,6 @@ public class Report implements ListEntry {
 		return builder.build();
 	}
 
-	public int getId() {
-		return id;
-	}
-
 	public boolean isOpen() {
 		return status == Status.OPEN;
 	}
@@ -147,7 +136,7 @@ public class Report implements ListEntry {
 	@Override
 	public String build(int index, ListContext<?> context) {
 		//Escaping the dot prevents discord from making this a numbered list. The problem with these is, that the numbering is corrected automatically which might cause the displayed ids to be wrong.
-		return id + "\\. [" + status.emoji + "] " + TimeFormat.DEFAULT.format(time.toInstant()) + ": " + target.getAsMention() + " gemeldet von " + issuer.getAsMention();
+		return id + "\\. [" + status.getEmoji() + "] " + TimeFormat.DEFAULT.format(timestamp.toInstant()) + ": " + target.getAsMention() + " gemeldet von " + issuer.getAsMention();
 	}
 
 	public static class ReportRowMapper implements RowMapper<Report> {

@@ -11,11 +11,12 @@ import com.slimebot.commands.config.engine.FieldVerification;
 import com.slimebot.commands.config.setup.StaffFrame;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
+import lombok.Cleanup;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.*;
@@ -34,8 +35,9 @@ import java.util.Optional;
  * Anhand der bereits vorhandenden Beispiele sollte erkennbar sein, wie diese Annotationen zu verwenden sind.
  */
 @ConfigCategory(name = "guild", description = "Haupteinstellungen")
+@Getter
+@Slf4j
 public class GuildConfig {
-	public static final Logger logger = LoggerFactory.getLogger(GuildConfig.class);
 
 	private static final Map<Long, GuildConfig> guildConfig = new HashMap<>();
 
@@ -55,16 +57,17 @@ public class GuildConfig {
 				file.createNewFile();
 			}
 
-			try (Reader reader = new FileReader(file, StandardCharsets.UTF_8)) {
-				GuildConfig config = Main.gson.fromJson(reader, GuildConfig.class);
+			@Cleanup
+			Reader reader = new FileReader(file, StandardCharsets.UTF_8);
+			GuildConfig config = Main.gson.fromJson(reader, GuildConfig.class);
 
-				if (config == null) {
-					config = new GuildConfig();
-				}
-
-				config.guild = guild.getIdLong();
-				guildConfig.put(guild.getIdLong(), config);
+			if (config == null) {
+				config = new GuildConfig();
 			}
+
+			config.guild = guild.getIdLong();
+			guildConfig.put(guild.getIdLong(), config);
+
 		} catch (Exception e) {
 			logger.error("Failed to load config for guild " + guild, e);
 		}

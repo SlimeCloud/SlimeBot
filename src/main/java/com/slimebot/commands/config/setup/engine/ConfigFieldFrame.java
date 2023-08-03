@@ -43,16 +43,16 @@ public class ConfigFieldFrame extends MessageFrame {
 				Object value = instance == null ? null : field.get(instance);
 
 				if (value != null) {
-					formattedValue = info.type().formatter.apply(value);
+					formattedValue = info.type().getFormatter().apply(value);
 				}
 			} catch (Exception e) {
-				ConfigCommand.logger.error("Fehler beim auslesen des aktuellen Konfigurationswerts für " + field.getName(), e);
+				ConfigCommand.getLogger().error("Fehler beim auslesen des aktuellen Konfigurationswerts für " + field.getName(), e);
 			}
 
 			if (info.title().isEmpty()) System.out.println(field.getName());
 
 			return new EmbedBuilder()
-					.setTitle(info.type().emoji + info.title())
+					.setTitle(info.type().getEmoji() + info.title())
 					.setColor(GuildConfig.getColor(guild))
 					.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
 					.setDescription(info.description())
@@ -112,7 +112,7 @@ public class ConfigFieldFrame extends MessageFrame {
 							}
 
 						} catch (Exception e) {
-							ConfigCommand.logger.error("Fehler beim zurücksetzten von " + field.getName(), e);
+							ConfigCommand.getLogger().error("Fehler beim zurücksetzten von " + field.getName(), e);
 						}
 					});
 
@@ -134,7 +134,7 @@ public class ConfigFieldFrame extends MessageFrame {
 	}
 
 	private void setValue(MenuBase menu, IReplyCallback event, Object value) {
-		if (!info.verifier().verifier.test(value)) {
+		if (!info.verifier().getVerifier().test(value)) {
 			menu.display(name);
 			event.getHook().sendMessage("Ungültiger Wert").setEphemeral(true).queue();
 			return;
@@ -148,7 +148,7 @@ public class ConfigFieldFrame extends MessageFrame {
 
 				field.set(instance, value);
 			} catch (Exception e) {
-				ConfigCommand.logger.error("Fehler beim setzten von " + field.getName(), e);
+				ConfigCommand.getLogger().error("Fehler beim setzten von " + field.getName(), e);
 			}
 		});
 

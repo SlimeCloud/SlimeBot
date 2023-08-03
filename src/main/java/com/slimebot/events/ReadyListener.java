@@ -24,10 +24,10 @@ public class ReadyListener extends ListenerAdapter {
 
 			Main.holiday.run();
 		} catch (Exception e) {
-			SpotifyListener.logger.error("Konnte spotify listener nicht starten", e);
+			SpotifyListener.getLogger().error("Konnte spotify listener nicht starten", e);
 		}
 
-		Main.discordUtils.getCommandCache().updateGlobalCommands(error -> Main.logger.error("Failed to update commands", error));
+		Main.discordUtils.getCommandCache().updateGlobalCommands(error -> Main.getLogger().error("Failed to update commands", error));
 	}
 
 	@Override
