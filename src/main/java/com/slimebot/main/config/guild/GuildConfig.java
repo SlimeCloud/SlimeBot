@@ -24,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Diese Klasse wird verwendet, um die Konfiguration eines Servers zu verwalten.
@@ -46,13 +45,14 @@ public class GuildConfig {
 	 * VERWENDE NICHT DIESE METHODE!
 	 * Die Konfiguration für Server wird automatisch geladen.
 	 * Um auf sie zuzugreifen, verwende die {@link #getConfig(Guild)}-Methode.
-	 * @see #getConfig(Guild) 
+	 *
+	 * @see #getConfig(Guild)
 	 */
 	public static void load(Guild guild) {
 		try {
 			File file = new File("guild/" + guild.getIdLong() + ".json");
 
-			if(!file.exists()) {
+			if (!file.exists()) {
 				file.getParentFile().mkdirs();
 				file.createNewFile();
 			}
@@ -61,14 +61,14 @@ public class GuildConfig {
 			Reader reader = new FileReader(file, StandardCharsets.UTF_8);
 			GuildConfig config = Main.gson.fromJson(reader, GuildConfig.class);
 
-			if(config == null) {
+			if (config == null) {
 				config = new GuildConfig();
 			}
 
 			config.guild = guild.getIdLong();
 			guildConfig.put(guild.getIdLong(), config);
 
-		} catch(Exception e) {
+		} catch (Exception e) {
 			logger.error("Failed to load config for guild " + guild, e);
 		}
 	}
@@ -108,12 +108,12 @@ public class GuildConfig {
 	/**
 	 * Speichert die Konfiguration in der Datei.
 	 * Diese Methode sollte vermieden werden.
-	 * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField(Guild, Consumer)}
+	 * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField}
 	 */
 	public synchronized void save() {
-		try(Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
+		try (Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
 			Main.gson.toJson(this, writer);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			logger.error("Failed to save config for guild " + guild, e);
 		}
 	}
@@ -142,18 +142,18 @@ public class GuildConfig {
 	public SpotifyNotificationConfig spotify;
 
 	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim", updateCommands = true,
-			subcommands = FdmdsConfigCommand.DisableCommand.class
+			subcommands = FdmdsConfigCommand.class
 	)
 	public FdmdsConfig fdmds;
 
 	@ConfigCategory(name = "staff", description = "Team-Nachricht",
-			subcommands = {StaffConfigCommand.ChannelCommand.class, StaffConfigCommand.AddRoleCommand.class, StaffConfigCommand.RemoveRoleCommand.class},
+			subcommands = StaffConfigCommand.class,
 			customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
 	)
 	public StaffConfig staffMessage;
 
 	@ConfigCategory(name = "level", description = "Level-System", updateCommands = true,
-			subcommands = {LevelConfigCommand.AddRoleCommand.class, LevelConfigCommand.RemoveRoleCommand.class, LevelConfigCommand.BlacklistChannelCommand.class, LevelConfigCommand.UnblacklistChannelCommand.class}
+			subcommands = LevelConfigCommand.class
 	)
 	public LevelGuildConfig level;
 

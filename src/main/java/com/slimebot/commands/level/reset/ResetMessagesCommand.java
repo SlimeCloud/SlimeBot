@@ -9,15 +9,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 @ApplicationCommand(name = "messages", description = "Setzt die Nachrichten-Statistiken eines Nutzers zurück")
 public class ResetMessagesCommand {
-    public static String execute(Member member) {
-        Level.getLevel(member).setMessages(0).save();
-        return "Nachrichten Statistiken von" + member.getAsMention() + " zurückgesetzt";
-    }
+	public static String execute(Member member) {
+		Level.getLevel(member).setMessages(0).save();
+		return "Nachrichten Statistiken von" + member.getAsMention() + " zurückgesetzt";
+	}
 
-    @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event,
-                               @Option(name = "member") Member member
-    ) {
-        event.reply(execute(member)).setEphemeral(true).queue();
-    }
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, dessen Nachrichten Statistiken zurückgesetzt werden sollen") Member user) {
+		event.reply(execute(user)).setEphemeral(true).queue();
+	}
 }

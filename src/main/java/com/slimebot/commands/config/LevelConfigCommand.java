@@ -1,16 +1,11 @@
 package com.slimebot.commands.config;
 
 import com.slimebot.level.Level;
-import com.slimebot.main.Main;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.Channel;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class LevelConfigCommand {
@@ -18,8 +13,8 @@ public class LevelConfigCommand {
 	public static class AddRoleCommand {
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event,
-								   @Option(name = "level", description = "Das Level") int level,
-								   @Option(name = "rolle", description = "Die Rolle, die vergeben wird") Role role
+		                           @Option(name = "level", description = "Das Level") int level,
+		                           @Option(name = "rolle", description = "Die Rolle, die vergeben wird") Role role
 		) {
 			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateLevel().levelRoles.put(level, role.getIdLong()));
 
@@ -33,7 +28,7 @@ public class LevelConfigCommand {
 	public static class RemoveRoleCommand {
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event,
-								   @Option(name = "level", description = "Das Level") int level
+		                           @Option(name = "level", description = "Das Level") int level
 		) {
 			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateLevel().levelRoles.remove(level));
 
@@ -47,7 +42,7 @@ public class LevelConfigCommand {
 	public static class BlacklistChannelCommand {
 
 		@ApplicationCommandMethod
-		public void performCommand(SlashCommandInteractionEvent event, @Option(name = "channel", description = "Der Kanal") GuildChannel channel) {
+		public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Kanal") GuildChannel channel) {
 			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateLevel().blacklist.add(channel.getIdLong()));
 
 			event.reply("Kanal " + channel.getAsMention() + " zur Level Blacklist hinzugefügt").setEphemeral(true).queue();
@@ -55,11 +50,11 @@ public class LevelConfigCommand {
 
 	}
 
-	@ApplicationCommand(name = "un_blacklist_channel", description = "Aktiviere das Leveling für einen Kanal")
+	@ApplicationCommand(name = "unblacklist_channel", description = "Aktiviere das Leveling für einen Kanal")
 	public static class UnblacklistChannelCommand {
 
 		@ApplicationCommandMethod
-		public void performCommand(SlashCommandInteractionEvent event, @Option(name = "channel", description = "Der Kanal") GuildChannel channel) {
+		public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Kanal") GuildChannel channel) {
 			ConfigCommand.updateField(event.getGuild(), config -> config.getOrCreateLevel().blacklist.remove(channel.getIdLong()));
 
 			event.reply("Kanal " + channel.getAsMention() + " von der Level Blacklist entfernt").setEphemeral(true).queue();

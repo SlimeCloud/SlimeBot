@@ -18,12 +18,12 @@ public class ReadyListener extends ListenerAdapter {
 	@Override
 	public void onReady(@NotNull net.dv8tion.jda.api.events.session.ReadyEvent event) {
 		try {
-			if(Main.spotify != null) {
+			if (Main.spotify != null) {
 				Main.spotify.register();
 			}
 
 			Main.holiday.run();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			SpotifyListener.getLogger().error("Konnte spotify listener nicht starten", e);
 		}
 

@@ -10,6 +10,7 @@ import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.message.StaffMessage;
+import com.slimebot.util.ReflectionUtil;
 import de.mineking.discord.commands.CommandImplementation;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
@@ -26,6 +27,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Dieser Befehl ist der Hauptbefehl für die Konfiguration. Wenn du in {@link GuildConfig} Felder mit den korrekten Annotationen {@link ConfigCategory} und {@link ConfigField} erstellst, werden die Unterbefehle automatisch generiert.
@@ -38,7 +40,8 @@ public class ConfigCommand {
 
 	/**
 	 * Gibt dir im `handler` Zugriff auf die Konfiguration eines Servers und speichert sie anschließend.
-	 * @param guild Der Server, dessen Konfiguration du verändern möchtest
+	 *
+	 * @param guild   Der Server, dessen Konfiguration du verändern möchtest
 	 * @param handler Der handler, in dem du die Konfiguration anpassen kannst.
 	 */
 	public static void updateField(Guild guild, Consumer<GuildConfig> handler) {
@@ -47,7 +50,8 @@ public class ConfigCommand {
 
 	/**
 	 * Gibt dir im `handler` Zugriff auf die Konfiguration eines Servers und speichert sie anschließend.
-	 * @param guild Der Server, dessen Konfiguration du verändern möchtest
+	 *
+	 * @param guild   Der Server, dessen Konfiguration du verändern möchtest
 	 * @param handler Der handler, in dem du die Konfiguration anpassen kannst.
 	 */
 	public static void updateField(long guild, Consumer<GuildConfig> handler) {
@@ -75,15 +79,15 @@ public class ConfigCommand {
 	public void setup(CommandManager<CommandContext> cmdMan) {
 		List<Field> mainFields = new ArrayList<>();
 
-		for(Field field : GuildConfig.class.getFields()) {
-			if(Modifier.isTransient(field.getModifiers())) continue;
+		for (Field field : GuildConfig.class.getFields()) {
+			if (Modifier.isTransient(field.getModifiers())) continue;
 
-			if(field.isAnnotationPresent(ConfigCategory.class)) {
+			if (field.isAnnotationPresent(ConfigCategory.class)) {
 				registerCategory(cmdMan, field.getAnnotation(ConfigCategory.class), field.getType().getFields(), (create, config) -> {
 					try {
 						Object temp = field.get(config);
 
-						if(temp == null && create) {
+						if (temp == null && create) {
 							temp = field.getType().getConstructor().newInstance();
 							field.set(config, temp);
 						}
@@ -108,9 +112,10 @@ public class ConfigCommand {
 
 		CommandImplementation group = cmdMan.getCommands().get("config " + category.name());
 
-		for(Class<?> sc : category.subcommands()) {
-			cmdMan.registerCommand(group, sc);
-		}
+		Stream.of(category.subcommands())
+				.flatMap(ReflectionUtil::getDeclaredClasses)
+				.filter(sc -> sc.isAnnotationPresent(ApplicationCommand.class))
+				.forEach(sc -> cmdMan.registerCommand(group, sc));
 	}
 
 	public static Logger getLogger() {

@@ -21,8 +21,8 @@ public class ContributorCommand {
 
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event,
-	                           @Option(name = "user", description = "Wie heißt du auf GitHub?") String user,
-	                           @Option(name = "link", description = "Der GitHub link zu deinem PR") String link
+	                           @Option(description = "Wie heißt du auf GitHub?") String user,
+	                           @Option(description = "Der GitHub link zu deinem PR") String link
 	) {
 		GuildConfig.getConfig(event.getGuild()).getLogChannel().ifPresentOrElse(
 				channel -> {

@@ -58,20 +58,20 @@ public class FdmdsCommand {
 
 		StringBuilder choicesStr = new StringBuilder();
 
-		if(event.getModalId().contains("send")) {
+		if (event.getModalId().contains("send")) {
 			String[] choices = event.getValue("choices").getAsString().split("\n");
 
-			if(choices.length <= 1) {
+			if (choices.length <= 1) {
 				event.reply("Du musst **mindestens 2** Antwortmöglichkeiten angeben!\n**Achte darauf jede Antwortmöglichkeit in eine neue Zeile zu schreiben!**").setEphemeral(true).queue();
 				return;
 			}
 
-			if(choices.length > 9) {
+			if (choices.length > 9) {
 				event.reply("Du kannst **maximal 9** Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
 				return;
 			}
 
-			for(int i = 0; i < choices.length; i++) {
+			for (int i = 0; i < choices.length; i++) {
 				choicesStr
 						.append(SlimeEmoji.fromId(i + 1).format())
 						.append(" -> ")
@@ -100,7 +100,7 @@ public class FdmdsCommand {
 				)
 				.build();
 
-		if(event.getModalId().contains("edit")) {
+		if (event.getModalId().contains("edit")) {
 			event.getMessage().editMessage(message).queue();
 
 			event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
@@ -148,7 +148,7 @@ public class FdmdsCommand {
 							channel.sendMessage(text)
 									.addActionRow(Button.secondary("fdmds:create", "Frage einreichen"))
 									.queue(m -> {
-										for(int i = 0; i < choices.lines().count(); i++) {
+										for (int i = 0; i < choices.lines().count(); i++) {
 											m.addReaction(SlimeEmoji.fromId(i + 1).getEmoji()).queue();
 										}
 

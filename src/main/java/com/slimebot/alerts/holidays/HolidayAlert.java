@@ -34,9 +34,9 @@ public class HolidayAlert implements Runnable {
 	}
 
 	private void sendMessage(List<Holiday> holidays) {
-		if(holidays.isEmpty()) return;
+		if (holidays.isEmpty()) return;
 
-		for(Guild guild : Main.jdaInstance.getGuilds()) {
+		for (Guild guild : Main.jdaInstance.getGuilds()) {
 			GuildConfig.getConfig(guild).getGreetingsChannel().ifPresent(channel -> {
 				String states = holidays
 						.stream()
@@ -44,7 +44,7 @@ public class HolidayAlert implements Runnable {
 						.collect(Collectors.joining(", "))
 						.replaceFirst(",(?=[^,]*$)", " und");
 
-				if(holidays.size() > 3) states = holidays.size() + " Bundesländern";
+				if (holidays.size() > 3) states = holidays.size() + " Bundesländern";
 
 				channel.sendMessageEmbeds(
 						new EmbedBuilder()

@@ -8,27 +8,20 @@ import de.mineking.discord.commands.annotated.option.Option;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-import java.io.IOException;
-
 @ApplicationCommand(name = "rank", description = "Zeigt dein Aktuelles Level und XP an", feature = "level")
 public class RankCommand {
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, dessen Platzierung die ansehen möchtest", required = false) Member user) {
+		if (user == null) user = event.getMember();
 
-    @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "user", required = false) Member member) {
-        if (member == null) member = event.getMember();
+		if (user.getUser().isBot()) {
+			event.reply("Bots wie " + user.getAsMention() + " können nicht leveln!").queue();
+			return;
+		}
 
-        if (member.getUser().isBot()) {
-            event.reply("Bots wie " + member.getAsMention() + " können nicht leveln!").queue();
-            return;
-        }
+		event.deferReply().queue();
 
-        event.deferReply().queue();
-
-        try {
-            event.getHook().sendFiles(new RankCard(Level.getLevel(member)).getFile()).queue();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+		event.getHook().sendFiles(new RankCard(Level.getLevel(user)).getFile()).queue();
+	}
 
 }

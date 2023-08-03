@@ -73,7 +73,7 @@ public class Report implements ListEntry {
 					.addField("Report von:", issuer.getAsMention(), true)
 					.addField("Gemeldet:", target.getAsMention(), true);
 
-			if(type == Type.MESSAGE) {
+			if (type == Type.MESSAGE) {
 				embedBuilder
 						.setDescription("Es wurde eine Nachricht gemeldet!")
 						.addField("Nachricht:", reason, false);
@@ -111,7 +111,7 @@ public class Report implements ListEntry {
 
 		embed.addField(type == Type.MESSAGE ? "Gemeldete Nachricht:" : "Meldegrund:", reason, false);
 
-		if(!isOpen()) {
+		if (!isOpen()) {
 			embed.addField("Verfahren:", closeReason, true);
 		}
 
@@ -122,7 +122,7 @@ public class Report implements ListEntry {
 		MessageCreateBuilder builder = new MessageCreateBuilder()
 				.setEmbeds(buildEmbed());
 
-		if(isOpen()) {
+		if (isOpen()) {
 			builder.setActionRow(Button.danger("report:close", "Close #" + id).withEmoji(Emoji.fromUnicode("\uD83D\uDD12")));
 		}
 

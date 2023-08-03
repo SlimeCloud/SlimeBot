@@ -14,7 +14,7 @@ import java.util.function.Function;
 public abstract class CustomSetupFrame extends MessageFrame {
 	private final String name;
 
-	public CustomSetupFrame(String name, Menu menu, long guild, String title, String description, Function<GuildConfig, Optional<String>> value) {
+	protected CustomSetupFrame(String name, Menu menu, long guild, String title, String description, Function<GuildConfig, Optional<String>> value) {
 		super(menu, () -> new EmbedBuilder()
 				.setTitle(title)
 				.setColor(GuildConfig.getColor(guild))

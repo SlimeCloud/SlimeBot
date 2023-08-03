@@ -85,15 +85,15 @@ Um den Code übersichtlich und einheitlich zu halten, sollten sich alle an einen
   Wenn ein Block nur aus einem weiteren Steuerblock wie `return` oder 
   `break` besteht, wird dieser in er Zeile des Kontrollblocks ohne geschweifte Klammern geschrieben:
   ```java
-  if(false) return;
-  if(true) {
+  if (false) return;
+  if (true) {
     System.out.println("Test");
     int x = 0;
   }
   ```
 - **Abstände:** Um den Code nicht gequetscht wirken zu lassen, werden zwischen einzelnen Teilen in einer Zeile Leerzeichen eingefügt:
   ```java
-  for(int i = 0; i < 10; i++) {
+  for (int i = 0; i < 10; i++) {
     System.out.println((i + 1) + ". Test");
   }
   ```
