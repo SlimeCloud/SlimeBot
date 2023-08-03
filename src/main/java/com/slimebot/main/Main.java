@@ -15,6 +15,7 @@ import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
 import com.slimebot.commands.report.UserReportSlashCommand;
 import com.slimebot.events.LevelListener;
+import com.slimebot.events.MemberJoinListener;
 import com.slimebot.events.ReadyListener;
 import com.slimebot.events.TimeoutListener;
 import com.slimebot.main.config.Config;
@@ -102,7 +103,8 @@ public class Main {
 				//Events
 				.addEventListeners(new ReadyListener())
 				.addEventListeners(new TimeoutListener())
-				.addEventListeners(new StaffMessage());
+				.addEventListeners(new StaffMessage())
+				.addEventListeners(new MemberJoinListener());
 
 		discordUtils = new DiscordUtils("", jdaBuilder)
 				.useCustomRestactionManager(null)

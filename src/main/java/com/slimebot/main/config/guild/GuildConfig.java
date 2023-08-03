@@ -157,6 +157,9 @@ public class GuildConfig {
 	)
 	public LevelGuildConfig level;
 
+	@ConfigCategory(name = "assignrole", description = "Join Role")
+	public AssignRoleConfig assignRole;
+
 	public Optional<Color> getColor() {
 		return Optional.ofNullable(color).map(Color::decode);
 	}
@@ -197,6 +200,10 @@ public class GuildConfig {
 
 	public Optional<LevelGuildConfig> getLevelConfig() {
 		return Optional.ofNullable(level);
+	}
+
+	public Optional<AssignRoleConfig> getAssignRole() {
+		return Optional.ofNullable(assignRole);
 	}
 
 	public StaffConfig getOrCreateStaff() {
