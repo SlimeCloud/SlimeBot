@@ -18,9 +18,7 @@ public class ConfigArrayPropertyCommand extends BaseCommand<CommandContext> {
     private final InstanceProvider instanceProvider;
     private final ConfigArrayPropertyCommandType type;
 
-    //field -> ist das proberty feld für den subcommand
-    //info -> ist die Annotation mit den ganzen infos wie z.B. der Type, wenn der CHANNELLIST ist müssen praktisch 2 subcommands hinzugefügt werden
-    //category -> ist die anotaion der Config klasse
+
     public ConfigArrayPropertyCommand(Field field, ConfigField info, ConfigCategory category, InstanceProvider instanceProvider, ConfigArrayPropertyCommandType type) {
         this.field = field;
         this.info = info;
