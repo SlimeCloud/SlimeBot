@@ -39,7 +39,8 @@
         "minWordLength": 3,
         "minWordXP": 0.05,
         "maxWordXP": 0.1,
-        "messageCooldown": 15000
+        "messageCooldown": 15000,
+        "voiceLevelingInterval": 60
     },
 
     "github": {

@@ -11,4 +11,5 @@ public class LevelConfig {
 	public Double minWordXP;
 	public Double maxWordXP;
 	public Long messageCooldown;
+	public Integer voiceLevelingInterval;
 }

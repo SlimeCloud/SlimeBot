@@ -32,8 +32,6 @@ public class Database {
 
 			handle.createUpdate("create table if not exists report_blocks(guild bigint, \"user\" bigint)").execute();
 			handle.createUpdate("create table if not exists reports(guild bigint, id serial, issuer bigint, target bigint, type text, time timestamp default now(), message text, status text default 'OPEN', closeReason text)").execute();
-
-			handle.createUpdate("create table if not exists levels(guild bigint, \"user\" bigint, level int, xp int, messages int, primary key(guild, \"user\"))").execute();
 		});
 
 		/*

@@ -32,7 +32,7 @@ public class LevelListener extends ListenerAdapter {
 	public void onReady(@NotNull ReadyEvent event) {
 		Main.jdaInstance.getVoiceChannels().forEach(this::updateChannel);
 
-		Main.scheduleAtFixedRate(5, TimeUnit.SECONDS, () ->
+		Main.scheduleAtFixedRate(Main.config.level.voiceLevelingInterval, TimeUnit.SECONDS, () ->
 				voiceUsers.forEach((user, guild) ->
 						Level.getLevel(guild, user)
 								.addXp(0, (int) (MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP) * GuildConfig.getConfig(guild).getLevelConfig()
