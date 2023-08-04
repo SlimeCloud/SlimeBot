@@ -16,12 +16,15 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -222,4 +225,13 @@ public class GuildConfig {
 	static Optional<Role> getRole(Long role) {
 		return Optional.ofNullable(role).map(id -> Main.jdaInstance.getRoleById(id));
 	}
+
+	static Optional<List<Role>> getRoles(List<Long> roles) {
+		return Optional.ofNullable(roles).map(list -> list.stream().map(Main.jdaInstance::getRoleById).toList());
+	}
+
+	static <T extends Channel> Optional<List<T>> getChannels(List<Long> channels, Class<T> type) {
+		return Optional.ofNullable(channels).map(list -> list.stream().map(id -> Main.jdaInstance.getChannelById(type, id)).toList());
+	}
+
 }

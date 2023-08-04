@@ -1,5 +1,6 @@
 package com.slimebot.events;
 
+import com.slimebot.main.config.guild.AssignRoleConfig;
 import com.slimebot.main.config.guild.GuildConfig;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -11,11 +12,8 @@ public class MemberJoinListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
-        GuildConfig.getConfig(event.getGuild().getIdLong()).getAssignRole().ifPresent(
-                assignRoleConfig -> assignRoleConfig.getRole().ifPresentOrElse(
-                        role -> event.getGuild().addRoleToMember(event.getMember(), role).queue(),
-                        () -> logger.warn("no Role found")
-                )
+        GuildConfig.getConfig(event.getGuild().getIdLong()).getAssignRole().flatMap(AssignRoleConfig::getRoles).ifPresent(
+                roles -> roles.forEach(r -> event.getGuild().addRoleToMember(event.getMember(), r).queue())
         );
 
     }
