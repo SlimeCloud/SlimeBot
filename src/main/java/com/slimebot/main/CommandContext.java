@@ -16,8 +16,7 @@ public class CommandContext extends ContextBase {
 	public CommandContext(GenericInteractionCreateEvent event) {
 		if (event instanceof SlashCommandInteractionEvent evt) {
 			this.event = evt;
-		}
-		else {
+		} else {
 			this.event = null;
 		}
 

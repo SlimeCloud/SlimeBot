@@ -78,9 +78,7 @@ public class FdmdsCommand {
 						.append(choices[i].strip())
 						.append("\r\n");
 			}
-		}
-
-		else {
+		} else {
 			choicesStr.append(event.getValue("choices").getAsString());
 		}
 
@@ -104,9 +102,7 @@ public class FdmdsCommand {
 			event.getMessage().editMessage(message).queue();
 
 			event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
-		}
-
-		else {
+		} else {
 			GuildConfig.getConfig(event.getGuild()).getFdmds().flatMap(FdmdsConfig::getLogChannel).ifPresentOrElse(
 					channel -> {
 						channel.sendMessage(MessageCreateData.fromEditData(message)).queue();

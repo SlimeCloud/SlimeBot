@@ -3,8 +3,8 @@ package com.slimebot.alerts.spotify;
 import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
-import lombok.extern.slf4j.Slf4j;
 import com.slimebot.main.config.guild.SpotifyNotificationConfig;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -18,9 +18,6 @@ import se.michaelthelin.spotify.requests.data.AbstractDataPagingRequest;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 

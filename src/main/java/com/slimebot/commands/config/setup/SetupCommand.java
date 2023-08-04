@@ -55,9 +55,7 @@ public class SetupCommand {
 						throw new RuntimeException(e);
 					}
 				}));
-			}
-
-			else {
+			} else {
 				mainFields.add(field);
 			}
 		}

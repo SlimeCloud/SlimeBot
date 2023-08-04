@@ -6,7 +6,10 @@ import com.slimebot.database.Table;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.main.config.guild.LevelGuildConfig;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -49,7 +52,7 @@ public class Level extends DataClass implements Comparable<Level> {
 	}
 
 	public Level addMessages(int messages) {
-		this.messages+=messages;
+		this.messages += messages;
 		return this;
 	}
 
@@ -89,9 +92,6 @@ public class Level extends DataClass implements Comparable<Level> {
 
 		return Integer.compare(this.getMessages(), o.getMessages());
 	}
-
-
-
 
 
 	public static @NotNull List<Level> getTopList(long guildId, int limit) {

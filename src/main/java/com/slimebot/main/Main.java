@@ -14,7 +14,6 @@ import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
 import com.slimebot.commands.report.UserReportSlashCommand;
-import com.slimebot.database.DataClass;
 import com.slimebot.database.Database;
 import com.slimebot.events.LevelListener;
 import com.slimebot.events.ReadyListener;
@@ -43,7 +42,9 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class Main {
@@ -130,9 +131,7 @@ public class Main {
 								} catch (IOException e) {
 									logger.error("Initialisieren der GitHub API fehlgeschlagen", e);
 								}
-							}
-
-							else {
+							} else {
 								logger.warn("Bug-Reporting aufgrund von fehlender GitHub konfiguration deaktiviert");
 							}
 
@@ -150,18 +149,15 @@ public class Main {
 									config.registerCommand(RankCommand.class);
 									config.registerCommand(LeaderboardCommand.class);
 									config.registerCommand(LevelCommand.class);
-								}
-								else logger.warn("Level System aufgrund fehlender Config deaktiviert");
-							}
-							else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
+								} else logger.warn("Level System aufgrund fehlender Config deaktiviert");
+							} else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
 
 							if (dbAvailable) {
 								config.registerCommand(UserReportCommand.class);
 								config.registerCommand(MessageReportCommand.class);
 								config.registerCommand(UserReportSlashCommand.class);
 								config.registerCommand(ReportCommand.class);
-							}
-							else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
+							} else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
 						}
 				)
 				.useCommandCache(null);

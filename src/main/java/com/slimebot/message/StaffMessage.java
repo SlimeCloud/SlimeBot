@@ -50,9 +50,7 @@ public class StaffMessage extends ListenerAdapter {
 					staff.message = mes.getIdLong();
 					config.save();
 				}));
-			}
-
-			else {
+			} else {
 				staff.getChannel().ifPresent(channel -> channel.editMessageById(staff.message, content).queue());
 			}
 		});
@@ -79,9 +77,7 @@ public class StaffMessage extends ListenerAdapter {
 
 			if (members.isEmpty()) {
 				builder.append("*Keine Mitglieder*").append("\n");
-			}
-
-			else {
+			} else {
 				for (Member member : members) {
 					builder.append("> ").append(member.getAsMention()).append("\n");
 				}

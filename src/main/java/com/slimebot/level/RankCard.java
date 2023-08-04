@@ -41,9 +41,9 @@ public class RankCard extends Graphic {
 	public void drawGraphic(Graphics2D graphics2D) throws IOException {
 		User user = Main.jdaInstance.getUserById(level.getUser());
 
-        assert user!=null;
+		assert user != null;
 
-        int avatarWidth = height - 80;
+		int avatarWidth = height - 80;
 
 		BufferedImage avatar = ImageIO.read(new URL(user.getEffectiveAvatarUrl()));
 

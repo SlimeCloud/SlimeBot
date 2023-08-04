@@ -1,6 +1,5 @@
 package com.slimebot.database;
 
-import com.slimebot.level.Level;
 import com.slimebot.main.Main;
 import com.slimebot.report.Report;
 import lombok.extern.slf4j.Slf4j;

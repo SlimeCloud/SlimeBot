@@ -52,9 +52,7 @@ public class ReportBlockSet implements Listable<ReportBlockSet.ReportBlock> {
 
 		if (context.entries.isEmpty()) {
 			builder.setDescription("*Keine Einträge*");
-		}
-
-		else {
+		} else {
 			builder.setFooter("Insgesamt " + context.entries.size() + " blockierte Nutzer");
 		}
 

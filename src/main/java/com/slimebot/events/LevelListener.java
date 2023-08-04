@@ -36,8 +36,8 @@ public class LevelListener extends ListenerAdapter {
 				voiceUsers.forEach((user, guild) ->
 						Level.getLevel(guild, user)
 								.addXp(0, (int) (MathUtil.randomInt(config.minVoiceXP, config.maxVoiceXP) * GuildConfig.getConfig(guild).getLevelConfig()
-											.map(config -> config.xpMultiplier)
-											.orElse(1.0)
+										.map(config -> config.xpMultiplier)
+										.orElse(1.0)
 								))
 								.save()
 				)

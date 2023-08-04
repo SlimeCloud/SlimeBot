@@ -97,9 +97,7 @@ public class ConfigCommand {
 						throw new RuntimeException(e);
 					}
 				});
-			}
-
-			else {
+			} else {
 				mainFields.add(field);
 			}
 		}
