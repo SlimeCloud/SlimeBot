@@ -6,15 +6,21 @@ import de.mineking.discord.commands.inherited.BaseCommand;
 import java.lang.reflect.Field;
 
 public class ConfigCategoryCommand extends BaseCommand<CommandContext> {
-	public ConfigCategoryCommand(ConfigCategory category, Field[] fields, InstanceProvider instanceProvider) {
-		description = category.description();
+    public ConfigCategoryCommand(ConfigCategory category, Field[] fields, InstanceProvider instanceProvider) {
+        description = category.description();
 
-		for (Field field : fields) {
-			ConfigField info = field.getAnnotation(ConfigField.class);
+        for (Field field : fields) {
+            ConfigField info = field.getAnnotation(ConfigField.class);
 
-			if (info == null) continue;
+            if (info == null) continue;
 
-			addSubcommand(info.command(), new ConfigPropertyCommand(field, info, category, instanceProvider));
-		}
-	}
+            if (info.toString().contains("LIST")) {
+                addSubcommand(info.command() + "_add", new ConfigArrayPropertyCommand(field, info, category, instanceProvider, ConfigArrayPropertyCommandType.ADD));
+                addSubcommand(info.command() + "_remove", new ConfigArrayPropertyCommand(field, info, category, instanceProvider, ConfigArrayPropertyCommandType.REMOVE));
+                return;
+            }
+
+            addSubcommand(info.command(), new ConfigPropertyCommand(field, info, category, instanceProvider));
+        }
+    }
 }
