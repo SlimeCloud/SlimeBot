@@ -8,10 +8,10 @@ import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
 public class CustomFont {
-    public static Font getFont(Font font, int style) {
-        if (font == null) return null;
-        return font.deriveFont(style);
-    }
+	public static Font getFont(Font font, int style) {
+		if (font == null) return null;
+		return font.deriveFont(style);
+	}
 
 	public static Font getFont(Font font, float size) {
 		if (font == null) return null;

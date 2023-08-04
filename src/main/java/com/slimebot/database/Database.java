@@ -1,6 +1,6 @@
-package com.slimebot.main;
+package com.slimebot.database;
 
-import com.slimebot.level.Level;
+import com.slimebot.main.Main;
 import com.slimebot.report.Report;
 import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Handle;
@@ -32,15 +32,12 @@ public class Database {
 
 			handle.createUpdate("create table if not exists report_blocks(guild bigint, \"user\" bigint)").execute();
 			handle.createUpdate("create table if not exists reports(guild bigint, id serial, issuer bigint, target bigint, type text, time timestamp default now(), message text, status text default 'OPEN', closeReason text)").execute();
-
-			handle.createUpdate("create table if not exists levels(guild bigint, \"user\" bigint, level int, xp int, messages int, primary key(guild, \"user\"))").execute();
 		});
 
 		/*
 		Hier kannst du RowMapper registrieren. Mit diesen gibst du an, wie java objekte aus einer SQL Tabellen Reihe erstellt werden können.
 		 */
 		jdbi.registerRowMapper(Report.class, new Report.ReportRowMapper());
-		jdbi.registerRowMapper(Level.class, new Level.LevelMapper());
 	}
 
 	/**

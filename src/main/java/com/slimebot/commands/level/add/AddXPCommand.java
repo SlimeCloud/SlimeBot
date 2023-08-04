@@ -18,6 +18,6 @@ public class AddXPCommand {
 				.addXp(0, xp)
 				.save();
 
-		event.reply(user.getAsMention() + "  wurden erfolgreich " + xp + " xp hinzugefügt!\nEr hat jetzt " + newLevel.xp() + " xp, und ist level " + newLevel.level() + "!").setEphemeral(true).queue();
+		event.reply(user.getAsMention() + "  wurden erfolgreich " + xp + " xp hinzugefügt!\nEr hat jetzt " + newLevel.getXp() + " xp, und ist level " + newLevel.getLevel() + "!").setEphemeral(true).queue();
 	}
 }

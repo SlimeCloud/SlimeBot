@@ -42,9 +42,9 @@ public class LevelCommand {
 
 			event.replyEmbeds(new EmbedBuilder()
 					.setTitle(user.getEffectiveName() + "`s Stats")
-					.addField("Level", String.valueOf(level.level()), false)
-					.addField("XP", String.valueOf(level.xp()), false)
-					.addField("Nachrichten", String.valueOf(level.messages()), false)
+					.addField("Level", String.valueOf(level.getLevel()), false)
+					.addField("XP", String.valueOf(level.getXp()), false)
+					.addField("Nachrichten", String.valueOf(level.getMessages()), false)
 					.setColor(GuildConfig.getColor(event.getGuild()))
 					.build()
 			).setEphemeral(true).queue();

@@ -39,11 +39,11 @@ public class RankCard extends Graphic {
 
 	@Override
 	public void drawGraphic(Graphics2D graphics2D) throws IOException {
-		User user = Main.jdaInstance.getUserById(level.user());
+		User user = Main.jdaInstance.getUserById(level.getUser());
 
-        assert user!=null;
+		assert user != null;
 
-        int avatarWidth = height - 80;
+		int avatarWidth = height - 80;
 
 		BufferedImage avatar = ImageIO.read(new URL(user.getEffectiveAvatarUrl()));
 
@@ -52,8 +52,8 @@ public class RankCard extends Graphic {
 
 		graphics2D.drawImage(avatar, 0, 80, null);
 
-		int xpRequired = Level.calculateRequiredXP(level.level() + 1);
-		double percentage = (double) level.xp() / xpRequired;
+		int xpRequired = Level.calculateRequiredXP(level.getLevel() + 1);
+		double percentage = (double) level.getXp() / xpRequired;
 
 		int maxBarSize = width - 160 - avatarWidth;
 		int barSize = (int) (maxBarSize * percentage);
@@ -74,12 +74,12 @@ public class RankCard extends Graphic {
 
 		graphics2D.setFont(CustomFont.getFont(font, 120F));
 
-		String xp = level.xp() + "/" + xpRequired + " XP";
+		String xp = level.getXp() + "/" + xpRequired + " XP";
 		graphics2D.drawString(xp, width - graphics2D.getFontMetrics().stringWidth(xp) - 80, height - 160);
 
 		graphics2D.setFont(CustomFont.getFont(font, 150F));
 
-		String levelString = "Level " + level.level();
+		String levelString = "Level " + level.getLevel();
 		String rank = "#" + level.getRank().map(i -> String.valueOf(i + 1)).orElse("Keiner");
 
 		int levelWidth = graphics2D.getFontMetrics().stringWidth(levelString);

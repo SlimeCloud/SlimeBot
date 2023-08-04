@@ -14,6 +14,7 @@ import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
 import com.slimebot.commands.report.UserReportSlashCommand;
+import com.slimebot.database.Database;
 import com.slimebot.events.LevelListener;
 import com.slimebot.events.MemberJoinListener;
 import com.slimebot.events.ReadyListener;
@@ -132,9 +133,7 @@ public class Main {
 								} catch (IOException e) {
 									logger.error("Initialisieren der GitHub API fehlgeschlagen", e);
 								}
-							}
-
-							else {
+							} else {
 								logger.warn("Bug-Reporting aufgrund von fehlender GitHub konfiguration deaktiviert");
 							}
 
@@ -152,18 +151,15 @@ public class Main {
 									config.registerCommand(RankCommand.class);
 									config.registerCommand(LeaderboardCommand.class);
 									config.registerCommand(LevelCommand.class);
-								}
-								else logger.warn("Level System aufgrund fehlender Config deaktiviert");
-							}
-							else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
+								} else logger.warn("Level System aufgrund fehlender Config deaktiviert");
+							} else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
 
 							if (dbAvailable) {
 								config.registerCommand(UserReportCommand.class);
 								config.registerCommand(MessageReportCommand.class);
 								config.registerCommand(UserReportSlashCommand.class);
 								config.registerCommand(ReportCommand.class);
-							}
-							else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
+							} else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
 						}
 				)
 				.useCommandCache(null);
@@ -205,7 +201,13 @@ public class Main {
 
 		long initialDelay = Duration.between(now, nextRun).getSeconds();
 
-		executor.scheduleAtFixedRate(task, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
+		executor.scheduleAtFixedRate(() -> {
+			try {
+				task.run();
+			} catch (Exception e) {
+				logger.error("Exception when executing the daily task", e);
+			}
+		}, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
 	}
 
 	/**
@@ -216,7 +218,13 @@ public class Main {
 	 * @param task   Die Aufgabe
 	 */
 	public static void scheduleAtFixedRate(int amount, TimeUnit unit, Runnable task) {
-		executor.scheduleAtFixedRate(task, 0, amount, unit);
+		executor.scheduleAtFixedRate(() -> {
+			try {
+				task.run();
+			} catch (Exception e) {
+				logger.error("Exception when executing the task", e);
+			}
+		}, 0, amount, unit);
 	}
 
 	public static Logger getLogger() {

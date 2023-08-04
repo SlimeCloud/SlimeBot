@@ -119,8 +119,101 @@ statt dem Initialisieren der Funktion eine Warnung ausgeben.
 ## 🗄️ Datenbank
 Wir verwenden eine [PostgreSQL](https://www.postgresql.org/) Datenbank, um große Datenmengen zu speichern.
 Zur Interaktion mit der Datenbank verwenden wir [JDBI-Bibliothek](https://jdbi.org/).<br>
-In der `Database` Klasse werden die Tabellen erstellt, mit denen dann später mit den `handle` und `run` Methoden in der gleichen Klasse interagiert wird.
-Die `handle`-Methode hat dabei einen Rückgabewert, und sollte daher für `select` SQL Befehle verwendet werden, während `run` keinen Rückgabewert hat und ist daher eher für `insert` oder `update` Befehle geeignet.
+Um mit der Datenbank zu interagieren wird eine sogenannte `DataClass` benötigt. Diese Klasse enthält alle daten die gespeichert werden sollen als Variabeln (es werden nur primitive typen und Strings unterstützt).
+````java
+public class TestData extends DataClass {
+	
+	private long guild;
+	private long user;
+	
+	private String name;
+	private boolean vip;
+	
+}
+````
+Die Primary keys für den Datensatz werden mit `@Key` markiert und sollten final sein.
+````java
+        ...
+	@Key
+	private final long guild;
+	@Key
+	private final long user;
+	...
+````
+Um einen Konstruktor für die Klasse zu erstellen, kann `@RequiredArgsConstructor` von lombok verwendet werden
+````java
+@RequiredArgsConstructor
+public class TestData extends DataClass {
+	...
+}
+````
+Als Tabellen name wird automatisch der Klassen name in klein genutzt.
+In diesem fall `testdata`.
+Der Tabellen name kann aber auch selbst gesetzt werden, durch die nutzung von `@Table`.
+In diesem beispiel wird der name auf `mytable` gesetzt.
+````java
+@Table(name = "mytable")
+@RequiredArgsConstructor
+public class TestData extends DataClass {
+    ...
+````
+
+Wenn daten in der DataClass geändert wurden, können diese durch die `save()` methode gespeichert werden.
+````java
+@Table(name = "mytable")
+@RequiredArgsConstructor
+@Setter
+public class TestData extends DataClass {
+	
+	@Key
+	private final long guild;
+	@Key
+	private final long user;
+	
+	private String name;
+	private boolean vip;
+	
+}
+````
+
+````java
+public class Main {
+	public static void main(String[] args) {
+		TestData td = new TestData(123L, 1234L);
+		td.setName("Paul");
+		td.save();
+	}
+}
+````
+
+Um die DataClass aus der Datenbank zu laden kann `DataClass.load()` verwendet werden.
+Als erster parameter wird eine instanz der DataClass über ein Interface übergeben.
+Was der DataClass für parameter übergeben werden ist in diesem fall egal.
+````java
+public class Main {
+	public static void main(String[] args) {
+		TestData td = DataClass.load(() -> new DataClass(64236L, 4214L), ...);
+	}
+}
+````
+Als zweiter parameter wird eine `Map<String, Object>` übergeben.
+In dieser Map ist der String der name des key parameters und das Object der Wert, mit dem die Daten gesucht werden sollen.
+````java
+public class Main {
+	public static void main(String[] args) {
+		TestData td = DataClass.load(..., Map.of("guild", 123L, "user", 1234L));
+	}
+}
+````
+um aus dem Optional<DataClass> welcher von der `load()` methode zurück gegeben wird eine DataClass zu machen, kann die methode `orElseGet()` verwendet werden.
+Dieser Methode wird einfach eine Instanz der DataClass über ein Interface übergeben, welche zurückgegeben werden soll, wenn keine passenden Daten gefunden wurden.
+````java
+public class Main {
+	public static void main(String[] args) {
+		TestData td = DataClass.load(..., ...).orElseGet(() -> new TestData(123L, 1234L));
+	}
+}
+````
 
 Um kleinere Datenmengen - wie zum Beispiel für Server Konfigurationen - verwenden wir json-files im `guild` Ordner. 
 In diesem Ordner gibt es für jeden Server eine Datei `<server id>.json`. 

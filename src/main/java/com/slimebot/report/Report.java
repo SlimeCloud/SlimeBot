@@ -77,9 +77,7 @@ public class Report implements ListEntry {
 				embedBuilder
 						.setDescription("Es wurde eine Nachricht gemeldet!")
 						.addField("Nachricht:", reason, false);
-			}
-
-			else {
+			} else {
 				embedBuilder
 						.setDescription("Es wurde eine Person gemeldet!")
 						.addField("Begründung:", reason, false);

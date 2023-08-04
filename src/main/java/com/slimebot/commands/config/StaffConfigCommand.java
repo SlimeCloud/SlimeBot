@@ -22,9 +22,7 @@ public class StaffConfigCommand {
 				ConfigCommand.updateField(event.getGuild(), config -> config.getStaffConfig().ifPresent(staff -> staff.channel = null)); //Keep role configuration to make it easier to re-enable the feature
 
 				event.reply("Kanal erfolgreich zurückgesetzt").setEphemeral(true).queue();
-			}
-
-			else {
+			} else {
 				if (!channel.getGuild().equals(event.getGuild())) {
 					event.reply("Der Kanal ist nicht auf diesem Server!").setEphemeral(true).queue();
 					return;

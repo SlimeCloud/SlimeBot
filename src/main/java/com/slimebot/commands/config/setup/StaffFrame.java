@@ -110,9 +110,7 @@ public class StaffFrame {
 
 						if (staff.roles.isEmpty()) {
 							select.addOption("---", "---"); //SelectMenus cannot be empty
-						}
-
-						else {
+						} else {
 							select.addOptions(
 									staff.roles.entrySet().stream()
 											.map(e -> {

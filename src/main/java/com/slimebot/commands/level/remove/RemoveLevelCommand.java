@@ -17,14 +17,16 @@ public class RemoveLevelCommand {
 	) {
 		Level current = Level.getLevel(user);
 
-		if (level > current.level()) {
-			event.reply(user.getAsMention() + "   hat nur " + current.level() + " Level. du kannst ihm also maximal " + current.level() + " Level entfernen!").setEphemeral(true).queue();
+		if (level > current.getLevel()) {
+			event.reply(user.getAsMention() + "   hat nur " + current.getLevel() + " Level. du kannst ihm also maximal " + current.getLevel() + " Level entfernen!").setEphemeral(true).queue();
 			return;
 		}
 
-		current = current.addXp(-1 * level, 0).save();
+		current = current
+				.addXp(-1 * level, 0)
+				.save();
 
-		event.reply(user.getAsMention() + " wurden erfolgreich " + level + " level entfernt!\nEr ist jetzt level " + current.level() + "!").setEphemeral(true).queue();
+		event.reply(user.getAsMention() + " wurden erfolgreich " + level + " level entfernt!\nEr ist jetzt level " + current.getLevel() + "!").setEphemeral(true).queue();
 	}
 
 }

@@ -42,9 +42,7 @@ public class ReportSet implements Listable<Report> {
 
 		if (context.entries.isEmpty()) {
 			builder.setDescription("*Keine Einträge*");
-		}
-
-		else {
+		} else {
 			builder
 					.setFooter("Insgesamt " + context.entries.size() + " Reports, die dem Filter entsprechen")
 					.setDescription("Nutze </report details:" + context.manager.getCommandCache().getGlobalCommand("report") + "> oder das Dropdown menu um mehr infos zu einem Report zu bekommen.\n");
