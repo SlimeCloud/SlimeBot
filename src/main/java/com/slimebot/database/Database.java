@@ -1,6 +1,7 @@
-package com.slimebot.main;
+package com.slimebot.database;
 
 import com.slimebot.level.Level;
+import com.slimebot.main.Main;
 import com.slimebot.report.Report;
 import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Handle;
@@ -40,7 +41,6 @@ public class Database {
 		Hier kannst du RowMapper registrieren. Mit diesen gibst du an, wie java objekte aus einer SQL Tabellen Reihe erstellt werden können.
 		 */
 		jdbi.registerRowMapper(Report.class, new Report.ReportRowMapper());
-		jdbi.registerRowMapper(Level.class, new Level.LevelMapper());
 	}
 
 	/**

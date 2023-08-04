@@ -14,6 +14,8 @@ import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
 import com.slimebot.commands.report.UserReportSlashCommand;
+import com.slimebot.database.DataClass;
+import com.slimebot.database.Database;
 import com.slimebot.events.LevelListener;
 import com.slimebot.events.ReadyListener;
 import com.slimebot.events.TimeoutListener;
@@ -41,9 +43,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Slf4j
 public class Main {
@@ -203,7 +203,13 @@ public class Main {
 
 		long initialDelay = Duration.between(now, nextRun).getSeconds();
 
-		executor.scheduleAtFixedRate(task, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
+		executor.scheduleAtFixedRate(() -> {
+			try {
+				task.run();
+			} catch (Exception e) {
+				logger.error("Exception when executing the daily task", e);
+			}
+		}, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
 	}
 
 	/**
@@ -214,7 +220,13 @@ public class Main {
 	 * @param task   Die Aufgabe
 	 */
 	public static void scheduleAtFixedRate(int amount, TimeUnit unit, Runnable task) {
-		executor.scheduleAtFixedRate(task, 0, amount, unit);
+		executor.scheduleAtFixedRate(() -> {
+			try {
+				task.run();
+			} catch (Exception e) {
+				logger.error("Exception when executing the task", e);
+			}
+		}, 0, amount, unit);
 	}
 
 	public static Logger getLogger() {

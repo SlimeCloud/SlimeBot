@@ -1,6 +1,6 @@
 package com.slimebot.main.config;
 
-import com.slimebot.main.Database;
+import com.slimebot.database.Database;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import io.github.cdimascio.dotenv.Dotenv;

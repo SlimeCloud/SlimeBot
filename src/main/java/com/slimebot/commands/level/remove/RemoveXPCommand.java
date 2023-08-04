@@ -16,13 +16,15 @@ public class RemoveXPCommand {
 	) {
 		Level current = Level.getLevel(user);
 
-		if (xp > current.xp()) {
-			event.reply(user.getAsMention() + " hat nur " + current.xp() + " XP. du kannst ihm also maximal " + current.xp() + " XP entfernen!").setEphemeral(true).queue();
+		if (xp > current.getXp()) {
+			event.reply(user.getAsMention() + " hat nur " + current.getXp() + " XP. du kannst ihm also maximal " + current.getXp() + " XP entfernen!").setEphemeral(true).queue();
 			return;
 		}
 
-		current = current.addXp(0, -1 * xp).save();
+		current = current
+				.addXp(0, -1 * xp)
+				.save();
 
-		event.reply(user.getAsMention() + " wurden erfolgreich " + xp + " XP entfernt!\nEr hat jetzt " + current.xp() + " xp!").setEphemeral(true).queue();
+		event.reply(user.getAsMention() + " wurden erfolgreich " + xp + " XP entfernt!\nEr hat jetzt " + current.getXp() + " xp!").setEphemeral(true).queue();
 	}
 }
