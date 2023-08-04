@@ -14,7 +14,7 @@ public class ConfigCategoryCommand extends BaseCommand<CommandContext> {
 
             if (info == null) continue;
 
-            if (info.type() == ConfigFieldType.CHANNEL_LIST || info.type() == ConfigFieldType.ROLE_LIST || info.type() == ConfigFieldType.NUMBER_LIST || info.type() == ConfigFieldType.STRING_LIST) {
+            if (info.toString().contains("LIST")) {
                 addSubcommand(info.command() + "_add", new ConfigArrayPropertyCommand(field, info, category, instanceProvider, ConfigArrayPropertyCommandType.ADD));
                 addSubcommand(info.command() + "_remove", new ConfigArrayPropertyCommand(field, info, category, instanceProvider, ConfigArrayPropertyCommandType.REMOVE));
                 return;
