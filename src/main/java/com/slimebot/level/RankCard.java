@@ -1,8 +1,13 @@
 package com.slimebot.level;
 
+import com.slimebot.database.DataClass;
 import com.slimebot.graphic.CustomFont;
 import com.slimebot.graphic.Graphic;
 import com.slimebot.graphic.ImageUtil;
+import com.slimebot.level.profile.Avatar;
+import com.slimebot.level.profile.Background;
+import com.slimebot.level.profile.CardProfile;
+import com.slimebot.level.profile.Progressbar;
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.entities.User;
 
@@ -11,13 +16,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
+
+import static com.slimebot.level.profile.CardProfile.ROUND;
 
 public class RankCard extends Graphic {
 	public final static int rankPadding = 60;
 
-	public final static Color barBackground = new Color(150, 150, 150, 50);
-	public final static Color barOutline = new Color(68, 140, 41, 255);
-	public final static Color barForeground = new Color(105, 227, 73, 200);
+	private final CardProfile profile;
 
 	private final static Font font;
 
@@ -34,6 +40,7 @@ public class RankCard extends Graphic {
 	public RankCard(Level level) {
 		super(3800, 600);
 		this.level = level;
+		this.profile = DataClass.load(() -> new CardProfile(level.getGuild(), level.getUser()), Map.of("guild", level.getGuild(), "user", level.getUser())).orElseGet(() -> new CardProfile(level.getGuild(), level.getUser()));
 		finish();
 	}
 
@@ -43,14 +50,46 @@ public class RankCard extends Graphic {
 
 		assert user != null;
 
+		Progressbar bar = profile.getProgressBar();
+		Avatar av = profile.getAvatar();
+		Background bg = profile.getBackground();
+
 		int avatarWidth = height - 80;
+		int avatarBorderFactor = av.border().width()*2;
+		int avatarBorderOffset = av.border().width();
+
+		int bgBorderFactor = bg.border().width()*2;
+		int bgBorderOffset = bg.border().width();
 
 		BufferedImage avatar = ImageIO.read(new URL(user.getEffectiveAvatarUrl()));
+		BufferedImage avatarBorder = new BufferedImage(avatarWidth+avatarBorderFactor, avatarWidth+avatarBorderFactor, BufferedImage.TYPE_INT_ARGB);
+		ImageUtil.fill(avatarBorder, av.border().color());
 
 		avatar = ImageUtil.resize(avatar, avatarWidth, avatarWidth);
-		avatar = ImageUtil.circle(avatar);
+		if (av.style()==ROUND) {
+			avatar = ImageUtil.circle(avatar);
+			avatarBorder = ImageUtil.circle(avatarBorder);
+		}
 
-		graphics2D.drawImage(avatar, 0, 80, null);
+		avatar = ImageUtil.merge(avatarBorder, avatar, avatarBorderOffset, avatarBorderOffset);
+
+		//Draw background
+		BufferedImage backgroundImage = null;
+		try {
+			if (!bg.imageURL().isBlank()) backgroundImage = ImageIO.read(new URL(bg.imageURL()));
+		} catch (Exception ignored) {}   //ignored because it wil be thrown every time a invalid url is passed.
+
+		Color borderColor = bg.border().color();
+		graphics2D.setColor(new Color(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), bg.color().getAlpha()));
+		graphics2D.fillRect(0, 0, width, height);
+		if (backgroundImage!=null) {
+			graphics2D.drawImage(backgroundImage, bgBorderOffset, bgBorderOffset, width-bgBorderFactor, height-bgBorderFactor, bg.color(), null);
+		} else {
+			graphics2D.setColor(bg.color());
+			graphics2D.fillRect(bgBorderOffset, bgBorderOffset, width-bgBorderFactor, height-bgBorderFactor);
+		}
+
+		graphics2D.drawImage(avatar, 0, Math.max(0, 80-avatarBorderOffset), null);
 
 		int xpRequired = Level.calculateRequiredXP(level.getLevel() + 1);
 		double percentage = (double) level.getXp() / xpRequired;
@@ -58,15 +97,17 @@ public class RankCard extends Graphic {
 		int maxBarSize = width - 160 - avatarWidth;
 		int barSize = (int) (maxBarSize * percentage);
 
-		graphics2D.setColor(barBackground);
+		graphics2D.setColor(bar.bgColor());
 		graphics2D.fillRoundRect(avatarWidth + 80, height - 120, maxBarSize, height - 500, height - 500, height - 500);
 
-		graphics2D.setColor(barOutline);
-		graphics2D.setStroke(new BasicStroke(15));
-		graphics2D.drawRoundRect(avatarWidth + 80, height - 120, maxBarSize, height - 500, height - 500, height - 500);
+		graphics2D.setColor(bar.border().color());
+		graphics2D.setStroke(new BasicStroke(bar.border().width()));
+		if (bar.style()==ROUND) graphics2D.drawRoundRect(avatarWidth + 80, height - 120, maxBarSize, height - 500, height - 500, height - 500);
+		else graphics2D.drawRect(avatarWidth + 80, height - 120, maxBarSize, height - 500);
 
-		graphics2D.setColor(barForeground);
-		graphics2D.fillRoundRect(avatarWidth + 80, height - 120, barSize, height - 500, height - 500, height - 500);
+		graphics2D.setColor(bar.color());
+		if (bar.style()==ROUND) graphics2D.fillRoundRect(avatarWidth + 80, height - 120, barSize, height - 500, height - 500, height - 500);
+		else graphics2D.fillRect(avatarWidth + 80, height - 120, barSize, height - 500);
 
 		graphics2D.setColor(Color.WHITE);
 		graphics2D.setFont(CustomFont.getFont(font, 150F));
