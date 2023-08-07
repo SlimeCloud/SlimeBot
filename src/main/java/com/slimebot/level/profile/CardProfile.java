@@ -11,9 +11,6 @@ import java.awt.*;
 @EqualsAndHashCode(callSuper = true)
 public class CardProfile extends DataClass {
 
-	public static final transient int SQUARE = 0;
-	public static final transient int ROUND = 1;
-
 	public static final transient int TRANSPARENT = new Color(0, 0, 0, 0).getRGB();
 
 	@Key
@@ -23,11 +20,11 @@ public class CardProfile extends DataClass {
 
 	private int progressBarColor;
 	private int progressBarBGColor;
-	private int progressBarStyle;
+	private Style progressBarStyle;
 	private int progressBarBorderColor;
 	private int progressBarBorderWidth;
 
-	private int avatarStyle;
+	private Style avatarStyle;
 	private int avatarBorderColor;
 	private int avatarBorderWidth;
 
@@ -42,11 +39,11 @@ public class CardProfile extends DataClass {
 
 		this.progressBarColor = new Color(105, 227, 73, 200).getRGB();
 		this.progressBarBGColor = new Color(150, 150, 150, 50).getRGB();
-		this.progressBarStyle = ROUND;
+		this.progressBarStyle = Style.ROUND;
 		this.progressBarBorderColor = new Color(68, 140, 41, 255).getRGB();
 		this.progressBarBorderWidth = 15;
 
-		this.avatarStyle = ROUND;
+		this.avatarStyle = Style.ROUND;
 		this.avatarBorderColor = TRANSPARENT;
 		this.avatarBorderWidth = 0;
 

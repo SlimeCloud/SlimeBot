@@ -119,7 +119,7 @@ statt dem Initialisieren der Funktion eine Warnung ausgeben.
 ## 🗄️ Datenbank
 Wir verwenden eine [PostgreSQL](https://www.postgresql.org/) Datenbank, um große Datenmengen zu speichern.
 Zur Interaktion mit der Datenbank verwenden wir [JDBI-Bibliothek](https://jdbi.org/).<br>
-Um mit der Datenbank zu interagieren wird eine sogenannte `DataClass` benötigt. Diese Klasse enthält alle daten die gespeichert werden sollen als Variabeln (es werden nur primitive typen und Strings unterstützt).
+Um mit der Datenbank zu interagieren wird eine sogenannte `DataClass` benötigt. Diese Klasse enthält alle daten die gespeichert werden sollen als Variabeln (es werden nur primitive typen, Strings und Enums unterstützt).
 ````java
 public class TestData extends DataClass {
 	

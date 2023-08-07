@@ -1,4 +1,4 @@
 package com.slimebot.level.profile;
 
-public record Avatar(int style, Border border) {
+public record Avatar(Style style, Border border) {
 }

@@ -18,12 +18,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
-import static com.slimebot.level.profile.CardProfile.ROUND;
+import static com.slimebot.level.profile.Style.ROUND;
+
 
 public class RankCard extends Graphic {
 	public final static int rankPadding = 60;
 
 	private final CardProfile profile;
+	private final int contentWidth;
+	private final int contentHeight;
+	private final int contentOffsetX;
+	private final int contentOffsetY;
 
 	private final static Font font;
 
@@ -38,7 +43,11 @@ public class RankCard extends Graphic {
 	private final Level level;
 
 	public RankCard(Level level) {
-		super(3800, 600);
+		super(3850, 700);
+		this.contentWidth = 3800;
+		this.contentHeight = 600;
+		this.contentOffsetX = 50;
+		this.contentOffsetY = 20;
 		this.level = level;
 		this.profile = DataClass.load(() -> new CardProfile(level.getGuild(), level.getUser()), Map.of("guild", level.getGuild(), "user", level.getUser())).orElseGet(() -> new CardProfile(level.getGuild(), level.getUser()));
 		finish();
@@ -54,7 +63,7 @@ public class RankCard extends Graphic {
 		Avatar av = profile.getAvatar();
 		Background bg = profile.getBackground();
 
-		int avatarWidth = height - 80;
+		int avatarWidth = contentHeight - 80;
 		int avatarBorderFactor = av.border().width()*2;
 		int avatarBorderOffset = av.border().width();
 
@@ -89,34 +98,35 @@ public class RankCard extends Graphic {
 			graphics2D.fillRect(bgBorderOffset, bgBorderOffset, width-bgBorderFactor, height-bgBorderFactor);
 		}
 
-		graphics2D.drawImage(avatar, 0, Math.max(0, 80-avatarBorderOffset), null);
+		graphics2D.drawImage(avatar, contentOffsetX, Math.max(0, 80-avatarBorderOffset) + contentOffsetY, null);
 
 		int xpRequired = Level.calculateRequiredXP(level.getLevel() + 1);
 		double percentage = (double) level.getXp() / xpRequired;
 
-		int maxBarSize = width - 160 - avatarWidth;
+		int maxBarSize = contentWidth - 160 - avatarWidth;
 		int barSize = (int) (maxBarSize * percentage);
 
 		graphics2D.setColor(bar.bgColor());
-		graphics2D.fillRoundRect(avatarWidth + 80, height - 120, maxBarSize, height - 500, height - 500, height - 500);
+		if (bar.style()==ROUND) graphics2D.fillRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
+		else graphics2D.fillRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500);
 
 		graphics2D.setColor(bar.border().color());
 		graphics2D.setStroke(new BasicStroke(bar.border().width()));
-		if (bar.style()==ROUND) graphics2D.drawRoundRect(avatarWidth + 80, height - 120, maxBarSize, height - 500, height - 500, height - 500);
-		else graphics2D.drawRect(avatarWidth + 80, height - 120, maxBarSize, height - 500);
+		if (bar.style()==ROUND) graphics2D.drawRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
+		else graphics2D.drawRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500);
 
 		graphics2D.setColor(bar.color());
-		if (bar.style()==ROUND) graphics2D.fillRoundRect(avatarWidth + 80, height - 120, barSize, height - 500, height - 500, height - 500);
-		else graphics2D.fillRect(avatarWidth + 80, height - 120, barSize, height - 500);
+		if (bar.style()==ROUND) graphics2D.fillRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120, barSize + contentOffsetY, contentHeight - 500, contentHeight - 500, contentHeight - 500);
+		else graphics2D.fillRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, barSize, contentHeight - 500);
 
 		graphics2D.setColor(Color.WHITE);
 		graphics2D.setFont(CustomFont.getFont(font, 150F));
-		graphics2D.drawString(user.getEffectiveName(), avatarWidth + 100, height - 160);
+		graphics2D.drawString(user.getEffectiveName(), avatarWidth + 100 + contentOffsetX, contentHeight - 160 + contentOffsetY);
 
 		graphics2D.setFont(CustomFont.getFont(font, 120F));
 
 		String xp = level.getXp() + "/" + xpRequired + " XP";
-		graphics2D.drawString(xp, width - graphics2D.getFontMetrics().stringWidth(xp) - 80, height - 160);
+		graphics2D.drawString(xp, contentWidth - graphics2D.getFontMetrics().stringWidth(xp) - 80 + contentOffsetX, contentHeight - 160 + contentOffsetY);
 
 		graphics2D.setFont(CustomFont.getFont(font, 150F));
 
@@ -126,12 +136,12 @@ public class RankCard extends Graphic {
 		int levelWidth = graphics2D.getFontMetrics().stringWidth(levelString);
 		int rankWidth = graphics2D.getFontMetrics().stringWidth(rank);
 
-		graphics2D.drawString(levelString, width - levelWidth - 80, height - 430);
+		graphics2D.drawString(levelString, contentWidth - levelWidth - 80 + contentOffsetX, contentHeight - 430 + contentOffsetY);
 
 		graphics2D.setColor(Color.decode("#222222"));
-		graphics2D.fillRoundRect(width - rankWidth - levelWidth - 330 - rankPadding, height - 430 - 100 - rankPadding, rankWidth + rankPadding, 150 + rankPadding, height - 500, height - 500);
+		graphics2D.fillRoundRect(contentWidth - rankWidth - levelWidth - 330 - rankPadding + contentOffsetX, contentHeight - 430 - 100 - rankPadding + contentOffsetY, rankWidth + rankPadding, 150 + rankPadding, contentHeight - 500, contentHeight - 500);
 
 		graphics2D.setColor(Color.WHITE);
-		graphics2D.drawString(rank, width - graphics2D.getFontMetrics().stringWidth(rank) - graphics2D.getFontMetrics().stringWidth(levelString) - 350, height - 430);
+		graphics2D.drawString(rank, contentWidth - graphics2D.getFontMetrics().stringWidth(rank) - graphics2D.getFontMetrics().stringWidth(levelString) - 350 + contentOffsetX, contentHeight - 430 + contentOffsetY);
 	}
 }
