@@ -1,11 +1,14 @@
 package com.slimebot.util;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.awt.*;
 import java.util.Arrays;
 
 public class ColorUtil {
 
 	public static String toString(Color color) {
+		if (color==null) return "null";
 		return """
 				red: %s
 				green: %s
@@ -17,6 +20,7 @@ public class ColorUtil {
 	}
 
 	public static String toHex(Color color) {
+		if (color==null) return "#";
 		String hex;
 		if (color.getAlpha()==255) hex = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
 		else hex = String.format("#%02x%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
@@ -35,14 +39,16 @@ public class ColorUtil {
 		return hex;
 	}
 
-	public static Color parseColor(String color) {
+	public static @Nullable Color parseColor(String color) {
+		if (color==null) return null;
 		if (color.startsWith("#")) return parseHex(color);
 		if (color.contains(",")) return parseRGBA(color);
 		if (Util.isNumeric(color)) return parseRGBACode(color);
 		return parseColorName(color);
 	}
 
-	public static Color parseRGBA(String rgba) {
+	public static @Nullable Color parseRGBA(String rgba) {
+		if (rgba==null) return null;
 		String[] values = rgba.split(",");
 		values = Arrays.stream(values)
 				.map(String::strip)
@@ -55,18 +61,20 @@ public class ColorUtil {
 		return new Color(r, g, b, a);
 	}
 
-	public static Color parseRGBACode(String code) {
+	public static @Nullable Color parseRGBACode(String code) {
+		if (code==null) return null;
 		return new Color(Integer.parseInt(code.strip()), true);
 	}
 
-	public static Color parseColorName(String name) {
+	public static @Nullable Color parseColorName(String name) {
 		try {
 			return (Color) Color.class.getField(name.strip().toUpperCase()).get(null);
 		} catch (IllegalAccessException | NoSuchFieldException ignored) {}
 		return null;
 	}
 
-	public static Color parseHex(String hex) {
+	public static @Nullable Color parseHex(String hex) {
+		if (hex==null) return null;
 		hex = hex.replace("#", "").strip();
 		return switch (hex.length()) {
 			case 3, 4 -> {
@@ -75,7 +83,6 @@ public class ColorUtil {
 					chars[i] = hex.charAt(i);
 					chars[i+1] = hex.charAt(i);
 				}
-				System.out.println(new String(chars));
 				yield parseHex(new String(chars));
 			}
 			case 6 -> new Color(

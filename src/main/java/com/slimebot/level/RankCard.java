@@ -42,6 +42,7 @@ public class RankCard extends Graphic {
 
 	private final Level level;
 
+
 	public RankCard(Level level) {
 		super(3850, 700);
 		this.contentWidth = 3800;
@@ -89,7 +90,7 @@ public class RankCard extends Graphic {
 		} catch (Exception ignored) {}   //ignored because it wil be thrown every time a invalid url is passed.
 
 		Color borderColor = bg.border().color();
-		graphics2D.setColor(new Color(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), bg.color().getAlpha()));
+		graphics2D.setColor(new Color(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), backgroundImage==null ? bg.color().getAlpha() : 255));
 		graphics2D.fillRect(0, 0, width, height);
 		if (backgroundImage!=null) {
 			graphics2D.drawImage(backgroundImage, bgBorderOffset, bgBorderOffset, width-bgBorderFactor, height-bgBorderFactor, bg.color(), null);
@@ -116,7 +117,7 @@ public class RankCard extends Graphic {
 		else graphics2D.drawRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500);
 
 		graphics2D.setColor(bar.color());
-		if (bar.style()==ROUND) graphics2D.fillRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120, barSize + contentOffsetY, contentHeight - 500, contentHeight - 500, contentHeight - 500);
+		if (bar.style()==ROUND) graphics2D.fillRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, barSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
 		else graphics2D.fillRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, barSize, contentHeight - 500);
 
 		graphics2D.setColor(Color.WHITE);

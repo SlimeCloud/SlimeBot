@@ -52,8 +52,18 @@ public class CardCommand {
 				.setContent(includeMsg ? "Deine Änderungen wurden gespeichert!" : null)
 				.setFiles(file)
 				.build();
-		RestAction<?> action = (deferred ? event.getHook().sendMessage(data).setEphemeral(true) : event.reply(data).setEphemeral(true));
+		RestAction<?> action = deferred ? event.getHook().sendMessage(data).setEphemeral(true) : event.reply(data).setEphemeral(true);
 		action.queue();
+	}
+
+	private static boolean validateColor(IReplyCallback event, Color c, String color, boolean deferred) {
+		if (c==null) {
+			String msg = "**Farbe '_" + color + "_' ist ungültig!**";
+			RestAction<?> action = deferred ? event.getHook().sendMessage(msg).setEphemeral(true) : event.reply(msg).setEphemeral(true);
+			action.queue();
+			return true;
+		}
+		return false;
 	}
 
 	@Listener(type = ButtonHandler.class, filter = "cardprofile:reset")
@@ -133,7 +143,9 @@ public class CardCommand {
 			public void performCommand(SlashCommandInteractionEvent event, @Option(name = "color", description = "hex code") String color) {
 				event.deferReply(true).queue();
 				CardProfile cp = loadProfile(event.getMember());
-				cp.setProgressBarColor(parseColor(color).getRGB());
+				Color c = parseColor(color);
+				if (validateColor(event, c, color, true)) return;
+				cp.setProgressBarColor(c.getRGB());
 				cp.save();
 				sendResult(event);
 			}
@@ -145,7 +157,9 @@ public class CardCommand {
 			public void performCommand(SlashCommandInteractionEvent event, @Option(name = "color", description = "hex code") String color) {
 				event.deferReply(true).queue();
 				CardProfile cp = loadProfile(event.getMember());
-				cp.setProgressBarBGColor(parseColor(color).getRGB());
+				Color c = parseColor(color);
+				if (validateColor(event, c, color, true)) return;
+				cp.setProgressBarBGColor(c.getRGB());
 				cp.save();
 				sendResult(event);
 			}
@@ -172,7 +186,9 @@ public class CardCommand {
 			public void performCommand(SlashCommandInteractionEvent event, @Option(name = "color", description = "hex code") String color) {
 				event.deferReply(true).queue();
 				CardProfile cp = loadProfile(event.getMember());
-				cp.setProgressBarBorderColor(parseColor(color).getRGB());
+				Color c = parseColor(color);
+				if (validateColor(event, c, color, true)) return;
+				cp.setProgressBarBorderColor(c.getRGB());
 				cp.save();
 				sendResult(event);
 			}
@@ -219,7 +235,9 @@ public class CardCommand {
 			public void performCommand(SlashCommandInteractionEvent event, @Option(name = "color", description = "hex code") String color) {
 				event.deferReply(true).queue();
 				CardProfile cp = loadProfile(event.getMember());
-				cp.setAvatarBorderColor(parseColor(color).getRGB());
+				Color c = parseColor(color);
+				if (validateColor(event, c, color, true)) return;
+				cp.setAvatarBorderColor(c.getRGB());
 				cp.save();
 				sendResult(event);
 			}
@@ -252,7 +270,9 @@ public class CardCommand {
 			public void performCommand(SlashCommandInteractionEvent event, @Option(name = "color", description = "hex code") String color) {
 				event.deferReply(true).queue();
 				CardProfile cp = loadProfile(event.getMember());
-				cp.setBackgroundColor(parseColor(color).getRGB());
+				Color c = parseColor(color);
+				if (validateColor(event, c, color, true)) return;
+				cp.setBackgroundColor(c.getRGB());
 				cp.save();
 				sendResult(event);
 			}
@@ -262,6 +282,10 @@ public class CardCommand {
 		public static class ImageCommand {
 			@ApplicationCommandMethod
 			public void performCommand(SlashCommandInteractionEvent event, @Option(name = "url") String url) {
+				if (!url.isBlank() && !Util.isValidURL(url)) {
+					event.reply("Die URL '" + url + "' ist ungültig!").setEphemeral(true).queue();
+					return;
+				}
 				event.deferReply(true).queue();
 				CardProfile cp = loadProfile(event.getMember());
 				cp.setBackgroundImageURL(url);
@@ -278,7 +302,9 @@ public class CardCommand {
 			public void performCommand(SlashCommandInteractionEvent event, @Option(name = "color", description = "hex code") String color) {
 				event.deferReply(true).queue();
 				CardProfile cp = loadProfile(event.getMember());
-				cp.setProgressBarBorderColor(parseColor(color).getRGB());
+				Color c = parseColor(color);
+				if (validateColor(event, c, color, true)) return;
+				cp.setBackgroundBorderColor(c.getRGB());
 				cp.save();
 				sendResult(event);
 			}
@@ -293,7 +319,7 @@ public class CardCommand {
 			public void performCommand(SlashCommandInteractionEvent event, @Option(name = "width", description = "border größe", minValue = 0) int width) {
 				event.deferReply(true).queue();
 				CardProfile cp = loadProfile(event.getMember());
-				cp.setProgressBarBorderWidth(width);
+				cp.setBackgroundBorderWidth(width);
 				cp.save();
 				sendResult(event);
 			}
