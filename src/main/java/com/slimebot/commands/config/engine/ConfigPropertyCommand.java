@@ -4,9 +4,7 @@ import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.main.CommandContext;
 import com.slimebot.main.Main;
 import de.mineking.discord.commands.inherited.BaseCommand;
-import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.lang.reflect.Field;
 
@@ -26,60 +24,45 @@ public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
 
 		description = info.description();
 
-		addOption(info.type().builder.apply(info));
+		addOption(info.type().getBuilder().apply(info));
 	}
 
 	@Override
 	public void performCommand(CommandContext context, GenericCommandInteractionEvent event) {
-		if(event.getOptions().isEmpty()) {
+		if (event.getOptions().isEmpty()) {
 			ConfigCommand.updateField(event.getGuild(), config -> {
 				try {
 					Object instance = instanceProvider.getInstance(false, config);
 
-					if(instance == null) return;
+					if (instance == null) return;
 
-					field.set(instanceProvider, null);
+					field.set(instance, null);
 				} catch (Exception e) {
-					ConfigCommand.logger.error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
+					ConfigCommand.getLogger().error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
 				}
 			});
 
 			event.reply(info.title() + " zurückgesetzt").setEphemeral(true).queue();
 
-			if(category.updateCommands()) {
+			if (category.updateCommands()) {
 				Main.updateGuildCommands(event.getGuild());
 			}
 
 			return;
 		}
 
-		OptionMapping option = event.getOptions().get(0);
-
-		String text;
-		Object value;
-
-		try {
-			//Role and Channel
-			IMentionable temp = option.getAsMentionable();
-			text = temp.getAsMention();
-			value = temp.getIdLong();
-		} catch(IllegalStateException e) {
-			//String
-			text = option.getAsString();
-			value = text;
-		}
-
-		final Object finalValue = value; //Because java
+		Object value = info.type().getData().apply(event.getOptions().get(0));
+		String text = info.type().getFormatter().apply(value);
 
 		ConfigCommand.updateField(event.getGuild(), config -> {
 			try {
-				field.set(instanceProvider.getInstance(true, config), finalValue);
+				field.set(instanceProvider.getInstance(true, config), value);
 			} catch (Exception e) {
-				ConfigCommand.logger.error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
+				ConfigCommand.getLogger().error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
 			}
 		});
 
-		if(category.updateCommands()) {
+		if (category.updateCommands()) {
 			Main.updateGuildCommands(event.getGuild());
 		}
 

@@ -1,22 +1,22 @@
-package com.slimebot.main;
+package com.slimebot.database;
 
-import com.slimebot.level.Level;
+import com.slimebot.main.Main;
 import com.slimebot.report.Report;
+import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Slf4j
 public class Database {
-	public final static Logger logger = LoggerFactory.getLogger(Database.class);
 
 	public Jdbi jdbi;
 
 	public Database() {
-		if(Main.config.database == null) {
+		if (Main.config.database == null) {
 			return;
 		}
 
@@ -32,15 +32,12 @@ public class Database {
 
 			handle.createUpdate("create table if not exists report_blocks(guild bigint, \"user\" bigint)").execute();
 			handle.createUpdate("create table if not exists reports(guild bigint, id serial, issuer bigint, target bigint, type text, time timestamp default now(), message text, status text default 'OPEN', closeReason text)").execute();
-
-			handle.createUpdate("create table if not exists levels(guild bigint, \"user\" bigint, level int, xp int, messages int, primary key(guild, \"user\"))").execute();
 		});
 
 		/*
 		Hier kannst du RowMapper registrieren. Mit diesen gibst du an, wie java objekte aus einer SQL Tabellen Reihe erstellt werden können.
 		 */
 		jdbi.registerRowMapper(Report.class, new Report.ReportRowMapper());
-		jdbi.registerRowMapper(Level.class, new Level.LevelMapper());
 	}
 
 	/**
@@ -49,10 +46,11 @@ public class Database {
 	 * <pre>{@code
 	 * Main.database.run(handle -> handle.createUpdate("insert into test values('test', 5)").execute());
 	 * }</pre>
+	 *
 	 * @param handler Ein handler, in dem du deinen Datenbank-Code ausführst.
 	 */
 	public void run(Consumer<Handle> handler) {
-		if(jdbi == null) {
+		if (jdbi == null) {
 			logger.warn("Versuchter Datenbankaufruf nicht möglich: Keine Datenbank konfiguriert");
 			return;
 		}
@@ -66,15 +64,20 @@ public class Database {
 	 * <pre>{@code
 	 * Main.database.run(handle -> handle.createUpdate("insert into test values('test', 5)").execute());
 	 * }</pre>
+	 *
 	 * @param handler Eine Funktion, die Daten aus der Datenbank umwandelt.
 	 * @return Den Rückgabewert der handler-Funktion
 	 */
 	public <T> T handle(Function<Handle, T> handler) {
-		if(jdbi == null) {
+		if (jdbi == null) {
 			logger.warn("Versuchter Datenbankaufruf nicht möglich: Keine Datenbank konfiguriert");
 			return null;
 		}
 
 		return jdbi.withHandle(handler::apply);
+	}
+
+	public static Logger getLogger() {
+		return logger;
 	}
 }

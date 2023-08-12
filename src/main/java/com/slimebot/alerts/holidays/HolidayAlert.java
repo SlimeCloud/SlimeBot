@@ -2,22 +2,21 @@ package com.slimebot.alerts.holidays;
 
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.Route;
 import net.dv8tion.jda.api.utils.data.DataArray;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class HolidayAlert implements Runnable {
-	public final static Logger logger = LoggerFactory.getLogger(HolidayAlert.class);
 
 	public final static String apiHost = "https://ferien-api.de";
 	public final static Route apiRoute = Route.get("api/v1/holidays");
@@ -35,9 +34,9 @@ public class HolidayAlert implements Runnable {
 	}
 
 	private void sendMessage(List<Holiday> holidays) {
-		if(holidays.isEmpty()) return;
+		if (holidays.isEmpty()) return;
 
-		for(Guild guild : Main.jdaInstance.getGuilds()) {
+		for (Guild guild : Main.jdaInstance.getGuilds()) {
 			GuildConfig.getConfig(guild).getGreetingsChannel().ifPresent(channel -> {
 				String states = holidays
 						.stream()
@@ -45,7 +44,7 @@ public class HolidayAlert implements Runnable {
 						.collect(Collectors.joining(", "))
 						.replaceFirst(",(?=[^,]*$)", " und");
 
-				if(holidays.size() > 3) states = holidays.size() + " Bundesländern";
+				if (holidays.size() > 3) states = holidays.size() + " Bundesländern";
 
 				channel.sendMessageEmbeds(
 						new EmbedBuilder()

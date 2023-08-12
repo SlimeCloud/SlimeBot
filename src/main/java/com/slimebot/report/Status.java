@@ -1,14 +1,14 @@
 package com.slimebot.report;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum Status {
 	CLOSED("Geschlossen", "\uD83D\uDCD5"),
 	OPEN("Offen", "\uD83D\uDCC2");
 
-	public final String str;
-	public final String emoji;
-
-	Status(String str, String emoji) {
-		this.str = str;
-		this.emoji = emoji;
-	}
+	private final String str;
+	private final String emoji;
 }

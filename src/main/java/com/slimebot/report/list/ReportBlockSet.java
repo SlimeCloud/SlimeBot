@@ -50,11 +50,9 @@ public class ReportBlockSet implements Listable<ReportBlockSet.ReportBlock> {
 				.setTimestamp(Instant.now())
 				.setTitle("Vom Report-System ausgeschlossene Nutzer");
 
-		if(context.entries.isEmpty()) {
+		if (context.entries.isEmpty()) {
 			builder.setDescription("*Keine Einträge*");
-		}
-
-		else {
+		} else {
 			builder.setFooter("Insgesamt " + context.entries.size() + " blockierte Nutzer");
 		}
 

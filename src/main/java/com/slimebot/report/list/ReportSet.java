@@ -6,6 +6,7 @@ import com.slimebot.report.Filter;
 import com.slimebot.report.Report;
 import de.mineking.discord.list.ListContext;
 import de.mineking.discord.list.Listable;
+import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -16,14 +17,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+@AllArgsConstructor
 public class ReportSet implements Listable<Report> {
 	private final Guild guild;
 	private final Filter filter;
-
-	public ReportSet(Guild guild, Filter filter) {
-		this.guild = guild;
-		this.filter = filter;
-	}
 
 	@Override
 	public List<Report> getEntries() {
@@ -31,7 +28,7 @@ public class ReportSet implements Listable<Report> {
 				.bind("guild", guild.getIdLong())
 				.mapTo(Report.class)
 				.stream()
-				.filter(filter.filter)
+				.filter(filter.getFilter())
 				.toList()
 		);
 	}
@@ -43,11 +40,9 @@ public class ReportSet implements Listable<Report> {
 				.setTimestamp(Instant.now())
 				.setTitle("Reports mit Filter **" + filter.toString() + "**");
 
-		if(context.entries.isEmpty()) {
+		if (context.entries.isEmpty()) {
 			builder.setDescription("*Keine Einträge*");
-		}
-
-		else {
+		} else {
 			builder
 					.setFooter("Insgesamt " + context.entries.size() + " Reports, die dem Filter entsprechen")
 					.setDescription("Nutze </report details:" + context.manager.getCommandCache().getGlobalCommand("report") + "> oder das Dropdown menu um mehr infos zu einem Report zu bekommen.\n");
@@ -60,10 +55,10 @@ public class ReportSet implements Listable<Report> {
 	public List<ActionRow> getComponents(ListContext<Report> context) {
 		List<ActionRow> components = new ArrayList<>(Listable.super.getComponents(context));
 
-		if(!context.entries.isEmpty()) {
+		if (!context.entries.isEmpty()) {
 			List<SelectOption> options = new ArrayList<>();
 
-			for(int i = ((context.page - 1) * entriesPerPage()); i < (context.page * entriesPerPage()) && i < context.entries.size(); i++) {
+			for (int i = ((context.page - 1) * entriesPerPage()); i < (context.page * entriesPerPage()) && i < context.entries.size(); i++) {
 				Report report = context.entries.get(i);
 
 				options.add(SelectOption.of("Report #" + report.getId(), String.valueOf(report.getId()))

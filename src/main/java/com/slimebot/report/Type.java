@@ -1,13 +1,14 @@
 package com.slimebot.report;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum Type {
 	MESSAGE("Nachricht"),
 	USER("User");
 
-	public final String str;
-
-	Type(String str) {
-		this.str = str;
-	}
+	private final String str;
 }
 

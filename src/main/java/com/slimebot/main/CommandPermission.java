@@ -2,12 +2,13 @@ package com.slimebot.main;
 
 import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.CommandManager;
+import de.mineking.discord.commands.ICommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 
-public enum CommandPermission implements de.mineking.discord.commands.CommandPermission {
+public enum CommandPermission implements ICommandPermission {
 	/**
 	 * Diese Befehle können nur von Teammitgliedern ausgeführt werden, sind aber Standardmäßig für alle Servermitglieder sichtbar.
 	 * Es wird überprüft, ob der Nutzer, der den Befehl verwendet die `Team-Rolle` hat.

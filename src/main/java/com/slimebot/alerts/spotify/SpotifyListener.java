@@ -3,85 +3,121 @@ package com.slimebot.alerts.spotify;
 import com.neovisionaries.i18n.CountryCode;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
+import com.slimebot.main.config.guild.SpotifyNotificationConfig;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import org.apache.hc.core5.http.ParseException;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.requests.data.AbstractDataPagingRequest;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
-public class SpotifyListener implements Runnable {
-	public final static Logger logger = LoggerFactory.getLogger(SpotifyListener.class);
+@Slf4j
+public class SpotifyListener {
 
-	private final String artistId;
-	private final SpotifyApi spotifyApi;
+	private final SpotifyApi api;
 
-	public SpotifyListener(SpotifyApi api, String artistId) {
-		this.spotifyApi = api;
-		this.artistId = artistId;
-
-		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this);
+	public SpotifyListener() {
+		api = new SpotifyApi.Builder()
+				.setClientId(Main.config.spotify.clientId)
+				.setClientSecret(Main.config.spotify.clientSecret)
+				.build();
+		try {
+			api.setAccessToken(api.clientCredentials().build().execute().getAccessToken());
+		} catch (IOException | SpotifyWebApiException | ParseException e) {
+			logger.error("Spotify login fehlgeschlagen", e);
+		}
 	}
 
-	public void run() {
-		logger.info("Überprüfe auf neue Alben von {}", artistId);
+	public void register() {
+		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this::check);
+	}
+
+	public void check() {
+		List<String> known = Main.config.database != null
+				? Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list())
+				: Collections.emptyList();
+
+		List<String> newIds = new ArrayList<>();
+
+		logger.info("Überprüfe auf neue Podcast Folgen...");
+
+		Main.config.spotify.podcast.artistIds.stream()
+				.flatMap(id -> getLatestEntries(id, api::getShowEpisodes).stream())
+				.filter(e -> !known.contains(e.getId()))
+				.forEach(e -> {
+					newIds.add(e.getId());
+					broadcast(Main.config.spotify.podcast.message, SpotifyNotificationConfig::getPodcastChannel, e.getName(), e.getExternalUrls().get("spotify"));
+				});
+
+		logger.info("Überprüfe auf neue Musik Releases...");
+
+		Main.config.spotify.music.artistIds.stream()
+				.flatMap(id -> getLatestEntries(id, api::getArtistsAlbums).stream())
+				.filter(e -> !known.contains(e.getId()))
+				.forEach(e -> {
+					newIds.add(e.getId());
+					broadcast(Main.config.spotify.music.message, SpotifyNotificationConfig::getMusicChannel, e.getName(), e.getExternalUrls().get("spotify"));
+				});
 
 		Main.database.run(handle -> {
-			List<String> known = handle.createQuery("select id from spotify_known").mapTo(String.class).list();
 			PreparedBatch update = handle.prepareBatch("insert into spotify_known values(:id)");
 
-			for(AlbumSimplified album : getLatestAlbums()) {
-				if(known.contains(album.getId())) continue;
-
-				broadcastAlbum(album);
-				update.bind("id", album.getId()).add();
-			}
+			newIds.forEach(id -> update.bind("id", id).add());
 
 			update.execute();
 		});
 	}
 
-	private List<AlbumSimplified> getLatestAlbums() {
-		try {
-			Paging<AlbumSimplified> albumSimplifiedPaging = spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).build().execute();
+	private <T, R extends AbstractDataPagingRequest.Builder<T, ?>> List<T> getLatestEntries(String id, Function<String, R> request) {
+		logger.info("Überprüfe auf Einträge bei {}...", id);
 
-			if(albumSimplifiedPaging.getTotal() > 20) {
-				logger.warn("Es wurden mehr als 20 Alben gefunden. Es werden nur die 20 neuesten veröffentlicht");
-				albumSimplifiedPaging = spotifyApi.getArtistsAlbums(artistId).market(CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal() - 20).build().execute();
+		try {
+			Paging<T> albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).build().execute();
+
+			if (albumSimplifiedPaging.getTotal() > 20) {
+				logger.warn("Es wurden mehr als 20 Einträge gefunden. Es werden nur die 20 neuesten veröffentlicht");
+				albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal() - 20).build().execute();
 			}
 
-			List<AlbumSimplified> albums = Arrays.asList(albumSimplifiedPaging.getItems());
+			List<T> albums = Arrays.asList(albumSimplifiedPaging.getItems());
+			logger.info("{} Einträge gefunden", albums.size());
 			Collections.reverse(albums);
 			return albums;
-		} catch(Exception e) {
-			logger.error("Alben können nicht geladen werden");
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			logger.error("Einträge können nicht geladen werden", e);
+			return Collections.emptyList();
 		}
 	}
 
-	private void broadcastAlbum(AlbumSimplified album) {
-		for(Guild guild : Main.jdaInstance.getGuilds()) {
+	private void broadcast(String format, Function<SpotifyNotificationConfig, Optional<GuildMessageChannel>> channel, String name, String url) {
+		for (Guild guild : Main.jdaInstance.getGuilds()) {
 			GuildConfig.getConfig(guild).getSpotify().ifPresent(spotify ->
-					spotify.getMusicChannel().ifPresent(channel -> {
+					channel.apply(spotify).ifPresent(ch -> {
 						String notification = spotify.getRole()
 								.map(Role::getAsMention)
 								.orElse("");
 
-						channel.sendMessage(Main.config.spotify.music.message
-								.replace("%mention%", notification)
-								.replace("%name%", album.getName())
-								.replace("%url%", album.getExternalUrls().get("spotify"))
+						ch.sendMessage(format
+								.replace("%notification%", notification)
+								.replace("%name%", name)
+								.replace("%url%", url)
 						).queue();
 					})
 			);
 		}
+	}
+
+	public static Logger getLogger() {
+		return logger;
 	}
 }

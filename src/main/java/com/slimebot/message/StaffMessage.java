@@ -30,7 +30,7 @@ public class StaffMessage extends ListenerAdapter {
 
 	public static void updateMessage(Guild guild, List<Role> roles) {
 		GuildConfig.getConfig(guild).getStaffConfig().ifPresent(config -> {
-			if(roles.stream().map(Role::getId).noneMatch(config.roles::containsKey)) return;
+			if (roles.stream().map(Role::getId).noneMatch(config.roles::containsKey)) return;
 
 			updateMessage(guild);
 		});
@@ -41,18 +41,16 @@ public class StaffMessage extends ListenerAdapter {
 		config.getStaffConfig().ifPresent(staff -> {
 			String content = buildMessage(staff, guild);
 
-			if(content.isEmpty()) {
+			if (content.isEmpty()) {
 				return;
 			}
 
-			if(staff.message == null || staff.message == 0) {
+			if (staff.message == null || staff.message == 0) {
 				staff.getChannel().ifPresent(channel -> channel.sendMessage(content).queue(mes -> {
 					staff.message = mes.getIdLong();
 					config.save();
 				}));
-			}
-
-			else {
+			} else {
 				staff.getChannel().ifPresent(channel -> channel.editMessageById(staff.message, content).queue());
 			}
 		});
@@ -66,23 +64,21 @@ public class StaffMessage extends ListenerAdapter {
 
 			try {
 				role = guild.getRoleById(roleId);
-			} catch(NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				builder.append(description).append("\n\n");
 				return;
 			}
 
-			if(role == null) return;
+			if (role == null) return;
 
 			List<Member> members = guild.getMembersWithRoles(role);
 
 			builder.append(role.getAsMention()).append(" **").append(description).append("**\n");
 
-			if(members.isEmpty()) {
+			if (members.isEmpty()) {
 				builder.append("*Keine Mitglieder*").append("\n");
-			}
-
-			else {
-				for(Member member : members) {
+			} else {
+				for (Member member : members) {
 					builder.append("> ").append(member.getAsMention()).append("\n");
 				}
 			}

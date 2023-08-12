@@ -6,16 +6,13 @@ import de.mineking.discord.commands.annotated.option.Option;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-@ApplicationCommand(name = "all", description = "Resete alle Statistiken eines nutzers")
+@ApplicationCommand(name = "all", description = "Setzt alle Statistiken eines Nutzers zurück")
 public class ResetAllCommand {
-
-    @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "member") Member member) {
-        String sb = ResetLevelCommand.execute(event, member) + "\n\n" +
-                ResetMessagesCommand.execute(event, member) + "\n\n" +
-                ResetXPCommand.execute(event, member);
-
-        event.reply(sb).setEphemeral(true).queue();
-    }
-
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, dessen Statistiken zurückgesetzt werden sollen") Member user) {
+		event.reply(
+				ResetLevelCommand.execute(user) + "\n\n" +
+						ResetMessagesCommand.execute(user)
+		).setEphemeral(true).queue();
+	}
 }

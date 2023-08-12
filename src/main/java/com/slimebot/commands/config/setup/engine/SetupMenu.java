@@ -34,9 +34,10 @@ public class SetupMenu extends Menu {
 
 		List<Field> configFields = Stream.of(fields)
 				.filter(f -> f.isAnnotationPresent(ConfigField.class))
+				.filter(f -> f.getAnnotation(ConfigField.class).menu())
 				.toList();
 
-		for(int i = 0; i < configFields.size(); i++) {
+		for (int i = 0; i < configFields.size(); i++) {
 			Field field = configFields.get(i);
 			ConfigField info = field.getAnnotation(ConfigField.class);
 
@@ -48,26 +49,26 @@ public class SetupMenu extends Menu {
 					i == configFields.size() - 1 ? null : category.name() + " " + configFields.get(i + 1).getName())
 			);
 
-			if(button == null) {
+			if (button == null) {
 				button = new FrameButton(ButtonColor.GRAY, category.description(), name);
 			}
 		}
 
-		for(Class<? extends CustomSetupFrame> type : category.customFrames()) {
+		for (Class<? extends CustomSetupFrame> type : category.customFrames()) {
 			try {
 				CustomSetupFrame instance = type.getConstructor(Menu.class, long.class).newInstance(this, guild);
 
-				addFrame(instance.name, instance);
+				addFrame(instance.getName(), instance);
 
-				if(button == null) {
-					button = new FrameButton(ButtonColor.GRAY, category.description(), instance.name);
+				if (button == null) {
+					button = new FrameButton(ButtonColor.GRAY, category.description(), instance.getName());
 				}
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 				logger.error("Failed to initialize " + type.getName(), e);
 			}
 		}
 
-		if(button == null) {
+		if (button == null) {
 			button = new FrameButton(ButtonColor.GRAY, category.description(), "main");
 		}
 

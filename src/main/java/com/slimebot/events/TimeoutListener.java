@@ -14,10 +14,10 @@ public class TimeoutListener extends ListenerAdapter {
 
 	@Override
 	public void onGuildMemberUpdateTimeOut(GuildMemberUpdateTimeOutEvent event) {
-		if(!event.getMember().isTimedOut()) return;
+		if (!event.getMember().isTimedOut()) return;
 
-		for(AuditLogEntry entry : event.getGuild().retrieveAuditLogs().type(ActionType.MEMBER_UPDATE)) {
-			if(entry.getTargetId().equals(event.getMember().getId())) {
+		for (AuditLogEntry entry : event.getGuild().retrieveAuditLogs().type(ActionType.MEMBER_UPDATE)) {
+			if (entry.getTargetId().equals(event.getMember().getId())) {
 				String reason = Optional.ofNullable(entry.getReason()).orElse("N/A");
 
 				event.getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(

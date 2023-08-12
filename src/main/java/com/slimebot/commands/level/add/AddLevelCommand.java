@@ -7,15 +7,17 @@ import de.mineking.discord.commands.annotated.option.Option;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-@ApplicationCommand(name = "level", description = "Füge einem nutzer level hinzu")
+@ApplicationCommand(name = "level", description = "Füge einem Nutzer level hinzu")
 public class AddLevelCommand {
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event,
+	                           @Option(description = "Der Nutzer, dem Level gegeben werden sollen") Member user,
+	                           @Option(description = "Die Anzahl an Leveln", minValue = 1) int level
+	) {
+		Level newLevel = Level.getLevel(user)
+				.addXp(level, 0)
+				.save();
 
-    @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, @Option(name = "member") Member member, @Option(name = "level", minValue = 1) int level) {
-        long userId = member.getIdLong();
-        long guildId = event.getGuild().getIdLong();
-        Level.addLevel(guildId, userId, level, 0, 0);
-        event.reply(member.getAsMention() + " (" + member.getEffectiveName() + ") wurden erfolgreich " + level + " level hinzugefügt!\nEr hat jetzt " + Level.getLevel(guildId, userId).level() + " level!").setEphemeral(true).queue();
-    }
-
+		event.reply(user.getAsMention() + " wurden erfolgreich " + level + " level hinzugefügt!\nEr hat jetzt " + newLevel.getLevel() + " level!").setEphemeral(true).queue();
+	}
 }
