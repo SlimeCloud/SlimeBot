@@ -146,6 +146,7 @@ public class Main {
 
 							config.registerCommand(SetupCommand.class);
 
+							config.registerCommand(QuoteCommand.class);
 							config.registerCommand(QuoteMessageCommand.class);
 
 							if (dbAvailable) {
