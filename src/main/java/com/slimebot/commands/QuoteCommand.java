@@ -31,7 +31,7 @@ public class QuoteCommand {
 		event.deferReply(true).queue();
 
 		GuildConfig.getConfig(author.getGuild()).getQuoteConfig().flatMap(QuoteConfig::getChannel).ifPresent(channel ->
-				channel.sendMessageEmbeds(
+				channel.sendMessage(author.getAsMention()).addEmbeds(
 						new EmbedBuilder()
 								.setColor(GuildConfig.getColor(author.getGuild()))
 								.setAuthor(author.getEffectiveName(), null, author.getEffectiveAvatarUrl())
