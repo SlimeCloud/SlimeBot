@@ -65,9 +65,9 @@ public class QuoteCommand {
                 ## Selbst jemanden zitieren
                 Es gibt zwei Möglichkeiten, um ein Zitat zu senden. Bitte beachte dabei die oben genannten Regeln!
                 
-                ### Context-Befehl
+                ### 1. Context-Befehl
                 Du kannst einfach eine Nachricht Rechtsklicken, "Apps" und dann "Nachricht Zitieren" auswählen. Die Nachricht wird anschließend vollautomatisch in den Zitate Kanal weitergeleitet.
-                ### Slash-Befehl
+                ### 2. Slash-Befehl
                 Wenn die Aussage in einem Sprachchat stattgefunden hat, kannst du auch </quote:%commandid%> verwenden. Bitte versuche jedoch, den Wortlaut möglichst genau am Original zu halten.
                 Bei dieser Methode bist du selbst für die richtigkeit des Zitats verantwortlich!
                 """.replace("%commandid%", String.valueOf(Main.discordUtils.getCommandCache().getGuildCommand(event.getGuild().getIdLong(), "quote")))
