@@ -23,11 +23,13 @@ import java.util.function.Function;
 
 @Slf4j
 public class SpotifyListener {
+	public void register() {
+		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this::check);
+	}
 
-	private final SpotifyApi api;
 
-	public SpotifyListener() {
-		api = new SpotifyApi.Builder()
+	public void check() {
+		SpotifyApi api = new SpotifyApi.Builder()
 				.setClientId(Main.config.spotify.clientId)
 				.setClientSecret(Main.config.spotify.clientSecret)
 				.build();
@@ -35,14 +37,8 @@ public class SpotifyListener {
 			api.setAccessToken(api.clientCredentials().build().execute().getAccessToken());
 		} catch (IOException | SpotifyWebApiException | ParseException e) {
 			logger.error("Spotify login fehlgeschlagen", e);
+			return;
 		}
-	}
-
-	public void register() {
-		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this::check);
-	}
-
-	public void check() {
 		List<String> known = Main.config.database != null
 				? Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list())
 				: Collections.emptyList();
