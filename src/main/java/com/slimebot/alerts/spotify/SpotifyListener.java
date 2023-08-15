@@ -13,6 +13,7 @@ import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.requests.data.AbstractDataPagingRequest;
 
@@ -23,21 +24,24 @@ import java.util.function.Function;
 
 @Slf4j
 public class SpotifyListener {
+	private long tokenExpiry=0;
+
+	private final SpotifyApi api;
+
+	public SpotifyListener(){
+		this.api = new SpotifyApi.Builder()
+				.setClientId(Main.config.spotify.clientId)
+				.setClientSecret(Main.config.spotify.clientSecret)
+				.build();
+	}
 	public void register() {
 		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this::check);
 	}
 
 
 	public void check() {
-		SpotifyApi api = new SpotifyApi.Builder()
-				.setClientId(Main.config.spotify.clientId)
-				.setClientSecret(Main.config.spotify.clientSecret)
-				.build();
-		try {
-			api.setAccessToken(api.clientCredentials().build().execute().getAccessToken());
-		} catch (IOException | SpotifyWebApiException | ParseException e) {
-			logger.error("Spotify login fehlgeschlagen", e);
-			return;
+		if(System.currentTimeMillis()>tokenExpiry){
+			fetchToken(api);
 		}
 		List<String> known = Main.config.database != null
 				? Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list())
@@ -115,5 +119,15 @@ public class SpotifyListener {
 
 	public static Logger getLogger() {
 		return logger;
+	}
+
+	private void fetchToken(SpotifyApi api){
+		try {
+			ClientCredentials credentials = api.clientCredentials().build().execute();
+			api.setAccessToken(credentials.getAccessToken());
+			tokenExpiry = System.currentTimeMillis() + credentials.getExpiresIn() * 1000;
+		} catch (IOException | SpotifyWebApiException | ParseException e) {
+			logger.error("Spotify login fehlgeschlagen", e);
+		}
 	}
 }
