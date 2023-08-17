@@ -24,11 +24,11 @@ import java.util.function.Function;
 
 @Slf4j
 public class SpotifyListener {
-	private long tokenExpiry=0;
+	private long tokenExpiry = 0;
 
 	private final SpotifyApi api;
 
-	public SpotifyListener(){
+	public SpotifyListener() {
 		this.api = new SpotifyApi.Builder()
 				.setClientId(Main.config.spotify.clientId)
 				.setClientSecret(Main.config.spotify.clientSecret)
@@ -40,9 +40,8 @@ public class SpotifyListener {
 
 
 	public void check() {
-		if(System.currentTimeMillis()>tokenExpiry){
-			fetchToken(api);
-		}
+		if(System.currentTimeMillis() > tokenExpiry) fetchToken(api);
+		
 		List<String> known = Main.config.database != null
 				? Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list())
 				: Collections.emptyList();
@@ -121,7 +120,7 @@ public class SpotifyListener {
 		return logger;
 	}
 
-	private void fetchToken(SpotifyApi api){
+	private void fetchToken(){
 		try {
 			ClientCredentials credentials = api.clientCredentials().build().execute();
 			api.setAccessToken(credentials.getAccessToken());
