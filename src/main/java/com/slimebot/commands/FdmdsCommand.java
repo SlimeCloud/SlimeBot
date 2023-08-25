@@ -82,30 +82,33 @@ public class FdmdsCommand {
 			choicesStr.append(event.getValue("choices").getAsString());
 		}
 
-		MessageEditData message = new MessageEditBuilder()
+		EmbedBuilder embedBuilder = new EmbedBuilder()
+				.setColor(GuildConfig.getColor(event.getGuild()))
+				.setTitle("Frag doch mal den Schleim")
+				.setFooter("Vorschlag von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")")
+				.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question, false)
+				.addField("Auswahlmöglichkeiten:", choicesStr.toString(), false);
+
+		if (event.getModalId().contains("edit")) {
+			embedBuilder.setFooter(event.getMessage().getEmbeds().get(0).getFooter().getText());
+		}
+
+		MessageEditBuilder message = new MessageEditBuilder()
 				.setActionRow(
 						Button.secondary("fdmds.edit", "Bearbeiten"),
 						Button.danger("fdmds.send", "Senden")
 				)
-				.setEmbeds(
-						new EmbedBuilder()
-								.setColor(GuildConfig.getColor(event.getGuild()))
-								.setTitle("Frag doch mal den Schleim")
-								.setFooter("Vorschlag von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")")
-								.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question, false)
-								.addField("Auswahlmöglichkeiten:", choicesStr.toString(), false)
-								.build()
-				)
-				.build();
+				.setEmbeds(embedBuilder.build());
 
 		if (event.getModalId().contains("edit")) {
-			event.getMessage().editMessage(message).queue();
+			message.setContent("Bearbeitet von " + event.getMember().getAsMention());
+			event.getMessage().editMessage(message.build()).queue();
 
 			event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
 		} else {
 			GuildConfig.getConfig(event.getGuild()).getFdmds().flatMap(FdmdsConfig::getLogChannel).ifPresentOrElse(
 					channel -> {
-						channel.sendMessage(MessageCreateData.fromEditData(message)).queue();
+						channel.sendMessage(MessageCreateData.fromEditData(message.build())).queue();
 						event.reply("Frage erfolgreich eingereicht! Das Team wird die Frage kontrollieren und anschließend veröffentlicht.").setEphemeral(true).queue();
 					},
 					() -> event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue()
