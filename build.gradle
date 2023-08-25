@@ -9,7 +9,7 @@ plugins {
 mainClassName = "com.slimebot.main.Main"
 
 group 'com.slimebot'
-version '2.7.3'
+version '2.8.0'
 
 repositories {
     mavenCentral()
