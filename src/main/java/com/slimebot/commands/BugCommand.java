@@ -38,9 +38,9 @@ public class BugCommand {
 				.addActionRow(TextInput.create("reproduction", "Schritte zum Reproduzieren", TextInputStyle.PARAGRAPH)
 						.setMinLength(10)
 						.setPlaceholder("""
-							1. Gehe zu '....'
-							2. Klicke auf '....'
-							3. Scrolle nach unten zu '....'"""
+								1. Gehe zu '....'
+								2. Klicke auf '....'
+								3. Scrolle nach unten zu '....'"""
 						)
 						.build()
 				)
@@ -65,8 +65,8 @@ public class BugCommand {
 	public static final Map<Long, Long> timeout = new HashMap<>();
 
 	public static boolean checkTimeout(IReplyCallback event) {
-		if(timeout.containsKey(event.getUser().getIdLong())) {
-			if(timeout.get(event.getUser().getIdLong()) > System.currentTimeMillis()) {
+		if (timeout.containsKey(event.getUser().getIdLong())) {
+			if (timeout.get(event.getUser().getIdLong()) > System.currentTimeMillis()) {
 				event.reply("Du kannst nur alle 5 Minuten einen Bug Melden!\nWieder freigegeben: " + TimeFormat.RELATIVE.format(timeout.get(event.getUser().getIdLong()))).setEphemeral(true).queue();
 				return false;
 			}
@@ -77,7 +77,7 @@ public class BugCommand {
 
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event) {
-		if(!checkTimeout(event)) return;
+		if (!checkTimeout(event)) return;
 
 		event.replyModal(createModal(null)).queue();
 	}

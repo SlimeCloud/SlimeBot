@@ -9,9 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 @ApplicationCommand(name = "report_user", description = "Melde einen Nutzer", guildOnly = true)
 public class UserReportSlashCommand {
 	@ApplicationCommandMethod
-	public void performCommand(SlashCommandInteractionEvent event,
-	                           @Option(name = "nutzer") User user,
-	                           @Option(name = "begründung") String reason
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, den du melden möchtest") User user, @Option(description = "Die Begründung für deine Meldung") String reason
 	) {
 		UserReportCommand.submitUserReport(event, user, reason);
 	}

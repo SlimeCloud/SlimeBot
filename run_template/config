@@ -31,8 +31,7 @@
 
     "level": {
         "levelUpMessage": "Herzlichen Glückwunsch, %user% du bist jetzt level %level%!",
-        "leaderboardTemplate": "zm-f838bf17-d82b-4023-92c4-45e481d546a1",
-        "xpMultiplier": 1,
+        "leaderboardTemplate": "zm-ae245f8c-2fc8-4f3b-913b-62f8d78aad75",
         "minVoiceXP": 1,
         "maxVoiceXP": 3,
         "minMessageXP": 5,
@@ -40,13 +39,14 @@
         "minWordLength": 3,
         "minWordXP": 0.05,
         "maxWordXP": 0.1,
-        "messageCooldown": 15000
+        "messageCooldown": 15000,
+        "voiceLevelingInterval": 60
     },
 
     "github": {
         "repository": "SlimeCloud/java-SlimeBot",
         "accessToken": "-- your personal access token --"
-    }
+    },
 
     "color": "#569d3c"
 }

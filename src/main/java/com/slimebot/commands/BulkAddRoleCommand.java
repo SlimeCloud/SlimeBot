@@ -7,10 +7,12 @@ import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.time.Instant;
+import java.util.List;
 
 @ApplicationCommand(name = "role_check", description = "Geht ALLE Mitglieder durch und gibt ihnen eine Rolle", guildOnly = true)
 public class BulkAddRoleCommand {
@@ -18,10 +20,10 @@ public class BulkAddRoleCommand {
 
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event,
-	                           @Option(name = "rolle", description = "Auf welche Rolle sollen die User überprüft werden?") Role role,
-	                           @Option(name = "bots", description = "Sollen Bots mit überprüft werden?") boolean bots
+	                           @Option(description = "Auf welche Rolle sollen die User überprüft werden?") Role role,
+	                           @Option(description = "Sollen Bots mit überprüft werden?") boolean bots
 	) {
-		var members = event.getGuild().getMembers().stream()
+		List<Member> members = event.getGuild().getMembers().stream()
 				.filter(m -> !m.getUser().isBot() || bots)
 				.filter(m -> !m.getRoles().contains(role))
 				.toList();

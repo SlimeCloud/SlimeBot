@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class StaffFrame {
 	public static class StaffChannelFrame extends CustomSetupFrame {
 		public StaffChannelFrame(Menu menu, long guild) {
-			super("staff channel", menu, guild, ConfigFieldType.CHANNEL.emoji + " Staff-Kanal", "In diesem Kanal wird die Team-Nachricht gesendet und bearbeitet",
+			super("staff channel", menu, guild, ConfigFieldType.CHANNEL.getEmoji() + " Staff-Kanal", "In diesem Kanal wird die Team-Nachricht gesendet und bearbeitet",
 					config -> config.getStaffConfig().flatMap(StaffConfig::getChannel).map(Channel::getAsMention)
 			);
 
@@ -76,12 +76,12 @@ public class StaffFrame {
 		private Long role;
 
 		public StaffRolesFrame(Menu menu, long guild) {
-			super("staff roles", menu, guild, ConfigFieldType.ROLE.emoji + " Team-Rollen festlegen", "Diese Rollen vergeben keine Rechte, sondern sind diejenigen, die in der Team-Nachricht nagezeigt werden",
+			super("staff roles", menu, guild, ConfigFieldType.ROLE.getEmoji() + " Team-Rollen festlegen", "Diese Rollen vergeben keine Rechte, sondern sind diejenigen, die in der Team-Nachricht nagezeigt werden",
 					config -> config.getStaffConfig().map(staff -> staff.roles.entrySet().stream()
 							.map(e -> {
 								try {
 									return "> " + Main.jdaInstance.getRoleById(e.getKey()).getAsMention() + " " + e.getValue();
-								} catch(NumberFormatException x) {
+								} catch (NumberFormatException x) {
 									return "> " + e.getValue();
 								}
 							}).collect(Collectors.joining("\n"))
@@ -108,19 +108,17 @@ public class StaffFrame {
 
 						StaffConfig staff = GuildConfig.getConfig(guild).getOrCreateStaff();
 
-						if(staff.roles.isEmpty()) {
+						if (staff.roles.isEmpty()) {
 							select.addOption("---", "---"); //SelectMenus cannot be empty
-						}
-
-						else {
+						} else {
 							select.addOptions(
 									staff.roles.entrySet().stream()
 											.map(e -> {
 												try {
 													return SelectOption.of(Main.jdaInstance.getRoleById(e.getKey()).getName(), e.getKey())
 															.withDescription(e.getValue())
-															.withEmoji(Emoji.fromFormatted(ConfigFieldType.ROLE.emoji));
-												} catch(NumberFormatException ex) {
+															.withEmoji(Emoji.fromFormatted(ConfigFieldType.ROLE.getEmoji()));
+												} catch (NumberFormatException ex) {
 													return SelectOption.of(e.getKey(), e.getKey())
 															.withDescription(e.getValue().substring(0, Math.min(100, e.getValue().length())))
 															.withEmoji(Emoji.fromFormatted("\uD83D\uDCDD"));

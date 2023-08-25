@@ -2,6 +2,7 @@ package com.slimebot.main.config.guild;
 
 import com.slimebot.commands.config.ConfigCommand;
 import com.slimebot.commands.config.FdmdsConfigCommand;
+import com.slimebot.commands.config.LevelConfigCommand;
 import com.slimebot.commands.config.StaffConfigCommand;
 import com.slimebot.commands.config.engine.ConfigCategory;
 import com.slimebot.commands.config.engine.ConfigField;
@@ -10,19 +11,22 @@ import com.slimebot.commands.config.engine.FieldVerification;
 import com.slimebot.commands.config.setup.StaffFrame;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
+import lombok.Cleanup;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Diese Klasse wird verwendet, um die Konfiguration eines Servers zu verwalten.
@@ -34,8 +38,8 @@ import java.util.function.Consumer;
  * Anhand der bereits vorhandenden Beispiele sollte erkennbar sein, wie diese Annotationen zu verwenden sind.
  */
 @ConfigCategory(name = "guild", description = "Haupteinstellungen")
+@Slf4j
 public class GuildConfig {
-	public static final Logger logger = LoggerFactory.getLogger(GuildConfig.class);
 
 	private static final Map<Long, GuildConfig> guildConfig = new HashMap<>();
 
@@ -43,28 +47,30 @@ public class GuildConfig {
 	 * VERWENDE NICHT DIESE METHODE!
 	 * Die Konfiguration für Server wird automatisch geladen.
 	 * Um auf sie zuzugreifen, verwende die {@link #getConfig(Guild)}-Methode.
-	 * @see #getConfig(Guild) 
+	 *
+	 * @see #getConfig(Guild)
 	 */
 	public static void load(Guild guild) {
 		try {
 			File file = new File("guild/" + guild.getIdLong() + ".json");
 
-			if(!file.exists()) {
+			if (!file.exists()) {
 				file.getParentFile().mkdirs();
 				file.createNewFile();
 			}
 
-			try(Reader reader = new FileReader(file, StandardCharsets.UTF_8)) {
-				GuildConfig config = Main.gson.fromJson(reader, GuildConfig.class);
+			@Cleanup
+			Reader reader = new FileReader(file, StandardCharsets.UTF_8);
+			GuildConfig config = Main.gson.fromJson(reader, GuildConfig.class);
 
-				if(config == null) {
-					config = new GuildConfig();
-				}
-
-				config.guild = guild.getIdLong();
-				guildConfig.put(guild.getIdLong(), config);
+			if (config == null) {
+				config = new GuildConfig();
 			}
-		} catch(Exception e) {
+
+			config.guild = guild.getIdLong();
+			guildConfig.put(guild.getIdLong(), config);
+
+		} catch (Exception e) {
 			logger.error("Failed to load config for guild " + guild, e);
 		}
 	}
@@ -104,12 +110,12 @@ public class GuildConfig {
 	/**
 	 * Speichert die Konfiguration in der Datei.
 	 * Diese Methode sollte vermieden werden.
-	 * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField(Guild, Consumer)}
+	 * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField}
 	 */
 	public synchronized void save() {
-		try(Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
+		try (Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
 			Main.gson.toJson(this, writer);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			logger.error("Failed to save config for guild " + guild, e);
 		}
 	}
@@ -121,30 +127,43 @@ public class GuildConfig {
 
 	@ConfigField(type = ConfigFieldType.CHANNEL, command = "log_channel", title = "Log-Kanal", description = "In diesem Kanal werden Informationen bezüglich des Bots gesendet")
 	public Long logChannel;
+
 	@ConfigField(type = ConfigFieldType.CHANNEL, command = "greetings_channel", title = "Gruß-Kanal", description = "In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet")
 	public Long greetingsChannel;
+
 	@ConfigField(type = ConfigFieldType.CHANNEL, command = "punishment_channel", title = "Straf-Kanal", description = "In diesem Kanal werden Informationen über Bestrafungen gesendet")
 	public Long punishmentChannel;
 
 	@ConfigField(type = ConfigFieldType.ROLE, command = "contributor_role", title = "Contributor Rolle", description = "Diese Rollen können Mitglieder beantragen, die an diesem Bot auf GitHub mitgearbeitet haben")
 	public Long contributorRole;
+
 	@ConfigField(type = ConfigFieldType.ROLE, command = "staff_role", title = "Team Rolle", description = "Diese Rolle hat Zugang zu beschränkten Befehlen")
 	public Long staffRole;
 
 	@ConfigCategory(name = "spotify", description = "Spotify Benachrichtigungen")
 	public SpotifyNotificationConfig spotify;
+
 	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim", updateCommands = true,
-			subcommands = FdmdsConfigCommand.DisableCommand.class
+			subcommands = FdmdsConfigCommand.class
 	)
 	public FdmdsConfig fdmds;
+
 	@ConfigCategory(name = "staff", description = "Team-Nachricht",
-			subcommands = {StaffConfigCommand.ChannelCommand.class, StaffConfigCommand.AddRoleCommand.class, StaffConfigCommand.RemoveRoleCommand.class},
+			subcommands = StaffConfigCommand.class,
 			customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
 	)
 	public StaffConfig staffMessage;
 
-	@ConfigCategory(name = "level", description = "Level-System")
+	@ConfigCategory(name = "level", description = "Level-System", updateCommands = true,
+			subcommands = LevelConfigCommand.class
+	)
 	public LevelGuildConfig level;
+
+	@ConfigCategory(name = "assignrole", description = "Join Role")
+	public AssignRoleConfig assignRole;
+
+	@ConfigCategory(name = "quote", description = "Zitate", updateCommands = true)
+	public QuoteConfig quote;
 
 	public Optional<Color> getColor() {
 		return Optional.ofNullable(color).map(Color::decode);
@@ -184,11 +203,24 @@ public class GuildConfig {
 		return Optional.ofNullable(staffMessage);
 	}
 
+	public Optional<LevelGuildConfig> getLevelConfig() {
+		return Optional.ofNullable(level);
+	}
+
+	public Optional<AssignRoleConfig> getAssignRole() {
+		return Optional.ofNullable(assignRole);
+	}
+
+	public Optional<QuoteConfig> getQuoteConfig() {
+		return Optional.ofNullable(quote);
+	}
+
 	public StaffConfig getOrCreateStaff() {
-		return getStaffConfig().orElseGet(() -> {
-			staffMessage = new StaffConfig();
-			return staffMessage;
-		});
+		return getStaffConfig().orElseGet(() -> staffMessage = new StaffConfig());
+	}
+
+	public LevelGuildConfig getOrCreateLevel() {
+		return getLevelConfig().orElseGet(() -> level = new LevelGuildConfig());
 	}
 
 	//Internal helper methods
@@ -199,4 +231,13 @@ public class GuildConfig {
 	static Optional<Role> getRole(Long role) {
 		return Optional.ofNullable(role).map(id -> Main.jdaInstance.getRoleById(id));
 	}
+
+	static Optional<List<Role>> getRoles(List<Long> roles) {
+		return Optional.ofNullable(roles).map(list -> list.stream().map(Main.jdaInstance::getRoleById).toList());
+	}
+
+	static <T extends Channel> Optional<List<T>> getChannels(List<Long> channels, Class<T> type) {
+		return Optional.ofNullable(channels).map(list -> list.stream().map(id -> Main.jdaInstance.getChannelById(type, id)).toList());
+	}
+
 }

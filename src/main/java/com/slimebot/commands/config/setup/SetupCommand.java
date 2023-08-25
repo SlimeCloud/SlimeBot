@@ -37,15 +37,15 @@ public class SetupCommand {
 
 		List<Field> mainFields = new ArrayList<>();
 
-		for(Field field : GuildConfig.class.getFields()) {
-			if(Modifier.isTransient(field.getModifiers())) continue;
+		for (Field field : GuildConfig.class.getFields()) {
+			if (Modifier.isTransient(field.getModifiers())) continue;
 
-			if(field.isAnnotationPresent(ConfigCategory.class)) {
+			if (field.isAnnotationPresent(ConfigCategory.class)) {
 				buttons.add(menu.addCategoryFrames(field.getAnnotation(ConfigCategory.class), field.getType().getFields(), (create, config) -> {
 					try {
 						Object temp = field.get(config);
 
-						if(temp == null && create) {
+						if (temp == null && create) {
 							temp = field.getType().getConstructor().newInstance();
 							field.set(config, temp);
 						}
@@ -55,9 +55,7 @@ public class SetupCommand {
 						throw new RuntimeException(e);
 					}
 				}));
-			}
-
-			else {
+			} else {
 				mainFields.add(field);
 			}
 		}

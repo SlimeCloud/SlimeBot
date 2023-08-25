@@ -42,15 +42,15 @@ public class ConfigFieldFrame extends MessageFrame {
 				Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(guild));
 				Object value = instance == null ? null : field.get(instance);
 
-				if(value != null) {
-					formattedValue = info.type().formatter.apply(value);
+				if (value != null) {
+					formattedValue = info.type().getFormatter().apply(value);
 				}
-			} catch(Exception e) {
-				ConfigCommand.logger.error("Fehler beim auslesen des aktuellen Konfigurationswerts für " + field.getName(), e);
+			} catch (Exception e) {
+				ConfigCommand.getLogger().error("Fehler beim auslesen des aktuellen Konfigurationswerts für " + field.getName(), e);
 			}
 
 			return new EmbedBuilder()
-					.setTitle(info.type().emoji + info.title())
+					.setTitle(info.type().getEmoji() + info.title())
 					.setColor(GuildConfig.getColor(guild))
 					.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
 					.setDescription(info.description())
@@ -66,7 +66,7 @@ public class ConfigFieldFrame extends MessageFrame {
 		this.instanceProvider = instanceProvider;
 		this.guild = guild;
 
-		switch(info.type()) {
+		switch (info.type()) {
 			case ROLE -> addComponents(
 					new EntitySelectComponent("role",
 							config -> config.setPlaceholder("Rolle festlegen"),
@@ -105,12 +105,12 @@ public class ConfigFieldFrame extends MessageFrame {
 								field.set(instance, null);
 							}
 
-							if(category.updateCommands()) {
+							if (category.updateCommands()) {
 								Main.updateGuildCommands(evt.getGuild());
 							}
 
 						} catch (Exception e) {
-							ConfigCommand.logger.error("Fehler beim zurücksetzten von " + field.getName(), e);
+							ConfigCommand.getLogger().error("Fehler beim zurücksetzten von " + field.getName(), e);
 						}
 					});
 
@@ -120,11 +120,11 @@ public class ConfigFieldFrame extends MessageFrame {
 
 		components.add(new FrameButton(ButtonColor.GRAY, "Zurück", last));
 
-		if(!last.equals("main") && next != null) {
+		if (!last.equals("main") && next != null) {
 			components.add(new FrameButton(ButtonColor.GRAY, "Hauptmenü", "main"));
 		}
 
-		if(!(last.equals("main") && next == null)) {
+		if (!(last.equals("main") && next == null)) {
 			components.add(new FrameButton(ButtonColor.GRAY, "Weiter", next == null ? "main" : next));
 		}
 
@@ -132,7 +132,7 @@ public class ConfigFieldFrame extends MessageFrame {
 	}
 
 	private void setValue(MenuBase menu, IReplyCallback event, Object value) {
-		if(!info.verifier().verifier.test(value)) {
+		if (!info.verifier().getVerifier().test(value)) {
 			menu.display(name);
 			event.getHook().sendMessage("Ungültiger Wert").setEphemeral(true).queue();
 			return;
@@ -140,17 +140,17 @@ public class ConfigFieldFrame extends MessageFrame {
 
 		ConfigCommand.updateField(guild, config -> {
 			try {
-				Object instance = instanceProvider.getInstance(false, config);
+				Object instance = instanceProvider.getInstance(true, config);
 
-				if(instance == null) return;
+				if (instance == null) return;
 
 				field.set(instance, value);
 			} catch (Exception e) {
-				ConfigCommand.logger.error("Fehler beim setzten von " + field.getName(), e);
+				ConfigCommand.getLogger().error("Fehler beim setzten von " + field.getName(), e);
 			}
 		});
 
-		if(category.updateCommands()) {
+		if (category.updateCommands()) {
 			Main.updateGuildCommands(event.getGuild());
 		}
 

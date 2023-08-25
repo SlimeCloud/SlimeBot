@@ -18,37 +18,36 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-@ApplicationCommand(name = "level", description = "Bearbeite die Level daten eines nutzers", guildOnly = true)
+@ApplicationCommand(name = "level", description = "Bearbeite die Level daten eines nutzers", feature = "level")
 public class LevelCommand {
+	public final CommandPermission permission = CommandPermission.TEAM;
 
-    public final CommandPermission permission = CommandPermission.TEAM;
+	@ApplicationCommand(name = "add", description = "Füge einem nutzer XP oder Level hinzu", subcommands = {AddLevelCommand.class, AddXPCommand.class})
+	public static class AddCommand {
+	}
 
+	@ApplicationCommand(name = "remove", description = "Entferne von einem nutzer XP oder Level", subcommands = {RemoveLevelCommand.class, RemoveXPCommand.class})
+	public static class RemoveCommand {
+	}
 
-    @ApplicationCommand(name = "add", description = "Füge einem nutzer XP oder Level hinzu", subcommands = {AddLevelCommand.class, AddXPCommand.class})
-    public static class AddCommand {
-    }
+	@ApplicationCommand(name = "reset", description = "Resete Level, XP oder Nachrichten anzahl eines nutzers", subcommands = {ResetAllCommand.class, ResetLevelCommand.class, ResetMessagesCommand.class, ResetXPCommand.class})
+	public static class ResetCommand {
+	}
 
-    @ApplicationCommand(name = "remove", description = "Entferne von einem nutzer XP oder Level", subcommands = {RemoveLevelCommand.class, RemoveXPCommand.class})
-    public static class RemoveCommand {
-    }
+	@ApplicationCommand(name = "stats", description = "zeigt die nutzer Statistiken an")
+	public static class StatsCommand {
+		@ApplicationCommandMethod
+		public void processCommand(SlashCommandInteractionEvent event, @Option(description = "Der Nutzer, dessen Statistiken angezeigt werden sollen") Member user) {
+			Level level = Level.getLevel(user);
 
-    @ApplicationCommand(name = "reset", description = "Resete Level, XP oder Nachrichten anzahl eines nutzers", subcommands = {ResetAllCommand.class, ResetLevelCommand.class, ResetMessagesCommand.class, ResetXPCommand.class})
-    public static class ResetCommand {
-    }
-
-    @ApplicationCommand(name = "stats", description = "zeigt die nutzer Statistiken an")
-    public static class StatsCommand {
-
-        @ApplicationCommandMethod
-        public void processCommand(SlashCommandInteractionEvent event, @Option(name = "member") Member member) {
-            Level lvl = Level.getLevel(event.getGuild().getIdLong(), member.getIdLong());
-            event.replyEmbeds(new EmbedBuilder()
-                    .setTitle(member.getEffectiveName() + "`s Stats")
-                    .addField("Level", String.valueOf(lvl.level()), false)
-                    .addField("XP", String.valueOf(lvl.xp()), false)
-                    .addField("Nachrichten", String.valueOf(lvl.messages()), false)
-                    .setColor(GuildConfig.getColor(event.getGuild()))
-                    .build()).setEphemeral(true).queue();
-        }
-    }
+			event.replyEmbeds(new EmbedBuilder()
+					.setTitle(user.getEffectiveName() + "`s Stats")
+					.addField("Level", String.valueOf(level.getLevel()), false)
+					.addField("XP", String.valueOf(level.getXp()), false)
+					.addField("Nachrichten", String.valueOf(level.getMessages()), false)
+					.setColor(GuildConfig.getColor(event.getGuild()))
+					.build()
+			).setEphemeral(true).queue();
+		}
+	}
 }

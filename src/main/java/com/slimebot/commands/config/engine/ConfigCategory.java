@@ -11,8 +11,12 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface ConfigCategory {
 	String name();
+
 	String description();
+
 	Class<?>[] subcommands() default {};
+
 	boolean updateCommands() default false;
+
 	Class<? extends CustomSetupFrame>[] customFrames() default {};
 }
