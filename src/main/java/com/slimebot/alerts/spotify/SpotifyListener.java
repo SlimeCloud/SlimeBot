@@ -78,20 +78,21 @@ public class SpotifyListener {
 	}
 
 	private <T, R extends AbstractDataPagingRequest.Builder<T, ?>> List<T> getLatestEntries(String id, Function<String, R> request) {
-		logger.info("Überprüfe auf Einträge bei {}...", id);
+		logger.info("Hole Einträge von User: {}...", id);
 
 		try {
 			Paging<T> albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).build().execute();
 
 			if (albumSimplifiedPaging.getTotal() > 20) {
-				logger.warn("Es wurden mehr als 20 Einträge gefunden. Es werden nur die 20 neuesten veröffentlicht");
+				logger.warn("Es wurden insgesamt mehr als 20 Einträge gefunden. Es werden nur die 20 neuesten verwendet");
 				albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal() - 20).build().execute();
 			}
 
 			List<T> albums = Arrays.asList(albumSimplifiedPaging.getItems());
-			logger.info("{} Einträge gefunden", albums.size());
+			logger.info("{} Releases gefunden", albums.size());
 			Collections.reverse(albums);
 			return albums;
+
 		} catch (Exception e) {
 			logger.error("Einträge können nicht geladen werden", e);
 			return Collections.emptyList();
