@@ -146,6 +146,9 @@ public class Main {
 
 							config.registerCommand(SetupCommand.class);
 
+							config.registerCommand(QuoteCommand.class);
+							config.registerCommand(QuoteMessageCommand.class);
+
 							if (dbAvailable) {
 								if (Main.config.level != null) {
 									config.registerCommand(RankCommand.class);
@@ -178,10 +181,13 @@ public class Main {
 	 * @param guild Der server, dessen Befehle geupdatet werden sollen.
 	 */
 	public static void updateGuildCommands(Guild guild) {
+		GuildConfig config = GuildConfig.getConfig(guild);
+
 		discordUtils.getCommandCache().updateGuildCommands(guild,
 				Map.of(
-						"fdmds", GuildConfig.getConfig(guild).getFdmds().isPresent(),
-						"level", GuildConfig.getConfig(guild).getLevelConfig().isPresent()
+						"fdmds", config.getFdmds().isPresent(),
+						"level", config.getLevelConfig().isPresent(),
+						"quote", config.getQuoteConfig().isPresent()
 				),
 				error -> logger.error("Failed to update guild commands for " + guild, error)
 		);
