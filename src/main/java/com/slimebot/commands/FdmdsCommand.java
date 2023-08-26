@@ -84,16 +84,21 @@ public class FdmdsCommand {
 			choicesStr.append(event.getValue("choices").getAsString());
 		}
 
+		System.out.println(event.getModalId());
+		System.out.println(question);
+
 		EmbedBuilder embedBuilder = new EmbedBuilder()
 				.setColor(GuildConfig.getColor(event.getGuild()))
 				.setTitle("Frag doch mal den Schleim")
-				.setFooter("Vorschlag von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")")
-				.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question, false)
-				.addField("Auswahlmöglichkeiten:", choicesStr.toString(), false);
+				.setFooter("Vorschlag von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")");
 
 		if (event.getModalId().contains("edit")) {
-			embedBuilder.setFooter(event.getMessage().getEmbeds().get(0).getFooter().getText());
+			embedBuilder.setFooter(event.getMessage().getEmbeds().get(0).getFooter().getText())
+						.addField("Frage:", question, false);
+		} else if (event.getModalId().contains("send")) {
+			embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question , false);
 		}
+		embedBuilder.addField("Auswahlmöglichkeiten:", choicesStr.toString(), false);
 
 		MessageEditBuilder message = new MessageEditBuilder()
 				.setActionRow(
