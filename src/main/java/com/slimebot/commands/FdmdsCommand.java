@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
@@ -23,7 +22,6 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageEditData;
 
 @ApplicationCommand(name = "fdmds", description = "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!", feature = "fdmds") //feature commands are guild-only
 public class FdmdsCommand {
@@ -84,9 +82,6 @@ public class FdmdsCommand {
 			choicesStr.append(event.getValue("choices").getAsString());
 		}
 
-		System.out.println(event.getModalId());
-		System.out.println(question);
-
 		EmbedBuilder embedBuilder = new EmbedBuilder()
 				.setColor(GuildConfig.getColor(event.getGuild()))
 				.setTitle("Frag doch mal den Schleim")
@@ -96,7 +91,7 @@ public class FdmdsCommand {
 			embedBuilder.setFooter(event.getMessage().getEmbeds().get(0).getFooter().getText())
 						.addField("Frage:", question, false);
 		} else if (event.getModalId().contains("send")) {
-			embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question , false);
+			embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question.split(" ", 2)[0].toLowerCase() + " " + question.split(" ", 2)[1] , false);
 		}
 		embedBuilder.addField("Auswahlmöglichkeiten:", choicesStr.toString(), false);
 
