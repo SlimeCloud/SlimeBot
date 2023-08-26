@@ -10,8 +10,10 @@ import de.mineking.discord.events.Listener;
 import de.mineking.discord.events.interaction.ButtonHandler;
 import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
@@ -131,11 +133,13 @@ public class FdmdsCommand {
 							MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 							String question = embed.getFields().get(0).getValue();
 							String choices = embed.getFields().get(1).getValue();
+							String footerText = embed.getFooter().getText();
+							Member requester = event.getGuild().getMemberById(footerText.substring(footerText.lastIndexOf(' ') + 2, footerText.length() - 1));
 
 
 							StringBuilder text = new StringBuilder()
 									.append(fdmds.getRole().map(Role::getAsMention).orElse("")).append("\n")
-									.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
+									.append("Einen Wunderschönen hier ist ").append(requester.getAsMention()).append(" <:slimewave:1080225151104331817>,\n\n")
 									.append(question).append("\n\n")
 									.append(choices).append("\n\n")
 									.append("Du möchtest selbst eine Umfrage Einreichen? Verwende </fdmds:")
