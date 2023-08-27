@@ -28,7 +28,7 @@ public abstract class DataClass {
 
 	public static boolean isValid(Field field) {
 		int mods = field.getModifiers();
-		return !(Modifier.isTransient(mods) && Modifier.isStatic(mods));
+		return !(Modifier.isTransient(mods) || Modifier.isStatic(mods));
 	}
 
 	private void createTable() {
@@ -67,7 +67,7 @@ public abstract class DataClass {
 		return null;
 	}
 
-	private void updateCache() {
+	protected void updateCache() {
 		this.cache = gson.toJson(this);
 	}
 
@@ -85,7 +85,7 @@ public abstract class DataClass {
 
 			try {
 				Object newVal = field.get(this);
-				if (newVal.equals(field.get(cacheObj))) continue;
+				if (newVal.equals(field.get(cacheObj)) && !field.isAnnotationPresent(Key.class)) continue;
 				updatedValues.put(name, field.getType().isEnum() ? ((Enum<?>) newVal).ordinal() : newVal);
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
@@ -131,7 +131,7 @@ public abstract class DataClass {
 				);
 	}
 
-	private static <T> T setFields(T instance, ResultSet rs) throws SQLException {
+	private static <T extends DataClass> T setFields(T instance, ResultSet rs) throws SQLException {
 		for (Field field : instance.getClass().getDeclaredFields()) {
 			if (!isValid(field)) continue;
 			field.setAccessible(true);
@@ -141,6 +141,7 @@ public abstract class DataClass {
 				throw new RuntimeException(e);
 			}
 		}
+		instance.updateCache();
 		return instance;
 	}
 

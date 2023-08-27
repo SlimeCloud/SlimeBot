@@ -65,18 +65,18 @@ public class RankCard extends Graphic {
 		Background bg = profile.getBackground();
 
 		int avatarWidth = contentHeight - 80;
-		int avatarBorderFactor = av.border().width()*2;
+		int avatarBorderFactor = av.border().width() * 2;
 		int avatarBorderOffset = av.border().width();
 
-		int bgBorderFactor = bg.border().width()*2;
+		int bgBorderFactor = bg.border().width() * 2;
 		int bgBorderOffset = bg.border().width();
 
 		BufferedImage avatar = ImageIO.read(new URL(user.getEffectiveAvatarUrl()));
-		BufferedImage avatarBorder = new BufferedImage(avatarWidth+avatarBorderFactor, avatarWidth+avatarBorderFactor, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage avatarBorder = new BufferedImage(avatarWidth + avatarBorderFactor, avatarWidth + avatarBorderFactor, BufferedImage.TYPE_INT_ARGB);
 		ImageUtil.fill(avatarBorder, av.border().color());
 
 		avatar = ImageUtil.resize(avatar, avatarWidth, avatarWidth);
-		if (av.style()==ROUND) {
+		if (av.style() == ROUND) {
 			avatar = ImageUtil.circle(avatar);
 			avatarBorder = ImageUtil.circle(avatarBorder);
 		}
@@ -87,19 +87,20 @@ public class RankCard extends Graphic {
 		BufferedImage backgroundImage = null;
 		try {
 			if (!bg.imageURL().isBlank()) backgroundImage = ImageIO.read(new URL(bg.imageURL()));
-		} catch (Exception ignored) {}   //ignored because it wil be thrown every time a invalid url is passed.
+		} catch (Exception ignored) {
+		}   //ignored because it wil be thrown every time a invalid url is passed.
 
 		Color borderColor = bg.border().color();
-		graphics2D.setColor(new Color(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), backgroundImage==null ? bg.color().getAlpha() : 255));
+		graphics2D.setColor(new Color(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), backgroundImage == null ? bg.color().getAlpha() : 255));
 		graphics2D.fillRect(0, 0, width, height);
-		if (backgroundImage!=null) {
-			graphics2D.drawImage(backgroundImage, bgBorderOffset, bgBorderOffset, width-bgBorderFactor, height-bgBorderFactor, bg.color(), null);
+		if (backgroundImage != null) {
+			graphics2D.drawImage(backgroundImage, bgBorderOffset, bgBorderOffset, width - bgBorderFactor, height - bgBorderFactor, bg.color(), null);
 		} else {
 			graphics2D.setColor(bg.color());
-			graphics2D.fillRect(bgBorderOffset, bgBorderOffset, width-bgBorderFactor, height-bgBorderFactor);
+			graphics2D.fillRect(bgBorderOffset, bgBorderOffset, width - bgBorderFactor, height - bgBorderFactor);
 		}
 
-		graphics2D.drawImage(avatar, contentOffsetX, Math.max(0, 80-avatarBorderOffset) + contentOffsetY, null);
+		graphics2D.drawImage(avatar, contentOffsetX, Math.max(0, 80 - avatarBorderOffset) + contentOffsetY, null);
 
 		int xpRequired = Level.calculateRequiredXP(level.getLevel() + 1);
 		double percentage = (double) level.getXp() / xpRequired;
@@ -108,16 +109,19 @@ public class RankCard extends Graphic {
 		int barSize = (int) (maxBarSize * percentage);
 
 		graphics2D.setColor(bar.bgColor());
-		if (bar.style()==ROUND) graphics2D.fillRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
+		if (bar.style() == ROUND)
+			graphics2D.fillRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
 		else graphics2D.fillRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500);
 
 		graphics2D.setColor(bar.border().color());
 		graphics2D.setStroke(new BasicStroke(bar.border().width()));
-		if (bar.style()==ROUND) graphics2D.drawRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
+		if (bar.style() == ROUND)
+			graphics2D.drawRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
 		else graphics2D.drawRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500);
 
 		graphics2D.setColor(bar.color());
-		if (bar.style()==ROUND) graphics2D.fillRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, barSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
+		if (bar.style() == ROUND)
+			graphics2D.fillRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, barSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
 		else graphics2D.fillRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, barSize, contentHeight - 500);
 
 		graphics2D.setColor(Color.WHITE);

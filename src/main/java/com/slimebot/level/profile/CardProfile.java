@@ -4,53 +4,42 @@ import com.slimebot.database.DataClass;
 import com.slimebot.database.Key;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
+import java.lang.reflect.Field;
 
 @Data
+@Slf4j
 @EqualsAndHashCode(callSuper = true)
 public class CardProfile extends DataClass {
 
-	public static final transient int TRANSPARENT = new Color(0, 0, 0, 0).getRGB();
+	public static final int TRANSPARENT = 0;
+	private static final CardProfile DEFAULT = new CardProfile(0, 0);
 
 	@Key
 	private final long guild;
 	@Key
 	private final long user;
 
-	private int progressBarColor;
-	private int progressBarBGColor;
-	private Style progressBarStyle;
-	private int progressBarBorderColor;
-	private int progressBarBorderWidth;
+	private int progressBarColor = new Color(105, 227, 73, 200).getRGB();
+	private int progressBarBGColor = new Color(150, 150, 150, 50).getRGB();
+	private Style progressBarStyle = Style.ROUND;
+	private int progressBarBorderColor = new Color(68, 140, 41, 255).getRGB();
+	private int progressBarBorderWidth = 15;
 
-	private Style avatarStyle;
-	private int avatarBorderColor;
-	private int avatarBorderWidth;
+	private Style avatarStyle = Style.ROUND;
+	private int avatarBorderColor = TRANSPARENT;
+	private int avatarBorderWidth = 0;
 
-	private int backgroundColor;
-	private String backgroundImageURL;
-	private int backgroundBorderColor;
-	private int backgroundBorderWidth;
+	private int backgroundColor = TRANSPARENT;
+	private String backgroundImageURL = "";
+	private int backgroundBorderColor = TRANSPARENT;
+	private int backgroundBorderWidth = 0;
 
 	public CardProfile(long guild, long user) {
 		this.guild = guild;
 		this.user = user;
-
-		this.progressBarColor = new Color(105, 227, 73, 200).getRGB();
-		this.progressBarBGColor = new Color(150, 150, 150, 50).getRGB();
-		this.progressBarStyle = Style.ROUND;
-		this.progressBarBorderColor = new Color(68, 140, 41, 255).getRGB();
-		this.progressBarBorderWidth = 15;
-
-		this.avatarStyle = Style.ROUND;
-		this.avatarBorderColor = TRANSPARENT;
-		this.avatarBorderWidth = 0;
-
-		this.backgroundColor = TRANSPARENT;
-		this.backgroundImageURL = "";
-		this.backgroundBorderColor = TRANSPARENT;
-		this.backgroundBorderWidth = 0;
 	}
 
 	private Color getColor(int rgba) {
@@ -67,5 +56,16 @@ public class CardProfile extends DataClass {
 
 	public Background getBackground() {
 		return new Background(getColor(backgroundColor), backgroundImageURL, new Border(getColor(backgroundBorderColor), backgroundBorderWidth));
+	}
+
+	public void reset(String name) {
+		try {
+			Field field = getClass().getDeclaredField(name);
+			if (!isValid(field)) return;
+			field.setAccessible(true);
+			field.set(this, field.get(DEFAULT));
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			logger.error("error on reset '" + name + "'", e);
+		}
 	}
 }
