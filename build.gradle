@@ -9,7 +9,7 @@ plugins {
 mainClassName = "com.slimebot.main.Main"
 
 group 'com.slimebot'
-version '2.7.3'
+version '2.8.0'
 
 repositories {
     mavenCentral()
@@ -33,7 +33,7 @@ dependencies {
     implementation 'org.jdbi:jdbi3-sqlobject:3.39.0'
     implementation 'org.jdbi:jdbi3-postgres:3.39.0'
 
-    implementation 'com.github.MineKingBot:DiscordUtils:233ed88'
+    implementation 'com.github.MineKingBot:DiscordUtils:c3975dd'
 
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'

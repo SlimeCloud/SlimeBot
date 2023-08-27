@@ -38,7 +38,6 @@ import java.util.Optional;
  * Anhand der bereits vorhandenden Beispiele sollte erkennbar sein, wie diese Annotationen zu verwenden sind.
  */
 @ConfigCategory(name = "guild", description = "Haupteinstellungen")
-@Getter
 @Slf4j
 public class GuildConfig {
 
@@ -163,6 +162,9 @@ public class GuildConfig {
 	@ConfigCategory(name = "assignrole", description = "Join Role")
 	public AssignRoleConfig assignRole;
 
+	@ConfigCategory(name = "quote", description = "Zitate", updateCommands = true)
+	public QuoteConfig quote;
+
 	public Optional<Color> getColor() {
 		return Optional.ofNullable(color).map(Color::decode);
 	}
@@ -207,6 +209,10 @@ public class GuildConfig {
 
 	public Optional<AssignRoleConfig> getAssignRole() {
 		return Optional.ofNullable(assignRole);
+	}
+
+	public Optional<QuoteConfig> getQuoteConfig() {
+		return Optional.ofNullable(quote);
 	}
 
 	public StaffConfig getOrCreateStaff() {

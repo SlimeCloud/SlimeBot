@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea for the Slimebot
 title: ''
-labels: feature
+labels: feature request
 assignees: ''
 
 ---
