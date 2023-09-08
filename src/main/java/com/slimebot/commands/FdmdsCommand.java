@@ -10,6 +10,7 @@ import de.mineking.discord.events.Listener;
 import de.mineking.discord.events.interaction.ButtonHandler;
 import de.mineking.discord.events.interaction.ModalHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -21,7 +22,6 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageEditData;
 
 @ApplicationCommand(name = "fdmds", description = "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!", feature = "fdmds") //feature commands are guild-only
 public class FdmdsCommand {
@@ -82,30 +82,35 @@ public class FdmdsCommand {
 			choicesStr.append(event.getValue("choices").getAsString());
 		}
 
-		MessageEditData message = new MessageEditBuilder()
+		EmbedBuilder embedBuilder = new EmbedBuilder()
+				.setColor(GuildConfig.getColor(event.getGuild()))
+				.setTitle("Frag doch mal den Schleim")
+				.setFooter("Vorschlag von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")");
+
+		if (event.getModalId().contains("edit")) {
+			embedBuilder.setFooter(event.getMessage().getEmbeds().get(0).getFooter().getText())
+						.addField("Frage:", question, false);
+		} else if (event.getModalId().contains("send")) {
+			embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question.split(" ", 2)[0].toLowerCase() + " " + question.split(" ", 2)[1] , false);
+		}
+		embedBuilder.addField("Auswahlmöglichkeiten:", choicesStr.toString(), false);
+
+		MessageEditBuilder message = new MessageEditBuilder()
 				.setActionRow(
 						Button.secondary("fdmds.edit", "Bearbeiten"),
 						Button.danger("fdmds.send", "Senden")
 				)
-				.setEmbeds(
-						new EmbedBuilder()
-								.setColor(GuildConfig.getColor(event.getGuild()))
-								.setTitle("Frag doch mal den Schleim")
-								.setFooter("Vorschlag von: " + event.getUser().getGlobalName() + " (" + event.getUser().getId() + ")")
-								.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question, false)
-								.addField("Auswahlmöglichkeiten:", choicesStr.toString(), false)
-								.build()
-				)
-				.build();
+				.setEmbeds(embedBuilder.build());
 
 		if (event.getModalId().contains("edit")) {
-			event.getMessage().editMessage(message).queue();
+			message.setContent("Bearbeitet von " + event.getMember().getAsMention());
+			event.getMessage().editMessage(message.build()).queue();
 
 			event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
 		} else {
 			GuildConfig.getConfig(event.getGuild()).getFdmds().flatMap(FdmdsConfig::getLogChannel).ifPresentOrElse(
 					channel -> {
-						channel.sendMessage(MessageCreateData.fromEditData(message)).queue();
+						channel.sendMessage(MessageCreateData.fromEditData(message.build())).queue();
 						event.reply("Frage erfolgreich eingereicht! Das Team wird die Frage kontrollieren und anschließend veröffentlicht.").setEphemeral(true).queue();
 					},
 					() -> event.reply("Error: Channel wurde nicht gesetzt!").setEphemeral(true).queue()
@@ -128,11 +133,13 @@ public class FdmdsCommand {
 							MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 							String question = embed.getFields().get(0).getValue();
 							String choices = embed.getFields().get(1).getValue();
+							String footerText = embed.getFooter().getText();
+							Member requester = event.getGuild().getMemberById(footerText.substring(footerText.lastIndexOf(' ') + 2, footerText.length() - 1));
 
 
 							StringBuilder text = new StringBuilder()
 									.append(fdmds.getRole().map(Role::getAsMention).orElse("")).append("\n")
-									.append("Einen Wunderschönen <:slimewave:1080225151104331817>,\n\n")
+									.append("Einen Wunderschönen hier ist ").append(requester.getAsMention()).append(" <:slimewave:1080225151104331817>,\n\n")
 									.append(question).append("\n\n")
 									.append(choices).append("\n\n")
 									.append("Du möchtest selbst eine Umfrage Einreichen? Verwende </fdmds:")
