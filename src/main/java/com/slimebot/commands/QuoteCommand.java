@@ -44,7 +44,7 @@ public class QuoteCommand {
 										? "\n\n" + url
 										: ""
 								)
-								.setFooter("Zitiert von: " + event.getMember().getUser().getName())
+								.setFooter("Zitiert von: " + event.getMember().getEffectiveName())
 								.setTimestamp(timestamp != null ? timestamp : Instant.now())
 								.build()
 				).addActionRow(
