@@ -30,6 +30,17 @@ public class QuoteCommand {
 	) {
 		event.deferReply(true).queue();
 
+		if (author.equals(event.getMember())) {
+			event.getHook().editOriginalEmbeds(
+					new EmbedBuilder()
+							.setTitle("⚠ Fehler!")
+							.setDescription("Du kannst dich nicht selbst zitieren")
+							.setTimestamp(Instant.now())
+							.setColor(GuildConfig.getColor(event.getGuild()))
+							.build()
+			).queue();
+			return;
+		}
 		GuildConfig.getConfig(author.getGuild()).getQuoteConfig().flatMap(QuoteConfig::getChannel).ifPresent(channel ->
 				channel.sendMessage(author.getAsMention()).addEmbeds(
 						new EmbedBuilder()
