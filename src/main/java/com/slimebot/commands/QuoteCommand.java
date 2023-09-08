@@ -30,7 +30,7 @@ public class QuoteCommand {
 	) {
 		event.deferReply(true).queue();
 
-		if (author == event.getMember()) {
+		if (author.equals(event.getMember())) {
 			event.getHook().editOriginalEmbeds(
 					new EmbedBuilder()
 							.setTitle("⚠ Fehler!")
