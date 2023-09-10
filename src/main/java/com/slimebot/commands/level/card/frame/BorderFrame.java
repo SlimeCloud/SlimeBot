@@ -64,7 +64,7 @@ public class BorderFrame extends ModalFrameBase {
 		ModalMapping color = event.getValue("color");
 		CardComponent.Part part = getPart();
 		boolean flag = false;
-		if (size!=null && Util.isInteger(size.getAsString())) {
+		if (size != null && Util.isInteger(size.getAsString())) {
 			int width = Integer.parseInt(size.getAsString());
 			switch (part) {
 				case AVATAR -> profile.setAvatarBorderWidth(width);
@@ -73,9 +73,9 @@ public class BorderFrame extends ModalFrameBase {
 			}
 			flag = true;
 		}
-		if (color!=null) {
+		if (color != null) {
 			Color c = ColorUtil.parseColor(color.getAsString());
-			if (c!=null) {
+			if (c != null) {
 				int rgba = c.getRGB();
 				switch (part) {
 					case AVATAR -> profile.setAvatarBorderColor(rgba);
