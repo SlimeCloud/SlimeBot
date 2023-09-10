@@ -4,10 +4,7 @@ import com.slimebot.database.DataClass;
 import com.slimebot.graphic.CustomFont;
 import com.slimebot.graphic.Graphic;
 import com.slimebot.graphic.ImageUtil;
-import com.slimebot.level.profile.Avatar;
-import com.slimebot.level.profile.Background;
-import com.slimebot.level.profile.CardProfile;
-import com.slimebot.level.profile.Progressbar;
+import com.slimebot.level.profile.*;
 import com.slimebot.main.Main;
 import net.dv8tion.jda.api.entities.User;
 
@@ -17,8 +14,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
-
-import static com.slimebot.level.profile.Style.ROUND;
 
 
 public class RankCard extends Graphic {
@@ -76,7 +71,7 @@ public class RankCard extends Graphic {
 		ImageUtil.fill(avatarBorder, av.border().color());
 
 		avatar = ImageUtil.resize(avatar, avatarWidth, avatarWidth);
-		if (av.style() == ROUND) {
+		if (av.style() == Style.ROUND) {
 			avatar = ImageUtil.circle(avatar);
 			avatarBorder = ImageUtil.circle(avatarBorder);
 		}
@@ -109,18 +104,18 @@ public class RankCard extends Graphic {
 		int barSize = (int) (maxBarSize * percentage);
 
 		graphics2D.setColor(bar.bgColor());
-		if (bar.style() == ROUND)
+		if (bar.style() == Style.ROUND)
 			graphics2D.fillRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
 		else graphics2D.fillRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500);
 
 		graphics2D.setColor(bar.border().color());
 		graphics2D.setStroke(new BasicStroke(bar.border().width()));
-		if (bar.style() == ROUND)
+		if (bar.style() == Style.ROUND)
 			graphics2D.drawRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
 		else graphics2D.drawRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, maxBarSize, contentHeight - 500);
 
 		graphics2D.setColor(bar.color());
-		if (bar.style() == ROUND)
+		if (bar.style() == Style.ROUND)
 			graphics2D.fillRoundRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, barSize, contentHeight - 500, contentHeight - 500, contentHeight - 500);
 		else graphics2D.fillRect(avatarWidth + 80 + contentOffsetX, contentHeight - 120 + contentOffsetY, barSize, contentHeight - 500);
 
