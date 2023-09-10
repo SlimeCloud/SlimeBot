@@ -1,11 +1,13 @@
 package com.slimebot.commands.level.card;
 
+import com.slimebot.commands.level.card.frame.*;
 import com.slimebot.database.DataClass;
 import com.slimebot.database.Key;
 import com.slimebot.level.Level;
 import com.slimebot.level.RankCard;
 import com.slimebot.level.profile.CardProfile;
 import com.slimebot.level.profile.Style;
+import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.util.ColorUtil;
 import com.slimebot.util.Util;
@@ -14,7 +16,10 @@ import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
 import de.mineking.discord.events.Listener;
 import de.mineking.discord.events.interaction.ButtonHandler;
+import de.mineking.discord.ui.CallbackState;
+import de.mineking.discord.ui.Menu;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -36,6 +41,17 @@ import static com.slimebot.util.ColorUtil.parseColor;
 
 @ApplicationCommand(name = "card", description = "passe deine rank card an", feature = "level")
 public class CardCommand {
+
+	private static Menu test() {
+		return Main.discordUtils.getUIManager().createMenu()
+				.addFrame("main", MainFrame::new)
+				.addFrame("avatar", AvatarFrame::new)
+				.addFrame("background", BackgroundFrame::new)
+				.addFrame("background.modal", BackgroundModalFrame::new)
+				.addFrame("progressbar", ProgressbarFrame::new)
+				.addFrame("progressbar.color", ProgressbarColorFrame::new)
+				.addFrame("border", BorderFrame::new);
+	}
 
 	private static CardProfile loadProfile(Member member) {
 		Supplier<CardProfile> sup = () -> new CardProfile(member.getGuild().getIdLong(), member.getIdLong());
@@ -71,6 +87,17 @@ public class CardCommand {
 		event.deferReply(true).queue();
 		new CardProfile(event.getGuild().getIdLong(), event.getUser().getIdLong()).save();
 		sendResult(event);
+	}
+
+	@ApplicationCommand(name = "test")
+	public static class TestCommand {
+
+		@ApplicationCommandMethod
+		public void performCommand(SlashCommandInteractionEvent event) {
+			event.deferReply(true).queue();
+			test().start(new CallbackState(event), "main");
+		}
+
 	}
 
 	@ApplicationCommand(name = "info", description = "zeigt deine aktuellen rankcard optionen an")

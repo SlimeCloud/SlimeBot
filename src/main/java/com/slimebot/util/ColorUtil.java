@@ -7,15 +7,16 @@ import java.awt.*;
 public class ColorUtil {
 
 	public static String toString(Color color) {
-		if (color == null) return "null";
-		return """
+		if (color == null) return "*null*";
+		return toHex(color);
+		/*return """
 				red: %s
 				green: %s
 				blue: %s
 				alpha: %s
 				rgb: %s
 				hex: %s
-				""".formatted(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha(), color.getRGB(), toHex(color));
+				""".formatted(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha(), color.getRGB(), toHex(color));*/
 	}
 
 	public static String toHex(Color color) {

@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 public class Util {
 
 	private static final Pattern CAMEL_CASE_PATTERN = Pattern.compile("((?<=[a-z])(?=[A-Z]))|((?<=[A-Z])(?=[A-Z][a-z]))");
-	private static final Pattern NUMERIC_PATTERN = Pattern.compile("-?\\d+(\\.\\d+)?");
 
 	public static String[] parseCamelCase(String s) {
 		return Arrays.stream(CAMEL_CASE_PATTERN.split(s))
@@ -17,9 +16,22 @@ public class Util {
 				.toArray(String[]::new);
 	}
 
+	public static boolean isInteger(String s) {
+		try {
+			Integer.parseInt(s);
+			return true;
+		} catch (NumberFormatException | NullPointerException e) {
+			return false;
+		}
+	}
+
 	public static boolean isNumeric(String s) {
-		if (s == null) return false;
-		return NUMERIC_PATTERN.matcher(s).matches();
+		try {
+			Double.parseDouble(s);
+			return true;
+		} catch (NumberFormatException | NullPointerException e) {
+			return false;
+		}
 	}
 
 	public static boolean isValidURL(String url) {
