@@ -9,6 +9,7 @@ import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.ui.Menu;
 import de.mineking.discord.ui.MenuBase;
 import de.mineking.discord.ui.MessageFrame;
+import de.mineking.discord.ui.components.Component;
 import de.mineking.discord.ui.components.ComponentRow;
 import de.mineking.discord.ui.components.button.ButtonColor;
 import de.mineking.discord.ui.components.button.ButtonComponent;
@@ -71,7 +72,7 @@ public class ConfigFieldFrame extends MessageFrame {
 					new EntitySelectComponent("role",
 							config -> config.setPlaceholder("Rolle festlegen"),
 							EntitySelectMenu.SelectTarget.ROLE
-					).handle((m, evt) -> setValue(m, evt, evt.getValues().get(0).getIdLong()))
+					).addHandler((m, evt) -> setValue(m, evt, evt.getValues().get(0).getIdLong()))
 			);
 			case CHANNEL -> addComponents(
 					new EntitySelectComponent("channel",
@@ -79,7 +80,7 @@ public class ConfigFieldFrame extends MessageFrame {
 									.setPlaceholder("Kanal festlegen")
 									.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS),
 							EntitySelectMenu.SelectTarget.CHANNEL
-					).handle((m, evt) -> setValue(m, evt, evt.getValues().get(0).getIdLong()))
+					).addHandler((m, evt) -> setValue(m, evt, evt.getValues().get(0).getIdLong()))
 			);
 			case STRING -> {
 				addComponents(new FrameButton(ButtonColor.BLUE, "Wert festlegen", info.title()));
@@ -93,10 +94,10 @@ public class ConfigFieldFrame extends MessageFrame {
 			}
 		}
 
-		List<ButtonComponent> components = new ArrayList<>();
+		List<Component<?>> components = new ArrayList<>();
 
 		components.add(
-				new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").handle((m, evt) -> {
+				new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").addHandler((m, evt) -> {
 					ConfigCommand.updateField(guild, config -> {
 						try {
 							Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(guild));
