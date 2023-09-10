@@ -34,14 +34,15 @@ public class SpotifyListener {
 				.setClientSecret(Main.config.spotify.clientSecret)
 				.build();
 	}
+
 	public void register() {
 		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this::check);
 	}
 
 
 	public void check() {
-		if(System.currentTimeMillis() > tokenExpiry) fetchToken();
-		
+		if (System.currentTimeMillis() > tokenExpiry) fetchToken();
+
 		List<String> known = Main.config.database != null
 				? Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list())
 				: Collections.emptyList();
@@ -121,7 +122,7 @@ public class SpotifyListener {
 		return logger;
 	}
 
-	private void fetchToken(){
+	private void fetchToken() {
 		try {
 			ClientCredentials credentials = api.clientCredentials().build().execute();
 			api.setAccessToken(credentials.getAccessToken());
