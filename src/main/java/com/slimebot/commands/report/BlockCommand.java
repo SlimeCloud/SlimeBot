@@ -8,7 +8,7 @@ import com.slimebot.report.list.ReportBlockSet;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
-import de.mineking.discord.commands.annotated.WhenFinished;
+import de.mineking.discord.commands.annotated.Setup;
 import de.mineking.discord.commands.annotated.option.Option;
 import de.mineking.discord.list.ListCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -27,7 +27,7 @@ public class BlockCommand {
 		) > 0;
 	}
 
-	@WhenFinished
+	@Setup
 	public void setup(CommandManager<CommandContext> manager) {
 		manager.registerCommand("report block list", new BlockListCommand());
 	}

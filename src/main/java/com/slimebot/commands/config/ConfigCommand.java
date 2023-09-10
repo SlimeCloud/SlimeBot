@@ -15,7 +15,7 @@ import de.mineking.discord.commands.CommandImplementation;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
-import de.mineking.discord.commands.annotated.WhenFinished;
+import de.mineking.discord.commands.annotated.Setup;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -75,7 +75,7 @@ public class ConfigCommand {
 		}
 	}
 
-	@WhenFinished
+	@Setup
 	public void setup(CommandManager<CommandContext> cmdMan) {
 		List<Field> mainFields = new ArrayList<>();
 

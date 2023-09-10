@@ -5,7 +5,7 @@ import com.slimebot.main.CommandPermission;
 import com.slimebot.report.Filter;
 import com.slimebot.report.Report;
 import com.slimebot.report.list.ReportSet;
-import de.mineking.discord.commands.Choice;
+import de.mineking.discord.commands.choice.Choice;
 import de.mineking.discord.commands.inherited.Option;
 import de.mineking.discord.list.ListCommand;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
