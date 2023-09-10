@@ -22,10 +22,10 @@ public class AutoDeleteListener extends ListenerAdapter {
 		if (filters == null) return;
 
 		Predicate<Message> filter = null;
-		for (AutoDeleteConfig.Filter f : EnumSet.complementOf(filters)) {
+		for (AutoDeleteConfig.Filter f : filters) {
 			filter = filter == null ? f.getFilter() : filter.or(f.getFilter());
 		}
 
-		if (filter != null && !filter.test(event.getMessage())) event.getMessage().delete().queue();
+		if (filter == null || !filter.test(event.getMessage())) event.getMessage().delete().queue();
 	}
 }

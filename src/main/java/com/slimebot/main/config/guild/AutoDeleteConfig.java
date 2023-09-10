@@ -14,10 +14,9 @@ import java.util.stream.Collectors;
 public class AutoDeleteConfig {
 	@Getter
 	public enum Filter {
-		NONE("Keine", m -> true),
-		IMAGE("Bilder", m -> !m.getContentRaw().isEmpty() || m.getAttachments().isEmpty() || !m.getAttachments().stream().allMatch(Message.Attachment::isImage)),
-		LINK("Links", m -> !m.getAttachments().isEmpty() || !Util.isValidURL(m.getContentRaw())),
-		INTEGER("Zahlen", m -> !m.getAttachments().isEmpty() || !Util.isInteger(m.getContentRaw()));
+		IMAGE("Bilder", m -> m.getContentRaw().isEmpty() && !m.getAttachments().isEmpty() && m.getAttachments().stream().allMatch(Message.Attachment::isImage)),
+		LINK("Links", m -> m.getAttachments().isEmpty() && Util.isValidURL(m.getContentRaw())),
+		INTEGER("Zahlen", m -> m.getAttachments().isEmpty() && Util.isInteger(m.getContentRaw()));
 
 		private final String name;
 		private final Predicate<Message> filter;
