@@ -52,13 +52,13 @@ public class BackgroundModalFrame extends ModalFrameBase {
 		ModalMapping image = event.getValue("image");
 		ModalMapping color = event.getValue("color");
 		boolean flag = false;
-		if (image!=null && !image.getAsString().isBlank()) {
+		if (image != null && !image.getAsString().isBlank()) {
 			profile.setBackgroundImageURL(image.getAsString());
 			flag = true;
 		}
-		if (color!=null) {
+		if (color != null) {
 			Color c = ColorUtil.parseColor(color.getAsString());
-			if (c!=null) {
+			if (c != null) {
 				profile.setBackgroundColor(c.getRGB());
 				flag = true;
 			}

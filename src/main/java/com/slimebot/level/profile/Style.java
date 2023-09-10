@@ -12,7 +12,7 @@ public enum Style implements CustomEnumOption {
 	}
 
 	public boolean asState() {
-		return this==ROUND;
+		return this == ROUND;
 	}
 
 	public static Style fromState(boolean state) {

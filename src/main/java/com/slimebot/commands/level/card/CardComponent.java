@@ -52,7 +52,7 @@ public class CardComponent {
 
 			@Override
 			public boolean getState(MenuBase menu) {
-				return part==Part.AVATAR ? profile.getAvatarStyle().asState() : (part == Part.PROGRESSBAR && profile.getProgressBarStyle().asState());
+				return part == Part.AVATAR ? profile.getAvatarStyle().asState() : (part == Part.PROGRESSBAR && profile.getProgressBarStyle().asState());
 			}
 		}, ToggleButton.blueGreen, s -> new ButtonLabel(s ? "Rund" : "Eckig"));
 	}

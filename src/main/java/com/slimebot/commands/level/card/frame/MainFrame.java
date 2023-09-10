@@ -7,7 +7,6 @@ import de.mineking.discord.ui.components.ComponentRow;
 import de.mineking.discord.ui.components.button.ButtonColor;
 import de.mineking.discord.ui.components.button.ButtonComponent;
 import de.mineking.discord.ui.components.button.FrameButton;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +23,8 @@ public class MainFrame extends CardFrame {
 				new GroupButton("Avatar", "avatar"),
 				new GroupButton("Hintergrund", "background"),
 				new GroupButton("Progressbar", "progressbar"),
-				new ButtonComponent("close", ButtonColor.RED, Emoji.fromUnicode("✖")).addHandler(m -> m.close())
+				new GroupButton("Reset", "reset"),
+				new ButtonComponent("close", ButtonColor.RED, "✖ Schließen").addHandler(m -> m.close())
 		));
 	}
 

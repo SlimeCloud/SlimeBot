@@ -27,7 +27,7 @@ public abstract class CardFrame extends MessageFrameBase {
 
 	@Override
 	public final Collection<ComponentRow> getComponents() {
-		if (COMPONENTS==null) COMPONENTS = CardComponent.fromMember(menu.getMember());
+		if (COMPONENTS == null) COMPONENTS = CardComponent.fromMember(menu.getMember());
 		return getComponents(COMPONENTS);
 	}
 
@@ -38,12 +38,15 @@ public abstract class CardFrame extends MessageFrameBase {
 		return super.buildMessage().setFiles(new RankCard(Level.getLevel(menu.getMember())).getFile());
 	}
 
-	@Override
-	public final MessageEmbed getEmbed() {
+	protected EmbedBuilder buildEmbed() {
 		return new EmbedBuilder()
 				.setColor(GuildConfig.getColor(menu.getGuild()))
 				.setTitle(title)
-				.setImage("attachment://image.png")
-				.build();
+				.setImage("attachment://image.png");
+	}
+
+	@Override
+	public final MessageEmbed getEmbed() {
+		return buildEmbed().build();
 	}
 }

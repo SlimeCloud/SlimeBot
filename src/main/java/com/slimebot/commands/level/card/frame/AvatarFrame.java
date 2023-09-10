@@ -12,6 +12,7 @@ public class AvatarFrame extends CardFrame {
 	public AvatarFrame(Menu menu) {
 		super(menu, CardComponent.Part.AVATAR, "Hier kannst du dein Avatar bearbeiten");
 	}
+
 	@Override
 	public Collection<ComponentRow> getComponents(CardComponent COMPONENTS) {
 		return List.of(ComponentRow.of(COMPONENTS.BACK(), COMPONENTS.STYLE(this), COMPONENTS.BORDER(this)));

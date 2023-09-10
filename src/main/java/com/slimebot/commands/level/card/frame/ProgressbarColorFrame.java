@@ -54,16 +54,16 @@ public class ProgressbarColorFrame extends ModalFrameBase {
 		ModalMapping color = event.getValue("color");
 		ModalMapping backgroundColor = event.getValue("background.color");
 		boolean flag = false;
-		if (color!=null) {
+		if (color != null) {
 			Color c = ColorUtil.parseColor(color.getAsString());
-			if (c!=null) {
+			if (c != null) {
 				profile.setProgressBarColor(c.getRGB());
 				flag = true;
 			}
 		}
-		if (backgroundColor!=null) {
+		if (backgroundColor != null) {
 			Color c = ColorUtil.parseColor(backgroundColor.getAsString());
-			if (c!=null) {
+			if (c != null) {
 				profile.setProgressBarBGColor(c.getRGB());
 				flag = true;
 			}

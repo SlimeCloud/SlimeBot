@@ -89,9 +89,9 @@ public class FdmdsCommand {
 
 		if (event.getModalId().contains("edit")) {
 			embedBuilder.setFooter(event.getMessage().getEmbeds().get(0).getFooter().getText())
-						.addField("Frage:", question, false);
+					.addField("Frage:", question, false);
 		} else if (event.getModalId().contains("send")) {
-			embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question.split(" ", 2)[0].toLowerCase() + " " + question.split(" ", 2)[1] , false);
+			embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question.split(" ", 2)[0].toLowerCase() + " " + question.split(" ", 2)[1], false);
 		}
 		embedBuilder.addField("Auswahlmöglichkeiten:", choicesStr.toString(), false);
 
