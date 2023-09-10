@@ -22,22 +22,34 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class StaffFrame {
 	public static class StaffChannelFrame extends CustomSetupFrame {
 		public StaffChannelFrame(Menu menu, long guild) {
-			super("staff channel", menu, guild, ConfigFieldType.CHANNEL.getEmoji() + " Staff-Kanal", "In diesem Kanal wird die Team-Nachricht gesendet und bearbeitet",
-					config -> config.getStaffConfig().flatMap(StaffConfig::getChannel).map(Channel::getAsMention)
+			super("staff channel", menu, guild,
+					ConfigFieldType.CHANNEL.getEmoji() + " Staff-Kanal",
+					"In diesem Kanal wird die Team-Nachricht gesendet und bearbeitet"
 			);
+		}
 
-			addComponents(
+		@Override
+		public Optional<String> getValue(GuildConfig config) {
+			return config.getStaffConfig().flatMap(StaffConfig::getChannel).map(Channel::getAsMention);
+		}
+
+		@Override
+		public Collection<ComponentRow> getComponents() {
+			return Arrays.asList(
 					new EntitySelectComponent("channel",
 							config -> config
 									.setPlaceholder("Kanal festlegen")
 									.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS),
 							EntitySelectMenu.SelectTarget.CHANNEL
-					).handle((m, evt) -> {
+					).addHandler((m, evt) -> {
 						GuildConfig.getConfig(guild).getStaffConfig().ifPresent(staff ->
 								staff.getChannel().ifPresent(ch -> {
 									if (staff.message != null) {
@@ -56,12 +68,9 @@ public class StaffFrame {
 						StaffMessage.updateMessage(evt.getGuild());
 
 						menu.update();
-					})
-			);
-
-			addComponents(
+					}),
 					ComponentRow.of(
-							new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").handle((m, evt) -> {
+							new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").addHandler((m, evt) -> {
 								ConfigCommand.updateField(guild, config -> config.getStaffConfig().ifPresent(staff -> staff.channel = null)); //Keep role configuration to make it easier to re-enable the feature
 								menu.update();
 							}),
@@ -76,16 +85,9 @@ public class StaffFrame {
 		private Long role;
 
 		public StaffRolesFrame(Menu menu, long guild) {
-			super("staff roles", menu, guild, ConfigFieldType.ROLE.getEmoji() + " Team-Rollen festlegen", "Diese Rollen vergeben keine Rechte, sondern sind diejenigen, die in der Team-Nachricht nagezeigt werden",
-					config -> config.getStaffConfig().map(staff -> staff.roles.entrySet().stream()
-							.map(e -> {
-								try {
-									return "> " + Main.jdaInstance.getRoleById(e.getKey()).getAsMention() + " " + e.getValue();
-								} catch (NumberFormatException x) {
-									return "> " + e.getValue();
-								}
-							}).collect(Collectors.joining("\n"))
-					)
+			super("staff roles", menu, guild,
+					ConfigFieldType.ROLE.getEmoji() + " Team-Rollen festlegen",
+					"Diese Rollen vergeben keine Rechte, sondern sind diejenigen, die in der Team-Nachricht nagezeigt werden"
 			);
 
 			menu.addModalFrame("staff role description", "Beschreibung der Rolle",
@@ -101,8 +103,24 @@ public class StaffFrame {
 						m.display("staff roles");
 					}
 			);
+		}
 
-			addComponents(
+		@Override
+		public Optional<String> getValue(GuildConfig config) {
+			return config.getStaffConfig().map(staff -> staff.roles.entrySet().stream()
+					.map(e -> {
+						try {
+							return "> " + Main.jdaInstance.getRoleById(e.getKey()).getAsMention() + " " + e.getValue();
+						} catch (NumberFormatException x) {
+							return "> " + e.getValue();
+						}
+					}).collect(Collectors.joining("\n"))
+			);
+		}
+
+		@Override
+		public Collection<ComponentRow> getComponents() {
+			return Arrays.asList(
 					new StringSelectComponent("remove", select -> {
 						select.setPlaceholder("Rolle entfernen");
 
@@ -127,7 +145,7 @@ public class StaffFrame {
 											.toList()
 							);
 						}
-					}).handle((m, evt) -> {
+					}).addHandler((m, evt) -> {
 						ConfigCommand.updateField(evt.getGuild(), config -> config.getOrCreateStaff().roles.remove(evt.getSelectedOptions().get(0).getValue()));
 						StaffMessage.updateMessage(evt.getGuild());
 
@@ -136,13 +154,10 @@ public class StaffFrame {
 					new EntitySelectComponent("add",
 							select -> select.setPlaceholder("Rolle hinzufügen"),
 							EntitySelectMenu.SelectTarget.ROLE
-					).handle((m, evt) -> {
+					).addHandler((m, evt) -> {
 						role = evt.getValues().get(0).getIdLong();
 						m.display("staff role description");
-					})
-			);
-
-			addComponents(
+					}),
 					ComponentRow.of(
 							new FrameButton(ButtonColor.GRAY, "Zurück", "staff channel"),
 							new FrameButton(ButtonColor.GRAY, "Weiter", "main")
