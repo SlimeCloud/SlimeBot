@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
-import java.beans.FeatureDescriptor;
 import java.util.*;
 import java.util.stream.Collectors;
 
