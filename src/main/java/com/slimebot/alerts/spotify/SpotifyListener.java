@@ -113,7 +113,7 @@ public class SpotifyListener {
 								.replace("%name%", name)
 								.replace("%url%", url)
 						).queue(msg -> {
-							msg.createThreadChannel("Unterhaltet euch über die Letzte Folge!").queue();
+							msg.createThreadChannel("Unterhaltet euch über diese Folge!").queue();
 							if (msg.getChannelType().equals(ChannelType.NEWS)) msg.crosspost().queue();
 						});
 					})
