@@ -23,7 +23,8 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
-@ApplicationCommand(name = "fdmds", description = "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!", feature = "fdmds") //feature commands are guild-only
+@ApplicationCommand(name = "fdmds", description = "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!", feature = "fdmds")
+//feature commands are guild-only
 public class FdmdsCommand {
 	@Listener(type = ButtonHandler.class, filter = "fdmds:create")
 	@ApplicationCommandMethod

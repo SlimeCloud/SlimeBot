@@ -7,6 +7,7 @@ import com.slimebot.main.config.guild.SpotifyNotificationConfig;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.apache.hc.core5.http.ParseException;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -112,7 +113,10 @@ public class SpotifyListener {
 								.replace("%notification%", notification)
 								.replace("%name%", name)
 								.replace("%url%", url)
-						).queue();
+						).queue(msg -> {
+							msg.createThreadChannel("Unterhaltet euch über diese Folge!").queue();
+							if (msg.getChannelType().equals(ChannelType.NEWS)) msg.crosspost().queue();
+						});
 					})
 			);
 		}

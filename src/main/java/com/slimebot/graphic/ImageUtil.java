@@ -24,4 +24,31 @@ public class ImageUtil {
 		g2d.dispose();
 		return result;
 	}
+
+	public static BufferedImage fill(BufferedImage image, Color color) {
+		Graphics2D g2d = image.createGraphics();
+		g2d.setPaint(color);
+		g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
+		g2d.dispose();
+		return image;
+	}
+
+	public static BufferedImage merge(BufferedImage img1, BufferedImage img2) {
+		int w = Math.max(img1.getWidth(), img2.getWidth());
+		int h = Math.max(img1.getHeight(), img2.getHeight());
+		BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+
+		Graphics2D g2d = result.createGraphics();
+		g2d.drawImage(img1, 0, 0, null);
+		g2d.drawImage(img2, 0, 0, null);
+		g2d.dispose();
+		return result;
+	}
+
+	public static BufferedImage merge(BufferedImage base, BufferedImage toMerge, int x, int y) {
+		Graphics2D g2d = base.createGraphics();
+		g2d.drawImage(toMerge, x, y, null);
+		g2d.dispose();
+		return base;
+	}
 }

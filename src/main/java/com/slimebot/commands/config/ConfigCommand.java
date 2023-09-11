@@ -93,7 +93,8 @@ public class ConfigCommand {
 						}
 
 						return temp;
-					} catch (IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
+					} catch (IllegalAccessException | NoSuchMethodException | InstantiationException |
+					         InvocationTargetException e) {
 						throw new RuntimeException(e);
 					}
 				});
