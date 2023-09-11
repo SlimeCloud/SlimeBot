@@ -39,203 +39,203 @@ import java.util.Optional;
 @Slf4j
 public class GuildConfig {
 
-    private static final Map<Long, GuildConfig> guildConfig = new HashMap<>();
+	private static final Map<Long, GuildConfig> guildConfig = new HashMap<>();
 
-    /**
-     * VERWENDE NICHT DIESE METHODE!
-     * Die Konfiguration für Server wird automatisch geladen.
-     * Um auf sie zuzugreifen, verwende die {@link #getConfig(Guild)}-Methode.
-     *
-     * @see #getConfig(Guild)
-     */
-    public static void load(Guild guild) {
-        try {
-            File file = new File("guild/" + guild.getIdLong() + ".json");
+	/**
+	 * VERWENDE NICHT DIESE METHODE!
+	 * Die Konfiguration für Server wird automatisch geladen.
+	 * Um auf sie zuzugreifen, verwende die {@link #getConfig(Guild)}-Methode.
+	 *
+	 * @see #getConfig(Guild)
+	 */
+	public static void load(Guild guild) {
+		try {
+			File file = new File("guild/" + guild.getIdLong() + ".json");
 
-            if (!file.exists()) {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            }
+			if (!file.exists()) {
+				file.getParentFile().mkdirs();
+				file.createNewFile();
+			}
 
-            @Cleanup
-            Reader reader = new FileReader(file, StandardCharsets.UTF_8);
-            GuildConfig config = Main.gson.fromJson(reader, GuildConfig.class);
+			@Cleanup
+			Reader reader = new FileReader(file, StandardCharsets.UTF_8);
+			GuildConfig config = Main.gson.fromJson(reader, GuildConfig.class);
 
-            if (config == null) {
-                config = new GuildConfig();
-            }
+			if (config == null) {
+				config = new GuildConfig();
+			}
 
-            config.guild = guild.getIdLong();
-            guildConfig.put(guild.getIdLong(), config);
+			config.guild = guild.getIdLong();
+			guildConfig.put(guild.getIdLong(), config);
 
-        } catch (Exception e) {
-            logger.error("Failed to load config for guild " + guild, e);
-        }
-    }
+		} catch (Exception e) {
+			logger.error("Failed to load config for guild " + guild, e);
+		}
+	}
 
-    /**
-     * @param guild Ein Server
-     * @return Die Konfiguration dieses Servers
-     */
-    public static GuildConfig getConfig(Guild guild) {
-        return guildConfig.get(guild.getIdLong());
-    }
+	/**
+	 * @param guild Ein Server
+	 * @return Die Konfiguration dieses Servers
+	 */
+	public static GuildConfig getConfig(Guild guild) {
+		return guildConfig.get(guild.getIdLong());
+	}
 
-    /**
-     * @param guild Ein Server
-     * @return Die Farbe, die für diesen Server konfiguriert ist. Falls der Server {@code null} ist oder für ihn keine Farbe konfiguriert ist, wird {@link Config#color} zurückgegeben.
-     */
-    public static Color getColor(Guild guild) {
-        return Optional.ofNullable(guild).map(GuildConfig::getConfig).flatMap(GuildConfig::getColor).orElse(Color.decode(Main.config.color));
-    }
+	/**
+	 * @param guild Ein Server
+	 * @return Die Farbe, die für diesen Server konfiguriert ist. Falls der Server {@code null} ist oder für ihn keine Farbe konfiguriert ist, wird {@link Config#color} zurückgegeben.
+	 */
+	public static Color getColor(Guild guild) {
+		return Optional.ofNullable(guild).map(GuildConfig::getConfig).flatMap(GuildConfig::getColor).orElse(Color.decode(Main.config.color));
+	}
 
-    /**
-     * @param guild Die ID eines Servers
-     * @return Die Konfiguration für diesen Server
-     */
-    public static GuildConfig getConfig(long guild) {
-        return guildConfig.get(guild);
-    }
+	/**
+	 * @param guild Die ID eines Servers
+	 * @return Die Konfiguration für diesen Server
+	 */
+	public static GuildConfig getConfig(long guild) {
+		return guildConfig.get(guild);
+	}
 
-    /**
-     * @param guild Die ID eines Servers
-     * @return Die Farbe, die für diesen Server konfiguriert ist. Falls für den Server keine Farbe konfiguriert ist, wird {@link Config#color} zurückgegeben.
-     */
-    public static Color getColor(long guild) {
-        return getConfig(guild).getColor().orElse(Color.decode(Main.config.color));
-    }
+	/**
+	 * @param guild Die ID eines Servers
+	 * @return Die Farbe, die für diesen Server konfiguriert ist. Falls für den Server keine Farbe konfiguriert ist, wird {@link Config#color} zurückgegeben.
+	 */
+	public static Color getColor(long guild) {
+		return getConfig(guild).getColor().orElse(Color.decode(Main.config.color));
+	}
 
-    /**
-     * Speichert die Konfiguration in der Datei.
-     * Diese Methode sollte vermieden werden.
-     * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField}
-     */
-    public synchronized void save() {
-        try (Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
-            Main.gson.toJson(this, writer);
-        } catch (Exception e) {
-            logger.error("Failed to save config for guild " + guild, e);
-        }
-    }
+	/**
+	 * Speichert die Konfiguration in der Datei.
+	 * Diese Methode sollte vermieden werden.
+	 * Wenn du im {@link ConfigCommand} die konfiguration veränderst, nutze {@link ConfigCommand#updateField}
+	 */
+	public synchronized void save() {
+		try (Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
+			Main.gson.toJson(this, writer);
+		} catch (Exception e) {
+			logger.error("Failed to save config for guild " + guild, e);
+		}
+	}
 
-    private transient long guild;
+	private transient long guild;
 
-    @ConfigField(type = ConfigFieldType.STRING, command = "color", title = "\uD83C\uDFA8 Farbe", description = "Die Farbe, die für Embeds verwendet wird", verifier = FieldVerification.COLOR)
-    public String color;
+	@ConfigField(type = ConfigFieldType.STRING, command = "color", title = "\uD83C\uDFA8 Farbe", description = "Die Farbe, die für Embeds verwendet wird", verifier = FieldVerification.COLOR)
+	public String color;
 
-    @ConfigField(type = ConfigFieldType.CHANNEL, command = "log_channel", title = "Log-Kanal", description = "In diesem Kanal werden Informationen bezüglich des Bots gesendet")
-    public Long logChannel;
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "log_channel", title = "Log-Kanal", description = "In diesem Kanal werden Informationen bezüglich des Bots gesendet")
+	public Long logChannel;
 
-    @ConfigField(type = ConfigFieldType.CHANNEL, command = "greetings_channel", title = "Gruß-Kanal", description = "In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet")
-    public Long greetingsChannel;
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "greetings_channel", title = "Gruß-Kanal", description = "In diesem Kanal werden Gruß-Nachrichten - wie z.B. zu Ferien-Beginnen - gesendet")
+	public Long greetingsChannel;
 
-    @ConfigField(type = ConfigFieldType.CHANNEL, command = "punishment_channel", title = "Straf-Kanal", description = "In diesem Kanal werden Informationen über Bestrafungen gesendet")
-    public Long punishmentChannel;
+	@ConfigField(type = ConfigFieldType.CHANNEL, command = "punishment_channel", title = "Straf-Kanal", description = "In diesem Kanal werden Informationen über Bestrafungen gesendet")
+	public Long punishmentChannel;
 
-    @ConfigField(type = ConfigFieldType.ROLE, command = "contributor_role", title = "Contributor Rolle", description = "Diese Rollen können Mitglieder beantragen, die an diesem Bot auf GitHub mitgearbeitet haben")
-    public Long contributorRole;
+	@ConfigField(type = ConfigFieldType.ROLE, command = "contributor_role", title = "Contributor Rolle", description = "Diese Rollen können Mitglieder beantragen, die an diesem Bot auf GitHub mitgearbeitet haben")
+	public Long contributorRole;
 
-    @ConfigField(type = ConfigFieldType.ROLE, command = "staff_role", title = "Team Rolle", description = "Diese Rolle hat Zugang zu beschränkten Befehlen")
-    public Long staffRole;
+	@ConfigField(type = ConfigFieldType.ROLE, command = "staff_role", title = "Team Rolle", description = "Diese Rolle hat Zugang zu beschränkten Befehlen")
+	public Long staffRole;
 
-    @ConfigCategory(name = "spotify", description = "Spotify Benachrichtigungen")
-    public SpotifyNotificationConfig spotify;
+	@ConfigCategory(name = "spotify", description = "Spotify Benachrichtigungen")
+	public SpotifyNotificationConfig spotify;
 
-    @ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim", updateCommands = true,
-            subcommands = FdmdsConfigCommand.class
-    )
-    public FdmdsConfig fdmds;
+	@ConfigCategory(name = "fdmds", description = "Frag doch mal den Schleim", updateCommands = true,
+			subcommands = FdmdsConfigCommand.class
+	)
+	public FdmdsConfig fdmds;
 
-    @ConfigCategory(name = "staff", description = "Team-Nachricht",
-            subcommands = StaffConfigCommand.class,
-            customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
-    )
-    public StaffConfig staffMessage;
+	@ConfigCategory(name = "staff", description = "Team-Nachricht",
+			subcommands = StaffConfigCommand.class,
+			customFrames = {StaffFrame.StaffChannelFrame.class, StaffFrame.StaffRolesFrame.class}
+	)
+	public StaffConfig staffMessage;
 
-    @ConfigCategory(name = "level", description = "Level-System", updateCommands = true,
-            subcommands = LevelConfigCommand.class
-    )
-    public LevelGuildConfig level;
+	@ConfigCategory(name = "level", description = "Level-System", updateCommands = true,
+			subcommands = LevelConfigCommand.class
+	)
+	public LevelGuildConfig level;
 
-    @ConfigCategory(name = "assignrole", description = "Join Role")
-    public AssignRoleConfig assignRole;
+	@ConfigCategory(name = "assignrole", description = "Join Role")
+	public AssignRoleConfig assignRole;
 
-    @ConfigCategory(name = "quote", description = "Zitate", updateCommands = true)
-    public QuoteConfig quote;
+	@ConfigCategory(name = "quote", description = "Zitate", updateCommands = true)
+	public QuoteConfig quote;
 
-    public Optional<Color> getColor() {
-        return Optional.ofNullable(color).map(Color::decode);
-    }
+	public Optional<Color> getColor() {
+		return Optional.ofNullable(color).map(Color::decode);
+	}
 
-    public Optional<GuildMessageChannel> getLogChannel() {
-        return getChannel(logChannel);
-    }
+	public Optional<GuildMessageChannel> getLogChannel() {
+		return getChannel(logChannel);
+	}
 
-    public Optional<GuildMessageChannel> getGreetingsChannel() {
-        return getChannel(greetingsChannel);
-    }
+	public Optional<GuildMessageChannel> getGreetingsChannel() {
+		return getChannel(greetingsChannel);
+	}
 
-    public Optional<GuildMessageChannel> getPunishmentChannel() {
-        return getChannel(punishmentChannel);
-    }
-
-
-    public Optional<Role> getContributorRole() {
-        return getRole(contributorRole);
-    }
-
-    public Optional<Role> getStaffRole() {
-        return getRole(staffRole);
-    }
+	public Optional<GuildMessageChannel> getPunishmentChannel() {
+		return getChannel(punishmentChannel);
+	}
 
 
-    public Optional<FdmdsConfig> getFdmds() {
-        return Optional.ofNullable(fdmds);
-    }
+	public Optional<Role> getContributorRole() {
+		return getRole(contributorRole);
+	}
 
-    public Optional<SpotifyNotificationConfig> getSpotify() {
-        return Optional.ofNullable(spotify);
-    }
+	public Optional<Role> getStaffRole() {
+		return getRole(staffRole);
+	}
 
-    public Optional<StaffConfig> getStaffConfig() {
-        return Optional.ofNullable(staffMessage);
-    }
 
-    public Optional<LevelGuildConfig> getLevelConfig() {
-        return Optional.ofNullable(level);
-    }
+	public Optional<FdmdsConfig> getFdmds() {
+		return Optional.ofNullable(fdmds);
+	}
 
-    public Optional<AssignRoleConfig> getAssignRole() {
-        return Optional.ofNullable(assignRole);
-    }
+	public Optional<SpotifyNotificationConfig> getSpotify() {
+		return Optional.ofNullable(spotify);
+	}
 
-    public Optional<QuoteConfig> getQuoteConfig() {
-        return Optional.ofNullable(quote);
-    }
+	public Optional<StaffConfig> getStaffConfig() {
+		return Optional.ofNullable(staffMessage);
+	}
 
-    public StaffConfig getOrCreateStaff() {
-        return getStaffConfig().orElseGet(() -> staffMessage = new StaffConfig());
-    }
+	public Optional<LevelGuildConfig> getLevelConfig() {
+		return Optional.ofNullable(level);
+	}
 
-    public LevelGuildConfig getOrCreateLevel() {
-        return getLevelConfig().orElseGet(() -> level = new LevelGuildConfig());
-    }
+	public Optional<AssignRoleConfig> getAssignRole() {
+		return Optional.ofNullable(assignRole);
+	}
 
-    //Internal helper methods
-    static Optional<GuildMessageChannel> getChannel(Long channel) {
-        return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(GuildMessageChannel.class, id));
-    }
+	public Optional<QuoteConfig> getQuoteConfig() {
+		return Optional.ofNullable(quote);
+	}
 
-    static Optional<Role> getRole(Long role) {
-        return Optional.ofNullable(role).map(id -> Main.jdaInstance.getRoleById(id));
-    }
+	public StaffConfig getOrCreateStaff() {
+		return getStaffConfig().orElseGet(() -> staffMessage = new StaffConfig());
+	}
 
-    static Optional<List<Role>> getRoles(List<Long> roles) {
-        return Optional.ofNullable(roles).map(list -> list.stream().map(Main.jdaInstance::getRoleById).toList());
-    }
+	public LevelGuildConfig getOrCreateLevel() {
+		return getLevelConfig().orElseGet(() -> level = new LevelGuildConfig());
+	}
 
-    static <T extends Channel> Optional<List<T>> getChannels(List<Long> channels, Class<T> type) {
-        return Optional.ofNullable(channels).map(list -> list.stream().map(id -> Main.jdaInstance.getChannelById(type, id)).toList());
-    }
+	//Internal helper methods
+	static Optional<GuildMessageChannel> getChannel(Long channel) {
+		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(GuildMessageChannel.class, id));
+	}
+
+	static Optional<Role> getRole(Long role) {
+		return Optional.ofNullable(role).map(id -> Main.jdaInstance.getRoleById(id));
+	}
+
+	static Optional<List<Role>> getRoles(List<Long> roles) {
+		return Optional.ofNullable(roles).map(list -> list.stream().map(Main.jdaInstance::getRoleById).toList());
+	}
+
+	static <T extends Channel> Optional<List<T>> getChannels(List<Long> channels, Class<T> type) {
+		return Optional.ofNullable(channels).map(list -> list.stream().map(id -> Main.jdaInstance.getChannelById(type, id)).toList());
+	}
 
 }

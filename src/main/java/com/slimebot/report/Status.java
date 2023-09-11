@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum Status {
-    CLOSED("Geschlossen", "\uD83D\uDCD5"),
-    OPEN("Offen", "\uD83D\uDCC2");
+	CLOSED("Geschlossen", "\uD83D\uDCD5"),
+	OPEN("Offen", "\uD83D\uDCC2");
 
-    private final String str;
-    private final String emoji;
+	private final String str;
+	private final String emoji;
 }

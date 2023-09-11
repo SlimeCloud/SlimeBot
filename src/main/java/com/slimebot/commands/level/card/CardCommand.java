@@ -23,57 +23,57 @@ import java.util.function.Supplier;
 @ApplicationCommand(name = "card", description = "Passe deine Rankcard an", feature = "level")
 public class CardCommand {
 
-    private static CardProfile loadProfile(Member member) {
-        Supplier<CardProfile> sup = () -> new CardProfile(member.getGuild().getIdLong(), member.getIdLong());
-        return DataClass.load(sup, Map.of("guild", member.getGuild().getIdLong(), "user", member.getIdLong())).orElseGet(sup);
-    }
+	private static CardProfile loadProfile(Member member) {
+		Supplier<CardProfile> sup = () -> new CardProfile(member.getGuild().getIdLong(), member.getIdLong());
+		return DataClass.load(sup, Map.of("guild", member.getGuild().getIdLong(), "user", member.getIdLong())).orElseGet(sup);
+	}
 
 
-    @ApplicationCommand(name = "edit", description = "Bearbeite deine Rankcard")
-    public static class EditCommand {
+	@ApplicationCommand(name = "edit", description = "Bearbeite deine Rankcard")
+	public static class EditCommand {
 
-        @ApplicationCommandMethod
-        public void performCommand(SlashCommandInteractionEvent event) {
-            event.deferReply(true).queue();
-            Main.discordUtils.getUIManager().createMenu()
-                    .addFrame("main", MainFrame::new)
-                    .addFrame("avatar", AvatarFrame::new)
-                    .addFrame("background", BackgroundFrame::new)
-                    .addFrame("background.modal", BackgroundModalFrame::new)
-                    .addFrame("progressbar", ProgressbarFrame::new)
-                    .addFrame("progressbar.color", ProgressbarColorFrame::new)
-                    .addFrame("border", BorderFrame::new)
-                    .addFrame("reset", ResetWarningFrame::new).start(new CallbackState(event), "main");
-        }
+		@ApplicationCommandMethod
+		public void performCommand(SlashCommandInteractionEvent event) {
+			event.deferReply(true).queue();
+			Main.discordUtils.getUIManager().createMenu()
+					.addFrame("main", MainFrame::new)
+					.addFrame("avatar", AvatarFrame::new)
+					.addFrame("background", BackgroundFrame::new)
+					.addFrame("background.modal", BackgroundModalFrame::new)
+					.addFrame("progressbar", ProgressbarFrame::new)
+					.addFrame("progressbar.color", ProgressbarColorFrame::new)
+					.addFrame("border", BorderFrame::new)
+					.addFrame("reset", ResetWarningFrame::new).start(new CallbackState(event), "main");
+		}
 
-    }
+	}
 
-    @ApplicationCommand(name = "info", description = "Zeigt deine aktuellen Rankcard Optionen an")
-    public static class InfoCommand {
+	@ApplicationCommand(name = "info", description = "Zeigt deine aktuellen Rankcard Optionen an")
+	public static class InfoCommand {
 
-        @ApplicationCommandMethod
-        public void performCommand(SlashCommandInteractionEvent event) {
-            event.deferReply(true).queue();
-            CardProfile cp = loadProfile(event.getMember());
-            EmbedBuilder builder = new EmbedBuilder();
-            Field[] fields = cp.getClass().getDeclaredFields();
-            for (Field field : fields) {
-                if (!DataClass.isValid(field) || field.isAnnotationPresent(Key.class)) continue;
-                try {
-                    field.setAccessible(true);
-                    String value;
-                    if (field.getName().toLowerCase().contains("color") && (field.getType().equals(Integer.class) || field.getType().equals(int.class)))
-                        value = ColorUtil.toString(new Color(field.getInt(cp)));
-                    else value = String.valueOf(field.get(cp));
-                    builder.addField(String.join(" ", Util.parseCamelCase(field.getName().replace("BG", "Background"))), value, false);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            builder.setColor(GuildConfig.getColor(event.getGuild()));
-            event.getHook().sendMessageEmbeds(builder.build()).queue();
-        }
+		@ApplicationCommandMethod
+		public void performCommand(SlashCommandInteractionEvent event) {
+			event.deferReply(true).queue();
+			CardProfile cp = loadProfile(event.getMember());
+			EmbedBuilder builder = new EmbedBuilder();
+			Field[] fields = cp.getClass().getDeclaredFields();
+			for (Field field : fields) {
+				if (!DataClass.isValid(field) || field.isAnnotationPresent(Key.class)) continue;
+				try {
+					field.setAccessible(true);
+					String value;
+					if (field.getName().toLowerCase().contains("color") && (field.getType().equals(Integer.class) || field.getType().equals(int.class)))
+						value = ColorUtil.toString(new Color(field.getInt(cp)));
+					else value = String.valueOf(field.get(cp));
+					builder.addField(String.join(" ", Util.parseCamelCase(field.getName().replace("BG", "Background"))), value, false);
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+			builder.setColor(GuildConfig.getColor(event.getGuild()));
+			event.getHook().sendMessageEmbeds(builder.build()).queue();
+		}
 
-    }
+	}
 
 }

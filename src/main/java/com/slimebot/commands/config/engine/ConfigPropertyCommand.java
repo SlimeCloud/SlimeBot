@@ -9,63 +9,63 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import java.lang.reflect.Field;
 
 public class ConfigPropertyCommand extends BaseCommand<CommandContext> {
-    private final Field field;
-    private final ConfigField info;
+	private final Field field;
+	private final ConfigField info;
 
-    private final ConfigCategory category;
+	private final ConfigCategory category;
 
-    private final InstanceProvider instanceProvider;
+	private final InstanceProvider instanceProvider;
 
-    public ConfigPropertyCommand(Field field, ConfigField info, ConfigCategory category, InstanceProvider instanceProvider) {
-        this.field = field;
-        this.info = info;
-        this.category = category;
-        this.instanceProvider = instanceProvider;
+	public ConfigPropertyCommand(Field field, ConfigField info, ConfigCategory category, InstanceProvider instanceProvider) {
+		this.field = field;
+		this.info = info;
+		this.category = category;
+		this.instanceProvider = instanceProvider;
 
-        description = info.description();
+		description = info.description();
 
-        addOption(info.type().getBuilder().apply(info));
-    }
+		addOption(info.type().getBuilder().apply(info));
+	}
 
-    @Override
-    public void performCommand(CommandContext context, GenericCommandInteractionEvent event) {
-        if (event.getOptions().isEmpty()) {
-            ConfigCommand.updateField(event.getGuild(), config -> {
-                try {
-                    Object instance = instanceProvider.getInstance(false, config);
+	@Override
+	public void performCommand(CommandContext context, GenericCommandInteractionEvent event) {
+		if (event.getOptions().isEmpty()) {
+			ConfigCommand.updateField(event.getGuild(), config -> {
+				try {
+					Object instance = instanceProvider.getInstance(false, config);
 
-                    if (instance == null) return;
+					if (instance == null) return;
 
-                    field.set(instance, null);
-                } catch (Exception e) {
-                    ConfigCommand.getLogger().error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
-                }
-            });
+					field.set(instance, null);
+				} catch (Exception e) {
+					ConfigCommand.getLogger().error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
+				}
+			});
 
-            event.reply(info.title() + " zurückgesetzt").setEphemeral(true).queue();
+			event.reply(info.title() + " zurückgesetzt").setEphemeral(true).queue();
 
-            if (category.updateCommands()) {
-                Main.updateGuildCommands(event.getGuild());
-            }
+			if (category.updateCommands()) {
+				Main.updateGuildCommands(event.getGuild());
+			}
 
-            return;
-        }
+			return;
+		}
 
-        Object value = info.type().getData().apply(event.getOptions().get(0));
-        String text = info.type().getFormatter().apply(value);
+		Object value = info.type().getData().apply(event.getOptions().get(0));
+		String text = info.type().getFormatter().apply(value);
 
-        ConfigCommand.updateField(event.getGuild(), config -> {
-            try {
-                field.set(instanceProvider.getInstance(true, config), value);
-            } catch (Exception e) {
-                ConfigCommand.getLogger().error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
-            }
-        });
+		ConfigCommand.updateField(event.getGuild(), config -> {
+			try {
+				field.set(instanceProvider.getInstance(true, config), value);
+			} catch (Exception e) {
+				ConfigCommand.getLogger().error("Fehler beim zugreifen auf die Konfigurationskategorie", e);
+			}
+		});
 
-        if (category.updateCommands()) {
-            Main.updateGuildCommands(event.getGuild());
-        }
+		if (category.updateCommands()) {
+			Main.updateGuildCommands(event.getGuild());
+		}
 
-        event.replyFormat("%s auf %s gesetzt", info.title(), text).setEphemeral(true).queue();
-    }
+		event.replyFormat("%s auf %s gesetzt", info.title(), text).setEphemeral(true).queue();
+	}
 }

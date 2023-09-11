@@ -27,134 +27,134 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigFieldFrame extends MessageFrame {
-    private final String name;
-    private final ConfigCategory category;
+	private final String name;
+	private final ConfigCategory category;
 
-    private final ConfigField info;
-    private final Field field;
-    private final InstanceProvider instanceProvider;
-    private final long guild;
+	private final ConfigField info;
+	private final Field field;
+	private final InstanceProvider instanceProvider;
+	private final long guild;
 
-    public ConfigFieldFrame(Menu menu, long guild, ConfigCategory category, Field field, ConfigField info, InstanceProvider instanceProvider, String name, String last, String next) {
-        super(menu, () -> {
-            String formattedValue = "*Kein Wert*";
+	public ConfigFieldFrame(Menu menu, long guild, ConfigCategory category, Field field, ConfigField info, InstanceProvider instanceProvider, String name, String last, String next) {
+		super(menu, () -> {
+			String formattedValue = "*Kein Wert*";
 
-            try {
-                Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(guild));
-                Object value = instance == null ? null : field.get(instance);
+			try {
+				Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(guild));
+				Object value = instance == null ? null : field.get(instance);
 
-                if (value != null) {
-                    formattedValue = info.type().getFormatter().apply(value);
-                }
-            } catch (Exception e) {
-                ConfigCommand.getLogger().error("Fehler beim auslesen des aktuellen Konfigurationswerts für " + field.getName(), e);
-            }
+				if (value != null) {
+					formattedValue = info.type().getFormatter().apply(value);
+				}
+			} catch (Exception e) {
+				ConfigCommand.getLogger().error("Fehler beim auslesen des aktuellen Konfigurationswerts für " + field.getName(), e);
+			}
 
-            return new EmbedBuilder()
-                    .setTitle(info.type().getEmoji() + info.title())
-                    .setColor(GuildConfig.getColor(guild))
-                    .setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
-                    .setDescription(info.description())
-                    .addField("Aktueller Wert", formattedValue, false)
-                    .build();
-        });
+			return new EmbedBuilder()
+					.setTitle(info.type().getEmoji() + info.title())
+					.setColor(GuildConfig.getColor(guild))
+					.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
+					.setDescription(info.description())
+					.addField("Aktueller Wert", formattedValue, false)
+					.build();
+		});
 
-        this.name = name;
-        this.category = category;
+		this.name = name;
+		this.category = category;
 
-        this.info = info;
-        this.field = field;
-        this.instanceProvider = instanceProvider;
-        this.guild = guild;
+		this.info = info;
+		this.field = field;
+		this.instanceProvider = instanceProvider;
+		this.guild = guild;
 
-        switch (info.type()) {
-            case ROLE -> addComponents(
-                    new EntitySelectComponent("role",
-                            config -> config.setPlaceholder("Rolle festlegen"),
-                            EntitySelectMenu.SelectTarget.ROLE
-                    ).addHandler((m, evt) -> setValue(m, evt, evt.getValues().get(0).getIdLong()))
-            );
-            case CHANNEL -> addComponents(
-                    new EntitySelectComponent("channel",
-                            config -> config
-                                    .setPlaceholder("Kanal festlegen")
-                                    .setChannelTypes(ChannelType.TEXT, ChannelType.NEWS),
-                            EntitySelectMenu.SelectTarget.CHANNEL
-                    ).addHandler((m, evt) -> setValue(m, evt, evt.getValues().get(0).getIdLong()))
-            );
-            case STRING -> {
-                addComponents(new FrameButton(ButtonColor.BLUE, "Wert festlegen", info.title()));
-                menu.addModalFrame(info.title(), "Wert festlegen",
-                        modal -> modal.addActionRow(
-                                TextInput.create("value", "Wert", TextInputStyle.SHORT)
-                                        .build()
-                        ),
-                        (m, evt) -> setValue(m, evt, evt.getValue("value").getAsString())
-                );
-            }
-        }
+		switch (info.type()) {
+			case ROLE -> addComponents(
+					new EntitySelectComponent("role",
+							config -> config.setPlaceholder("Rolle festlegen"),
+							EntitySelectMenu.SelectTarget.ROLE
+					).addHandler((m, evt) -> setValue(m, evt, evt.getValues().get(0).getIdLong()))
+			);
+			case CHANNEL -> addComponents(
+					new EntitySelectComponent("channel",
+							config -> config
+									.setPlaceholder("Kanal festlegen")
+									.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS),
+							EntitySelectMenu.SelectTarget.CHANNEL
+					).addHandler((m, evt) -> setValue(m, evt, evt.getValues().get(0).getIdLong()))
+			);
+			case STRING -> {
+				addComponents(new FrameButton(ButtonColor.BLUE, "Wert festlegen", info.title()));
+				menu.addModalFrame(info.title(), "Wert festlegen",
+						modal -> modal.addActionRow(
+								TextInput.create("value", "Wert", TextInputStyle.SHORT)
+										.build()
+						),
+						(m, evt) -> setValue(m, evt, evt.getValue("value").getAsString())
+				);
+			}
+		}
 
-        List<Component<?>> components = new ArrayList<>();
+		List<Component<?>> components = new ArrayList<>();
 
-        components.add(
-                new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").addHandler((m, evt) -> {
-                    ConfigCommand.updateField(guild, config -> {
-                        try {
-                            Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(guild));
+		components.add(
+				new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").addHandler((m, evt) -> {
+					ConfigCommand.updateField(guild, config -> {
+						try {
+							Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(guild));
 
-                            if (instance != null) {
-                                field.set(instance, null);
-                            }
+							if (instance != null) {
+								field.set(instance, null);
+							}
 
-                            if (category.updateCommands()) {
-                                Main.updateGuildCommands(evt.getGuild());
-                            }
+							if (category.updateCommands()) {
+								Main.updateGuildCommands(evt.getGuild());
+							}
 
-                        } catch (Exception e) {
-                            ConfigCommand.getLogger().error("Fehler beim zurücksetzten von " + field.getName(), e);
-                        }
-                    });
+						} catch (Exception e) {
+							ConfigCommand.getLogger().error("Fehler beim zurücksetzten von " + field.getName(), e);
+						}
+					});
 
-                    menu.update();
-                })
-        );
+					menu.update();
+				})
+		);
 
-        components.add(new FrameButton(ButtonColor.GRAY, "Zurück", last));
+		components.add(new FrameButton(ButtonColor.GRAY, "Zurück", last));
 
-        if (!last.equals("main") && next != null) {
-            components.add(new FrameButton(ButtonColor.GRAY, "Hauptmenü", "main"));
-        }
+		if (!last.equals("main") && next != null) {
+			components.add(new FrameButton(ButtonColor.GRAY, "Hauptmenü", "main"));
+		}
 
-        if (!(last.equals("main") && next == null)) {
-            components.add(new FrameButton(ButtonColor.GRAY, "Weiter", next == null ? "main" : next));
-        }
+		if (!(last.equals("main") && next == null)) {
+			components.add(new FrameButton(ButtonColor.GRAY, "Weiter", next == null ? "main" : next));
+		}
 
-        addComponents(ComponentRow.of(components));
-    }
+		addComponents(ComponentRow.of(components));
+	}
 
-    private void setValue(MenuBase menu, IReplyCallback event, Object value) {
-        if (!info.verifier().getVerifier().test(value)) {
-            menu.display(name);
-            event.getHook().sendMessage("Ungültiger Wert").setEphemeral(true).queue();
-            return;
-        }
+	private void setValue(MenuBase menu, IReplyCallback event, Object value) {
+		if (!info.verifier().getVerifier().test(value)) {
+			menu.display(name);
+			event.getHook().sendMessage("Ungültiger Wert").setEphemeral(true).queue();
+			return;
+		}
 
-        ConfigCommand.updateField(guild, config -> {
-            try {
-                Object instance = instanceProvider.getInstance(true, config);
+		ConfigCommand.updateField(guild, config -> {
+			try {
+				Object instance = instanceProvider.getInstance(true, config);
 
-                if (instance == null) return;
+				if (instance == null) return;
 
-                field.set(instance, value);
-            } catch (Exception e) {
-                ConfigCommand.getLogger().error("Fehler beim setzten von " + field.getName(), e);
-            }
-        });
+				field.set(instance, value);
+			} catch (Exception e) {
+				ConfigCommand.getLogger().error("Fehler beim setzten von " + field.getName(), e);
+			}
+		});
 
-        if (category.updateCommands()) {
-            Main.updateGuildCommands(event.getGuild());
-        }
+		if (category.updateCommands()) {
+			Main.updateGuildCommands(event.getGuild());
+		}
 
-        menu.display(name);
-    }
+		menu.display(name);
+	}
 }

@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum Type {
-    MESSAGE("Nachricht"),
-    USER("User");
+	MESSAGE("Nachricht"),
+	USER("User");
 
-    private final String str;
+	private final String str;
 }
 

@@ -9,14 +9,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 @ApplicationCommand(name = "ping", description = "ping pong")
 public class PingCommand {
-    @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event) {
-        event.replyEmbeds(
-                new EmbedBuilder()
-                        .setTitle("Pong")
-                        .setDescription(event.getJDA().getGatewayPing() + "ms")
-                        .setColor(GuildConfig.getColor(event.getGuild()))
-                        .build()
-        ).setEphemeral(true).queue();
-    }
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event) {
+		event.replyEmbeds(
+				new EmbedBuilder()
+						.setTitle("Pong")
+						.setDescription(event.getJDA().getGatewayPing() + "ms")
+						.setColor(GuildConfig.getColor(event.getGuild()))
+						.build()
+		).setEphemeral(true).queue();
+	}
 }

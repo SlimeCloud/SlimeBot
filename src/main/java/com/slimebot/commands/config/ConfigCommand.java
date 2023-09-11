@@ -36,88 +36,88 @@ import java.util.stream.Stream;
 @ApplicationCommand(name = "config", description = "Verwaltet die Bot-Konfiguration für diesen Server", guildOnly = true)
 public class ConfigCommand {
 
-    public CommandPermission permission = CommandPermission.TEAM;
+	public CommandPermission permission = CommandPermission.TEAM;
 
-    /**
-     * Gibt dir im `handler` Zugriff auf die Konfiguration eines Servers und speichert sie anschließend.
-     *
-     * @param guild   Der Server, dessen Konfiguration du verändern möchtest
-     * @param handler Der handler, in dem du die Konfiguration anpassen kannst.
-     */
-    public static void updateField(Guild guild, Consumer<GuildConfig> handler) {
-        updateField(guild.getIdLong(), handler);
-    }
+	/**
+	 * Gibt dir im `handler` Zugriff auf die Konfiguration eines Servers und speichert sie anschließend.
+	 *
+	 * @param guild   Der Server, dessen Konfiguration du verändern möchtest
+	 * @param handler Der handler, in dem du die Konfiguration anpassen kannst.
+	 */
+	public static void updateField(Guild guild, Consumer<GuildConfig> handler) {
+		updateField(guild.getIdLong(), handler);
+	}
 
-    /**
-     * Gibt dir im `handler` Zugriff auf die Konfiguration eines Servers und speichert sie anschließend.
-     *
-     * @param guild   Der Server, dessen Konfiguration du verändern möchtest
-     * @param handler Der handler, in dem du die Konfiguration anpassen kannst.
-     */
-    public static void updateField(long guild, Consumer<GuildConfig> handler) {
-        GuildConfig config = GuildConfig.getConfig(guild);
-        handler.accept(config);
-        config.save();
-    }
+	/**
+	 * Gibt dir im `handler` Zugriff auf die Konfiguration eines Servers und speichert sie anschließend.
+	 *
+	 * @param guild   Der Server, dessen Konfiguration du verändern möchtest
+	 * @param handler Der handler, in dem du die Konfiguration anpassen kannst.
+	 */
+	public static void updateField(long guild, Consumer<GuildConfig> handler) {
+		GuildConfig config = GuildConfig.getConfig(guild);
+		handler.accept(config);
+		config.save();
+	}
 
-    @ApplicationCommand(name = "reload", description = "Lädt alle Konfigurationen neu")
-    public static class ReloadCommand {
-        @ApplicationCommandMethod
-        public void performCommand(SlashCommandInteractionEvent event) throws Exception {
-            Main.config = Config.readFromFile("config");
+	@ApplicationCommand(name = "reload", description = "Lädt alle Konfigurationen neu")
+	public static class ReloadCommand {
+		@ApplicationCommandMethod
+		public void performCommand(SlashCommandInteractionEvent event) throws Exception {
+			Main.config = Config.readFromFile("config");
 
-            Main.jdaInstance.getGuilds().forEach(g -> {
-                GuildConfig.load(g);
-                StaffMessage.updateMessage(g);
-            });
+			Main.jdaInstance.getGuilds().forEach(g -> {
+				GuildConfig.load(g);
+				StaffMessage.updateMessage(g);
+			});
 
-            event.reply("Konfigurationen neu geladen").setEphemeral(true).queue();
-        }
-    }
+			event.reply("Konfigurationen neu geladen").setEphemeral(true).queue();
+		}
+	}
 
-    @Setup
-    public void setup(CommandManager<CommandContext> cmdMan) {
-        List<Field> mainFields = new ArrayList<>();
+	@Setup
+	public void setup(CommandManager<CommandContext> cmdMan) {
+		List<Field> mainFields = new ArrayList<>();
 
-        for (Field field : GuildConfig.class.getFields()) {
-            if (Modifier.isTransient(field.getModifiers())) continue;
+		for (Field field : GuildConfig.class.getFields()) {
+			if (Modifier.isTransient(field.getModifiers())) continue;
 
-            if (field.isAnnotationPresent(ConfigCategory.class)) {
-                registerCategory(cmdMan, field.getAnnotation(ConfigCategory.class), field.getType().getFields(), (create, config) -> {
-                    try {
-                        Object temp = field.get(config);
+			if (field.isAnnotationPresent(ConfigCategory.class)) {
+				registerCategory(cmdMan, field.getAnnotation(ConfigCategory.class), field.getType().getFields(), (create, config) -> {
+					try {
+						Object temp = field.get(config);
 
-                        if (temp == null && create) {
-                            temp = field.getType().getConstructor().newInstance();
-                            field.set(config, temp);
-                        }
+						if (temp == null && create) {
+							temp = field.getType().getConstructor().newInstance();
+							field.set(config, temp);
+						}
 
-                        return temp;
-                    } catch (IllegalAccessException | NoSuchMethodException | InstantiationException |
-                             InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            } else {
-                mainFields.add(field);
-            }
-        }
+						return temp;
+					} catch (IllegalAccessException | NoSuchMethodException | InstantiationException |
+					         InvocationTargetException e) {
+						throw new RuntimeException(e);
+					}
+				});
+			} else {
+				mainFields.add(field);
+			}
+		}
 
-        registerCategory(cmdMan, GuildConfig.class.getAnnotation(ConfigCategory.class), mainFields.toArray(Field[]::new), (create, config) -> config);
-    }
+		registerCategory(cmdMan, GuildConfig.class.getAnnotation(ConfigCategory.class), mainFields.toArray(Field[]::new), (create, config) -> config);
+	}
 
-    private void registerCategory(CommandManager<CommandContext> cmdMan, ConfigCategory category, Field[] fields, InstanceProvider instanceProvider) {
-        cmdMan.registerCommand("config " + category.name(), new ConfigCategoryCommand(category, fields, instanceProvider));
+	private void registerCategory(CommandManager<CommandContext> cmdMan, ConfigCategory category, Field[] fields, InstanceProvider instanceProvider) {
+		cmdMan.registerCommand("config " + category.name(), new ConfigCategoryCommand(category, fields, instanceProvider));
 
-        CommandImplementation group = cmdMan.getCommands().get("config " + category.name());
+		CommandImplementation group = cmdMan.getCommands().get("config " + category.name());
 
-        Stream.of(category.subcommands())
-                .flatMap(ReflectionUtil::getDeclaredClasses)
-                .filter(sc -> sc.isAnnotationPresent(ApplicationCommand.class))
-                .forEach(sc -> cmdMan.registerCommand(group, sc));
-    }
+		Stream.of(category.subcommands())
+				.flatMap(ReflectionUtil::getDeclaredClasses)
+				.filter(sc -> sc.isAnnotationPresent(ApplicationCommand.class))
+				.forEach(sc -> cmdMan.registerCommand(group, sc));
+	}
 
-    public static Logger getLogger() {
-        return logger;
-    }
+	public static Logger getLogger() {
+		return logger;
+	}
 }

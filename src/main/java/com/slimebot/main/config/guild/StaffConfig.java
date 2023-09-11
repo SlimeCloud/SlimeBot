@@ -6,12 +6,12 @@ import java.util.LinkedHashMap;
 import java.util.Optional;
 
 public class StaffConfig {
-    public LinkedHashMap<String, String> roles = new LinkedHashMap<>();
+	public LinkedHashMap<String, String> roles = new LinkedHashMap<>();
 
-    public Long channel;
-    public Long message;
+	public Long channel;
+	public Long message;
 
-    public Optional<GuildMessageChannel> getChannel() {
-        return GuildConfig.getChannel(channel);
-    }
+	public Optional<GuildMessageChannel> getChannel() {
+		return GuildConfig.getChannel(channel);
+	}
 }

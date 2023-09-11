@@ -21,62 +21,62 @@ import java.time.Instant;
 
 @ApplicationCommand(name = "report", description = "Verwaltet reports", guildOnly = true, subcommands = {BlockCommand.class, DetailsCommand.class})
 public class ReportCommand {
-    public final CommandPermission permission = CommandPermission.TEAM;
+	public final CommandPermission permission = CommandPermission.TEAM;
 
-    @Setup
-    public void setup(CommandManager<CommandContext> cmdMan) {
-        cmdMan.registerCommand("report list", new ReportListCommand());
-    }
+	@Setup
+	public void setup(CommandManager<CommandContext> cmdMan) {
+		cmdMan.registerCommand("report list", new ReportListCommand());
+	}
 
-    @Listener(type = ButtonHandler.class, filter = "report:close")
-    public void handleCloseButton(ButtonInteractionEvent event) {
-        String reportID = event.getButton().getLabel().split("#")[1];
+	@Listener(type = ButtonHandler.class, filter = "report:close")
+	public void handleCloseButton(ButtonInteractionEvent event) {
+		String reportID = event.getButton().getLabel().split("#")[1];
 
-        event.replyModal(
-                Modal.create("report:close", "Meldung schließen")
-                        .addActionRow(
-                                TextInput.create("reason", "Wie Wurde mit dem Report Verfahren?", TextInputStyle.SHORT)
-                                        .setRequired(true)
-                                        .setPlaceholder("z. B. Warn, Kick, Mute, Ban, Nichts etc..")
-                                        .build()
-                        )
-                        .addActionRow(
-                                TextInput.create("id", "ID des Reports der geschlossen wird", TextInputStyle.SHORT)
-                                        .setRequired(true)
-                                        .setValue(reportID)
-                                        .setPlaceholder("Dieses Feld wird automatisch ausgefüllt!")
-                                        .build()
-                        )
-                        .build()
-        ).queue();
-    }
+		event.replyModal(
+				Modal.create("report:close", "Meldung schließen")
+						.addActionRow(
+								TextInput.create("reason", "Wie Wurde mit dem Report Verfahren?", TextInputStyle.SHORT)
+										.setRequired(true)
+										.setPlaceholder("z. B. Warn, Kick, Mute, Ban, Nichts etc..")
+										.build()
+						)
+						.addActionRow(
+								TextInput.create("id", "ID des Reports der geschlossen wird", TextInputStyle.SHORT)
+										.setRequired(true)
+										.setValue(reportID)
+										.setPlaceholder("Dieses Feld wird automatisch ausgefüllt!")
+										.build()
+						)
+						.build()
+		).queue();
+	}
 
-    @Listener(type = ModalHandler.class, filter = "report:close")
-    public void handleCloseModal(ModalInteractionEvent event) {
-        int reportID = Integer.parseInt(event.getValue("id").getAsString());
+	@Listener(type = ModalHandler.class, filter = "report:close")
+	public void handleCloseModal(ModalInteractionEvent event) {
+		int reportID = Integer.parseInt(event.getValue("id").getAsString());
 
-        Report.get(event.getGuild(), reportID)
-                .ifPresentOrElse(
-                        report -> {
-                            report.close(event.getValue("reason").getAsString());
+		Report.get(event.getGuild(), reportID)
+				.ifPresentOrElse(
+						report -> {
+							report.close(event.getValue("reason").getAsString());
 
-                            event.replyEmbeds(
-                                    new EmbedBuilder()
-                                            .setColor(GuildConfig.getColor(event.getGuild()))
-                                            .setTimestamp(Instant.now())
-                                            .setTitle("Report **#" + reportID + "** closed")
-                                            .setDescription("Der Report mit der ID **#" + reportID + "** wurde erfolgreich geschlossen")
-                                            .build()
-                            ).queue();
-                        },
-                        () -> event.replyEmbeds(
-                                new EmbedBuilder()
-                                        .setTimestamp(Instant.now())
-                                        .setColor(GuildConfig.getColor(event.getGuild()))
-                                        .setTitle(":exclamation: Error: Report not Found")
-                                        .setDescription("Der Report #" + reportID + " konnte nicht gefunden werden!")
-                                        .build()
-                        ).setEphemeral(true).queue()
-                );
-    }
+							event.replyEmbeds(
+									new EmbedBuilder()
+											.setColor(GuildConfig.getColor(event.getGuild()))
+											.setTimestamp(Instant.now())
+											.setTitle("Report **#" + reportID + "** closed")
+											.setDescription("Der Report mit der ID **#" + reportID + "** wurde erfolgreich geschlossen")
+											.build()
+							).queue();
+						},
+						() -> event.replyEmbeds(
+								new EmbedBuilder()
+										.setTimestamp(Instant.now())
+										.setColor(GuildConfig.getColor(event.getGuild()))
+										.setTitle(":exclamation: Error: Report not Found")
+										.setDescription("Der Report #" + reportID + " konnte nicht gefunden werden!")
+										.build()
+						).setEphemeral(true).queue()
+				);
+	}
 }

@@ -1,6 +1,6 @@
 package com.slimebot.main.config;
 
 public class GitHubConfig {
-    public String repository;
-    public String accessToken;
+	public String repository;
+	public String accessToken;
 }

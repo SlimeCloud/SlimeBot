@@ -8,15 +8,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface ConfigField {
-    String command();
+	String command();
 
-    String title();
+	String title();
 
-    String description();
+	String description();
 
-    ConfigFieldType type();
+	ConfigFieldType type();
 
-    FieldVerification verifier() default FieldVerification.ALL;
+	FieldVerification verifier() default FieldVerification.ALL;
 
-    boolean menu() default true;
+	boolean menu() default true;
 }

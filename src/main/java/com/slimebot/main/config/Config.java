@@ -20,46 +20,46 @@ import java.nio.charset.StandardCharsets;
  * @see GuildConfig
  */
 public class Config {
-    public final static Dotenv env = Dotenv.load();
+	public final static Dotenv env = Dotenv.load();
 
-    public Activity activity;
+	public Activity activity;
 
 
-    public DatabaseConfig database;
-    public SpotifyConfig spotify;
-    public GitHubConfig github;
-    public LevelConfig level;
+	public DatabaseConfig database;
+	public SpotifyConfig spotify;
+	public GitHubConfig github;
+	public LevelConfig level;
 
-    public String color;
+	public String color;
 
-    /**
-     * VERWENDE NICHT DIESE METHODE!
-     * Doe Konfiguration wird bereits beim Starten gelesen und ist in der {@link Main}-Klasse verfügbar.
-     *
-     * @see Main#config
-     */
-    public static Config readFromFile(String file) throws IOException {
-        @Cleanup
-        Reader reader = new FileReader(file, StandardCharsets.UTF_8);
-        Config config = Main.gson.fromJson(reader, Config.class);
+	/**
+	 * VERWENDE NICHT DIESE METHODE!
+	 * Doe Konfiguration wird bereits beim Starten gelesen und ist in der {@link Main}-Klasse verfügbar.
+	 *
+	 * @see Main#config
+	 */
+	public static Config readFromFile(String file) throws IOException {
+		@Cleanup
+		Reader reader = new FileReader(file, StandardCharsets.UTF_8);
+		Config config = Main.gson.fromJson(reader, Config.class);
 
-        if (config.activity == null || config.color == null) {
-            throw new IOException("Notwendiges Konfigurationsfeld nicht gesetzt. Siehe https://github.com/SlimeCloud/java-SlimeBot/blob/master/config_preset");
-        }
+		if (config.activity == null || config.color == null) {
+			throw new IOException("Notwendiges Konfigurationsfeld nicht gesetzt. Siehe https://github.com/SlimeCloud/java-SlimeBot/blob/master/config_preset");
+		}
 
-        if (config.database == null) {
-            Database.getLogger().warn("Keine Datenbank konfiguriert. Einige Funktionen werden nicht verfügbar sein!");
-        }
+		if (config.database == null) {
+			Database.getLogger().warn("Keine Datenbank konfiguriert. Einige Funktionen werden nicht verfügbar sein!");
+		}
 
-        return config;
-    }
+		return config;
+	}
 
-    public static class Activity {
-        public ActivityType type;
-        public String text;
+	public static class Activity {
+		public ActivityType type;
+		public String text;
 
-        public net.dv8tion.jda.api.entities.Activity build() {
-            return net.dv8tion.jda.api.entities.Activity.of(type, text);
-        }
-    }
+		public net.dv8tion.jda.api.entities.Activity build() {
+			return net.dv8tion.jda.api.entities.Activity.of(type, text);
+		}
+	}
 }

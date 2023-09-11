@@ -11,10 +11,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 @ApplicationCommand(name = "bonk", description = "Bonke eine Person", guildOnly = true)
 public class BonkCommand {
-    @ApplicationCommandMethod
-    public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Wen willst du bonken?") User user) {
-        Emoji bonkEmoji = Main.jdaInstance.getEmojiById("1128781773908758638");
+	@ApplicationCommandMethod
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Wen willst du bonken?") User user) {
+		Emoji bonkEmoji = Main.jdaInstance.getEmojiById("1128781773908758638");
 
-        event.reply(event.getUser().getAsMention() + " --> " + bonkEmoji.getFormatted() + " <-- " + user.getAsMention()).queue();
-    }
+		event.reply(event.getUser().getAsMention() + " --> " + bonkEmoji.getFormatted() + " <-- " + user.getAsMention()).queue();
+	}
 }
