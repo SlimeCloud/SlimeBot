@@ -20,7 +20,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@ApplicationCommand(name = "card", description = "passe deine rank card an", feature = "level")
+@ApplicationCommand(name = "card", description = "Passe deine Rankcard an", feature = "level")
 public class CardCommand {
 
     private static CardProfile loadProfile(Member member) {
@@ -29,7 +29,7 @@ public class CardCommand {
     }
 
 
-    @ApplicationCommand(name = "edit", description = "bearbeite deine rankcard")
+    @ApplicationCommand(name = "edit", description = "Bearbeite deine Rankcard")
     public static class EditCommand {
 
         @ApplicationCommandMethod
@@ -48,7 +48,7 @@ public class CardCommand {
 
     }
 
-    @ApplicationCommand(name = "info", description = "zeigt deine aktuellen rankcard optionen an")
+    @ApplicationCommand(name = "info", description = "Zeigt deine aktuellen Rankcard Optionen an")
     public static class InfoCommand {
 
         @ApplicationCommandMethod
