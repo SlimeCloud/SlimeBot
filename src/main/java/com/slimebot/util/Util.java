@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class Util {
-
 	private static final Pattern CAMEL_CASE_PATTERN = Pattern.compile("((?<=[a-z])(?=[A-Z]))|((?<=[A-Z])(?=[A-Z][a-z]))");
 
 	public static String[] parseCamelCase(String s) {
@@ -43,5 +42,4 @@ public class Util {
 			return false;
 		}
 	}
-
 }

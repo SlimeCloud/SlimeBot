@@ -49,9 +49,7 @@ public class SetupMenu extends Menu {
 					i == configFields.size() - 1 ? null : category.name() + " " + configFields.get(i + 1).getName())
 			);
 
-			if (button == null) {
-				button = new FrameButton(ButtonColor.GRAY, category.description(), name);
-			}
+			if (button == null) button = new FrameButton(ButtonColor.GRAY, category.description(), name);
 		}
 
 		for (Class<? extends CustomSetupFrame> type : category.customFrames()) {
@@ -69,9 +67,7 @@ public class SetupMenu extends Menu {
 			}
 		}
 
-		if (button == null) {
-			button = new FrameButton(ButtonColor.GRAY, category.description(), "main");
-		}
+		if (button == null) button = new FrameButton(ButtonColor.GRAY, category.description(), "main");
 
 		return button;
 	}

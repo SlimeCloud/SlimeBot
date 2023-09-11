@@ -8,6 +8,7 @@ import com.slimebot.commands.config.engine.ConfigCategory;
 import com.slimebot.commands.config.engine.ConfigField;
 import com.slimebot.commands.config.engine.ConfigFieldType;
 import com.slimebot.commands.config.engine.FieldVerification;
+import com.slimebot.commands.config.setup.AutoDeleteFrame;
 import com.slimebot.commands.config.setup.StaffFrame;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
@@ -163,6 +164,9 @@ public class GuildConfig {
 	@ConfigCategory(name = "quote", description = "Zitate", updateCommands = true)
 	public QuoteConfig quote;
 
+	@ConfigCategory(name = "auto-delete", description = "Automatisches Nachrichtenlöschen", customFrames = AutoDeleteFrame.class)
+	public AutoDeleteConfig autoDelete;
+
 	public Optional<Color> getColor() {
 		return Optional.ofNullable(color).map(Color::decode);
 	}
@@ -213,6 +217,10 @@ public class GuildConfig {
 		return Optional.ofNullable(quote);
 	}
 
+	public Optional<AutoDeleteConfig> getAutoDeleteConfig() {
+		return Optional.ofNullable(autoDelete);
+	}
+
 	public StaffConfig getOrCreateStaff() {
 		return getStaffConfig().orElseGet(() -> staffMessage = new StaffConfig());
 	}
@@ -221,8 +229,16 @@ public class GuildConfig {
 		return getLevelConfig().orElseGet(() -> level = new LevelGuildConfig());
 	}
 
+	public AutoDeleteConfig getOrCreateAutoDelete() {
+		return getAutoDeleteConfig().orElseGet(() -> autoDelete = new AutoDeleteConfig());
+	}
+
 	//Internal helper methods
 	static Optional<GuildMessageChannel> getChannel(Long channel) {
+		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(GuildMessageChannel.class, id));
+	}
+
+	static Optional<GuildMessageChannel> getChannel(String channel) {
 		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(GuildMessageChannel.class, id));
 	}
 
