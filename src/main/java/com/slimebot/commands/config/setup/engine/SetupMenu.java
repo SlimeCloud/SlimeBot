@@ -63,7 +63,8 @@ public class SetupMenu extends Menu {
 				if (button == null) {
 					button = new FrameButton(ButtonColor.GRAY, category.description(), instance.getName());
 				}
-			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+			} catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+			         NoSuchMethodException e) {
 				logger.error("Failed to initialize " + type.getName(), e);
 			}
 		}

@@ -37,7 +37,7 @@ public class StaffFrame {
 									.setPlaceholder("Kanal festlegen")
 									.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS),
 							EntitySelectMenu.SelectTarget.CHANNEL
-					).handle((m, evt) -> {
+					).addHandler((m, evt) -> {
 						GuildConfig.getConfig(guild).getStaffConfig().ifPresent(staff ->
 								staff.getChannel().ifPresent(ch -> {
 									if (staff.message != null) {
@@ -61,7 +61,7 @@ public class StaffFrame {
 
 			addComponents(
 					ComponentRow.of(
-							new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").handle((m, evt) -> {
+							new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").addHandler((m, evt) -> {
 								ConfigCommand.updateField(guild, config -> config.getStaffConfig().ifPresent(staff -> staff.channel = null)); //Keep role configuration to make it easier to re-enable the feature
 								menu.update();
 							}),
@@ -127,7 +127,7 @@ public class StaffFrame {
 											.toList()
 							);
 						}
-					}).handle((m, evt) -> {
+					}).addHandler((m, evt) -> {
 						ConfigCommand.updateField(evt.getGuild(), config -> config.getOrCreateStaff().roles.remove(evt.getSelectedOptions().get(0).getValue()));
 						StaffMessage.updateMessage(evt.getGuild());
 
@@ -136,7 +136,7 @@ public class StaffFrame {
 					new EntitySelectComponent("add",
 							select -> select.setPlaceholder("Rolle hinzufügen"),
 							EntitySelectMenu.SelectTarget.ROLE
-					).handle((m, evt) -> {
+					).addHandler((m, evt) -> {
 						role = evt.getValues().get(0).getIdLong();
 						m.display("staff role description");
 					})

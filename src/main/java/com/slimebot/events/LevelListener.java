@@ -57,7 +57,8 @@ public class LevelListener extends ListenerAdapter {
 
 		if (!event.isFromGuild() || author.isBot() || isBlacklisted((ICategorizableChannel) event.getChannel())) return;
 
-		if (messageTimeout.getOrDefault(author.getIdLong(), 0L) + config.messageCooldown >= System.currentTimeMillis()) return;
+		if (messageTimeout.getOrDefault(author.getIdLong(), 0L) + config.messageCooldown >= System.currentTimeMillis())
+			return;
 		messageTimeout.put(author.getIdLong(), System.currentTimeMillis());
 
 		double xp = MathUtil.randomInt(config.minMessageXP, config.maxMessageXP);
@@ -77,7 +78,8 @@ public class LevelListener extends ListenerAdapter {
 	@Override
 	public void onGenericGuildVoice(GenericGuildVoiceEvent event) {
 		if (event instanceof GuildVoiceUpdateEvent update) {
-			if (update.getChannelLeft() != null && update.getChannelJoined() == null) voiceUsers.remove(event.getMember().getIdLong());
+			if (update.getChannelLeft() != null && update.getChannelJoined() == null)
+				voiceUsers.remove(event.getMember().getIdLong());
 			updateChannel(update.getChannelLeft());
 			updateChannel(update.getChannelJoined());
 		} else {

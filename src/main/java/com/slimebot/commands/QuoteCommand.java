@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 public class QuoteCommand {
 	@ApplicationCommandMethod
 	public static void quote(IReplyCallback event,
-	                  @Option(description = "Das Mitglied, das du zitieren möchtest") Member author,
-	                  @Option(description = "Die Aussage des Mitglieds") String message,
-	                  String url,
-	                  TemporalAccessor timestamp
+	                         @Option(description = "Das Mitglied, das du zitieren möchtest") Member author,
+	                         @Option(description = "Die Aussage des Mitglieds") String message,
+	                         String url,
+	                         TemporalAccessor timestamp
 	) {
 		event.deferReply(true).queue();
 
@@ -67,21 +67,21 @@ public class QuoteCommand {
 	@Listener(type = ButtonHandler.class, filter = "quote:guidance")
 	public void sendGuidance(ButtonInteractionEvent event) {
 		event.reply("""
-                Du möchtest selbst ein Zitat wie dieses teilen? Kein Problem! Folge einfach den Folgenden Schritten:
-                ## Regeln
-                1. Bitte zitiere nur Aussagen von diesem Server
-                2. Zitiere nur besondere Nachrichten. Ein "*Hi*" ist nicht unbedingt zitat würdig
-                3. Stelle sicher, dass du nur Mitglieder zitierst, wenn die zitierte Person nichts dagegen hat. Respektiere bitte das Urheber recht und die Privatsphäre!
-                
-                ## Selbst jemanden zitieren
-                Es gibt zwei Möglichkeiten, um ein Zitat zu senden. Bitte beachte dabei die oben genannten Regeln!
-                
-                ### 1. Context-Befehl
-                Du kannst einfach eine Nachricht Rechtsklicken, "Apps" und dann "Nachricht Zitieren" auswählen. Die Nachricht wird anschließend vollautomatisch in den Zitate Kanal weitergeleitet.
-                ### 2. Slash-Befehl
-                Wenn die Aussage in einem Sprachchat stattgefunden hat, kannst du auch </quote:%commandid%> verwenden. Bitte versuche jedoch, den Wortlaut möglichst genau am Original zu halten.
-                Bei dieser Methode bist du selbst für die richtigkeit des Zitats verantwortlich!
-                """.replace("%commandid%", String.valueOf(Main.discordUtils.getCommandCache().getGuildCommand(event.getGuild().getIdLong(), "quote")))
+				Du möchtest selbst ein Zitat wie dieses teilen? Kein Problem! Folge einfach den Folgenden Schritten:
+				## Regeln
+				1. Bitte zitiere nur Aussagen von diesem Server
+				2. Zitiere nur besondere Nachrichten. Ein "*Hi*" ist nicht unbedingt zitat würdig
+				3. Stelle sicher, dass du nur Mitglieder zitierst, wenn die zitierte Person nichts dagegen hat. Respektiere bitte das Urheber recht und die Privatsphäre!
+				                
+				## Selbst jemanden zitieren
+				Es gibt zwei Möglichkeiten, um ein Zitat zu senden. Bitte beachte dabei die oben genannten Regeln!
+				                
+				### 1. Context-Befehl
+				Du kannst einfach eine Nachricht Rechtsklicken, "Apps" und dann "Nachricht Zitieren" auswählen. Die Nachricht wird anschließend vollautomatisch in den Zitate Kanal weitergeleitet.
+				### 2. Slash-Befehl
+				Wenn die Aussage in einem Sprachchat stattgefunden hat, kannst du auch </quote:%commandid%> verwenden. Bitte versuche jedoch, den Wortlaut möglichst genau am Original zu halten.
+				Bei dieser Methode bist du selbst für die richtigkeit des Zitats verantwortlich!
+				""".replace("%commandid%", String.valueOf(Main.discordUtils.getCommandCache().getGuildCommand(event.getGuild().getIdLong(), "quote")))
 		).setEphemeral(true).queue();
 	}
 }

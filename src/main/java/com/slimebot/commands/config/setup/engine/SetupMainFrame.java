@@ -23,6 +23,6 @@ public class SetupMainFrame extends MessageFrame {
 		);
 
 		addComponents(components);
-		addComponents(new ButtonComponent("close", ButtonColor.RED, "Menü Schließen").handle((m, evt) -> m.close()));
+		addComponents(new ButtonComponent("close", ButtonColor.RED, "Menü Schließen").addHandler((m, evt) -> m.close()));
 	}
 }

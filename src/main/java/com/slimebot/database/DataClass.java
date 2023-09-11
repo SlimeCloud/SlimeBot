@@ -26,12 +26,17 @@ public abstract class DataClass {
 		createTable();
 	}
 
+	public static boolean isValid(Field field) {
+		int mods = field.getModifiers();
+		return !(Modifier.isTransient(mods) || Modifier.isStatic(mods));
+	}
+
 	private void createTable() {
 		List<String> keyTypes = new LinkedList<>();
 		List<String> primaryKeys = new LinkedList<>();
 
 		for (Field field : getClass().getDeclaredFields()) {
-			if (Modifier.isTransient(field.getModifiers())) continue;
+			if (!isValid(field)) continue;
 			field.setAccessible(true);
 
 			String name = field.getName().toLowerCase();
@@ -50,7 +55,9 @@ public abstract class DataClass {
 	}
 
 	private @Nullable String getDataType(@NotNull Class<?> clazz) {
-		if (clazz.equals(byte.class) || clazz.equals(Byte.class) || clazz.equals(short.class) || clazz.equals(Short.class)) return "smallint";
+		if (clazz.isEnum() || clazz.isAssignableFrom(EnumSet.class)) return "int";
+		if (clazz.equals(byte.class) || clazz.equals(Byte.class) || clazz.equals(short.class) || clazz.equals(Short.class))
+			return "smallint";
 		if (clazz.isAssignableFrom(int.class) || clazz.equals(Integer.class)) return "int";
 		if (clazz.isAssignableFrom(long.class) || clazz.equals(Long.class)) return "bigint";
 		if (clazz.isAssignableFrom(float.class) || clazz.equals(Float.class)) return "real";
@@ -61,7 +68,7 @@ public abstract class DataClass {
 		return null;
 	}
 
-	private void updateCache() {
+	protected void updateCache() {
 		this.cache = gson.toJson(this);
 	}
 
@@ -71,7 +78,7 @@ public abstract class DataClass {
 		Set<String> keys = new HashSet<>();
 
 		for (Field field : getClass().getDeclaredFields()) {
-			if (Modifier.isTransient(field.getModifiers())) continue;
+			if (!isValid(field)) continue;
 			field.setAccessible(true);
 
 			String name = field.getName().toLowerCase();
@@ -79,8 +86,8 @@ public abstract class DataClass {
 
 			try {
 				Object newVal = field.get(this);
-				if (newVal.equals(field.get(cacheObj))) continue;
-				updatedValues.put(name, newVal);
+				if (newVal.equals(field.get(cacheObj)) && !field.isAnnotationPresent(Key.class)) continue;
+				updatedValues.put(name, field.getType().isEnum() ? ((Enum<?>) newVal).ordinal() : newVal);
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
@@ -125,16 +132,17 @@ public abstract class DataClass {
 				);
 	}
 
-	private static <T> T setFields(T instance, ResultSet rs) throws SQLException {
+	private static <T extends DataClass> T setFields(T instance, ResultSet rs) throws SQLException {
 		for (Field field : instance.getClass().getDeclaredFields()) {
-			if (Modifier.isTransient(field.getModifiers())) continue;
+			if (!isValid(field)) continue;
 			field.setAccessible(true);
 			try {
-				field.set(instance, get(field.getType(), rs, field.getName().toLowerCase()));
+				field.set(instance, field.getType().isEnum() ? field.getType().getEnumConstants()[rs.getInt(field.getName().toLowerCase())] : get(field.getType(), rs, field.getName().toLowerCase()));
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
 		}
+		instance.updateCache();
 		return instance;
 	}
 
