@@ -8,11 +8,11 @@ import com.slimebot.commands.config.engine.ConfigCategory;
 import com.slimebot.commands.config.engine.ConfigField;
 import com.slimebot.commands.config.engine.ConfigFieldType;
 import com.slimebot.commands.config.engine.FieldVerification;
+import com.slimebot.commands.config.setup.MeetingInitFrame;
 import com.slimebot.commands.config.setup.StaffFrame;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
 import lombok.Cleanup;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,6 +164,9 @@ public class GuildConfig {
 	@ConfigCategory(name = "quote", description = "Zitate", updateCommands = true)
 	public QuoteConfig quote;
 
+	@ConfigCategory(name = "meeting", description = "Team Besprechungen", customFrames = MeetingInitFrame.class)
+	public MeetingConfig meeting;
+
 	public Optional<Color> getColor() {
 		return Optional.ofNullable(color).map(Color::decode);
 	}
@@ -213,6 +215,10 @@ public class GuildConfig {
 
 	public Optional<QuoteConfig> getQuoteConfig() {
 		return Optional.ofNullable(quote);
+	}
+
+	public Optional<MeetingConfig> getMeetingConfig() {
+		return Optional.ofNullable(meeting);
 	}
 
 	public StaffConfig getOrCreateStaff() {
