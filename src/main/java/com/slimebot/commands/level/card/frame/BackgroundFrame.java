@@ -11,12 +11,12 @@ import java.util.List;
 
 public class BackgroundFrame extends CardFrame {
 
-	public BackgroundFrame(Menu menu) {
-		super(menu, CardComponent.Part.BACKGROUND, "Hier kannst du deinen Hintergrund bearbeiten");
-	}
+    public BackgroundFrame(Menu menu) {
+        super(menu, CardComponent.Part.BACKGROUND, "Hier kannst du deinen Hintergrund bearbeiten");
+    }
 
-	@Override
-	public Collection<ComponentRow> getComponents(CardComponent COMPONENTS) {
-		return List.of(ComponentRow.of(COMPONENTS.BACK(), COMPONENTS.BORDER(this), new FrameButton(ButtonColor.GRAY, "Hintergrund", "background.modal")));
-	}
+    @Override
+    public Collection<ComponentRow> getComponents(CardComponent COMPONENTS) {
+        return List.of(ComponentRow.of(COMPONENTS.BACK(), COMPONENTS.BORDER(this), new FrameButton(ButtonColor.GRAY, "Hintergrund", "background.modal")));
+    }
 }

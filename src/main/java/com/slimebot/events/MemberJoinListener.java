@@ -10,11 +10,11 @@ import org.jetbrains.annotations.NotNull;
 @Slf4j
 public class MemberJoinListener extends ListenerAdapter {
 
-	@Override
-	public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
-		GuildConfig.getConfig(event.getGuild().getIdLong()).getAssignRole().flatMap(AssignRoleConfig::getRoles).ifPresent(
-				roles -> roles.forEach(r -> event.getGuild().addRoleToMember(event.getMember(), r).queue())
-		);
+    @Override
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+        GuildConfig.getConfig(event.getGuild().getIdLong()).getAssignRole().flatMap(AssignRoleConfig::getRoles).ifPresent(
+                roles -> roles.forEach(r -> event.getGuild().addRoleToMember(event.getMember(), r).queue())
+        );
 
-	}
+    }
 }

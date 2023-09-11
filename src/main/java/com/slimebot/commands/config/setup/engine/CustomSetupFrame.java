@@ -12,18 +12,18 @@ import java.util.function.Function;
 
 @Getter
 public abstract class CustomSetupFrame extends MessageFrame {
-	private final String name;
+    private final String name;
 
-	protected CustomSetupFrame(String name, Menu menu, long guild, String title, String description, Function<GuildConfig, Optional<String>> value) {
-		super(menu, () -> new EmbedBuilder()
-				.setTitle(title)
-				.setColor(GuildConfig.getColor(guild))
-				.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
-				.setDescription(description)
-				.addField("Aktueller Wert", value.apply(GuildConfig.getConfig(guild)).orElse("*Kein Wert*"), false)
-				.build()
-		);
+    protected CustomSetupFrame(String name, Menu menu, long guild, String title, String description, Function<GuildConfig, Optional<String>> value) {
+        super(menu, () -> new EmbedBuilder()
+                .setTitle(title)
+                .setColor(GuildConfig.getColor(guild))
+                .setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
+                .setDescription(description)
+                .addField("Aktueller Wert", value.apply(GuildConfig.getConfig(guild)).orElse("*Kein Wert*"), false)
+                .build()
+        );
 
-		this.name = name;
-	}
+        this.name = name;
+    }
 }

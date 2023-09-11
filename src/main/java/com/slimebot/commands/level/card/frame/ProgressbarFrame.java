@@ -11,12 +11,12 @@ import java.util.List;
 
 public class ProgressbarFrame extends CardFrame {
 
-	public ProgressbarFrame(Menu menu) {
-		super(menu, CardComponent.Part.PROGRESSBAR, "Hier kannst du deine Progressbar bearbeiten");
-	}
+    public ProgressbarFrame(Menu menu) {
+        super(menu, CardComponent.Part.PROGRESSBAR, "Hier kannst du deine Progressbar bearbeiten");
+    }
 
-	@Override
-	public Collection<ComponentRow> getComponents(CardComponent COMPONENTS) {
-		return List.of(ComponentRow.of(COMPONENTS.BACK(), COMPONENTS.STYLE(this), COMPONENTS.BORDER(this), new FrameButton(ButtonColor.GRAY, "Farbe", "progressbar.color")));
-	}
+    @Override
+    public Collection<ComponentRow> getComponents(CardComponent COMPONENTS) {
+        return List.of(ComponentRow.of(COMPONENTS.BACK(), COMPONENTS.STYLE(this), COMPONENTS.BORDER(this), new FrameButton(ButtonColor.GRAY, "Farbe", "progressbar.color")));
+    }
 }

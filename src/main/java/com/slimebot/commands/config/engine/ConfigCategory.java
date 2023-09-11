@@ -10,13 +10,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface ConfigCategory {
-	String name();
+    String name();
 
-	String description();
+    String description();
 
-	Class<?>[] subcommands() default {};
+    Class<?>[] subcommands() default {};
 
-	boolean updateCommands() default false;
+    boolean updateCommands() default false;
 
-	Class<? extends CustomSetupFrame>[] customFrames() default {};
+    Class<? extends CustomSetupFrame>[] customFrames() default {};
 }

@@ -24,111 +24,111 @@ import java.util.function.Function;
 
 @Slf4j
 public class SpotifyListener {
-	private long tokenExpiry = 0;
+    private long tokenExpiry = 0;
 
-	private final SpotifyApi api;
+    private final SpotifyApi api;
 
-	public SpotifyListener() {
-		this.api = new SpotifyApi.Builder()
-				.setClientId(Main.config.spotify.clientId)
-				.setClientSecret(Main.config.spotify.clientSecret)
-				.build();
-	}
+    public SpotifyListener() {
+        this.api = new SpotifyApi.Builder()
+                .setClientId(Main.config.spotify.clientId)
+                .setClientSecret(Main.config.spotify.clientSecret)
+                .build();
+    }
 
-	public void register() {
-		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this::check);
-	}
+    public void register() {
+        Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this::check);
+    }
 
 
-	public void check() {
-		if (System.currentTimeMillis() > tokenExpiry) fetchToken();
+    public void check() {
+        if (System.currentTimeMillis() > tokenExpiry) fetchToken();
 
-		List<String> known = Main.config.database != null
-				? Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list())
-				: Collections.emptyList();
+        List<String> known = Main.config.database != null
+                ? Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list())
+                : Collections.emptyList();
 
-		List<String> newIds = new ArrayList<>();
+        List<String> newIds = new ArrayList<>();
 
-		logger.info("Überprüfe auf neue Podcast Folgen...");
+        logger.info("Überprüfe auf neue Podcast Folgen...");
 
-		Main.config.spotify.podcast.artistIds.stream()
-				.flatMap(id -> getLatestEntries(id, api::getShowEpisodes).stream())
-				.filter(e -> !known.contains(e.getId()))
-				.forEach(e -> {
-					newIds.add(e.getId());
-					broadcast(Main.config.spotify.podcast.message, SpotifyNotificationConfig::getPodcastChannel, e.getName(), e.getExternalUrls().get("spotify"));
-				});
+        Main.config.spotify.podcast.artistIds.stream()
+                .flatMap(id -> getLatestEntries(id, api::getShowEpisodes).stream())
+                .filter(e -> !known.contains(e.getId()))
+                .forEach(e -> {
+                    newIds.add(e.getId());
+                    broadcast(Main.config.spotify.podcast.message, SpotifyNotificationConfig::getPodcastChannel, e.getName(), e.getExternalUrls().get("spotify"));
+                });
 
-		logger.info("Überprüfe auf neue Musik Releases...");
+        logger.info("Überprüfe auf neue Musik Releases...");
 
-		Main.config.spotify.music.artistIds.stream()
-				.flatMap(id -> getLatestEntries(id, api::getArtistsAlbums).stream())
-				.filter(e -> !known.contains(e.getId()))
-				.forEach(e -> {
-					newIds.add(e.getId());
-					broadcast(Main.config.spotify.music.message, SpotifyNotificationConfig::getMusicChannel, e.getName(), e.getExternalUrls().get("spotify"));
-				});
+        Main.config.spotify.music.artistIds.stream()
+                .flatMap(id -> getLatestEntries(id, api::getArtistsAlbums).stream())
+                .filter(e -> !known.contains(e.getId()))
+                .forEach(e -> {
+                    newIds.add(e.getId());
+                    broadcast(Main.config.spotify.music.message, SpotifyNotificationConfig::getMusicChannel, e.getName(), e.getExternalUrls().get("spotify"));
+                });
 
-		Main.database.run(handle -> {
-			PreparedBatch update = handle.prepareBatch("insert into spotify_known values(:id)");
+        Main.database.run(handle -> {
+            PreparedBatch update = handle.prepareBatch("insert into spotify_known values(:id)");
 
-			newIds.forEach(id -> update.bind("id", id).add());
+            newIds.forEach(id -> update.bind("id", id).add());
 
-			update.execute();
-		});
-	}
+            update.execute();
+        });
+    }
 
-	private <T, R extends AbstractDataPagingRequest.Builder<T, ?>> List<T> getLatestEntries(String id, Function<String, R> request) {
-		logger.info("Hole Einträge von User: {}...", id);
+    private <T, R extends AbstractDataPagingRequest.Builder<T, ?>> List<T> getLatestEntries(String id, Function<String, R> request) {
+        logger.info("Hole Einträge von User: {}...", id);
 
-		try {
-			Paging<T> albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).build().execute();
+        try {
+            Paging<T> albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).build().execute();
 
-			if (albumSimplifiedPaging.getTotal() > 20) {
-				logger.warn("Es wurden insgesamt mehr als 20 Einträge gefunden. Es werden nur die 20 neuesten verwendet");
-				albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal() - 20).build().execute();
-			}
+            if (albumSimplifiedPaging.getTotal() > 20) {
+                logger.warn("Es wurden insgesamt mehr als 20 Einträge gefunden. Es werden nur die 20 neuesten verwendet");
+                albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal() - 20).build().execute();
+            }
 
-			List<T> albums = Arrays.asList(albumSimplifiedPaging.getItems());
-			logger.info("{} Releases gefunden", albums.size());
-			Collections.reverse(albums);
-			return albums;
+            List<T> albums = Arrays.asList(albumSimplifiedPaging.getItems());
+            logger.info("{} Releases gefunden", albums.size());
+            Collections.reverse(albums);
+            return albums;
 
-		} catch (Exception e) {
-			logger.error("Einträge können nicht geladen werden", e);
-			return Collections.emptyList();
-		}
-	}
+        } catch (Exception e) {
+            logger.error("Einträge können nicht geladen werden", e);
+            return Collections.emptyList();
+        }
+    }
 
-	private void broadcast(String format, Function<SpotifyNotificationConfig, Optional<GuildMessageChannel>> channel, String name, String url) {
-		for (Guild guild : Main.jdaInstance.getGuilds()) {
-			GuildConfig.getConfig(guild).getSpotify().ifPresent(spotify ->
-					channel.apply(spotify).ifPresent(ch -> {
-						String notification = spotify.getRole()
-								.map(Role::getAsMention)
-								.orElse("");
+    private void broadcast(String format, Function<SpotifyNotificationConfig, Optional<GuildMessageChannel>> channel, String name, String url) {
+        for (Guild guild : Main.jdaInstance.getGuilds()) {
+            GuildConfig.getConfig(guild).getSpotify().ifPresent(spotify ->
+                    channel.apply(spotify).ifPresent(ch -> {
+                        String notification = spotify.getRole()
+                                .map(Role::getAsMention)
+                                .orElse("");
 
-						ch.sendMessage(format
-								.replace("%notification%", notification)
-								.replace("%name%", name)
-								.replace("%url%", url)
-						).queue();
-					})
-			);
-		}
-	}
+                        ch.sendMessage(format
+                                .replace("%notification%", notification)
+                                .replace("%name%", name)
+                                .replace("%url%", url)
+                        ).queue();
+                    })
+            );
+        }
+    }
 
-	public static Logger getLogger() {
-		return logger;
-	}
+    public static Logger getLogger() {
+        return logger;
+    }
 
-	private void fetchToken() {
-		try {
-			ClientCredentials credentials = api.clientCredentials().build().execute();
-			api.setAccessToken(credentials.getAccessToken());
-			tokenExpiry = System.currentTimeMillis() + credentials.getExpiresIn() * 1000;
-		} catch (IOException | SpotifyWebApiException | ParseException e) {
-			logger.error("Spotify login fehlgeschlagen", e);
-		}
-	}
+    private void fetchToken() {
+        try {
+            ClientCredentials credentials = api.clientCredentials().build().execute();
+            api.setAccessToken(credentials.getAccessToken());
+            tokenExpiry = System.currentTimeMillis() + credentials.getExpiresIn() * 1000;
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            logger.error("Spotify login fehlgeschlagen", e);
+        }
+    }
 }

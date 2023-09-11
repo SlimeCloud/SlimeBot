@@ -3,19 +3,19 @@ package com.slimebot.level.profile;
 import de.mineking.discord.commands.annotated.option.CustomEnumOption;
 
 public enum Style implements CustomEnumOption {
-	SQUARE,
-	ROUND;
+    SQUARE,
+    ROUND;
 
-	@Override
-	public String getName() {
-		return name().toLowerCase();
-	}
+    @Override
+    public String getName() {
+        return name().toLowerCase();
+    }
 
-	public boolean asState() {
-		return this == ROUND;
-	}
+    public boolean asState() {
+        return this == ROUND;
+    }
 
-	public static Style fromState(boolean state) {
-		return state ? ROUND : SQUARE;
-	}
+    public static Style fromState(boolean state) {
+        return state ? ROUND : SQUARE;
+    }
 }

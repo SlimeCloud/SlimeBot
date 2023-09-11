@@ -12,22 +12,22 @@ public class UIError {
      * Parameters: the invalid color
      */
     public static final UIError COLOR_ERROR = new UIError("""
-																		Die Farbe *%s* ist ungültig!
-          								
-																		Bitte nutze eines der Folgenden Formate
-          								
-																		**hex:** *#543423*
-																		**rgb:** *352345*
-																		**rgb:** *30,45,64*
-																		**rgba:** *40,46,46,200*
-										""");
+            								Die Farbe *%s* ist ungültig!
+            								
+            								Bitte nutze eines der Folgenden Formate
+            								
+            								**hex:** *#543423*
+            								**rgb:** *352345*
+            								**rgb:** *30,45,64*
+            								**rgba:** *40,46,46,200*
+            """);
 
     /**
      * Parameters: the invalid url, example url extension
      */
     public static final UIError URL_ERROR = new UIError("""
             Die URL *%s* ist ungültig!
-            
+                        
             Bitte verwende eine Korrekte http url.
             *https://example.org/%s*
             """);

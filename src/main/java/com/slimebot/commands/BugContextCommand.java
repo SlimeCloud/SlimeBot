@@ -7,10 +7,10 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 
 @ApplicationCommand(name = "Bug Melden", guildOnly = true, type = Command.Type.MESSAGE)
 public class BugContextCommand {
-	@ApplicationCommandMethod
-	public void performCommand(MessageContextInteractionEvent event) {
-		if (!BugCommand.checkTimeout(event)) return;
+    @ApplicationCommandMethod
+    public void performCommand(MessageContextInteractionEvent event) {
+        if (!BugCommand.checkTimeout(event)) return;
 
-		event.replyModal(BugCommand.createModal(event.getTarget())).queue();
-	}
+        event.replyModal(BugCommand.createModal(event.getTarget())).queue();
+    }
 }

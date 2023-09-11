@@ -10,10 +10,10 @@ import java.util.Optional;
 
 
 public class AssignRoleConfig {
-	@ConfigField(type = ConfigFieldType.ROLE_LIST, command = "role", title = "Assign Role", description = "Diese Rolle wird jedem joinenden Member gegeben")
-	public List<Long> role = new ArrayList<>();
+    @ConfigField(type = ConfigFieldType.ROLE_LIST, command = "role", title = "Assign Role", description = "Diese Rolle wird jedem joinenden Member gegeben")
+    public List<Long> role = new ArrayList<>();
 
-	public Optional<List<Role>> getRoles() {
-		return GuildConfig.getRoles(role);
-	}
+    public Optional<List<Role>> getRoles() {
+        return GuildConfig.getRoles(role);
+    }
 }
