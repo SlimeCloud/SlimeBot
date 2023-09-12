@@ -23,8 +23,8 @@ public class LeaderboardCommand {
 	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Die maximale Anzahl a Nutzern, die angezeigt werden sollen", required = false, minValue = 2, maxValue = 10) @IntegerDefault(10) Integer limit) {
 		event.deferReply(true).queue();
 
-		List<Level> top = event.getGuild().getMembers().stream()
-				.map(m -> new Level(event.getGuild().getIdLong(), m.getIdLong()))
+		List<Level> top = Level.getTopList(event.getGuild().getIdLong(), limit).stream()
+				.filter(l -> l.getLevel() > 0 || l.getXp() > 0)
 				.toList();
 
 		String labels = top.stream()
