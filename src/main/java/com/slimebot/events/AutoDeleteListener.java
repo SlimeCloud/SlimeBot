@@ -14,8 +14,8 @@ import java.util.function.Predicate;
 public class AutoDeleteListener extends ListenerAdapter {
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-		if (!event.isFromGuild()) return;
-		if (!CommandPermission.TEAM.isPermitted(event.getMember())) return;
+		if (!event.isFromGuild() || event.isWebhookMessage()) return;
+		if (CommandPermission.TEAM.isPermitted(event.getMember())) return;
 
 		EnumSet<AutoDeleteConfig.Filter> filters = GuildConfig.getConfig(event.getGuild()).getAutoDeleteConfig().map(a -> a.autoDeleteChannels.get(event.getChannel().getId())).orElse(null);
 
