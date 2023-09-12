@@ -8,7 +8,9 @@ import com.slimebot.util.MathUtil;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
@@ -102,8 +104,17 @@ public class LevelListener extends ListenerAdapter {
 		}
 	}
 
-	private boolean isBlacklisted(ICategorizableChannel cc) {
-		List<Long> blacklist = GuildConfig.getConfig(cc.getGuild()).getOrCreateLevel().blacklist;
-		return blacklist.contains(cc.getIdLong()) || blacklist.contains(cc.getParentCategoryIdLong());
+	private boolean isBlacklisted(GuildChannel channel) {
+		List<Long> blacklist = GuildConfig.getConfig(channel.getGuild()).getOrCreateLevel().blacklist;
+		//Check blocklist for channel,
+		return blacklist.contains(channel.getIdLong())
+				//If channel has category: Check category blacklist
+				|| (channel instanceof ICategorizableChannel cc && blacklist.contains(cc.getParentCategoryIdLong()))
+				//If channel is ThreadChannel check parent channel and parent channel category
+				|| (channel instanceof ThreadChannel tc &&
+				(
+						blacklist.contains(tc.getParentChannel().getIdLong())
+								|| (tc.getParentChannel() instanceof ICategorizableChannel tpc && blacklist.contains(tpc.getParentCategoryIdLong()))
+				));
 	}
 }
