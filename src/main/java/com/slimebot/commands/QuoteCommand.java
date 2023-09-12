@@ -41,27 +41,40 @@ public class QuoteCommand {
 			).queue();
 			return;
 		}
-		GuildConfig.getConfig(author.getGuild()).getQuoteConfig().flatMap(QuoteConfig::getChannel).ifPresent(channel ->
-				channel.sendMessage(author.getAsMention()).addEmbeds(
+
+		GuildConfig.getConfig(author.getGuild()).getQuoteConfig().flatMap(QuoteConfig::getChannel).ifPresent(channel ->{
+			if (channel.equals(event.getChannel()))  {
+				event.getHook().editOriginalEmbeds(
 						new EmbedBuilder()
-								.setColor(GuildConfig.getColor(author.getGuild()))
-								.setAuthor(author.getEffectiveName(), null, author.getEffectiveAvatarUrl())
-								.setDescription(
-										Arrays.stream(message.split("\n"))
-												.map(s -> "> " + s)
-												.collect(Collectors.joining("\n"))
-								)
-								.appendDescription(url != null
-										? "\n\n" + url
-										: ""
-								)
-								.setFooter("Zitiert von: " + event.getMember().getUser().getName())
-								.setTimestamp(timestamp != null ? timestamp : Instant.now())
+								.setTitle("⚠ Fehler!")
+								.setDescription("Du kannst keine Nachrichten im Zitate Kanal zitieren!")
+								.setTimestamp(Instant.now())
+								.setColor(GuildConfig.getColor(event.getGuild()))
 								.build()
-				).addActionRow(
-						Button.secondary("quote:guidance", "Wie zitiere ich?")
-				).flatMap(mes -> event.getHook().editOriginal(author.getAsMention() + " zitiert")).queue()
-		);
+				).queue();
+				return;
+			}
+
+			channel.sendMessage(author.getAsMention()).addEmbeds(
+					new EmbedBuilder()
+							.setColor(GuildConfig.getColor(author.getGuild()))
+							.setAuthor(author.getEffectiveName(), null, author.getEffectiveAvatarUrl())
+							.setDescription(
+									Arrays.stream(message.split("\n"))
+											.map(s -> "> " + s)
+											.collect(Collectors.joining("\n"))
+							)
+							.appendDescription(url != null
+									? "\n\n" + url
+									: ""
+							)
+							.setFooter("Zitiert von: " + event.getMember().getUser().getName())
+							.setTimestamp(timestamp != null ? timestamp : Instant.now())
+							.build()
+			).addActionRow(
+					Button.secondary("quote:guidance", "Wie zitiere ich?")
+			).flatMap(mes -> event.getHook().editOriginal(author.getAsMention() + " zitiert")).queue();
+		});
 	}
 
 	@Listener(type = ButtonHandler.class, filter = "quote:guidance")
