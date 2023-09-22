@@ -5,7 +5,6 @@ import com.slimebot.main.config.guild.AutoDeleteConfig;
 import com.slimebot.main.config.guild.GuildConfig;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.Channel;
-import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -23,10 +22,10 @@ public class AutoDeleteListener extends ListenerAdapter {
 
 	@Override
 	public void onChannelCreate(ChannelCreateEvent event) {
-		if(!(event.getChannel() instanceof ThreadChannel thread)) return;
+		if (!(event.getChannel() instanceof ThreadChannel thread)) return;
 
 		thread.retrieveStartMessage().queue(mes -> {
-			if(shouldDelete(mes, thread.getParentChannel())) thread.delete().queue();
+			if (shouldDelete(mes, thread.getParentChannel())) thread.delete().queue();
 		});
 	}
 

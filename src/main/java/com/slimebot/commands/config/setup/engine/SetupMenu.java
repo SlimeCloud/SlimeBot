@@ -17,15 +17,12 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class SetupMenu extends Menu {
-	private final long guild;
-
-	public SetupMenu(UIManager manager, String id, long guild) {
+	public SetupMenu(UIManager manager, String id) {
 		super(manager, id);
-		this.guild = guild;
 	}
 
 	public SetupMenu addMainFrame(List<ComponentRow> components) {
-		addFrame("main", new SetupMainFrame(this, guild, components));
+		addFrame("main", new SetupMainFrame(this, components));
 		return this;
 	}
 
@@ -43,7 +40,7 @@ public class SetupMenu extends Menu {
 
 			String name = category.name() + " " + field.getName();
 
-			addFrame(name, new ConfigFieldFrame(this, guild, category, field, info, instanceProvider,
+			addFrame(name, new ConfigFieldFrame(this, category, field, info, instanceProvider,
 					name,
 					i == 0 ? "main" : category.name() + " " + configFields.get(i - 1).getName(),
 					i == configFields.size() - 1 ? null : category.name() + " " + configFields.get(i + 1).getName())
@@ -54,7 +51,7 @@ public class SetupMenu extends Menu {
 
 		for (Class<? extends CustomSetupFrame> type : category.customFrames()) {
 			try {
-				CustomSetupFrame instance = type.getConstructor(Menu.class, long.class).newInstance(this, guild);
+				CustomSetupFrame instance = type.getConstructor(Menu.class).newInstance(this);
 
 				addFrame(instance.getName(), instance);
 

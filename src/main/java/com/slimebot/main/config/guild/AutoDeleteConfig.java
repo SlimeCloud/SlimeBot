@@ -16,6 +16,8 @@ public class AutoDeleteConfig {
 	public enum Filter {
 		IMAGE("Bilder", m -> m.getContentRaw().isEmpty() && !m.getAttachments().isEmpty() && m.getAttachments().stream().allMatch(Message.Attachment::isImage)),
 		IMAGE_WITH_TEXT("Beschriftete Bilder", m -> !m.getAttachments().isEmpty() && m.getAttachments().stream().allMatch(Message.Attachment::isImage)),
+		VIDEO("Video", m -> m.getContentRaw().isEmpty() && !m.getAttachments().isEmpty() && m.getAttachments().stream().allMatch(Message.Attachment::isVideo)),
+		VIDEO_WITH_TEXT("Beschriftetes Video", m -> !m.getAttachments().isEmpty() && m.getAttachments().stream().allMatch(Message.Attachment::isVideo)),
 		LINK("Links", m -> m.getAttachments().isEmpty() && Util.isValidURL(m.getContentRaw())),
 		INTEGER("Zahlen", m -> m.getAttachments().isEmpty() && Util.isInteger(m.getContentRaw()));
 

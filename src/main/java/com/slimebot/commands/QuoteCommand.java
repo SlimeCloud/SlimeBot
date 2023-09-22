@@ -42,8 +42,8 @@ public class QuoteCommand {
 			return;
 		}
 
-		GuildConfig.getConfig(author.getGuild()).getQuoteConfig().flatMap(QuoteConfig::getChannel).ifPresent(channel ->{
-			if (channel.equals(event.getChannel()))  {
+		GuildConfig.getConfig(author.getGuild()).getQuoteConfig().flatMap(QuoteConfig::getChannel).ifPresent(channel -> {
+			if (channel.equals(event.getChannel())) {
 				event.getHook().editOriginalEmbeds(
 						new EmbedBuilder()
 								.setTitle("⚠ Fehler!")
