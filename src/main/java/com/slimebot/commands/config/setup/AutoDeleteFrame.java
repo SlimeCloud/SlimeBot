@@ -16,6 +16,8 @@ import de.mineking.discord.ui.components.select.EntitySelectComponent;
 import de.mineking.discord.ui.components.select.StringSelectComponent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
@@ -81,7 +83,7 @@ public class AutoDeleteFrame extends CustomSetupFrame {
 		return Arrays.asList(
 				new EntitySelectComponent("add", config -> config
 						.setPlaceholder("Kanal hinzufügen")
-						.setChannelTypes(ChannelType.TEXT),
+						.setChannelTypes(ChannelType.TEXT, ChannelType.FORUM),
 						EntitySelectMenu.SelectTarget.CHANNEL
 				).addHandler((m, event) -> {
 					m.putData("channel", event.getValues().get(0).getId());
@@ -103,12 +105,13 @@ public class AutoDeleteFrame extends CustomSetupFrame {
 				}).asDisabled(() -> GuildConfig.getConfig(guild).getAutoDeleteConfig().map(a -> a.autoDeleteChannels.isEmpty()).orElse(true)).addHandler((m, event) -> {
 					GuildConfig.getConfig(guild).getAutoDeleteConfig().ifPresent(a -> a.autoDeleteChannels.remove(event.getSelectedOptions().get(0).getValue()));
 					m.update();
-				})
+				}),
+				new FrameButton(ButtonColor.GRAY, "Zurück", "main")
 		);
 	}
 
 	private void configureSelect(StringSelectMenu.Builder config) {
-		Map<MessageChannel, EnumSet<AutoDeleteConfig.Filter>> data = GuildConfig.getConfig(guild).getAutoDeleteConfig().map(AutoDeleteConfig::getAutoDeleteChannels).orElse(Collections.emptyMap());
+		Map<GuildChannel, EnumSet<AutoDeleteConfig.Filter>> data = GuildConfig.getConfig(guild).getAutoDeleteConfig().map(AutoDeleteConfig::getAutoDeleteChannels).orElse(Collections.emptyMap());
 
 		if (data.isEmpty()) config.addOption("---", "---");
 		else config.addOptions(

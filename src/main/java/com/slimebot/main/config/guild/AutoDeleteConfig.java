@@ -3,7 +3,7 @@ package com.slimebot.main.config.guild;
 import com.slimebot.util.Util;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -30,9 +30,9 @@ public class AutoDeleteConfig {
 
 	public Map<String, EnumSet<Filter>> autoDeleteChannels = new HashMap<>();
 
-	public Map<MessageChannel, EnumSet<Filter>> getAutoDeleteChannels() {
+	public Map<GuildChannel, EnumSet<Filter>> getAutoDeleteChannels() {
 		return autoDeleteChannels.entrySet().stream()
-				.map(e -> Map.entry(GuildConfig.getChannel(e.getKey()), e.getValue()))
+				.map(e -> Map.entry(GuildConfig.getChannel(e.getKey(), GuildChannel.class), e.getValue()))
 				.filter(e -> e.getKey().isPresent())
 				.collect(Collectors.toUnmodifiableMap(
 						e -> e.getKey().get(),

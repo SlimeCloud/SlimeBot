@@ -57,7 +57,7 @@ public class LevelListener extends ListenerAdapter {
 	public void onMessageReceived(MessageReceivedEvent event) {
 		User author = event.getAuthor();
 
-		if (!event.isFromGuild() || author.isBot() || isBlacklisted((ICategorizableChannel) event.getChannel())) return;
+		if (!event.isFromGuild() || author.isBot() || isBlacklisted((GuildChannel) event.getChannel())) return;
 
 		if (messageTimeout.getOrDefault(author.getIdLong(), 0L) + config.messageCooldown >= System.currentTimeMillis())
 			return;
