@@ -23,5 +23,4 @@ public class RankCommand {
 
 		event.getHook().sendFiles(new RankCard(Level.getLevel(user)).getFile()).queue();
 	}
-
 }
