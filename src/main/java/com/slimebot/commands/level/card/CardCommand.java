@@ -48,6 +48,16 @@ public class CardCommand {
 
 	}
 
+	@ApplicationCommand(name = "reset", description = "Setzt deine Rankcard zurück")
+	public static class ResetCommand {
+		@ApplicationCommandMethod
+		public void performCommand(SlashCommandInteractionEvent event) {
+			Main.discordUtils.getUIManager().createMenu()
+					.addFrame("main", ResetWarningFrame::new)
+					.start(new CallbackState(event), "main");
+		}
+	}
+
 	@ApplicationCommand(name = "info", description = "Zeigt deine aktuellen Rankcard Optionen an")
 	public static class InfoCommand {
 
