@@ -12,6 +12,9 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.Map;
 
@@ -81,9 +84,19 @@ public class RankCard extends Graphic {
 		//Draw background
 		BufferedImage backgroundImage = null;
 		try {
-			if (!bg.imageURL().isBlank()) backgroundImage = ImageIO.read(new URL(bg.imageURL()));
-		} catch (Exception ignored) {
-		}   //ignored because it wil be thrown every time a invalid url is passed.
+			if (!bg.imageURL().isBlank()) {
+				var url = new URL(bg.imageURL());
+				var con = (HttpURLConnection) url.openConnection();
+
+				con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0");
+
+				con.setConnectTimeout(5000);
+				con.setReadTimeout(5000);
+
+				backgroundImage = ImageIO.read(con.getInputStream());
+			}
+		} catch (MalformedURLException | SocketTimeoutException ignored) {
+		}   //ignored because it wil be thrown every time an invalid url is passed.
 
 		Color borderColor = bg.border().color();
 		graphics2D.setColor(new Color(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), backgroundImage == null ? bg.color().getAlpha() : 255));
