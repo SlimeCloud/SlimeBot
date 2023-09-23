@@ -9,14 +9,6 @@ public class ColorUtil {
 	public static String toString(Color color) {
 		if (color == null) return "*null*";
 		return toHex(color);
-		/*return """
-				red: %s
-				green: %s
-				blue: %s
-				alpha: %s
-				rgb: %s
-				hex: %s
-				""".formatted(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha(), color.getRGB(), toHex(color));*/
 	}
 
 	public static String toHex(Color color) {
@@ -44,10 +36,16 @@ public class ColorUtil {
 
 	public static @Nullable Color parseColor(String color) {
 		if (color == null) return null;
-		color = color.replaceAll("\\s", "");
-		if (color.startsWith("#")) return parseHex(color);
-		if (color.contains(",")) return parseRGBA(color);
-		if (Util.isNumeric(color)) return parseRGBACode(color);
+
+		try {
+			color = color.replaceAll("\\s", "");
+			if (color.startsWith("#")) return parseHex(color);
+			if (color.contains(",")) return parseRGBA(color);
+			if (Util.isNumeric(color)) return parseRGBACode(color);
+		} catch(NumberFormatException e) {
+			return null;
+		}
+
 		return parseColorName(color);
 	}
 
@@ -77,7 +75,7 @@ public class ColorUtil {
 
 	public static @Nullable Color parseHex(String hex) {
 		if (hex == null) return null;
-		hex = hex.substring(1);
+		if (hex.startsWith("#")) hex = hex.substring(1);
 		return switch (hex.length()) {
 			case 3, 4 -> {
 				char[] chars = new char[hex.length() * 2];
