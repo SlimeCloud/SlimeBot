@@ -86,7 +86,7 @@ public class MeetingListener extends ListenerAdapter {
 										false
 								)
 								.addField(
-										"So halb",
+										"Unbekannt/Vielleicht",
 										"",
 										true
 								)
