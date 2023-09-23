@@ -35,12 +35,15 @@ public class ResetWarningFrame extends CardFrame {
 	public Collection<ComponentRow> getComponents(CardComponent COMPONENTS) {
 		return List.of(
 				ComponentRow.of(COMPONENTS.BACK(),
-						new ButtonComponent("reset", ButtonColor.RED, Emoji.fromUnicode("✔")).addHandler((m, event) ->
-								Main.database.run(handle -> handle.createUpdate("delete from cardprofile where guild = :guild and \"user\" = :user")
-										.bind("guild", event.getGuild().getIdLong())
-										.bind("user", event.getUser().getIdLong())
-								)
-						))
+				new ButtonComponent("reset", ButtonColor.RED, Emoji.fromUnicode("✔")).addHandler((m, event) -> {
+					m.setLoading();
+					Main.database.run(handle -> handle.createUpdate("delete from cardprofile where guild = :guild and \"user\" = :user")
+							.bind("guild", event.getGuild().getIdLong())
+							.bind("user", event.getUser().getIdLong())
+							.execute()
+					);
+					m.display("main");
+				}))
 		);
 	}
 }

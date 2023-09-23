@@ -11,12 +11,16 @@ import com.slimebot.util.Util;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.ui.CallbackState;
+import de.mineking.discord.ui.components.ComponentRow;
+import de.mineking.discord.ui.components.button.ButtonColor;
+import de.mineking.discord.ui.components.button.ButtonComponent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -52,8 +56,38 @@ public class CardCommand {
 	public static class ResetCommand {
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event) {
+			event.deferReply(true).queue();
 			Main.discordUtils.getUIManager().createMenu()
-					.addFrame("main", ResetWarningFrame::new)
+					.addMessageFrame("main",
+							() -> new EmbedBuilder()
+									.setTitle("Zurücksetzen bestätigen")
+									.setColor(GuildConfig.getColor(event.getGuild()))
+									.setDescription("Möchtest du deine Rankcard wirklich zurücksetzen?")
+									.addField(
+											"Warnung",
+											"Diese Aktion kann nicht rückgängig gemacht werden!",
+											false
+									)
+									.build(),
+							frame -> frame.addComponents(
+									ComponentRow.of(
+											new ButtonComponent("cancel", ButtonColor.GRAY, "Abbrechen").addHandler((m, evt) -> {
+												m.close(false);
+												evt.editMessage("Löschen abgebrochen").setReplace(true).queue();
+											}),
+											new ButtonComponent("confirm", ButtonColor.RED, "Bestätigen").addHandler((m, evt) -> {
+												m.close(false);
+												evt.editMessage("Rankcard erfolgreich zurückgesetzt").setReplace(true).queue();
+
+												Main.database.run(handle -> handle.createUpdate("delete from cardprofile where guild = :guild and \"user\" = :user")
+														.bind("guild", event.getGuild().getIdLong())
+														.bind("user", event.getUser().getIdLong())
+														.execute()
+												);
+											})
+									)
+							)
+					)
 					.start(new CallbackState(event), "main");
 		}
 	}
