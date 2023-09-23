@@ -26,19 +26,12 @@ import java.util.function.Supplier;
 
 @ApplicationCommand(name = "card", description = "Passe deine Rankcard an", feature = "level")
 public class CardCommand {
-
-	private static CardProfile loadProfile(Member member) {
-		Supplier<CardProfile> sup = () -> new CardProfile(member.getGuild().getIdLong(), member.getIdLong());
-		return DataClass.load(sup, Map.of("guild", member.getGuild().getIdLong(), "user", member.getIdLong())).orElseGet(sup);
-	}
-
-
 	@ApplicationCommand(name = "edit", description = "Bearbeite deine Rankcard")
 	public static class EditCommand {
-
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event) {
 			event.deferReply(true).queue();
+
 			Main.discordUtils.getUIManager().createMenu()
 					.addFrame("main", MainFrame::new)
 					.addFrame("avatar", AvatarFrame::new)
@@ -49,7 +42,6 @@ public class CardCommand {
 					.addFrame("border", BorderFrame::new)
 					.addFrame("reset", ResetWarningFrame::new).start(new CallbackState(event), "main");
 		}
-
 	}
 
 	@ApplicationCommand(name = "reset", description = "Setzt deine Rankcard zurück")
@@ -57,6 +49,7 @@ public class CardCommand {
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event) {
 			event.deferReply(true).queue();
+
 			Main.discordUtils.getUIManager().createMenu()
 					.addMessageFrame("main",
 							() -> new EmbedBuilder()

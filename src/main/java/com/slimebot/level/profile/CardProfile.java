@@ -4,16 +4,20 @@ import com.slimebot.database.DataClass;
 import com.slimebot.database.Key;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.Member;
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.function.Supplier;
 
 @Data
+@Accessors(chain = true)
 @Slf4j
 @EqualsAndHashCode(callSuper = true)
 public class CardProfile extends DataClass {
-
 	public static final int TRANSPARENT = 0;
 	private static final CardProfile DEFAULT = new CardProfile(0, 0);
 
@@ -67,5 +71,16 @@ public class CardProfile extends DataClass {
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			logger.error("error on reset '" + name + "'", e);
 		}
+	}
+
+	public static CardProfile loadProfile(Member member) {
+		Supplier<CardProfile> sup = () -> new CardProfile(member.getGuild().getIdLong(), member.getIdLong());
+		return DataClass.load(
+				sup,
+				Map.of(
+						"guild", member.getGuild().getIdLong(),
+						"user", member.getIdLong()
+				)
+		).orElseGet(sup);
 	}
 }

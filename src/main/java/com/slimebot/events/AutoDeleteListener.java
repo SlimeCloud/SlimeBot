@@ -26,8 +26,8 @@ public class AutoDeleteListener extends ListenerAdapter {
 	public void onChannelCreate(ChannelCreateEvent event) {
 		if (!(event.getChannel() instanceof ThreadChannel thread)) return;
 
-		Main.executor.schedule(() ->
-				thread.retrieveStartMessage().queue(mes -> {
+		Main.executor.schedule(
+				() -> thread.retrieveStartMessage().queue(mes -> {
 					if (shouldDelete(mes, thread.getParentChannel())) thread.delete().queue();
 				}),
 				1, TimeUnit.SECONDS
