@@ -1,6 +1,7 @@
 package com.slimebot.events;
 
 import com.slimebot.main.CommandPermission;
+import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.AutoDeleteConfig;
 import com.slimebot.main.config.guild.GuildConfig;
 import net.dv8tion.jda.api.entities.Message;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 public class AutoDeleteListener extends ListenerAdapter {
@@ -24,9 +26,12 @@ public class AutoDeleteListener extends ListenerAdapter {
 	public void onChannelCreate(ChannelCreateEvent event) {
 		if (!(event.getChannel() instanceof ThreadChannel thread)) return;
 
-		thread.retrieveStartMessage().queue(mes -> {
-			if (shouldDelete(mes, thread.getParentChannel())) thread.delete().queue();
-		});
+		Main.executor.schedule(() ->
+				thread.retrieveStartMessage().queue(mes -> {
+					if (shouldDelete(mes, thread.getParentChannel())) thread.delete().queue();
+				}),
+				1, TimeUnit.SECONDS
+		);
 	}
 
 	private boolean shouldDelete(Message message, Channel channel) {
