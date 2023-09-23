@@ -35,12 +35,11 @@ public class ConfigFieldFrame extends MessageFrameBase {
 	private final ConfigField info;
 	private final Field field;
 	private final InstanceProvider instanceProvider;
-	private final long guild;
 
 	private final String last;
 	private final String next;
 
-	public ConfigFieldFrame(Menu menu, long guild, ConfigCategory category, Field field, ConfigField info, InstanceProvider instanceProvider, String name, String last, String next) {
+	public ConfigFieldFrame(Menu menu, ConfigCategory category, Field field, ConfigField info, InstanceProvider instanceProvider, String name, String last, String next) {
 		super(menu);
 
 		this.name = name;
@@ -49,7 +48,6 @@ public class ConfigFieldFrame extends MessageFrameBase {
 		this.info = info;
 		this.field = field;
 		this.instanceProvider = instanceProvider;
-		this.guild = guild;
 
 		this.last = last;
 		this.next = next;
@@ -60,7 +58,7 @@ public class ConfigFieldFrame extends MessageFrameBase {
 		String formattedValue = "*Kein Wert*";
 
 		try {
-			Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(guild));
+			Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(menu.getGuild()));
 			Object value = instance == null ? null : field.get(instance);
 
 			if (value != null) {
@@ -72,7 +70,7 @@ public class ConfigFieldFrame extends MessageFrameBase {
 
 		return new EmbedBuilder()
 				.setTitle(info.type().getEmoji() + info.title())
-				.setColor(GuildConfig.getColor(guild))
+				.setColor(GuildConfig.getColor(menu.getGuild()))
 				.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
 				.setDescription(info.description())
 				.addField("Aktueller Wert", formattedValue, false)
@@ -114,9 +112,9 @@ public class ConfigFieldFrame extends MessageFrameBase {
 
 		temp.add(
 				new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").addHandler((m, evt) -> {
-					ConfigCommand.updateField(guild, config -> {
+					ConfigCommand.updateField(menu.getGuild(), config -> {
 						try {
-							Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(guild));
+							Object instance = instanceProvider.getInstance(false, GuildConfig.getConfig(menu.getGuild()));
 
 							if (instance != null) {
 								field.set(instance, null);
@@ -157,7 +155,7 @@ public class ConfigFieldFrame extends MessageFrameBase {
 			return;
 		}
 
-		ConfigCommand.updateField(guild, config -> {
+		ConfigCommand.updateField(menu.getGuild(), config -> {
 			try {
 				Object instance = instanceProvider.getInstance(true, config);
 

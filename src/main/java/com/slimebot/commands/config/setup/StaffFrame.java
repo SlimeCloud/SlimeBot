@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 
 public class StaffFrame {
 	public static class StaffChannelFrame extends CustomSetupFrame {
-		public StaffChannelFrame(Menu menu, long guild) {
-			super("staff channel", menu, guild,
+		public StaffChannelFrame(Menu menu) {
+			super("staff channel", menu,
 					ConfigFieldType.CHANNEL.getEmoji() + " Staff-Kanal",
 					"In diesem Kanal wird die Team-Nachricht gesendet und bearbeitet"
 			);
@@ -50,7 +50,7 @@ public class StaffFrame {
 									.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS),
 							EntitySelectMenu.SelectTarget.CHANNEL
 					).addHandler((m, evt) -> {
-						GuildConfig.getConfig(guild).getStaffConfig().ifPresent(staff ->
+						GuildConfig.getConfig(menu.getGuild()).getStaffConfig().ifPresent(staff ->
 								staff.getChannel().ifPresent(ch -> {
 									if (staff.message != null) {
 										ch.deleteMessageById(staff.message).queue();
@@ -58,7 +58,7 @@ public class StaffFrame {
 								})
 						);
 
-						ConfigCommand.updateField(guild, config -> {
+						ConfigCommand.updateField(menu.getGuild(), config -> {
 							StaffConfig staff = config.getOrCreateStaff();
 
 							staff.channel = evt.getValues().get(0).getIdLong();
@@ -71,7 +71,7 @@ public class StaffFrame {
 					}),
 					ComponentRow.of(
 							new ButtonComponent("reset", ButtonColor.RED, "Wert zurücksetzten").addHandler((m, evt) -> {
-								ConfigCommand.updateField(guild, config -> config.getStaffConfig().ifPresent(staff -> staff.channel = null)); //Keep role configuration to make it easier to re-enable the feature
+								ConfigCommand.updateField(menu.getGuild(), config -> config.getStaffConfig().ifPresent(staff -> staff.channel = null)); //Keep role configuration to make it easier to re-enable the feature
 								menu.update();
 							}),
 							new FrameButton(ButtonColor.GRAY, "Zurück", "main"),
@@ -84,8 +84,8 @@ public class StaffFrame {
 	public static class StaffRolesFrame extends CustomSetupFrame {
 		private Long role;
 
-		public StaffRolesFrame(Menu menu, long guild) {
-			super("staff roles", menu, guild,
+		public StaffRolesFrame(Menu menu) {
+			super("staff roles", menu,
 					ConfigFieldType.ROLE.getEmoji() + " Team-Rollen festlegen",
 					"Diese Rollen vergeben keine Rechte, sondern sind diejenigen, die in der Team-Nachricht nagezeigt werden"
 			);
@@ -124,7 +124,7 @@ public class StaffFrame {
 					new StringSelectComponent("remove", select -> {
 						select.setPlaceholder("Rolle entfernen");
 
-						StaffConfig staff = GuildConfig.getConfig(guild).getOrCreateStaff();
+						StaffConfig staff = GuildConfig.getConfig(menu.getGuild()).getOrCreateStaff();
 
 						if (staff.roles.isEmpty()) {
 							select.addOption("---", "---"); //SelectMenus cannot be empty
@@ -150,7 +150,7 @@ public class StaffFrame {
 						StaffMessage.updateMessage(evt.getGuild());
 
 						m.update();
-					}).asDisabled(() -> GuildConfig.getConfig(guild).getStaffConfig().map(staff -> staff.roles.isEmpty()).orElse(true)),
+					}).asDisabled(() -> GuildConfig.getConfig(menu.getGuild()).getStaffConfig().map(staff -> staff.roles.isEmpty()).orElse(true)),
 					new EntitySelectComponent("add",
 							select -> select.setPlaceholder("Rolle hinzufügen"),
 							EntitySelectMenu.SelectTarget.ROLE

@@ -15,13 +15,11 @@ import java.util.Collection;
 import java.util.List;
 
 public class SetupMainFrame extends MessageFrameBase {
-	private final long guild;
 	private final List<ComponentRow> components;
 
-	public SetupMainFrame(Menu menu, long guild, List<ComponentRow> components) {
+	public SetupMainFrame(Menu menu, List<ComponentRow> components) {
 		super(menu);
 
-		this.guild = guild;
 		this.components = components;
 	}
 
@@ -29,7 +27,7 @@ public class SetupMainFrame extends MessageFrameBase {
 	public MessageEmbed getEmbed() {
 		return new EmbedBuilder()
 				.setTitle("\uD83D\uDD27 Einstellungs-Menü")
-				.setColor(GuildConfig.getColor(guild))
+				.setColor(GuildConfig.getColor(menu.getGuild()))
 				.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
 				.setDescription("In diesem Menü kann die Konfiguration des Bots für diesen Server eingestellt werden. Nutze die Knöpfe um ein Untermenü zu öffnen, in dem du dann Einstellungen für die Entsprechende Funktion vornehmen " +
 						"kannst")

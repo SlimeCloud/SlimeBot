@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 import java.awt.*;
@@ -235,11 +236,19 @@ public class GuildConfig {
 
 	//Internal helper methods
 	static Optional<GuildMessageChannel> getChannel(Long channel) {
-		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(GuildMessageChannel.class, id));
+		return getChannel(channel, GuildMessageChannel.class);
 	}
 
 	static Optional<GuildMessageChannel> getChannel(String channel) {
-		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(GuildMessageChannel.class, id));
+		return getChannel(channel, GuildMessageChannel.class);
+	}
+
+	static <T extends GuildChannel> Optional<T> getChannel(Long channel, Class<T> type) {
+		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(type, id));
+	}
+
+	static <T extends GuildChannel> Optional<T> getChannel(String channel, Class<T> type) {
+		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(type, id));
 	}
 
 	static Optional<Role> getRole(Long role) {
