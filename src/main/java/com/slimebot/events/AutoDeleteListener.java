@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.internal.requests.CompletedRestAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
@@ -26,12 +28,18 @@ public class AutoDeleteListener extends ListenerAdapter {
 	public void onChannelCreate(ChannelCreateEvent event) {
 		if (!(event.getChannel() instanceof ThreadChannel thread)) return;
 
-		Main.executor.schedule(() ->
-				thread.retrieveStartMessage().queue(mes -> {
-					if (shouldDelete(mes, thread.getParentChannel())) thread.delete().queue();
-				}),
-				1, TimeUnit.SECONDS
-		);
+		buildThreadDelete(thread)
+				.delay(5, TimeUnit.SECONDS)
+				.onErrorFlatMap(e -> buildThreadDelete(thread))
+				.queueAfter(1, TimeUnit.SECONDS);
+	}
+
+	private RestAction<Void> buildThreadDelete(ThreadChannel thread) {
+		return thread.retrieveStartMessage()
+				.flatMap(mes -> shouldDelete(mes, thread.getParentChannel())
+						? thread.delete()
+						: new CompletedRestAction<>(Main.jdaInstance, null)
+				);
 	}
 
 	private boolean shouldDelete(Message message, Channel channel) {
