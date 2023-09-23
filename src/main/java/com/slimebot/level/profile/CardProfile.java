@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 @EqualsAndHashCode(callSuper = true)
 public class CardProfile extends DataClass {
 	public static final int TRANSPARENT = 0;
-	private static final CardProfile DEFAULT = new CardProfile(0, 0);
+	public static final CardProfile DEFAULT = new CardProfile(0, 0);
 
 	@Key
 	private final long guild;
