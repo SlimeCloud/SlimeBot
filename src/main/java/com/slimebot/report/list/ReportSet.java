@@ -9,6 +9,7 @@ import de.mineking.discord.list.Listable;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
@@ -23,7 +24,7 @@ public class ReportSet implements Listable<Report> {
 	private final Filter filter;
 
 	@Override
-	public List<Report> getEntries() {
+	public List<Report> getEntries(IReplyCallback event) {
 		return Main.database.handle(handle -> handle.createQuery("select * from reports where guild = :guild")
 				.bind("guild", guild.getIdLong())
 				.mapTo(Report.class)
