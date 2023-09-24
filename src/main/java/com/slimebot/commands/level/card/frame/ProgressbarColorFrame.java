@@ -1,6 +1,7 @@
 package com.slimebot.commands.level.card.frame;
 
 import com.slimebot.database.DataClass;
+import com.slimebot.graphic.UIError;
 import com.slimebot.level.profile.CardProfile;
 import com.slimebot.util.ColorUtil;
 import de.mineking.discord.ui.Menu;
@@ -38,37 +39,42 @@ public class ProgressbarColorFrame extends ModalFrameBase {
 						.setMinLength(3)
 						.setMaxLength(15)
 						.setPlaceholder("#46eb34")
-						.build())
+						.setValue(ColorUtil.toHex(ColorUtil.ofCode(profile.getProgressBarColor())))
+						.build()
+				)
 				.addActionRow(TextInput.create("background.color", "Hintergrund Farbe", TextInputStyle.SHORT)
 						.setRequired(false)
 						.setMinLength(3)
 						.setMaxLength(15)
 						.setPlaceholder("#46eb34")
-						.build())
+						.setValue(ColorUtil.toHex(ColorUtil.ofCode(profile.getProgressBarBGColor())))
+						.build()
+				)
 				.build();
 	}
 
 	@Override
 	public void handle(MenuBase menu, ModalInteractionEvent event) {
 		menu.setLoading();
+
 		ModalMapping color = event.getValue("color");
 		ModalMapping backgroundColor = event.getValue("background.color");
-		boolean flag = false;
+
 		if (color != null) {
 			Color c = ColorUtil.parseColor(color.getAsString());
-			if (c != null) {
-				profile.setProgressBarColor(c.getRGB());
-				flag = true;
-			}
-		}
+
+			if (c != null) profile.setProgressBarColor(c.getRGB());
+			else UIError.COLOR.send(event, color.getAsString());
+		} else profile.setProgressBarColor(CardProfile.DEFAULT.getProgressBarColor());
+
 		if (backgroundColor != null) {
 			Color c = ColorUtil.parseColor(backgroundColor.getAsString());
-			if (c != null) {
-				profile.setProgressBarBGColor(c.getRGB());
-				flag = true;
-			}
-		}
-		if (flag) profile.save();
+
+			if (c != null) profile.setProgressBarBGColor(c.getRGB());
+			else UIError.COLOR.send(event, backgroundColor.getAsString());
+		} else profile.setProgressBarBGColor(CardProfile.DEFAULT.getProgressBarBGColor());
+
+		profile.save();
 		menu.display("progressbar");
 	}
 }

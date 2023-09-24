@@ -1,6 +1,5 @@
 package com.slimebot.commands.level.card.frame;
 
-import com.slimebot.commands.level.card.CardComponent;
 import com.slimebot.main.Main;
 import de.mineking.discord.ui.Menu;
 import de.mineking.discord.ui.components.ComponentRow;
@@ -32,9 +31,9 @@ public class ResetWarningFrame extends CardFrame {
 	}
 
 	@Override
-	public Collection<ComponentRow> getComponents(CardComponent COMPONENTS) {
-		return List.of(
-				ComponentRow.of(COMPONENTS.BACK(),
+	public Collection<ComponentRow> getComponents() {
+		return List.of(ComponentRow.of(
+				COMPONENTS.BACK(),
 				new ButtonComponent("reset", ButtonColor.RED, Emoji.fromUnicode("✔")).addHandler((m, event) -> {
 					m.setLoading();
 					Main.database.run(handle -> handle.createUpdate("delete from cardprofile where guild = :guild and \"user\" = :user")

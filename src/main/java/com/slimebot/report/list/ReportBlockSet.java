@@ -8,6 +8,7 @@ import de.mineking.discord.list.Listable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import java.time.Instant;
 import java.util.List;
@@ -33,7 +34,7 @@ public class ReportBlockSet implements Listable<ReportBlockSet.ReportBlock> {
 	}
 
 	@Override
-	public List<ReportBlock> getEntries() {
+	public List<ReportBlock> getEntries(IReplyCallback event) {
 		return Main.database.handle(handle -> handle.createQuery("select \"user\" from report_blocks where guild = :guild")
 				.bind("guild", guild.getIdLong())
 				.mapTo(long.class)

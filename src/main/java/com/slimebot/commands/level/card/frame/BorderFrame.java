@@ -1,10 +1,9 @@
 package com.slimebot.commands.level.card.frame;
 
 import com.slimebot.commands.level.card.CardComponent;
-import com.slimebot.database.DataClass;
+import com.slimebot.graphic.UIError;
 import com.slimebot.level.profile.CardProfile;
 import com.slimebot.util.ColorUtil;
-import com.slimebot.util.Util;
 import de.mineking.discord.ui.Menu;
 import de.mineking.discord.ui.MenuBase;
 import de.mineking.discord.ui.ModalFrameBase;
@@ -15,8 +14,6 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 
 import java.awt.*;
-import java.util.Map;
-import java.util.function.Supplier;
 
 public class BorderFrame extends ModalFrameBase {
 
@@ -28,8 +25,7 @@ public class BorderFrame extends ModalFrameBase {
 
 	@Override
 	public void setup() {
-		Supplier<CardProfile> sup = () -> new CardProfile(menu.getGuild().getIdLong(), menu.getMember().getIdLong());
-		profile = DataClass.load(sup, Map.of("guild", menu.getGuild().getIdLong(), "user", menu.getMember().getIdLong())).orElseGet(sup);
+		profile = CardProfile.loadProfile(menu.getMember());
 	}
 
 	@Override
@@ -41,6 +37,15 @@ public class BorderFrame extends ModalFrameBase {
 								.setMinLength(1)
 								.setPlaceholder("12")
 								.setRequired(false)
+								.setValue(
+										String.valueOf(
+												switch (getPart()) {
+													case AVATAR -> profile.getAvatarBorderWidth();
+													case BACKGROUND -> profile.getBackgroundBorderWidth();
+													case PROGRESSBAR -> profile.getProgressBarBorderWidth();
+												}
+										)
+								)
 								.build()
 				)
 				.addActionRow(
@@ -49,6 +54,15 @@ public class BorderFrame extends ModalFrameBase {
 								.setMinLength(3)
 								.setRequired(false)
 								.setPlaceholder("#46eb34")
+								.setValue(
+										ColorUtil.toHex(ColorUtil.ofCode(
+												switch (getPart()) {
+													case AVATAR -> profile.getAvatarBorderColor();
+													case BACKGROUND -> profile.getBackgroundBorderColor();
+													case PROGRESSBAR -> profile.getProgressBarBorderColor();
+												}
+										))
+								)
 								.build()
 				).build();
 	}
@@ -60,19 +74,25 @@ public class BorderFrame extends ModalFrameBase {
 	@Override
 	public void handle(MenuBase menu, ModalInteractionEvent event) {
 		menu.setLoading();
+
+		CardComponent.Part part = getPart();
+
 		ModalMapping size = event.getValue("size");
 		ModalMapping color = event.getValue("color");
-		CardComponent.Part part = getPart();
-		boolean flag = false;
-		if (size != null && Util.isInteger(size.getAsString())) {
-			int width = Integer.parseInt(size.getAsString());
-			switch (part) {
-				case AVATAR -> profile.setAvatarBorderWidth(width);
-				case BACKGROUND -> profile.setBackgroundBorderWidth(width);
-				case PROGRESSBAR -> profile.setProgressBarBorderWidth(width);
+
+		if (size != null) {
+			try {
+				int width = Integer.parseInt(size.getAsString());
+				switch (part) {
+					case AVATAR -> profile.setAvatarBorderWidth(width);
+					case BACKGROUND -> profile.setBackgroundBorderWidth(width);
+					case PROGRESSBAR -> profile.setProgressBarBorderWidth(width);
+				}
+			} catch(NumberFormatException e) {
+				UIError.NUMBER.send(event, size.getAsString());
 			}
-			flag = true;
 		}
+
 		if (color != null) {
 			Color c = ColorUtil.parseColor(color.getAsString());
 			if (c != null) {
@@ -82,10 +102,17 @@ public class BorderFrame extends ModalFrameBase {
 					case BACKGROUND -> profile.setBackgroundBorderColor(rgba);
 					case PROGRESSBAR -> profile.setProgressBarBorderColor(rgba);
 				}
-				flag = true;
+			}
+			else UIError.COLOR.send(event, color.getAsString());
+		} else {
+			switch (part) {
+				case AVATAR -> profile.setAvatarBorderColor(CardProfile.DEFAULT.getAvatarBorderColor());
+				case BACKGROUND -> profile.setBackgroundBorderColor(CardProfile.DEFAULT.getBackgroundBorderColor());
+				case PROGRESSBAR -> profile.setProgressBarBorderColor(CardProfile.DEFAULT.getProgressBarBorderColor());
 			}
 		}
-		if (flag) profile.save();
+
+		profile.save();
 		menu.display(part.name().toLowerCase());
 	}
 }
