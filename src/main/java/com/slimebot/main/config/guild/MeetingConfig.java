@@ -13,11 +13,17 @@ public class MeetingConfig {
 	@ConfigField(type = ConfigFieldType.CHANNEL, title = "ToDo Kanal", description = "Hier werden aus Team Besprechungen resultierende ToDos verwaltet", command = "todo-channel")
 	public Long todoChannel;
 
+	@ConfigField(type = ConfigFieldType.VOICE_CHANNEL, title = "Meeting Voice Kanal", description = "Hier werden die Teammeetings abgehalten", command = "meeting-voice-channel")
+	public Long voiceChannel;
+
 	public Optional<GuildMessageChannel> getMeetingChannel() {
 		return GuildConfig.getChannel(meetingChannel);
 	}
 
 	public Optional<GuildMessageChannel> getTodoChannel() {
 		return GuildConfig.getChannel(todoChannel);
+	}
+	public Optional<GuildMessageChannel> getVoiceChannel() {
+		return GuildConfig.getChannel(voiceChannel);
 	}
 }
