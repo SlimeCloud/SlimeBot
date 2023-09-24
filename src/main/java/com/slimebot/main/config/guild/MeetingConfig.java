@@ -2,6 +2,7 @@ package com.slimebot.main.config.guild;
 
 import com.slimebot.commands.config.engine.ConfigField;
 import com.slimebot.commands.config.engine.ConfigFieldType;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class MeetingConfig {
 	public Optional<GuildMessageChannel> getTodoChannel() {
 		return GuildConfig.getChannel(todoChannel);
 	}
-	public Optional<GuildMessageChannel> getVoiceChannel() {
-		return GuildConfig.getChannel(voiceChannel);
+	public Optional<AudioChannel> getVoiceChannel() {
+		return GuildConfig.getChannel(voiceChannel, AudioChannel.class);
 	}
 }

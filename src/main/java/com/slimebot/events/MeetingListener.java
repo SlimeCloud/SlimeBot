@@ -216,14 +216,12 @@ public class MeetingListener extends ListenerAdapter {
 								)
 								.build()
 				).queue(
-						msg -> GuildConfig.getConfig(guild).getMeetingConfig().flatMap(MeetingConfig::getVoiceChannel).ifPresent(
-								ch -> {
-									guild.createScheduledEvent(
-													"Teamsitzung",
-													guild.getVoiceChannelById(ch.getId()),
-													Main.atTime(time, 20).toOffsetDateTime())
-											.setDescription("Alle Infos: " + msg.getJumpUrl()).queue();
-								}
+						msg -> GuildConfig.getConfig(guild).getMeetingConfig().flatMap(MeetingConfig::getVoiceChannel).ifPresent(ch ->
+								guild.createScheduledEvent(
+										"Teamsitzung",
+										ch,
+										Main.atTime(time, 20).toOffsetDateTime()
+								).setDescription("Alle Infos: " + msg.getJumpUrl()).queue()
 						)
 				)
 		);
