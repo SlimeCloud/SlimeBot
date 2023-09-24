@@ -38,6 +38,8 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.Map;
@@ -103,6 +105,7 @@ public class Main {
 				.addEventListeners(new ReadyListener())
 				.addEventListeners(new AutoDeleteListener())
 				.addEventListeners(new TimeoutListener())
+				.addEventListeners(new MeetingListener())
 				.addEventListeners(new StaffMessage())
 				.addEventListeners(new MemberJoinListener());
 
@@ -191,6 +194,13 @@ public class Main {
 				),
 				error -> logger.error("Failed to update guild commands for " + guild, error)
 		);
+	}
+
+	public static ZonedDateTime atTime(Instant in, int hour) {
+		return in.atZone(ZoneId.systemDefault())
+				.withHour(hour)
+				.withMinute(0)
+				.withSecond(0);
 	}
 
 	/**

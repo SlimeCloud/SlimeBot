@@ -1,0 +1,311 @@
+package com.slimebot.events;
+
+import com.slimebot.main.Main;
+import com.slimebot.main.config.guild.GuildConfig;
+import com.slimebot.main.config.guild.MeetingConfig;
+import de.mineking.discord.Utils;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
+import net.dv8tion.jda.internal.entities.channel.concrete.VoiceChannelImpl;
+import org.jetbrains.annotations.NotNull;
+
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class MeetingListener extends ListenerAdapter {
+	public final static Modal modal = Modal.create("meeting:agenda", "Punkt zur Agenda hinzufügen")
+			.addActionRow(TextInput.create("text", "Der Text", TextInputStyle.SHORT).build())
+			.build();
+
+	public final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm");
+
+	@Override
+	public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+		String[] id = event.getComponentId().split(":", 2);
+
+		if (!id[0].equals("meeting")) return;
+
+		switch (id[1]) {
+			case "end" -> {
+				event.editComponents().queue();
+
+				String agenda = event.getMessage().getEmbeds().get(0).getFields().get(0).getValue();
+
+				GuildConfig.getConfig(event.getGuild()).getMeetingConfig()
+						.flatMap(MeetingConfig::getTodoChannel)
+						.ifPresentOrElse(
+								ch -> {
+									if (!getOpenAgenda(agenda).isEmpty()) {
+										ch.sendMessage(MessageCreateData.fromEditData(buildTodoMessage(event.getGuild(), agenda))).queue(mes -> {
+											if (!ch.equals(event.getChannel())) {
+												event.getMessage().replyEmbeds(
+														new EmbedBuilder()
+																.setTitle("Meeting Resultate")
+																.setColor(GuildConfig.getColor(event.getGuild()))
+																.setDescription("Das heutige Meeting wurde beendet. Daraus entstandene ToDos kannst du hier sehen: " + mes.getJumpUrl())
+																.setTimestamp(Instant.now())
+																.build()
+												).queue(x -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS)));
+											} else sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS));
+										});
+									} else {
+										event.getMessage().replyEmbeds(
+												new EmbedBuilder()
+														.setTitle("Meeting Resultate")
+														.setColor(GuildConfig.getColor(event.getGuild()))
+														.setDescription("Das heutige Meeting wurde beendet. Es sind keine ToDos offen geblieben")
+														.setTimestamp(Instant.now())
+														.build()
+										).queue(x -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS)));
+									}
+								},
+								() -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS))
+						);
+			}
+			case "agenda:add" -> event.replyModal(modal).queue();
+
+			case "presence:yes" -> editPresence(event, event.getUser(), 2);
+			case "presence:unknown" -> editPresence(event, event.getUser(), 3);
+			case "presence:no" -> editPresence(event, event.getUser(), 4);
+		}
+	}
+
+	@Override
+	public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+		if (!event.getModalId().equals("meeting:agenda")) return;
+
+		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
+		modifyFieldValue(builder, 0, value -> value + (value.length() == 1 ? "" : "\n") + event.getValue("text").getAsString());
+
+		event.editMessageEmbeds(builder.build())
+				.setComponents(buildComponents(builder.getFields().get(0).getValue()))
+				.queue();
+	}
+
+	@Override
+	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+		switch (event.getComponentId()) {
+			case "meeting:agenda:remove" -> {
+				EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
+				modifyFieldValue(builder, 0, value -> {
+					int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
+					String[] temp = value.split("\n");
+
+					temp[i] = "~~" + temp[i] + "~~";
+					return String.join("\n", temp);
+				});
+
+				event.editMessageEmbeds(builder.build())
+						.setComponents(buildComponents(builder.getFields().get(0).getValue()))
+						.queue();
+			}
+
+			case "todo:done" -> {
+				int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
+				String[] temp = event.getMessage().getEmbeds().get(0).getDescription().split("\n");
+
+				temp[i] = "~~" + temp[i] + "~~ (:white_check_mark:)";
+
+				event.editMessage(
+						buildTodoMessage(
+								event.getGuild(),
+								String.join("\n", temp)
+						)
+				).queue();
+			}
+
+			case "todo:assign" -> {
+				int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
+				String[] temp = event.getMessage().getEmbeds().get(0).getDescription().split("\n");
+
+				temp[i] = event.getMember().getAsMention() + " " + temp[i];
+
+				event.editMessage(
+						buildTodoMessage(
+								event.getGuild(),
+								String.join("\n", temp)
+						)
+				).queue();
+			}
+		}
+	}
+
+	private void editPresence(ButtonInteractionEvent event, User user, int field) {
+		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
+
+		for (int i = 2; i <= 4; i++) modifyFieldValue(builder, i, value -> value.replace(user.getAsMention() + (value.contains(user.getAsMention() + "\n") ? "\n" : ""), ""));
+		modifyFieldValue(builder, field, value -> value + (value.length() == 1 ? "" : "\n") + user.getAsMention());
+
+		event.editMessageEmbeds(builder.build()).queue();
+	}
+
+	private void modifyFieldValue(EmbedBuilder builder, int field, Function<String, String> handler) {
+		MessageEmbed.Field f = builder.getFields().get(field);
+		builder.getFields().set(field, new MessageEmbed.Field(
+				f.getName(),
+				handler.apply(f.getValue()),
+				f.isInline()
+		));
+	}
+
+	public static void sendEmptyMessage(Guild guild, Instant time) {
+		GuildConfig.getConfig(guild).getMeetingConfig().flatMap(MeetingConfig::getMeetingChannel).ifPresent(channel ->
+				channel.sendMessage(
+						new MessageCreateBuilder()
+								.setContent(GuildConfig.getConfig(guild).getStaffRole().map(Role::getAsMention).orElse(""))
+								.setComponents(buildComponents(""))
+								.setEmbeds(
+										new EmbedBuilder()
+												.setColor(GuildConfig.getColor(guild))
+												.setTitle("Team Besprechung **" + formatter.format(Main.atTime(time, 20)) + "**")
+												.setThumbnail(guild.getIconUrl())
+												.addField(
+														"Agenda",
+														"",
+														false
+												)
+												.addBlankField(false)
+												.addField(
+														"Voraussichtlich Anwesend",
+														"",
+														true
+												)
+												.addField(
+														"Nicht sicher\n" + EmbedBuilder.ZERO_WIDTH_SPACE,
+														GuildConfig.getConfig(guild).getStaffRole()
+																.map(r -> guild.getMembersWithRoles(r).stream()
+																		.map(Member::getAsMention)
+																		.collect(Collectors.joining("\n"))
+																)
+																.orElse(""),
+														true
+												)
+												.addField(
+														"Voraussichtlich abwesend",
+														"",
+														true
+												)
+												.setTimestamp(Main.atTime(time, 20))
+												.build()
+								)
+								.build()
+				).queue(
+						msg -> GuildConfig.getConfig(guild).getMeetingConfig().flatMap(MeetingConfig::getVoiceChannel).ifPresent(ch ->
+								guild.createScheduledEvent(
+										"Teamsitzung",
+										ch,
+										Main.atTime(time, 20).toOffsetDateTime()
+								).setDescription("Alle Infos: " + msg.getJumpUrl()).queue()
+						)
+				)
+		);
+	}
+
+	private static MessageEditData buildTodoMessage(Guild guild, String agenda) {
+		List<String> temp = getOpenAgenda(agenda);
+
+		StringSelectMenu.Builder done = StringSelectMenu.create("todo:done")
+				.setPlaceholder("ToDo abhaken");
+		StringSelectMenu.Builder assign = StringSelectMenu.create("todo:assign")
+				.setPlaceholder("ToDo übernehmen");
+
+		if (temp.isEmpty()) {
+			done.setDisabled(true).addOption("---", "---");
+			assign.setDisabled(true).addOption("---", "---");
+		} else {
+			for (int i = 0; i < temp.size(); i++) {
+				SelectOption option = SelectOption.of(
+						Utils.label(
+								temp.get(i).replaceAll("<@\\d+> ", ""),
+								SelectOption.LABEL_MAX_LENGTH
+						),
+						String.valueOf(i)
+				).withDescription(
+						Arrays.stream(temp.get(i).replaceAll("[^\\d ]|((?<!<@|\\d)\\d+(?!>))", "").split(" "))
+								.filter(id -> !id.isEmpty())
+								.map(id -> guild.retrieveMemberById(id).complete().getEffectiveName())
+								.collect(Collectors.joining(" "))
+				);
+
+				done.addOptions(option);
+				assign.addOptions(option);
+			}
+		}
+
+		return new MessageEditBuilder()
+				.setEmbeds(
+						new EmbedBuilder()
+								.setTitle("ToDo des Meetings vom **" + formatter.format(Main.atTime(Instant.now(), 20)) + "**")
+								.setColor(GuildConfig.getColor(guild))
+								.setDescription(agenda)
+								.setTimestamp(Instant.now())
+								.build()
+				)
+				.setComponents(
+						ActionRow.of(assign.build()),
+						ActionRow.of(done.build())
+				)
+				.build();
+	}
+
+	private static List<ActionRow> buildComponents(String agenda) {
+		return List.of(
+				ActionRow.of(
+						Button.success("meeting:presence:yes", "Ich kann"),
+						Button.secondary("meeting:presence:unknown", "Vielleicht"),
+						Button.danger("meeting:presence:no", "Ich kann nicht"),
+						Button.primary("meeting:agenda:add", "Agenda-Punkt hinzufügen")
+				),
+				ActionRow.of(createAgendaSelect(agenda)),
+				ActionRow.of(Button.danger("meeting:end", "Meeting beenden"))
+		);
+	}
+
+	private static List<String> getOpenAgenda(String agenda) {
+		return Arrays.stream(agenda.split("\n"))
+				.filter(a -> a.length() > 1)
+				.filter(a -> !a.startsWith("~~"))
+				.toList();
+	}
+
+	private static StringSelectMenu createAgendaSelect(String agenda) {
+		StringSelectMenu.Builder builder = StringSelectMenu.create("meeting:agenda:remove")
+				.setPlaceholder("Agenda-Punkt entfernen");
+
+		List<String> temp = getOpenAgenda(agenda);
+
+		if (temp.isEmpty()) builder.setDisabled(true).addOption("---", "---");
+		else {
+			for (int i = 0; i < temp.size(); i++)
+				builder.addOption(Utils.label(temp.get(i), SelectOption.LABEL_MAX_LENGTH), String.valueOf(i));
+		}
+
+		return builder.build();
+	}
+}
