@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.utils.TimeFormat;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
@@ -172,7 +173,7 @@ public class MeetingListener extends ListenerAdapter {
 		GuildConfig.getConfig(guild).getMeetingConfig().flatMap(MeetingConfig::getMeetingChannel).ifPresent(channel ->
 				channel.sendMessage(
 						new MessageCreateBuilder()
-								.setContent(GuildConfig.getConfig(guild).getStaffRole().map(Role::getAsMention).orElse(""))
+								.setContent(GuildConfig.getConfig(guild).getStaffRole().map(Role::getAsMention).orElse("") + " Beginnt " + TimeFormat.RELATIVE.format(Main.atTime(time, 20)))
 								.setComponents(buildComponents(""))
 								.setEmbeds(
 										new EmbedBuilder()
