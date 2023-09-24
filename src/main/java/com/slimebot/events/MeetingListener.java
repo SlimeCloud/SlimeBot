@@ -18,6 +18,9 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
@@ -44,9 +47,43 @@ public class MeetingListener extends ListenerAdapter {
 		switch (id[1]) {
 			case "end" -> {
 				event.editComponents().queue();
-				sendEmptyMessage(event.getGuild(), Instant.now().plus(2, ChronoUnit.WEEKS));
 
-				//TODO sendTodoMessage
+				String agenda = event.getMessage().getEmbeds().get(0).getFields().get(0).getValue();
+
+				GuildConfig.getConfig(event.getGuild()).getMeetingConfig()
+						.flatMap(MeetingConfig::getTodoChannel)
+						.ifPresentOrElse(
+								ch -> {
+									if(!getOpenAgenda(agenda).isEmpty()) {
+										ch.sendMessage(MessageCreateData.fromEditData(buildTodoMessage(event.getGuild(), agenda))).queue(mes -> {
+											if (!ch.equals(event.getChannel())) {
+												event.getMessage().replyEmbeds(
+														new EmbedBuilder()
+																.setTitle("Meeting Resultate")
+																.setColor(GuildConfig.getColor(event.getGuild()))
+																.setDescription("Das heutige Meeting wurde beendet. Daraus entstandene ToDos kannst du hier sehen: " + mes.getJumpUrl())
+																.setTimestamp(Instant.now())
+																.build()
+												).queue(x -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS)));
+											}
+
+											else sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS));
+										});
+									}
+
+									else {
+										event.getMessage().replyEmbeds(
+												new EmbedBuilder()
+														.setTitle("Meeting Resultate")
+														.setColor(GuildConfig.getColor(event.getGuild()))
+														.setDescription("Das heutige Meeting wurde beendet. Es sind keine ToDos offen geblieben")
+														.setTimestamp(Instant.now())
+														.build()
+										).queue(x -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS)));
+									}
+								},
+								() -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS))
+						);
 			}
 			case "agenda:add" -> event.replyModal(modal).queue();
 
@@ -70,20 +107,50 @@ public class MeetingListener extends ListenerAdapter {
 
 	@Override
 	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-		if(!event.getComponentId().equals("meeting:agenda:remove")) return;
+		switch (event.getComponentId()) {
+			case "meeting:agenda:remove" -> {
+				EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
+				modifyFieldValue(builder, 0, value -> {
+					int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
+					String[] temp = value.split("\n");
 
-		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
-		modifyFieldValue(builder, 0, value -> {
-			int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
-			String[] temp = value.split("\n");
+					temp[i] = "~~" + temp[i] + "~~";
+					return String.join("\n", temp);
+				});
 
-			temp[i] = "~~" + temp[i] + "~~";
-			return String.join("\n", temp);
-		});
+				event.editMessageEmbeds(builder.build())
+						.setComponents(buildComponents(builder.getFields().get(0).getValue()))
+						.queue();
+			}
 
-		event.editMessageEmbeds(builder.build())
-				.setComponents(buildComponents(builder.getFields().get(0).getValue()))
-				.queue();
+			case "todo:done" -> {
+				int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
+				String[] temp = event.getMessage().getEmbeds().get(0).getDescription().split("\n");
+
+				temp[i] = "~~" + temp[i] + "~~ (:white_check_mark:)";
+
+				event.editMessage(
+						buildTodoMessage(
+								event.getGuild(),
+								String.join("\n", temp)
+						)
+				).queue();
+			}
+
+			case "todo:assign" -> {
+				int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
+				String[] temp = event.getMessage().getEmbeds().get(0).getDescription().split("\n");
+
+				temp[i] = event.getMember().getAsMention() + " " + temp[i];
+
+				event.editMessage(
+						buildTodoMessage(
+								event.getGuild(),
+								String.join("\n", temp)
+						)
+				).queue();
+			}
+		}
 	}
 
 	private void editPresence(ButtonInteractionEvent event, User user, int field) {
@@ -149,6 +216,53 @@ public class MeetingListener extends ListenerAdapter {
 		);
 	}
 
+	private static MessageEditData buildTodoMessage(Guild guild, String agenda) {
+		List<String> temp = getOpenAgenda(agenda);
+
+		StringSelectMenu.Builder done = StringSelectMenu.create("todo:done")
+				.setPlaceholder("ToDo abhaken");
+		StringSelectMenu.Builder assign = StringSelectMenu.create("todo:assign")
+				.setPlaceholder("ToDo übernehmen");
+
+		if (temp.isEmpty()) {
+			done.setDisabled(true).addOption("---", "---");
+			assign.setDisabled(true).addOption("---", "---");
+		} else {
+			for (int i = 0; i < temp.size(); i++) {
+				SelectOption option = SelectOption.of(
+						Utils.label(
+								temp.get(i).replaceAll("<@\\d+> ", ""),
+								SelectOption.LABEL_MAX_LENGTH
+						),
+						String.valueOf(i)
+				).withDescription(
+						Arrays.stream(temp.get(i).replaceAll("[^\\d ]|((?<!<@|\\d)\\d+(?!>))", "").split(" "))
+								.filter(id -> !id.isEmpty())
+								.map(id -> guild.retrieveMemberById(id).complete().getEffectiveName())
+								.collect(Collectors.joining(" "))
+				);
+
+				done.addOptions(option);
+				assign.addOptions(option);
+			}
+		}
+
+		return new MessageEditBuilder()
+				.setEmbeds(
+						new EmbedBuilder()
+								.setTitle("ToDo des Meetings vom **" + formatter.format(Main.atTime(Instant.now(), 20)) + "**")
+								.setColor(GuildConfig.getColor(guild))
+								.setDescription(agenda)
+								.setTimestamp(Instant.now())
+								.build()
+				)
+				.setComponents(
+						ActionRow.of(assign.build()),
+						ActionRow.of(done.build())
+				)
+				.build();
+	}
+
 	private static List<ActionRow> buildComponents(String agenda) {
 		return List.of(
 				ActionRow.of(
@@ -162,14 +276,18 @@ public class MeetingListener extends ListenerAdapter {
 		);
 	}
 
+	private static List<String> getOpenAgenda(String agenda) {
+		return Arrays.stream(agenda.split("\n"))
+				.filter(a -> a.length() > 1)
+				.filter(a -> !a.startsWith("~~"))
+				.toList();
+	}
+
 	private static StringSelectMenu createAgendaSelect(String agenda) {
 		StringSelectMenu.Builder builder = StringSelectMenu.create("meeting:agenda:remove")
 				.setPlaceholder("Agenda-Punkt entfernen");
 
-		List<String> temp = Arrays.stream(agenda.split("\n"))
-				.filter(a -> a.length() > 1)
-				.filter(a -> !a.startsWith("~~"))
-				.toList();
+		List<String> temp = getOpenAgenda(agenda);
 
 		if(temp.isEmpty()) builder.setDisabled(true).addOption("---", "---");
 		else {
