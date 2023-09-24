@@ -9,6 +9,7 @@ import com.slimebot.commands.config.engine.ConfigField;
 import com.slimebot.commands.config.engine.ConfigFieldType;
 import com.slimebot.commands.config.engine.FieldVerification;
 import com.slimebot.commands.config.setup.AutoDeleteFrame;
+import com.slimebot.commands.config.setup.MeetingInitFrame;
 import com.slimebot.commands.config.setup.StaffFrame;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
@@ -168,6 +169,9 @@ public class GuildConfig {
 	@ConfigCategory(name = "auto-delete", description = "Automatisches Nachrichtenlöschen", customFrames = AutoDeleteFrame.class)
 	public AutoDeleteConfig autoDelete;
 
+	@ConfigCategory(name = "meeting", description = "Team Besprechungen", customFrames = MeetingInitFrame.class)
+	public MeetingConfig meeting;
+
 	public Optional<Color> getColor() {
 		return Optional.ofNullable(color).map(Color::decode);
 	}
@@ -216,6 +220,10 @@ public class GuildConfig {
 
 	public Optional<QuoteConfig> getQuoteConfig() {
 		return Optional.ofNullable(quote);
+	}
+
+	public Optional<MeetingConfig> getMeetingConfig() {
+		return Optional.ofNullable(meeting);
 	}
 
 	public Optional<AutoDeleteConfig> getAutoDeleteConfig() {

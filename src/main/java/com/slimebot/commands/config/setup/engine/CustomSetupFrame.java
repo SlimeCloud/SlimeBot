@@ -29,12 +29,16 @@ public abstract class CustomSetupFrame extends MessageFrameBase {
 
 	@Override
 	public MessageEmbed getEmbed() {
-		return new EmbedBuilder()
+		EmbedBuilder builder = new EmbedBuilder()
 				.setTitle(title)
 				.setColor(GuildConfig.getColor(menu.getGuild()))
 				.setThumbnail(Main.jdaInstance.getSelfUser().getEffectiveAvatarUrl())
-				.setDescription(description)
-				.addField("Aktueller Wert", getValue(GuildConfig.getConfig(menu.getGuild())).orElse("*Kein Wert*"), false)
-				.build();
+				.setDescription(description);
+
+		Optional<String> value = getValue(GuildConfig.getConfig(menu.getGuild()));
+
+		if (value != null) builder.addField("Aktueller Wert", value.orElse("*Kein Wert*"), false);
+
+		return builder.build();
 	}
 }
