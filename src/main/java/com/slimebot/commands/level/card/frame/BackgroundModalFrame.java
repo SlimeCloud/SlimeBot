@@ -1,6 +1,5 @@
 package com.slimebot.commands.level.card.frame;
 
-import com.slimebot.database.DataClass;
 import com.slimebot.graphic.UIError;
 import com.slimebot.level.profile.CardProfile;
 import com.slimebot.util.ColorUtil;
@@ -15,11 +14,8 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 
 import java.awt.*;
-import java.util.Map;
-import java.util.function.Supplier;
 
 public class BackgroundModalFrame extends ModalFrameBase {
-
 	private CardProfile profile;
 
 	public BackgroundModalFrame(Menu menu) {
@@ -28,8 +24,7 @@ public class BackgroundModalFrame extends ModalFrameBase {
 
 	@Override
 	public void setup() {
-		Supplier<CardProfile> sup = () -> new CardProfile(menu.getGuild().getIdLong(), menu.getMember().getIdLong());
-		profile = DataClass.load(sup, Map.of("guild", menu.getGuild().getIdLong(), "user", menu.getMember().getIdLong())).orElseGet(sup);
+		profile = CardProfile.loadProfile(menu.getMember());
 	}
 
 	@Override
@@ -38,43 +33,41 @@ public class BackgroundModalFrame extends ModalFrameBase {
 				.addActionRow(TextInput.create("image", "Hintergrund Bild URL", TextInputStyle.SHORT)
 						.setRequired(false)
 						.setPlaceholder("https://example.org/image.png")
-						.build())
+						.setValue(profile.getBackgroundImageURL().isBlank() ? null : profile.getBackgroundImageURL())
+						.build()
+				)
 				.addActionRow(TextInput.create("color", "Hintergrund Farbe", TextInputStyle.SHORT)
 						.setRequired(false)
 						.setMinLength(3)
 						.setMaxLength(15)
 						.setPlaceholder("#46eb34")
-						.build())
+						.setValue(ColorUtil.toHex(ColorUtil.ofCode(profile.getAvatarBorderColor())))
+						.build()
+				)
 				.build();
 	}
 
 	@Override
 	public void handle(MenuBase menu, ModalInteractionEvent event) {
 		menu.setLoading();
+
 		ModalMapping image = event.getValue("image");
 		ModalMapping color = event.getValue("color");
-		image = image == null ? null : (image.getAsString().isBlank() ? null : image);
-		color = color == null ? null : (color.getAsString().isBlank() ? null : color);
-		if (image == null && color == null) {
-			menu.display("background");
-			return;
-		}
-		boolean flag = false;
-		if (image != null) {
-			if (Util.isValidURL(image.getAsString())) {
-				profile.setBackgroundImageURL(image.getAsString());
-				flag = true;
-			} else UIError.URL_ERROR.send(event, image.getAsString(), "image.png");
-		} else profile.setBackgroundImageURL("");
-		if (color != null) {
-			Color c = ColorUtil.parseColor(color.getAsString());
-			if (c != null) {
-				profile.setBackgroundColor(c.getRGB());
-				flag = true;
-			} else UIError.COLOR_ERROR.send(event, color.getAsString());
-		}
 
-		if (flag) profile.save();
+		if (image != null && !image.getAsString().isBlank()) {
+			if (Util.isValidURL(image.getAsString())) profile.setBackgroundImageURL(image.getAsString());
+			else UIError.URL.send(event, image.getAsString(), "image.png");
+		} else profile.setBackgroundImageURL("");
+
+		if (color != null && !color.getAsString().isBlank()) {
+			Color c = ColorUtil.parseColor(color.getAsString());
+
+			if (c != null) profile.setBackgroundColor(c.getRGB());
+			else UIError.COLOR.send(event, color.getAsString());
+		} else profile.setBackgroundColor(CardProfile.DEFAULT.getBackgroundColor());
+
+		profile.save();
+
 		menu.display("background");
 	}
 }

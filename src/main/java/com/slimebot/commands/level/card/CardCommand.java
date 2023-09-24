@@ -14,31 +14,21 @@ import de.mineking.discord.ui.CallbackState;
 import de.mineking.discord.ui.components.ComponentRow;
 import de.mineking.discord.ui.components.button.ButtonColor;
 import de.mineking.discord.ui.components.button.ButtonComponent;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-import java.awt.*;
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.Map;
-import java.util.function.Supplier;
 
+@Slf4j
 @ApplicationCommand(name = "card", description = "Passe deine Rankcard an", feature = "level")
 public class CardCommand {
-
-	private static CardProfile loadProfile(Member member) {
-		Supplier<CardProfile> sup = () -> new CardProfile(member.getGuild().getIdLong(), member.getIdLong());
-		return DataClass.load(sup, Map.of("guild", member.getGuild().getIdLong(), "user", member.getIdLong())).orElseGet(sup);
-	}
-
-
 	@ApplicationCommand(name = "edit", description = "Bearbeite deine Rankcard")
 	public static class EditCommand {
-
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event) {
 			event.deferReply(true).queue();
+
 			Main.discordUtils.getUIManager().createMenu()
 					.addFrame("main", MainFrame::new)
 					.addFrame("avatar", AvatarFrame::new)
@@ -49,7 +39,6 @@ public class CardCommand {
 					.addFrame("border", BorderFrame::new)
 					.addFrame("reset", ResetWarningFrame::new).start(new CallbackState(event), "main");
 		}
-
 	}
 
 	@ApplicationCommand(name = "reset", description = "Setzt deine Rankcard zurück")
@@ -57,6 +46,7 @@ public class CardCommand {
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event) {
 			event.deferReply(true).queue();
+
 			Main.discordUtils.getUIManager().createMenu()
 					.addMessageFrame("main",
 							() -> new EmbedBuilder()
@@ -94,30 +84,42 @@ public class CardCommand {
 
 	@ApplicationCommand(name = "info", description = "Zeigt deine aktuellen Rankcard Optionen an")
 	public static class InfoCommand {
-
 		@ApplicationCommandMethod
 		public void performCommand(SlashCommandInteractionEvent event) {
 			event.deferReply(true).queue();
-			CardProfile cp = loadProfile(event.getMember());
-			EmbedBuilder builder = new EmbedBuilder();
-			Field[] fields = cp.getClass().getDeclaredFields();
-			for (Field field : fields) {
+
+			CardProfile profile = CardProfile.loadProfile(event.getMember());
+
+			EmbedBuilder builder = new EmbedBuilder()
+					.setColor(GuildConfig.getColor(event.getGuild()));
+
+			Field[] fields = CardProfile.class.getDeclaredFields();
+
+			for (int i = 0; i < fields.length; i++) {
+				Field field = fields[i];
+
 				if (!DataClass.isValid(field) || field.isAnnotationPresent(Key.class)) continue;
+
 				try {
 					field.setAccessible(true);
-					String value;
-					if (field.getName().toLowerCase().contains("color") && (field.getType().equals(Integer.class) || field.getType().equals(int.class)))
-						value = ColorUtil.toString(new Color(field.getInt(cp)));
-					else value = String.valueOf(field.get(cp));
-					builder.addField(String.join(" ", Util.parseCamelCase(field.getName().replace("BG", "Background"))), value, false);
+
+					String[] parsedName = Util.parseCamelCase(field.getName().replace("BG", "Background"));
+
+					builder.addField(
+							String.join(" ", parsedName),
+							field.getName().toLowerCase().contains("color") && (field.getType().equals(Integer.class) || field.getType().equals(int.class))
+									? ColorUtil.toString(ColorUtil.ofCode(field.getInt(profile)))
+									: (field.get(profile) == null || String.valueOf(field.get(profile)).isBlank() ? "*null*" : String.valueOf(field.get(profile))),
+							false
+					);
+
+					if(i != fields.length - 1 && !parsedName[0].equals(Util.parseCamelCase(fields[i + 1].getName())[0])) builder.addBlankField(false);
 				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+					logger.error("Failed to read CardProfile for user " + event.getUser(), e);
 				}
 			}
-			builder.setColor(GuildConfig.getColor(event.getGuild()));
-			event.getHook().sendMessageEmbeds(builder.build()).queue();
+
+			event.getHook().editOriginalEmbeds(builder.build()).queue();
 		}
-
 	}
-
 }

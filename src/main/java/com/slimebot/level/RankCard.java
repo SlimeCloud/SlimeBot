@@ -147,7 +147,7 @@ public class RankCard extends Graphic {
 		graphics2D.setFont(CustomFont.getFont(font, 150F));
 
 		String levelString = "Level " + level.getLevel();
-		String rank = "#" + level.getRank().map(i -> String.valueOf(i + 1)).orElse("Keiner");
+		String rank = level.getRank().map(i -> "#" + (i + 1)).orElse("Keiner");
 
 		int levelWidth = graphics2D.getFontMetrics().stringWidth(levelString);
 		int rankWidth = graphics2D.getFontMetrics().stringWidth(rank);
@@ -158,6 +158,7 @@ public class RankCard extends Graphic {
 		graphics2D.fillRoundRect(contentWidth - rankWidth - levelWidth - 330 - rankPadding + contentOffsetX, contentHeight - 430 - 100 - rankPadding + contentOffsetY, rankWidth + rankPadding, 150 + rankPadding, contentHeight - 500, contentHeight - 500);
 
 		graphics2D.setColor(Color.WHITE);
-		graphics2D.drawString(rank, contentWidth - graphics2D.getFontMetrics().stringWidth(rank) - graphics2D.getFontMetrics().stringWidth(levelString) - 350 + contentOffsetX, contentHeight - 430 + contentOffsetY);
+		if(level.getRank().isEmpty()) graphics2D.setFont(CustomFont.getFont(font, Font.ITALIC, 150F));
+		graphics2D.drawString(rank, contentWidth - rankWidth - levelWidth - 350 + contentOffsetX, contentHeight - 430 + contentOffsetY);
 	}
 }
