@@ -2,6 +2,7 @@ package com.slimebot.commands.config.setup;
 
 import com.slimebot.commands.config.setup.engine.CustomSetupFrame;
 import com.slimebot.events.MeetingListener;
+import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.ui.Menu;
 import de.mineking.discord.ui.components.ComponentRow;
@@ -9,6 +10,7 @@ import de.mineking.discord.ui.components.button.ButtonColor;
 import de.mineking.discord.ui.components.button.ButtonComponent;
 import de.mineking.discord.ui.components.button.FrameButton;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +34,7 @@ public class MeetingInitFrame extends CustomSetupFrame {
 				ComponentRow.of(
 						new ButtonComponent("init", ButtonColor.GREEN, "Initiale Nachricht senden").addHandler((m, event) -> {
 							m.display("main");
-							MeetingListener.sendEmptyMessage(event.getGuild());
+							MeetingListener.sendEmptyMessage(event.getGuild(), Instant.now());
 						}),
 						new FrameButton(ButtonColor.GRAY, "Überspringen", "main")
 				)

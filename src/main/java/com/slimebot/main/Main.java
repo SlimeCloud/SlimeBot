@@ -37,8 +37,9 @@ import org.kohsuke.github.GitHubBuilder;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -192,6 +193,13 @@ public class Main {
 				),
 				error -> logger.error("Failed to update guild commands for " + guild, error)
 		);
+	}
+
+	public static ZonedDateTime atTime(Instant in, int hour) {
+		return in.atZone(ZoneId.systemDefault())
+				.withHour(hour)
+				.withMinute(0)
+				.withSecond(0);
 	}
 
 	/**
