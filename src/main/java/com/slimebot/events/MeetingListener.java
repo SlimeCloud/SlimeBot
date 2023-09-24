@@ -3,12 +3,17 @@ package com.slimebot.events;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.main.config.guild.MeetingConfig;
+import de.mineking.discord.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
@@ -18,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -43,9 +50,9 @@ public class MeetingListener extends ListenerAdapter {
 			}
 			case "agenda:add" -> event.replyModal(modal).queue();
 
-			case "presence:yes" -> editPresence(event, event.getUser(), 1);
-			case "presence:unknown" -> editPresence(event, event.getUser(), 2);
-			case "presence:no" -> editPresence(event, event.getUser(), 3);
+			case "presence:yes" -> editPresence(event, event.getUser(), 2);
+			case "presence:unknown" -> editPresence(event, event.getUser(), 3);
+			case "presence:no" -> editPresence(event, event.getUser(), 4);
 		}
 	}
 
@@ -54,14 +61,35 @@ public class MeetingListener extends ListenerAdapter {
 		if(!event.getModalId().equals("meeting:agenda")) return;
 
 		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
-		modifyFieldValue(builder, 0, value -> value + "\n- " + event.getValue("text").getAsString());
-		event.editMessageEmbeds(builder.build()).queue();
+		modifyFieldValue(builder, 0, value -> value + (value.length() == 1 ? "" : "\n") + event.getValue("text").getAsString());
+
+		event.editMessageEmbeds(builder.build())
+				.setComponents(buildComponents(builder.getFields().get(0).getValue()))
+				.queue();
+	}
+
+	@Override
+	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+		if(!event.getComponentId().equals("meeting:agenda:remove")) return;
+
+		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
+		modifyFieldValue(builder, 0, value -> {
+			int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
+			String[] temp = value.split("\n");
+
+			temp[i] = "~~" + temp[i] + "~~";
+			return String.join("\n", temp);
+		});
+
+		event.editMessageEmbeds(builder.build())
+				.setComponents(buildComponents(builder.getFields().get(0).getValue()))
+				.queue();
 	}
 
 	private void editPresence(ButtonInteractionEvent event, User user, int field) {
 		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
 
-		for(int i = 1; i <= 3; i++) modifyFieldValue(builder, i, value -> value.replace(user.getAsMention(), ""));
+		for(int i = 2; i <= 4; i++) modifyFieldValue(builder, i, value -> value.replace(user.getAsMention(), ""));
 		modifyFieldValue(builder, field, value -> value + (value.length() == 1 ? "" : "\n") + user.getAsMention());
 
 		event.editMessageEmbeds(builder.build()).queue();
@@ -81,12 +109,7 @@ public class MeetingListener extends ListenerAdapter {
 				channel.sendMessage(
 						new MessageCreateBuilder()
 								.setContent(GuildConfig.getConfig(guild).getStaffRole().map(Role::getAsMention).orElse(""))
-								.addActionRow(
-										Button.success("meeting:presence:yes", "Ich kann"),
-										Button.secondary("meeting:presence:unknown", "Vielleicht"),
-										Button.danger("meeting:presence:no", "Ich kann nicht")
-								)
-								.addActionRow(Button.danger("end", "Meeting beenden"))
+								.setComponents(buildComponents(""))
 								.setEmbeds(
 										new EmbedBuilder()
 												.setColor(GuildConfig.getColor(guild))
@@ -97,6 +120,7 @@ public class MeetingListener extends ListenerAdapter {
 														"",
 														false
 												)
+												.addBlankField(false)
 												.addField(
 														"Voraussichtlich Anwesend",
 														"",
@@ -123,5 +147,36 @@ public class MeetingListener extends ListenerAdapter {
 								.build()
 				).queue()
 		);
+	}
+
+	private static List<ActionRow> buildComponents(String agenda) {
+		return List.of(
+				ActionRow.of(
+						Button.success("meeting:presence:yes", "Ich kann"),
+						Button.secondary("meeting:presence:unknown", "Vielleicht"),
+						Button.danger("meeting:presence:no", "Ich kann nicht"),
+						Button.primary("meeting:agenda:add", "Agenda-Punkt hinzufügen")
+				),
+				ActionRow.of(createAgendaSelect(agenda)),
+				ActionRow.of(Button.danger("meeting:end", "Meeting beenden"))
+		);
+	}
+
+	private static StringSelectMenu createAgendaSelect(String agenda) {
+		StringSelectMenu.Builder builder = StringSelectMenu.create("meeting:agenda:remove")
+				.setPlaceholder("Agenda-Punkt entfernen");
+
+		List<String> temp = Arrays.stream(agenda.split("\n"))
+				.filter(a -> a.length() > 1)
+				.filter(a -> !a.startsWith("~~"))
+				.toList();
+
+		if(temp.isEmpty()) builder.setDisabled(true).addOption("---", "---");
+		else {
+			for(int i = 0; i < temp.size(); i++)
+				builder.addOption(Utils.label(temp.get(i), SelectOption.LABEL_MAX_LENGTH), String.valueOf(i));
+		}
+
+		return builder.build();
 	}
 }
