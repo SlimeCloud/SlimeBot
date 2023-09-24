@@ -96,6 +96,14 @@ public class ConfigFieldFrame extends MessageFrameBase {
 							EntitySelectMenu.SelectTarget.CHANNEL
 					).addHandler((m, evt) -> setValue(m, evt, evt.getValues().get(0).getIdLong()))
 			);
+			case VOICE_CHANNEL -> result.add(
+					new EntitySelectComponent("voice_channel",
+							config -> config
+									.setPlaceholder("Sprachkanal festlegen")
+									.setChannelTypes(ChannelType.VOICE, ChannelType.STAGE),
+							EntitySelectMenu.SelectTarget.CHANNEL
+					).addHandler((m, evt) -> setValue(m, evt, evt.getValues().get(0).getIdLong()))
+			);
 			case STRING -> {
 				result.add(new FrameButton(ButtonColor.BLUE, "Wert festlegen", info.title()));
 				menu.addModalFrame(info.title(), "Wert festlegen",
