@@ -6,10 +6,6 @@ import com.slimebot.main.config.guild.MeetingConfig;
 import de.mineking.discord.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -25,12 +21,9 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
-import net.dv8tion.jda.internal.entities.channel.concrete.VoiceChannelImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -218,10 +211,19 @@ public class MeetingListener extends ListenerAdapter {
 				).queue(
 						msg -> GuildConfig.getConfig(guild).getMeetingConfig().flatMap(MeetingConfig::getVoiceChannel).ifPresent(ch ->
 								guild.createScheduledEvent(
-										"Teamsitzung",
+										"\uD83D\uDCDC Teamsitzung",
 										ch,
 										Main.atTime(time, 20).toOffsetDateTime()
-								).setDescription("Alle Infos: " + msg.getJumpUrl()).queue()
+								).setDescription("Alle Infos: " + msg.getJumpUrl())
+										.flatMap(e -> msg.editMessageEmbeds(
+												new EmbedBuilder(msg.getEmbeds().get(0))
+														.setDescription("https://discord.com/events/%s/%s".formatted(
+																e.getGuild().getId(),
+																e.getId()
+														))
+														.build()
+										))
+										.queue()
 						)
 				)
 		);
