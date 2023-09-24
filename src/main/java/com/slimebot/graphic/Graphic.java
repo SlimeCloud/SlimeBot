@@ -35,12 +35,16 @@ public abstract class Graphic {
 
 	protected abstract void drawGraphic(Graphics2D graphics2D) throws IOException;
 
-	public FileUpload getFile() {
+	public FileUpload getFile(String name) {
 		try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
 			ImageIO.write(image, "png", bos);
-			return FileUpload.fromData(bos.toByteArray(), "image.png");
+			return FileUpload.fromData(bos.toByteArray(), name);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public FileUpload getFile() {
+		return getFile("image.png");
 	}
 }

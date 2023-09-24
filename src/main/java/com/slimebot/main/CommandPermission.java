@@ -4,6 +4,7 @@ import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.ICommandPermission;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -17,10 +18,15 @@ public enum CommandPermission implements ICommandPermission {
 	 */
 	TEAM {
 		@Override
+		public boolean isPermitted(Member m) {
+			return GuildConfig.getConfig(m.getGuild()).getStaffRole()
+					.map(role -> m.getRoles().contains(role))
+					.orElse(m.hasPermission(Permission.MANAGE_SERVER));
+		}
+
+		@Override
 		public boolean isPermitted(CommandManager<?> manager, GenericInteractionCreateEvent event) {
-			return GuildConfig.getConfig(event.getGuild()).getStaffRole()
-					.map(role -> event.getMember().getRoles().contains(role))
-					.orElse(event.getMember().hasPermission(Permission.MANAGE_SERVER));
+			return isPermitted(event.getMember());
 		}
 
 		@Override
@@ -33,6 +39,11 @@ public enum CommandPermission implements ICommandPermission {
 	 */
 	ROLE_MANAGE {
 		@Override
+		public boolean isPermitted(Member m) {
+			return m.hasPermission(Permission.MANAGE_ROLES);
+		}
+
+		@Override
 		public DefaultMemberPermissions requirePermissions() {
 			return DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES);
 		}
@@ -42,8 +53,15 @@ public enum CommandPermission implements ICommandPermission {
 	 */
 	ADMINISTRATOR {
 		@Override
+		public boolean isPermitted(Member m) {
+			return m.hasPermission(Permission.MANAGE_SERVER);
+		}
+
+		@Override
 		public DefaultMemberPermissions requirePermissions() {
 			return DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER);
 		}
-	}
+	};
+
+	public abstract boolean isPermitted(Member m);
 }

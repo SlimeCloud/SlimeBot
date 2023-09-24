@@ -17,8 +17,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @ApplicationCommand(name = "setup", description = "Startet einen Setup-Wizard, mit dem eine initiale Konfiguration erstellt werden kann", guildOnly = true)
 public class SetupCommand {
@@ -30,8 +28,7 @@ public class SetupCommand {
 	}
 
 	public static void showSetupMenu(IReplyCallback event) {
-		SetupMenu menu = Main.discordUtils.getUIManager()
-				.createMenu((manger, id) -> new SetupMenu(manger, id, event.getGuild().getIdLong()));
+		SetupMenu menu = Main.discordUtils.getUIManager().createMenu(SetupMenu::new);
 
 		List<FrameButton> buttons = new ArrayList<>();
 
@@ -51,7 +48,8 @@ public class SetupCommand {
 						}
 
 						return temp;
-					} catch (IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
+					} catch (IllegalAccessException | NoSuchMethodException | InstantiationException |
+					         InvocationTargetException e) {
 						throw new RuntimeException(e);
 					}
 				}));
@@ -62,11 +60,6 @@ public class SetupCommand {
 
 		buttons.add(0, menu.addCategoryFrames(GuildConfig.class.getAnnotation(ConfigCategory.class), mainFields.toArray(Field[]::new), (create, config) -> config));
 
-		AtomicInteger counter = new AtomicInteger();
-		menu.addMainFrame(
-				buttons.stream().collect(Collectors.groupingBy(it -> counter.getAndIncrement() / 5)).values().stream()
-						.map(ComponentRow::of)
-						.toList()
-		).start(event);
+		menu.addMainFrame(ComponentRow.build(buttons)).start(event);
 	}
 }

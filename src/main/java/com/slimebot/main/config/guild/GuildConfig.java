@@ -9,6 +9,7 @@ import com.slimebot.commands.config.engine.ConfigField;
 import com.slimebot.commands.config.engine.ConfigFieldType;
 import com.slimebot.commands.config.engine.FieldVerification;
 import com.slimebot.commands.config.setup.MeetingInitFrame;
+import com.slimebot.commands.config.setup.AutoDeleteFrame;
 import com.slimebot.commands.config.setup.StaffFrame;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 import java.awt.*;
@@ -164,6 +166,9 @@ public class GuildConfig {
 	@ConfigCategory(name = "quote", description = "Zitate", updateCommands = true)
 	public QuoteConfig quote;
 
+	@ConfigCategory(name = "auto-delete", description = "Automatisches Nachrichtenlöschen", customFrames = AutoDeleteFrame.class)
+	public AutoDeleteConfig autoDelete;
+
 	@ConfigCategory(name = "meeting", description = "Team Besprechungen", customFrames = MeetingInitFrame.class)
 	public MeetingConfig meeting;
 
@@ -221,6 +226,10 @@ public class GuildConfig {
 		return Optional.ofNullable(meeting);
 	}
 
+	public Optional<AutoDeleteConfig> getAutoDeleteConfig() {
+		return Optional.ofNullable(autoDelete);
+	}
+
 	public StaffConfig getOrCreateStaff() {
 		return getStaffConfig().orElseGet(() -> staffMessage = new StaffConfig());
 	}
@@ -229,9 +238,25 @@ public class GuildConfig {
 		return getLevelConfig().orElseGet(() -> level = new LevelGuildConfig());
 	}
 
+	public AutoDeleteConfig getOrCreateAutoDelete() {
+		return getAutoDeleteConfig().orElseGet(() -> autoDelete = new AutoDeleteConfig());
+	}
+
 	//Internal helper methods
 	static Optional<GuildMessageChannel> getChannel(Long channel) {
-		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(GuildMessageChannel.class, id));
+		return getChannel(channel, GuildMessageChannel.class);
+	}
+
+	static Optional<GuildMessageChannel> getChannel(String channel) {
+		return getChannel(channel, GuildMessageChannel.class);
+	}
+
+	static <T extends GuildChannel> Optional<T> getChannel(Long channel, Class<T> type) {
+		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(type, id));
+	}
+
+	static <T extends GuildChannel> Optional<T> getChannel(String channel, Class<T> type) {
+		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(type, id));
 	}
 
 	static Optional<Role> getRole(Long role) {

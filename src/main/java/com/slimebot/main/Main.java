@@ -10,6 +10,7 @@ import com.slimebot.commands.config.setup.SetupCommand;
 import com.slimebot.commands.level.LeaderboardCommand;
 import com.slimebot.commands.level.LevelCommand;
 import com.slimebot.commands.level.RankCommand;
+import com.slimebot.commands.level.card.CardCommand;
 import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
@@ -100,6 +101,7 @@ public class Main {
 
 				//Events
 				.addEventListeners(new ReadyListener())
+				.addEventListeners(new AutoDeleteListener())
 				.addEventListeners(new TimeoutListener())
 				.addEventListeners(new MeetingListener())
 				.addEventListeners(new StaffMessage())
@@ -152,6 +154,7 @@ public class Main {
 									config.registerCommand(RankCommand.class);
 									config.registerCommand(LeaderboardCommand.class);
 									config.registerCommand(LevelCommand.class);
+									config.registerCommand(CardCommand.class);
 								} else logger.warn("Level System aufgrund fehlender Config deaktiviert");
 							} else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
 
