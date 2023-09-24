@@ -152,7 +152,7 @@ public class MeetingListener extends ListenerAdapter {
 	private void editPresence(ButtonInteractionEvent event, User user, int field) {
 		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
 
-		for (int i = 2; i <= 4; i++) modifyFieldValue(builder, i, value -> value.replace(user.getAsMention(), ""));
+		for (int i = 2; i <= 4; i++) modifyFieldValue(builder, i, value -> value.replace(user.getAsMention() + (value.contains(user.getAsMention() + "\n") ? "\n" : ""), ""));
 		modifyFieldValue(builder, field, value -> value + (value.length() == 1 ? "" : "\n") + user.getAsMention());
 
 		event.editMessageEmbeds(builder.build()).queue();
