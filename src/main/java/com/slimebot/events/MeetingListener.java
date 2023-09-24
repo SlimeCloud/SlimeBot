@@ -94,7 +94,7 @@ public class MeetingListener extends ListenerAdapter {
 		if (!event.getModalId().equals("meeting:agenda")) return;
 
 		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
-		modifyFieldValue(builder, 0, value -> value + (value.length() == 1 ? "" : "\n") + event.getValue("text").getAsString());
+		modifyFieldValue(builder, 0, value -> value + (value.length() <= 1 ? "1. " : "\n" + (value.split("\n").length + 1) + ". ") + event.getValue("text").getAsString());
 
 		event.editMessageEmbeds(builder.build())
 				.setComponents(buildComponents(builder.getFields().get(0).getValue()))
@@ -110,7 +110,7 @@ public class MeetingListener extends ListenerAdapter {
 					int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
 					String[] temp = value.split("\n");
 
-					temp[i] = "~~" + temp[i] + "~~";
+					temp[i] = temp[i].split(". ")[0] + ". ~~" + temp[i].split(". ")[1] + "~~";
 					return String.join("\n", temp);
 				});
 
@@ -123,7 +123,7 @@ public class MeetingListener extends ListenerAdapter {
 				int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
 				String[] temp = event.getMessage().getEmbeds().get(0).getDescription().split("\n");
 
-				temp[i] = "~~" + temp[i] + "~~ (:white_check_mark:)";
+				temp[i] = temp[i].split(". ")[0] + ". ~~" + temp[i].split(". ")[1] + "~~";
 
 				event.editMessage(
 						buildTodoMessage(
@@ -137,7 +137,7 @@ public class MeetingListener extends ListenerAdapter {
 				int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
 				String[] temp = event.getMessage().getEmbeds().get(0).getDescription().split("\n");
 
-				temp[i] = event.getMember().getAsMention() + " " + temp[i];
+				temp[i] = temp[i] + " (" + event.getMember().getAsMention() + ")";
 
 				event.editMessage(
 						buildTodoMessage(
@@ -244,7 +244,7 @@ public class MeetingListener extends ListenerAdapter {
 			for (int i = 0; i < temp.size(); i++) {
 				SelectOption option = SelectOption.of(
 						Utils.label(
-								temp.get(i).replaceAll("<@\\d+> ", ""),
+								temp.get(i).replaceAll(" \\(<@\\d+>\\)", ""),
 								SelectOption.LABEL_MAX_LENGTH
 						),
 						String.valueOf(i)
@@ -292,7 +292,10 @@ public class MeetingListener extends ListenerAdapter {
 	private static List<String> getOpenAgenda(String agenda) {
 		return Arrays.stream(agenda.split("\n"))
 				.filter(a -> a.length() > 1)
-				.filter(a -> !a.startsWith("~~"))
+				.filter(a -> {
+					System.out.println("#" + a + "#" + a.matches("\\d+. (?!~~).*(?!~~)$"));
+					return a.matches("\\D*\\d+. (?!~~).*(?!~~)$");
+				})
 				.toList();
 	}
 
