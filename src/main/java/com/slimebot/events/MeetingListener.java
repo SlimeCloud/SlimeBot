@@ -292,10 +292,7 @@ public class MeetingListener extends ListenerAdapter {
 	private static List<String> getOpenAgenda(String agenda) {
 		return Arrays.stream(agenda.split("\n"))
 				.filter(a -> a.length() > 1)
-				.filter(a -> {
-					System.out.println("#" + a + "#" + a.matches("\\d+. (?!~~).*(?!~~)$"));
-					return a.matches("\\D*\\d+. (?!~~).*(?!~~)$");
-				})
+				.filter(a -> a.matches("\\D*\\d+. (?!~~).*(?!~~)$"))
 				.toList();
 	}
 
