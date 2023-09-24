@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class MeetingInitFrame extends CustomSetupFrame {
-	protected MeetingInitFrame(Menu menu) {
-		super("meeting-init", menu,
+	public MeetingInitFrame(Menu menu) {
+		super("meeting init", menu,
 				"Meeting Initialisieren",
 				"Um das erste Meeting zu initialisieren, drücke den Knopf unter der Nachricht. Dadurch wird eine Nachricht gesendet, über die das heutige und die folgenden Meetings kontrolliert werden können"
 		);
@@ -23,7 +23,7 @@ public class MeetingInitFrame extends CustomSetupFrame {
 
 	@Override
 	public Optional<String> getValue(GuildConfig config) {
-		return Optional.empty();
+		return null;
 	}
 
 	@Override
