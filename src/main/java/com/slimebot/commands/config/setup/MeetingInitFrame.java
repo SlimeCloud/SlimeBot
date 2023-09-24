@@ -2,7 +2,6 @@ package com.slimebot.commands.config.setup;
 
 import com.slimebot.commands.config.setup.engine.CustomSetupFrame;
 import com.slimebot.events.MeetingListener;
-import com.slimebot.main.Main;
 import com.slimebot.main.config.guild.GuildConfig;
 import de.mineking.discord.ui.Menu;
 import de.mineking.discord.ui.components.ComponentRow;

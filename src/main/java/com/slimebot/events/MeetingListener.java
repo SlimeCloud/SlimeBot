@@ -42,7 +42,7 @@ public class MeetingListener extends ListenerAdapter {
 	public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
 		String[] id = event.getComponentId().split(":", 2);
 
-		if(!id[0].equals("meeting")) return;
+		if (!id[0].equals("meeting")) return;
 
 		switch (id[1]) {
 			case "end" -> {
@@ -54,7 +54,7 @@ public class MeetingListener extends ListenerAdapter {
 						.flatMap(MeetingConfig::getTodoChannel)
 						.ifPresentOrElse(
 								ch -> {
-									if(!getOpenAgenda(agenda).isEmpty()) {
+									if (!getOpenAgenda(agenda).isEmpty()) {
 										ch.sendMessage(MessageCreateData.fromEditData(buildTodoMessage(event.getGuild(), agenda))).queue(mes -> {
 											if (!ch.equals(event.getChannel())) {
 												event.getMessage().replyEmbeds(
@@ -65,13 +65,9 @@ public class MeetingListener extends ListenerAdapter {
 																.setTimestamp(Instant.now())
 																.build()
 												).queue(x -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS)));
-											}
-
-											else sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS));
+											} else sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS));
 										});
-									}
-
-									else {
+									} else {
 										event.getMessage().replyEmbeds(
 												new EmbedBuilder()
 														.setTitle("Meeting Resultate")
@@ -95,7 +91,7 @@ public class MeetingListener extends ListenerAdapter {
 
 	@Override
 	public void onModalInteraction(@NotNull ModalInteractionEvent event) {
-		if(!event.getModalId().equals("meeting:agenda")) return;
+		if (!event.getModalId().equals("meeting:agenda")) return;
 
 		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
 		modifyFieldValue(builder, 0, value -> value + (value.length() == 1 ? "" : "\n") + event.getValue("text").getAsString());
@@ -156,7 +152,7 @@ public class MeetingListener extends ListenerAdapter {
 	private void editPresence(ButtonInteractionEvent event, User user, int field) {
 		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
 
-		for(int i = 2; i <= 4; i++) modifyFieldValue(builder, i, value -> value.replace(user.getAsMention(), ""));
+		for (int i = 2; i <= 4; i++) modifyFieldValue(builder, i, value -> value.replace(user.getAsMention(), ""));
 		modifyFieldValue(builder, field, value -> value + (value.length() == 1 ? "" : "\n") + user.getAsMention());
 
 		event.editMessageEmbeds(builder.build()).queue();
@@ -289,9 +285,9 @@ public class MeetingListener extends ListenerAdapter {
 
 		List<String> temp = getOpenAgenda(agenda);
 
-		if(temp.isEmpty()) builder.setDisabled(true).addOption("---", "---");
+		if (temp.isEmpty()) builder.setDisabled(true).addOption("---", "---");
 		else {
-			for(int i = 0; i < temp.size(); i++)
+			for (int i = 0; i < temp.size(); i++)
 				builder.addOption(Utils.label(temp.get(i), SelectOption.LABEL_MAX_LENGTH), String.valueOf(i));
 		}
 
