@@ -55,7 +55,7 @@ public class MeetingListener extends ListenerAdapter {
 						.flatMap(MeetingConfig::getTodoChannel)
 						.ifPresentOrElse(
 								ch -> {
-									if (Arrays.stream(agenda.split("\n")).noneMatch(a -> a.length() > 1 && a.matches("\\D*\\d+. (?!~~).*(?!~~)$"))) {
+									if (Arrays.stream(agenda.split("\n")).noneMatch(MeetingListener::isValidAgenda)) {
 										event.getMessage().replyEmbeds(
 												new EmbedBuilder()
 														.setTitle("Meeting Resultate")
@@ -66,7 +66,7 @@ public class MeetingListener extends ListenerAdapter {
 										).queue(x -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS)));
 									} else {
 										ch.sendMessage(MessageCreateData.fromEditData(buildTodoMessage(event.getGuild(),
-												Arrays.stream(agenda.split("\n")).filter(a -> a.length() > 1 && a.matches("\\D*\\d+. (?!~~).*(?!~~)$")).collect(Collectors.joining("\n"))))).queue(mes -> {
+												Arrays.stream(agenda.split("\n")).filter(MeetingListener::isValidAgenda).collect(Collectors.joining("\n"))))).queue(mes -> {
 											if (!ch.equals(event.getChannel())) {
 												event.getMessage().replyEmbeds(
 														new EmbedBuilder()
@@ -242,7 +242,7 @@ public class MeetingListener extends ListenerAdapter {
 		for (int i = 0; i < temp.length; i++) {
 			if (temp[i].contains(". ")) temp[i] = (i + 1) + ". " + temp[i].split(". ")[1];
 
-			if (temp[i].length() > 1 && temp[i].matches("\\D*\\d+. (?!~~).*(?!~~)$")) {
+			if (isValidAgenda(temp[i])) {
 				SelectOption option = SelectOption.of(
 						Utils.label(
 								temp[i].replaceAll(" \\(<@\\d+>\\)", ""),
@@ -282,6 +282,10 @@ public class MeetingListener extends ListenerAdapter {
 				.build();
 	}
 
+	private static boolean isValidAgenda(String s) {
+		return s.length() > 1 && s.matches("\\D*\\d+. (?!~~).*(?!~~)$");
+	}
+
 	private static List<ActionRow> buildComponents(String agenda) {
 		return List.of(
 				ActionRow.of(
@@ -302,7 +306,7 @@ public class MeetingListener extends ListenerAdapter {
 		String[] temp = agenda.split("\n");
 
 		for (int i = 0; i < temp.length; i++)
-			if (temp[i].length() > 1 && temp[i].matches("\\D*\\d+. (?!~~).*(?!~~)$"))
+			if (isValidAgenda(temp[i]))
 				builder.addOption(Utils.label(temp[i], SelectOption.LABEL_MAX_LENGTH), String.valueOf(i));
 
 		if (builder.getOptions().isEmpty()) builder.setDisabled(true).addOption("---", "---");
