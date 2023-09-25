@@ -34,7 +34,11 @@ import java.util.stream.Collectors;
 
 public class MeetingListener extends ListenerAdapter {
 	public final static Modal modal = Modal.create("meeting:agenda", "Punkt zur Agenda hinzufügen")
-			.addActionRow(TextInput.create("text", "Der Text", TextInputStyle.SHORT).build())
+			.addActionRow(
+					TextInput.create("text", "Der Text", TextInputStyle.PARAGRAPH)
+							.setPlaceholder("Du kannst mehrere Punkte durch Trennung mit einer neuen Zeile hinzufügen.")
+							.build()
+			)
 			.build();
 
 	public final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm");
@@ -96,7 +100,9 @@ public class MeetingListener extends ListenerAdapter {
 		if (!event.getModalId().equals("meeting:agenda")) return;
 
 		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
-		modifyFieldValue(builder, 0, value -> value + (value.length() <= 1 ? "1. " : "\n" + (value.split("\n").length + 1) + ". ") + event.getValue("text").getAsString());
+
+		for(String a : event.getValue("text").getAsString().split("\n"))
+			modifyFieldValue(builder, 0, value -> value + (value.length() <= 1 ? "1. " : "\n" + (value.split("\n").length + 1) + ". ") + a);
 
 		event.editMessageEmbeds(builder.build())
 				.setComponents(buildComponents(builder.getFields().get(0).getValue()))
