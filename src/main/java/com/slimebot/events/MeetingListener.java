@@ -33,7 +33,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MeetingListener extends ListenerAdapter {
-	public final static Modal modal = Modal.create("meeting:agenda", "Punkt zur Agenda hinzufügen")
+	public final static Modal agendaAddModal = Modal.create("meeting:agenda:add", "Punkt zur Agenda hinzufügen")
 			.addActionRow(
 					TextInput.create("text", "Der Text", TextInputStyle.PARAGRAPH)
 							.setPlaceholder("Du kannst mehrere Punkte durch Trennung mit einer neuen Zeile hinzufügen.")
@@ -87,7 +87,7 @@ public class MeetingListener extends ListenerAdapter {
 								() -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS))
 						);
 			}
-			case "agenda:add" -> event.replyModal(modal).queue();
+			case "agenda:add" -> event.replyModal(agendaAddModal).queue();
 
 			case "presence:yes" -> editPresence(event, event.getUser(), 2);
 			case "presence:unknown" -> editPresence(event, event.getUser(), 3);
@@ -97,16 +97,39 @@ public class MeetingListener extends ListenerAdapter {
 
 	@Override
 	public void onModalInteraction(@NotNull ModalInteractionEvent event) {
-		if (!event.getModalId().equals("meeting:agenda")) return;
+		String[] id = event.getModalId().split(":", 2);
 
-		EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
+		if (!id[0].equals("meeting")) return;
 
-		for(String a : event.getValue("text").getAsString().split("\n"))
-			modifyFieldValue(builder, 0, value -> value + (value.length() <= 1 ? "1. " : "\n" + (value.split("\n").length + 1) + ". ") + a);
+		switch (id[1]) {
+			case "agenda:add" -> {
+				EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
 
-		event.editMessageEmbeds(builder.build())
-				.setComponents(buildComponents(builder.getFields().get(0).getValue()))
-				.queue();
+				for (String a : event.getValue("text").getAsString().split("\n"))
+					modifyFieldValue(builder, 0, value -> value + (value.length() <= 1 ? "1. " : "\n" + (value.split("\n").length + 1) + ". ") + a);
+
+				event.editMessageEmbeds(builder.build())
+						.setComponents(buildComponents(builder.getFields().get(0).getValue()))
+						.queue();
+			}
+
+			case "agenda:edit" -> {
+				EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
+
+				modifyFieldValue(builder, 0, value -> {
+					int i = Integer.parseInt(event.getValue("id").getAsString());
+					String[] temp = value.split("\n");
+
+					temp[i - 1] = i + ". " + event.getValue("text").getAsString();
+
+					return String.join("\n", temp);
+				});
+
+				event.editMessageEmbeds(builder.build())
+						.setComponents(buildComponents(builder.getFields().get(0).getValue()))
+						.queue();
+			}
+		}
 	}
 
 	@Override
@@ -118,7 +141,7 @@ public class MeetingListener extends ListenerAdapter {
 					int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
 					String[] temp = value.split("\n");
 
-					temp[i] = temp[i].split(". ")[0] + ". ~~" + temp[i].split(". ")[1] + "~~";
+					temp[i] = temp[i].split(". ", 2)[0] + ". ~~" + temp[i].split(". ", 2)[1] + "~~";
 					return String.join("\n", temp);
 				});
 
@@ -127,11 +150,29 @@ public class MeetingListener extends ListenerAdapter {
 						.queue();
 			}
 
+			case "meeting:agenda:edit" -> {
+				int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
+				event.replyModal(
+						Modal.create("meeting:agenda:edit", "Punkt zur Agenda hinzufügen")
+								.addActionRow(
+										TextInput.create("id", "Die ID des Agendapunkts", TextInputStyle.SHORT)
+												.setValue(String.valueOf(i + 1))
+												.build()
+								)
+								.addActionRow(
+										TextInput.create("text", "Der Text", TextInputStyle.SHORT)
+												.setValue(event.getMessage().getEmbeds().get(0).getFields().get(0).getValue().split("\n")[i].split(". ", 2)[1])
+											.build()
+								)
+								.build()
+				).queue();
+			}
+
 			case "todo:done" -> {
 				int i = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
 				String[] temp = event.getMessage().getEmbeds().get(0).getDescription().split("\n");
 
-				temp[i] = temp[i].split(". ")[0] + ". ~~" + temp[i].split(". ")[1] + "~~";
+				temp[i] = temp[i].split(". ", 2)[0] + ". ~~" + temp[i].split(". ", 2)[1] + "~~";
 
 				event.editMessage(
 						buildTodoMessage(
@@ -246,7 +287,7 @@ public class MeetingListener extends ListenerAdapter {
 		String[] temp = agenda.split("\n");
 
 		for (int i = 0; i < temp.length; i++) {
-			if (temp[i].contains(". ")) temp[i] = (i + 1) + ". " + temp[i].split(". ")[1];
+			if (temp[i].contains(". ")) temp[i] = (i + 1) + ". " + temp[i].split(". ", 2)[1];
 
 			if (isValidAgenda(temp[i])) {
 				SelectOption option = SelectOption.of(
@@ -300,14 +341,15 @@ public class MeetingListener extends ListenerAdapter {
 						Button.danger("meeting:presence:no", "Ich kann nicht"),
 						Button.primary("meeting:agenda:add", "Agenda-Punkt hinzufügen")
 				),
-				ActionRow.of(createAgendaSelect(agenda)),
+				ActionRow.of(createAgendaSelect(agenda, "remove", "Agenda-Punkt entfernen")),
+				ActionRow.of(createAgendaSelect(agenda, "edit", "Agenda-Punkt bearbeiten")),
 				ActionRow.of(Button.danger("meeting:end", "Meeting beenden"))
 		);
 	}
 
-	private static StringSelectMenu createAgendaSelect(String agenda) {
-		StringSelectMenu.Builder builder = StringSelectMenu.create("meeting:agenda:remove")
-				.setPlaceholder("Agenda-Punkt entfernen");
+	private static StringSelectMenu createAgendaSelect(String agenda, String id, String placeholder) {
+		StringSelectMenu.Builder builder = StringSelectMenu.create("meeting:agenda:" + id)
+				.setPlaceholder(placeholder);
 
 		String[] temp = agenda.split("\n");
 
