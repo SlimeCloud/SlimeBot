@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class AutoDeleteListener extends ListenerAdapter {
@@ -82,13 +81,6 @@ public class AutoDeleteListener extends ListenerAdapter {
 				.getAutoDeleteConfig().map(a -> a.autoDeleteChannels.get(channel.getId()))
 				.orElse(null);
 
-		if (filters == null) return false;
-
-		Predicate<Message> filter = null;
-		for (AutoDeleteConfig.Filter f : filters) {
-			filter = filter == null ? f.getFilter() : filter.or(f.getFilter());
-		}
-
-		return filter == null || !filter.test(message);
+		return filters != null && (filters.isEmpty() || filters.stream().noneMatch(f -> f.getFilter().test(message)));
 	}
 }
