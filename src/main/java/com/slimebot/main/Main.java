@@ -31,7 +31,9 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.internal.requests.CompletedRestAction;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.slf4j.Logger;
@@ -245,5 +247,9 @@ public class Main {
 
 	public static Logger getLogger() {
 		return logger;
+	}
+
+	public static <T> RestAction<T> emptyAction(T value) {
+		return new CompletedRestAction<>(jdaInstance, value);
 	}
 }

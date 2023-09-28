@@ -35,16 +35,17 @@ public class AutoDeleteListener extends ListenerAdapter {
 		if (!(event.getChannel() instanceof ThreadChannel thread)) return;
 
 		buildThreadDelete(thread)
-				.onErrorFlatMap(e -> buildThreadDelete(thread).delay(5, TimeUnit.SECONDS))
-				.flatMap(x -> deleteFeedback(thread.getOwner().getUser(), thread.getParentChannel()))
-				.queueAfter(1, TimeUnit.SECONDS);
+				.onErrorFlatMap(e -> Main.emptyAction(null).delay(5, TimeUnit.SECONDS).flatMap(x -> buildThreadDelete(thread)))
+				.queueAfter(1, TimeUnit.SECONDS, del -> {
+					if(del) deleteFeedback(thread.getOwner().getUser(), thread.getParentChannel()).queue();
+				});
 	}
 
-	private RestAction<Void> buildThreadDelete(ThreadChannel thread) {
+	private RestAction<Boolean> buildThreadDelete(ThreadChannel thread) {
 		return thread.retrieveStartMessage()
 				.flatMap(mes -> shouldDelete(mes, thread.getParentChannel())
-						? thread.delete()
-						: new CompletedRestAction<>(Main.jdaInstance, null)
+						? thread.delete().map(x -> true)
+						: Main.emptyAction(false)
 				);
 	}
 
