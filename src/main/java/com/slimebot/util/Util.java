@@ -5,8 +5,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class Util {
@@ -64,5 +66,12 @@ public class Util {
 
 	public static String padLeft(String s, char padChar, int n) {
 		return String.format("%" + n + "s", s).replace(' ', padChar);
+	}
+
+	@SuppressWarnings({"unchecked"})
+	public static <T> List<T>[] createListArray(int size) {
+		List<T>[] result = new List[size];
+		Arrays.fill(result, new ArrayList<T>());
+		return result;
 	}
 }
