@@ -166,6 +166,8 @@ public class Main {
 								config.registerCommand(UserReportSlashCommand.class);
 								config.registerCommand(ReportCommand.class);
 							} else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
+
+							config.registerCommand(PollCommand.class);
 						}
 				)
 				.useCommandCache(null);
