@@ -86,7 +86,7 @@ public class BugCommand {
 	public void handleModal(ModalInteractionEvent event) throws IOException {
 		timeout.put(event.getUser().getIdLong(), System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5));
 
-		var id = event.getModalId().split(":", 2);
+		String[] id = event.getModalId().split(":", 2);
 
 		String context = id.length == 1 ? "N/A" : id[1];
 		String solution = event.getValue("solution").getAsString();
