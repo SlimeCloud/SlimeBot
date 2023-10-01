@@ -85,8 +85,8 @@ public class RankCard extends Graphic {
 		BufferedImage backgroundImage = null;
 		try {
 			if (bg.imageURL() != null && !bg.imageURL().isBlank()) {
-				var url = new URL(bg.imageURL());
-				var con = (HttpURLConnection) url.openConnection();
+				URL url = new URL(bg.imageURL());
+				HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
 				con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0");
 

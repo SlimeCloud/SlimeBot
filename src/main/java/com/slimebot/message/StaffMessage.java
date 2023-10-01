@@ -37,7 +37,7 @@ public class StaffMessage extends ListenerAdapter {
 	}
 
 	public static void updateMessage(Guild guild) {
-		var config = GuildConfig.getConfig(guild);
+		GuildConfig config = GuildConfig.getConfig(guild);
 		config.getStaffConfig().ifPresent(staff -> {
 			String content = buildMessage(staff, guild);
 

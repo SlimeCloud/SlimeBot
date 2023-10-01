@@ -43,10 +43,10 @@ dependencies {
 }
 
 String getVersion() {
-    var version = project.version.toString()
+    String version = project.version.toString()
 
     try {
-        var commit = 'git rev-parse --verify --short HEAD'.execute().text.trim()
+        String commit = 'git rev-parse --verify --short HEAD'.execute().text.trim()
         version += "-" + commit
     } catch(IOException ignore) {
         version += "-unknown"
@@ -74,7 +74,7 @@ tasks.register("prepareSources", Copy) {
 }
 
 compileJava {
-    var javaSources = sourceSets["main"].allJava.filter {
+    FileTree javaSources = sourceSets["main"].allJava.filter {
         it.name != "BuildInfo.java"
     }.asFileTree
 
