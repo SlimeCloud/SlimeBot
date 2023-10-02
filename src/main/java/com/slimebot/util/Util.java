@@ -57,15 +57,11 @@ public class Util {
 	}
 
 	public static String padRight(String s, char padChar, int n) {
-		StringBuilder sb = new StringBuilder(s);
-		while (sb.length()<n) sb.append(padChar);
-		return sb.toString();
+		return s + String.valueOf(padChar).repeat(n-s.length());
 	}
 
 	public static String padLeft(String s, char padChar, int n) {
-		StringBuilder sb = new StringBuilder(s);
-		while (sb.length()<n) sb.insert(0, padChar);
-		return sb.toString();
+		return String.valueOf(padChar).repeat(n-s.length()) + s;
 	}
 
 	public static StringBuilder padRight(StringBuilder sb, char padChar, int n) {
