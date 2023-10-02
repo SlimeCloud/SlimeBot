@@ -53,19 +53,39 @@ public class Util {
 	}
 
 	public static String padRight(String s, int n) {
-		return String.format("%-" + n + "s", s);
+		return padRight(s, ' ', n);
 	}
 
 	public static String padLeft(String s, int n) {
-		return String.format("%" + n + "s", s);
+		return padLeft(s, ' ', n);
 	}
 
 	public static String padRight(String s, char padChar, int n) {
-		return String.format("%-" + n + "s", s).replace(' ', padChar);
+		StringBuilder sb = new StringBuilder(s);
+		while (sb.length()<n) sb.append(padChar);
+		return sb.toString();
 	}
 
 	public static String padLeft(String s, char padChar, int n) {
-		return String.format("%" + n + "s", s).replace(' ', padChar);
+		StringBuilder sb = new StringBuilder(s);
+		while (sb.length()<n) sb.insert(0, padChar);
+		return sb.toString();
+	}
+
+	public static StringBuilder padRight(StringBuilder sb, char padChar, int n) {
+		return new StringBuilder(padRight(sb.toString(), padChar, n));
+	}
+
+	public static StringBuilder padLeft(StringBuilder sb, char padChar, int n) {
+		return new StringBuilder(padLeft(sb.toString(), padChar, n));
+	}
+
+	public static StringBuilder padRight(StringBuilder sb, int n) {
+		return new StringBuilder(padRight(sb.toString(), n));
+	}
+
+	public static StringBuilder padLeft(StringBuilder sb, int n) {
+		return new StringBuilder(padLeft(sb.toString(), n));
 	}
 
 	@SuppressWarnings({"unchecked"})
