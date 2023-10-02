@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 import java.time.Instant;
 
-@ApplicationCommand(name = "poll", description = "")
+@ApplicationCommand(name = "poll", description = "erstelle eine abstimmung")
 public class PollCommand {
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event,
