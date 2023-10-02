@@ -6,6 +6,7 @@ import com.slimebot.util.Util;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
 import de.mineking.discord.commands.annotated.ApplicationCommandMethod;
 import de.mineking.discord.commands.annotated.option.Option;
+import de.mineking.discord.commands.annotated.option.OptionArray;
 import de.mineking.discord.events.Listener;
 import de.mineking.discord.events.interaction.StringSelectHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -23,26 +24,13 @@ public class PollCommand {
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event,
 	                           @Option(name = "question") String question,
-	                           @Option(name = "choice1") String choice1,
-	                           @Option(name = "choice2") String choice2,
-	                           @Option(name = "choice3", required = false) String choice3,
-	                           @Option(name = "choice4", required = false) String choice4,
-	                           @Option(name = "choice5", required = false) String choice5,
-	                           @Option(name = "choice6", required = false) String choice6,
-	                           @Option(name = "choice7", required = false) String choice7,
-	                           @Option(name = "choice8", required = false) String choice8,
-	                           @Option(name = "choice9", required = false) String choice9,
-	                           @Option(name = "choice10", required = false) String choice10
+							   @OptionArray(required = 2, optional = 8) @Option(name = "choice") String... options
 	) {
-		String[] options = new String[] {choice1, choice2, choice3, choice4, choice5, choice6, choice7, choice8, choice9, choice10};
-
-
-		EmbedBuilder embed =
-				new EmbedBuilder()
-						.setTitle("Abstimmung")
-						.setDescription(question)
-						.setColor(GuildConfig.getColor(event.getGuild()))
-						.setTimestamp(Instant.now());
+		EmbedBuilder embed = new EmbedBuilder()
+				.setTitle("Abstimmung")
+				.setDescription(question)
+				.setColor(GuildConfig.getColor(event.getGuild()))
+				.setTimestamp(Instant.now());
 
 		for (int i = 0; i < options.length; i++) {
 			String option = options[i];
