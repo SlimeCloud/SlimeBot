@@ -1,5 +1,6 @@
 package com.slimebot.commands.poll;
 
+import com.slimebot.main.CommandPermission;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.util.Util;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
@@ -17,6 +18,9 @@ import java.time.Instant;
 
 @ApplicationCommand(name = "poll", description = "erstelle eine abstimmung")
 public class PollCommand {
+
+	public final CommandPermission permission = CommandPermission.TEAM;
+
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event,
 	                           @Option(name = "question") String question,
