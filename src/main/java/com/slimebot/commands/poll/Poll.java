@@ -5,7 +5,10 @@ import com.slimebot.database.Key;
 import com.slimebot.main.Main;
 import com.slimebot.util.Util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Poll extends DataClass {
 
@@ -14,12 +17,17 @@ public class Poll extends DataClass {
 
 	private String json;
 
-	private transient List<Long>[] values;
+	private transient List<String>[] values;
 
 	public Poll(long id, int options) {
 		this.id = id;
 		this.values = Util.createListArray(options);
 		generateJson();
+	}
+
+
+	public static Poll getPoll(long id) {
+		return load(() -> new Poll(id, 0), Map.of("id", id)).orElseGet(() -> new Poll(id, 0));
 	}
 
 	@Override
@@ -39,21 +47,50 @@ public class Poll extends DataClass {
 		this.json = Main.gson.toJson(values);
 	}
 
-	private void remove(long member) {
-		for (List<Long> value : values) {
-			value.remove(member);
+
+	/**
+	 * @return true if the member has already voted and was removed now
+	 */
+	private boolean remove(long member) {
+		for (List<String> value : values) {
+			if (value.remove(Long.toString(member))) return true;
 		}
+		return false;
 	}
 
-	public void set(int option, long member) {
-		if (values[option].contains(member)) values[option].remove(member);
+	enum Type {
+		REMOVED,
+		SET,
+		REMOVED_SET
+	}
+
+	public Type set(int option, long member) {
+		if (values[option].contains(Long.toString(member))) {
+			values[option].remove(Long.toString(member));
+			return Type.REMOVED;
+		}
 		else {
-			remove(member);
-			values[option].add(member);
+			boolean flag = remove(member);
+			values[option].add(Long.toString(member));
+			return flag ? Type.REMOVED_SET : Type.SET;
 		}
 	}
 
-	public List<Long> getOption(int option) {
+	public List<String> getOption(int option) {
 		return values[option];
+	}
+
+	public int getOptionCount() {
+		return values.length;
+	}
+
+	public List<Long> getAll() {
+		List<Long> result = new ArrayList<>();
+		for (List<String> value : values) {
+			for (String s : value) {
+				result.add(Long.parseLong(s));
+			}
+		}
+		return result;
 	}
 }
