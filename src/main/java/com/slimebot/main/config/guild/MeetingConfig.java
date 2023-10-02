@@ -24,6 +24,7 @@ public class MeetingConfig {
 	public Optional<GuildMessageChannel> getTodoChannel() {
 		return GuildConfig.getChannel(todoChannel);
 	}
+
 	public Optional<AudioChannel> getVoiceChannel() {
 		return GuildConfig.getChannel(voiceChannel, AudioChannel.class);
 	}

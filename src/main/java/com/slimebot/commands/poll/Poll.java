@@ -5,13 +5,9 @@ import com.slimebot.database.Key;
 import com.slimebot.main.Main;
 import com.slimebot.util.Util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Poll extends DataClass {
-
 	@Key
 	private final long id;
 
@@ -38,7 +34,7 @@ public class Poll extends DataClass {
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked"})
+	@SuppressWarnings("unchecked")
 	protected void finishedLoading() {
 		this.values = Main.gson.fromJson(json, List[].class);
 	}
@@ -52,26 +48,24 @@ public class Poll extends DataClass {
 	 * @return true if the member has already voted and was removed now
 	 */
 	private boolean remove(long member) {
-		for (List<String> value : values) {
+		for (List<String> value : values)
 			if (value.remove(Long.toString(member))) return true;
-		}
+
 		return false;
 	}
 
-	enum Type {
+	public enum Type {
 		REMOVED,
 		SET,
 		REMOVED_SET
 	}
 
 	public Type set(int option, long member) {
-		if (values[option].contains(Long.toString(member))) {
-			values[option].remove(Long.toString(member));
-			return Type.REMOVED;
-		}
+		if (values[option].remove(Long.toString(member))) return Type.REMOVED;
 		else {
 			boolean flag = remove(member);
 			values[option].add(Long.toString(member));
+
 			return flag ? Type.REMOVED_SET : Type.SET;
 		}
 	}
@@ -85,12 +79,9 @@ public class Poll extends DataClass {
 	}
 
 	public List<Long> getAll() {
-		List<Long> result = new ArrayList<>();
-		for (List<String> value : values) {
-			for (String s : value) {
-				result.add(Long.parseLong(s));
-			}
-		}
-		return result;
+		return Arrays.stream(values)
+				.flatMap(Collection::stream)
+				.map(Long::parseLong)
+				.toList();
 	}
 }

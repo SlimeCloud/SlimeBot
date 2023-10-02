@@ -3,11 +3,8 @@ package com.slimebot.util;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -57,11 +54,11 @@ public class Util {
 	}
 
 	public static String padRight(String s, char padChar, int n) {
-		return s + String.valueOf(padChar).repeat(n-s.length());
+		return s + String.valueOf(padChar).repeat(n - s.length());
 	}
 
 	public static String padLeft(String s, char padChar, int n) {
-		return String.valueOf(padChar).repeat(n-s.length()) + s;
+		return String.valueOf(padChar).repeat(n - s.length()) + s;
 	}
 
 	public static StringBuilder padRight(StringBuilder sb, char padChar, int n) {

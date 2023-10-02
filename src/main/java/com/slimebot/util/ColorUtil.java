@@ -48,7 +48,7 @@ public class ColorUtil {
 			if (color.startsWith("#")) return parseHex(color);
 			if (color.contains(",")) return parseRGBA(color);
 			if (Util.isNumeric(color)) return parseRGBACode(color);
-		} catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return null;
 		}
 

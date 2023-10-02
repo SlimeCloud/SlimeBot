@@ -24,7 +24,7 @@ public class PollCommand {
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event,
 	                           @Option(name = "question") String question,
-							   @OptionArray(required = 2, optional = 8) @Option(name = "choice") String... options
+	                           @OptionArray(required = 2, optional = 8) @Option(name = "choice") String... options
 	) {
 		EmbedBuilder embed = new EmbedBuilder()
 				.setTitle("Abstimmung")
@@ -32,26 +32,24 @@ public class PollCommand {
 				.setColor(GuildConfig.getColor(event.getGuild()))
 				.setTimestamp(Instant.now());
 
-		for (int i = 0; i < options.length; i++) {
-			String option = options[i];
-			if (option==null) continue;
-			embed.addField("#" + (i+1) + "  " + option, "(0) **0%**  " + createProgressbar(0), false);
-		}
-
 		long id = System.currentTimeMillis();
 
 		StringSelectMenu.Builder select = StringSelectMenu.create("poll:%s:select".formatted(id))
-						.setPlaceholder("Wähle weise");
+				.setPlaceholder("Wähle weise");
 
 		for (int i = 0; i < options.length; i++) {
 			String option = options[i];
-			if (option==null) continue;
-			select.addOption("#" + (i+1) + "  " + option, "#" + (i+1));
+			if (option == null) continue;
+
+			embed.addField("#" + (i + 1) + "  " + option, "(0) **0%**  " + createProgressbar(0), false);
+			select.addOption("#" + (i + 1) + "  " + option, "#" + (i + 1));
 		}
 
-		new Poll(id, options.length+1).save();
+		new Poll(id, options.length + 1).save();
 
-		event.replyEmbeds(embed.build()).addActionRow(select.build()).queue();
+		event.replyEmbeds(embed.build())
+				.addActionRow(select.build())
+				.queue();
 	}
 
 	@Listener(type = StringSelectHandler.class, filter = "poll:\\d+:select")
@@ -68,16 +66,15 @@ public class PollCommand {
 		for (int i = 0; i < embed.getFields().size(); i++) {
 			MessageEmbed.Field field = embed.getFields().get(i);
 			String option = field.getName();
-			if (option==null || !option.startsWith("#")) break;
+			if (option == null || !option.startsWith("#")) break;
+
 			String optionNum = option.split(" ")[0];
-			if (event.getSelectedOptions().get(0).getValue().equals(optionNum)) {
-				Poll.Type type = poll.set(i, event.getMember().getIdLong());
-				msg = (switch (type) {
+			if (event.getSelectedOptions().get(0).getValue().equals(optionNum))
+				msg = (switch (poll.set(i, event.getMember().getIdLong())) {
 					case SET -> "Du hast für option **%s** gestimmt.";
 					case REMOVED -> "Du hast deine Stimme von option **%s** entfernt.";
 					case REMOVED_SET -> "Du hast deine Stimme zu option **%s** geändert.";
 				}).formatted(optionNum);
-			}
 		}
 
 		poll.save();
@@ -89,34 +86,34 @@ public class PollCommand {
 		for (int i = 0; i < embed.getFields().size(); i++) {
 			MessageEmbed.Field field = embed.getFields().get(i);
 			String option = field.getName();
-			if (option==null || !option.startsWith("#")) break;
+			if (option == null || !option.startsWith("#")) break;
 			int count = poll.getOption(i).size();
-			double percentage = totalCount==0 ? 0 : ((double) count/totalCount);
-			pad = Math.max(pad, ("(" + count + ") **" + ((int)(percentage*100)) + "%**  ").length());
+			double percentage = totalCount == 0 ? 0 : ((double) count / totalCount);
+			pad = Math.max(pad, ("(" + count + ") **" + ((int) (percentage * 100)) + "%**  ").length());
 		}
 
 		for (int i = 0; i < embed.getFields().size(); i++) {
 			MessageEmbed.Field field = embed.getFields().get(i);
 			String option = field.getName();
-			if (option==null || !option.startsWith("#")) break;
+			if (option == null || !option.startsWith("#")) break;
 			int count = poll.getOption(i).size();
-			double percentage = totalCount==0 ? 0 : ((double) count/totalCount);
-			builder.addField(option, Util.padRight("(" + count + ") **" + ((int)(percentage*100)) + "%**  ", '\u1CBC', pad) + createProgressbar(percentage), false);
+			double percentage = totalCount == 0 ? 0 : ((double) count / totalCount);
+			builder.addField(option, Util.padRight("(" + count + ") **" + ((int) (percentage * 100)) + "%**  ", '\u1CBC', pad) + createProgressbar(percentage), false);
 		}
 
 		event.editMessageEmbeds(builder.build()).queue();
-		if (msg!=null) event.getHook().sendMessage(msg).setEphemeral(true).queue();
+		if (msg != null) event.getHook().sendMessage(msg).setEphemeral(true).queue();
 	}
 
 	private String createProgressbar(double value) {
-		value*=400;
+		value *= 400;
 		StringBuilder sb = new StringBuilder();
-		for (int v = (int) Math.round(value); v >= 10; v-=10) {
+		for (int v = (int) Math.round(value); v >= 10; v -= 10) {
 			sb.append('░');
 		}
-		sb.append(value>=0.10 ? "||" : "");
-		sb = Util.padRight(sb, '░', 40 + (value>=0.10 ? 2 : 0));
-		sb.insert(0, value>=10 ? "\\|||" : "|");
+		sb.append(value >= 0.10 ? "||" : "");
+		sb = Util.padRight(sb, '░', 40 + (value >= 0.10 ? 2 : 0));
+		sb.insert(0, value >= 10 ? "\\|||" : "|");
 		return sb + "|";
 	}
 }
