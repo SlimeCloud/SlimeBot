@@ -11,6 +11,7 @@ import com.slimebot.commands.level.LeaderboardCommand;
 import com.slimebot.commands.level.LevelCommand;
 import com.slimebot.commands.level.RankCommand;
 import com.slimebot.commands.level.card.CardCommand;
+import com.slimebot.commands.poll.PollCommand;
 import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
@@ -52,7 +53,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class Main {
 	public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
-	public final static Gson gson = new GsonBuilder()
+
+	public final static Gson gson = new Gson();
+
+	public final static Gson prettyGson = new GsonBuilder()
 			.setPrettyPrinting()
 			.create();
 
@@ -168,6 +172,9 @@ public class Main {
 								config.registerCommand(UserReportSlashCommand.class);
 								config.registerCommand(ReportCommand.class);
 							} else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
+
+							if (dbAvailable) config.registerCommand(PollCommand.class);
+							else logger.warn("Poll System aufgrund von fehlender Datenbank deaktiviert");
 						}
 				)
 				.useCommandCache(null);

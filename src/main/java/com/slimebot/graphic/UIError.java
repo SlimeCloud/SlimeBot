@@ -11,9 +11,9 @@ public enum UIError {
 	 */
 	COLOR("""
 			Die Farbe *%s* ist ungültig!
-			
+						
 			Bitte nutze eines der Folgenden Formate
-			
+						
 			**hex:** *#543423*
 			**rgb:** *352345*
 			**rgb:** *30,45,64*

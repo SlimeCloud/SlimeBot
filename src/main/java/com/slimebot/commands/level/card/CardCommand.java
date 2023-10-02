@@ -113,7 +113,7 @@ public class CardCommand {
 							false
 					);
 
-					if(i != fields.length - 1 && !parsedName[0].equals(Util.parseCamelCase(fields[i + 1].getName())[0])) builder.addBlankField(false);
+					if (i != fields.length - 1 && !parsedName[0].equals(Util.parseCamelCase(fields[i + 1].getName())[0])) builder.addBlankField(false);
 				} catch (IllegalAccessException e) {
 					logger.error("Failed to read CardProfile for user " + event.getUser(), e);
 				}

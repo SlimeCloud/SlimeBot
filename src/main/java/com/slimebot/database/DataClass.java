@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 @EqualsAndHashCode
 public abstract class DataClass {
-
 	public static final Gson gson = new Gson();
 
 	private transient String cache;
@@ -72,6 +71,8 @@ public abstract class DataClass {
 		this.cache = gson.toJson(this);
 	}
 
+	protected void finishedLoading() {}
+
 	public synchronized DataClass save() {
 		Object cacheObj = gson.fromJson(cache, getClass());
 		Map<String, Object> updatedValues = new HashMap<>();
@@ -91,7 +92,6 @@ public abstract class DataClass {
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
-
 		}
 
 		if (keys.containsAll(updatedValues.keySet())) return this;
@@ -148,13 +148,28 @@ public abstract class DataClass {
 
 	public static <T extends DataClass> List<T> loadAll(@NotNull Supplier<T> creator, @NotNull Map<String, Object> keys) {
 		String sql = buildSQL(creator.get().getTableName(), keys);
-		return Main.database.handle(handle -> handle.createQuery(sql).bindMap(keys).map((rs, ctx) -> setFields(creator.get(), rs)).list());
+
+		return Main.database.handle(handle -> handle.createQuery(sql)
+				.bindMap(keys)
+				.map((rs, ctx) -> setFields(creator.get(), rs))
+				.stream()
+				.peek(DataClass::finishedLoading)
+				.toList()
+		);
 	}
 
 	public static <T extends DataClass> @NotNull Optional<T> load(Supplier<T> creator, Map<String, Object> keys) {
 		T instance = creator.get();
 		String sql = buildSQL(instance.getTableName(), keys);
-		return Main.database.handle(handle -> handle.createQuery(sql).bindMap(keys).map((rs, ctx) -> setFields(instance, rs)).findFirst());
+
+		Optional<T> result = Main.database.handle(handle -> handle.createQuery(sql)
+				.bindMap(keys)
+				.map((rs, ctx) -> setFields(instance, rs))
+				.findFirst()
+		);
+
+		result.ifPresent(DataClass::finishedLoading);
+		return result;
 	}
 
 	public String getTableName() {
@@ -174,5 +189,4 @@ public abstract class DataClass {
 		if (type.isAssignableFrom(String.class)) return rs.getString(name);
 		return rs.getObject(name);
 	}
-
 }

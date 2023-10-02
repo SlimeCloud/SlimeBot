@@ -88,7 +88,7 @@ public class BorderFrame extends ModalFrameBase {
 					case BACKGROUND -> profile.setBackgroundBorderWidth(width);
 					case PROGRESSBAR -> profile.setProgressBarBorderWidth(width);
 				}
-			} catch(NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				UIError.NUMBER.send(event, size.getAsString());
 			}
 		}
@@ -102,8 +102,7 @@ public class BorderFrame extends ModalFrameBase {
 					case BACKGROUND -> profile.setBackgroundBorderColor(rgba);
 					case PROGRESSBAR -> profile.setProgressBarBorderColor(rgba);
 				}
-			}
-			else UIError.COLOR.send(event, color.getAsString());
+			} else UIError.COLOR.send(event, color.getAsString());
 		} else {
 			switch (part) {
 				case AVATAR -> profile.setAvatarBorderColor(CardProfile.DEFAULT.getAvatarBorderColor());
