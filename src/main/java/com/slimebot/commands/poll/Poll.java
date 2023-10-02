@@ -78,8 +78,8 @@ public class Poll extends DataClass {
 		return values[option];
 	}
 
-	public int getOptionCount() {
-		return values.length;
+	public List<String>[] getOptions() {
+		return values;
 	}
 
 	public List<Long> getAll() {

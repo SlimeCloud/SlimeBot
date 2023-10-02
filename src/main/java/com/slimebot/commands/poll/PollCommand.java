@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 import java.time.Instant;
+import java.util.Arrays;
 
 @ApplicationCommand(name = "poll", description = "Erstelle eine Abstimmung")
 public class PollCommand {
@@ -59,60 +60,54 @@ public class PollCommand {
 			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 			EmbedBuilder builder = new EmbedBuilder(embed).clearFields();
 
-			String msg = null;
-
 			for (int i = 0; i < embed.getFields().size(); i++) {
 				MessageEmbed.Field field = embed.getFields().get(i);
 				String option = field.getName();
-				if (option == null || !option.startsWith("#")) break;
+				if (option == null || !option.startsWith("#")) continue;
 
 				String optionNum = option.split(" ")[0];
-				if (event.getSelectedOptions().get(0).getValue().equals(optionNum))
-					msg = (switch (poll.set(i, event.getMember().getIdLong())) {
-						case SET -> "Du hast für option **%s** gestimmt.";
-						case REMOVED -> "Du hast deine Stimme von option **%s** entfernt.";
-						case REMOVED_SET -> "Du hast deine Stimme zu option **%s** geändert.";
-					}).formatted(optionNum);
+				if (event.getSelectedOptions().get(0).getValue().equals(optionNum)) {
+					Poll.Type res = poll.set(i, event.getMember().getIdLong());
+					event.getHook().sendMessage(
+							(switch (res) {
+								case SET -> "Du hast für option **%s** gestimmt.";
+								case REMOVED -> "Du hast deine Stimme von option **%s** entfernt.";
+								case REMOVED_SET -> "Du hast deine Stimme zu option **%s** geändert.";
+							}).formatted(optionNum)
+					).setEphemeral(true).queue();
+				}
 			}
 
 			poll.save();
 
 			int totalCount = poll.getAll().size();
-
-			int pad = 0;
-
-			for (int i = 0; i < embed.getFields().size(); i++) {
-				MessageEmbed.Field field = embed.getFields().get(i);
-				String option = field.getName();
-				if (option == null || !option.startsWith("#")) break;
-				int count = poll.getOption(i).size();
-				double percentage = totalCount == 0 ? 0 : ((double) count / totalCount);
-				pad = Math.max(pad, ("(" + count + ") **" + ((int) (percentage * 100)) + "%**  ").length());
-			}
+			int maxCountSize = Arrays.stream(poll.getOptions())
+					.map(l -> String.valueOf(l.size()))
+					.mapToInt(String::length)
+					.max().orElse(0);
 
 			for (int i = 0; i < embed.getFields().size(); i++) {
 				MessageEmbed.Field field = embed.getFields().get(i);
 				String option = field.getName();
-				if (option == null || !option.startsWith("#")) break;
+				if (option == null || !option.startsWith("#")) continue;
+
 				int count = poll.getOption(i).size();
 				double percentage = totalCount == 0 ? 0 : ((double) count / totalCount);
-				builder.addField(option, Util.padRight("(" + count + ") **" + ((int) (percentage * 100)) + "%**  ", '\u1CBC', pad) + createProgressbar(percentage), false);
+
+				builder.addField(
+						option,
+						Util.padRight("(" + count + ") **" + ((int) (percentage * 100)) + "%**", ' ', 1 + maxCountSize + 4 + 3 + 3 + 2) + "\\|" + createProgressbar(percentage) + "\\|",
+						false
+				);
 			}
 
 			event.editMessageEmbeds(builder.build()).queue();
-			if (msg != null) event.getHook().sendMessage(msg).setEphemeral(true).queue();
 		});
 	}
 
 	private String createProgressbar(double value) {
-		value *= 400;
-		StringBuilder sb = new StringBuilder();
-		for (int v = (int) Math.round(value); v >= 10; v -= 10) {
-			sb.append('░');
-		}
-		sb.append(value >= 0.10 ? "||" : "");
-		sb = Util.padRight(sb, '░', 40 + (value >= 0.10 ? 2 : 0));
-		sb.insert(0, value >= 10 ? "\\|||" : "|");
-		return sb + "|";
+		StringBuilder base = new StringBuilder("░".repeat(40));
+		if(value > 1.0 / 40) base.insert((int) value * 40, "||").insert(0, "||");
+		return base.toString();
 	}
 }
