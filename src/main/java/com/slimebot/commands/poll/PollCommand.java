@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
+import java.time.Instant;
+
 @ApplicationCommand(name = "poll", description = "")
 public class PollCommand {
 	@ApplicationCommandMethod
@@ -37,7 +39,7 @@ public class PollCommand {
 						.setTitle("Abstimmung")
 						.setDescription(question)
 						.setColor(GuildConfig.getColor(event.getGuild()))
-						.setTimestamp(Util.timestamp());
+						.setTimestamp(Instant.now());
 
 		for (int i = 0; i < options.length; i++) {
 			String option = options[i];

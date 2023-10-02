@@ -48,10 +48,6 @@ public class Util {
 		}
 	}
 
-	public static Instant timestamp() {
-		return new Date().toInstant().atZone(ZoneId.systemDefault()).toInstant();
-	}
-
 	public static String padRight(String s, int n) {
 		return padRight(s, ' ', n);
 	}
