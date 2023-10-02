@@ -51,7 +51,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class Main {
 	public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
-	public final static Gson gson = new GsonBuilder()
+
+	public final static Gson gson = new Gson();
+
+	public final static Gson prettyGson = new GsonBuilder()
 			.setPrettyPrinting()
 			.create();
 

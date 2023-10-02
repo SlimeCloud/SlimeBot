@@ -4,6 +4,7 @@ import com.slimebot.database.DataClass;
 import com.slimebot.database.Key;
 import com.slimebot.main.Main;
 import com.slimebot.util.Util;
+import io.leangen.geantyref.TypeToken;
 
 import java.util.*;
 
@@ -13,7 +14,7 @@ public class Poll extends DataClass {
 
 	private String json;
 
-	private transient List<String>[] values;
+	private transient List<Long>[] values;
 
 	private Poll() {
 		id = 0;
@@ -38,22 +39,18 @@ public class Poll extends DataClass {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected void finishedLoading() {
-		this.values = Main.gson.fromJson(json, List[].class);
+		this.values = Main.gson.fromJson(json, new TypeToken<List<Long>[]>(){
+		}.getType());
 	}
 
 	private void generateJson() {
 		this.json = Main.gson.toJson(values);
 	}
 
-
-	/**
-	 * @return true if the member has already voted and was removed now
-	 */
 	private boolean remove(long member) {
-		for (List<String> value : values)
-			if (value.remove(Long.toString(member))) return true;
+		for (List<Long> value : values)
+			if (value.remove(member)) return true;
 
 		return false;
 	}
@@ -65,27 +62,22 @@ public class Poll extends DataClass {
 	}
 
 	public Type set(int option, long member) {
-		if (values[option].remove(Long.toString(member))) return Type.REMOVED;
+		if (values[option].remove(member)) return Type.REMOVED;
 		else {
 			boolean flag = remove(member);
-			values[option].add(Long.toString(member));
+			values[option].add(member);
 
 			return flag ? Type.REMOVED_SET : Type.SET;
 		}
 	}
 
-	public List<String> getOption(int option) {
-		return values[option];
-	}
-
-	public List<String>[] getOptions() {
+	public List<Long>[] getOptions() {
 		return values;
 	}
 
 	public List<Long> getAll() {
 		return Arrays.stream(values)
 				.flatMap(Collection::stream)
-				.map(Long::parseLong)
 				.toList();
 	}
 }

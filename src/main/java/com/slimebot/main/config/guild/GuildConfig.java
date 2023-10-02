@@ -41,7 +41,6 @@ import java.util.Optional;
 @ConfigCategory(name = "guild", description = "Haupteinstellungen")
 @Slf4j
 public class GuildConfig {
-
 	private static final Map<Long, GuildConfig> guildConfig = new HashMap<>();
 
 	/**
@@ -115,7 +114,7 @@ public class GuildConfig {
 	 */
 	public synchronized void save() {
 		try (Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
-			Main.gson.toJson(this, writer);
+			Main.prettyGson.toJson(this, writer);
 		} catch (Exception e) {
 			logger.error("Failed to save config for guild " + guild, e);
 		}

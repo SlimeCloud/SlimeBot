@@ -42,7 +42,13 @@ public class PollCommand {
 				String option = options[i];
 				if (option == null) continue;
 
-				embed.addField("#" + (i + 1) + "  " + option, "(0) **0%**  " + createProgressbar(0), false);
+				embed.addField(buildField(
+						0,
+						1,
+						0,
+						"#" + (i + 1) + "  " + option
+				));
+
 				select.addOption("#" + (i + 1) + "  " + option, "#" + (i + 1));
 			}
 
@@ -81,7 +87,7 @@ public class PollCommand {
 			poll.save();
 
 			int totalCount = poll.getAll().size();
-			int maxCountSize = Arrays.stream(poll.getOptions())
+			int maxCountLength = Arrays.stream(poll.getOptions())
 					.map(l -> String.valueOf(l.size()))
 					.mapToInt(String::length)
 					.max().orElse(0);
@@ -91,23 +97,31 @@ public class PollCommand {
 				String option = field.getName();
 				if (option == null || !option.startsWith("#")) continue;
 
-				int count = poll.getOption(i).size();
-				double percentage = totalCount == 0 ? 0 : ((double) count / totalCount);
+				int count = poll.getOptions()[i].size();
 
-				builder.addField(
-						option,
-						Util.padRight("(" + count + ") **" + ((int) (percentage * 100)) + "%**", ' ', 1 + maxCountSize + 4 + 3 + 3 + 2) + "\\|" + createProgressbar(percentage) + "\\|",
-						false
-				);
+				builder.addField(buildField(
+						poll.getOptions()[i].size(),
+						maxCountLength,
+						totalCount == 0 ? 0 : ((double) count / totalCount),
+						option
+				));
 			}
 
 			event.editMessageEmbeds(builder.build()).queue();
 		});
 	}
 
+	private MessageEmbed.Field buildField(int count, int maxCountLength, double percentage, String text) {
+		return new MessageEmbed.Field(
+				text,
+				Util.padRight("(" + count + ") **" + ((int) (percentage * 100)) + "%**", ' ', 1 + maxCountLength + 4 + 3 + 3 + 2) + "\\|" + createProgressbar(percentage) + "\\|",
+				false
+		);
+	}
+
 	private String createProgressbar(double value) {
 		StringBuilder base = new StringBuilder("░".repeat(40));
-		if(value > 1.0 / 40) base.insert((int) value * 40, "||").insert(0, "||");
+		if(value > 1.0 / 40) base.insert((int) (value * 40), "||").insert(0, "||");
 		return base.toString();
 	}
 }
