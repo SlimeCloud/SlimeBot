@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 import java.time.Instant;
@@ -26,83 +27,81 @@ public class PollCommand {
 	                           @Option(name = "question") String question,
 	                           @OptionArray(required = 2, optional = 8) @Option(name = "choice") String... options
 	) {
-		EmbedBuilder embed = new EmbedBuilder()
-				.setTitle("Abstimmung")
-				.setDescription(question)
-				.setColor(GuildConfig.getColor(event.getGuild()))
-				.setTimestamp(Instant.now());
+		event.deferReply().flatMap(InteractionHook::retrieveOriginal).queue(mes -> {
+			EmbedBuilder embed = new EmbedBuilder()
+					.setTitle("Abstimmung")
+					.setDescription(question)
+					.setColor(GuildConfig.getColor(event.getGuild()))
+					.setTimestamp(Instant.now());
 
-		long id = System.currentTimeMillis();
+			StringSelectMenu.Builder select = StringSelectMenu.create("poll:select")
+					.setPlaceholder("Wähle weise");
 
-		StringSelectMenu.Builder select = StringSelectMenu.create("poll:%s:select".formatted(id))
-				.setPlaceholder("Wähle weise");
+			for (int i = 0; i < options.length; i++) {
+				String option = options[i];
+				if (option == null) continue;
 
-		for (int i = 0; i < options.length; i++) {
-			String option = options[i];
-			if (option == null) continue;
+				embed.addField("#" + (i + 1) + "  " + option, "(0) **0%**  " + createProgressbar(0), false);
+				select.addOption("#" + (i + 1) + "  " + option, "#" + (i + 1));
+			}
 
-			embed.addField("#" + (i + 1) + "  " + option, "(0) **0%**  " + createProgressbar(0), false);
-			select.addOption("#" + (i + 1) + "  " + option, "#" + (i + 1));
-		}
+			new Poll(mes.getIdLong(), options.length + 1).save();
 
-		new Poll(id, options.length + 1).save();
-
-		event.replyEmbeds(embed.build())
-				.addActionRow(select.build())
-				.queue();
+			event.getHook().editOriginalEmbeds(embed.build())
+					.setActionRow(select.build())
+					.queue();
+		});
 	}
 
-	@Listener(type = StringSelectHandler.class, filter = "poll:\\d+:select")
+	@Listener(type = StringSelectHandler.class, filter = "poll:select")
 	public void handle(StringSelectInteractionEvent event) {
-		long id = Long.parseLong(event.getComponentId().split(":")[1]);
+		Poll.getPoll(event.getMessageIdLong()).ifPresent(poll -> {
+			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
+			EmbedBuilder builder = new EmbedBuilder(embed).clearFields();
 
-		Poll poll = Poll.getPoll(id);
+			String msg = null;
 
-		MessageEmbed embed = event.getMessage().getEmbeds().get(0);
-		EmbedBuilder builder = new EmbedBuilder(embed).clearFields();
+			for (int i = 0; i < embed.getFields().size(); i++) {
+				MessageEmbed.Field field = embed.getFields().get(i);
+				String option = field.getName();
+				if (option == null || !option.startsWith("#")) break;
 
-		String msg = null;
+				String optionNum = option.split(" ")[0];
+				if (event.getSelectedOptions().get(0).getValue().equals(optionNum))
+					msg = (switch (poll.set(i, event.getMember().getIdLong())) {
+						case SET -> "Du hast für option **%s** gestimmt.";
+						case REMOVED -> "Du hast deine Stimme von option **%s** entfernt.";
+						case REMOVED_SET -> "Du hast deine Stimme zu option **%s** geändert.";
+					}).formatted(optionNum);
+			}
 
-		for (int i = 0; i < embed.getFields().size(); i++) {
-			MessageEmbed.Field field = embed.getFields().get(i);
-			String option = field.getName();
-			if (option == null || !option.startsWith("#")) break;
+			poll.save();
 
-			String optionNum = option.split(" ")[0];
-			if (event.getSelectedOptions().get(0).getValue().equals(optionNum))
-				msg = (switch (poll.set(i, event.getMember().getIdLong())) {
-					case SET -> "Du hast für option **%s** gestimmt.";
-					case REMOVED -> "Du hast deine Stimme von option **%s** entfernt.";
-					case REMOVED_SET -> "Du hast deine Stimme zu option **%s** geändert.";
-				}).formatted(optionNum);
-		}
+			int totalCount = poll.getAll().size();
 
-		poll.save();
+			int pad = 0;
 
-		int totalCount = poll.getAll().size();
+			for (int i = 0; i < embed.getFields().size(); i++) {
+				MessageEmbed.Field field = embed.getFields().get(i);
+				String option = field.getName();
+				if (option == null || !option.startsWith("#")) break;
+				int count = poll.getOption(i).size();
+				double percentage = totalCount == 0 ? 0 : ((double) count / totalCount);
+				pad = Math.max(pad, ("(" + count + ") **" + ((int) (percentage * 100)) + "%**  ").length());
+			}
 
-		int pad = 0;
+			for (int i = 0; i < embed.getFields().size(); i++) {
+				MessageEmbed.Field field = embed.getFields().get(i);
+				String option = field.getName();
+				if (option == null || !option.startsWith("#")) break;
+				int count = poll.getOption(i).size();
+				double percentage = totalCount == 0 ? 0 : ((double) count / totalCount);
+				builder.addField(option, Util.padRight("(" + count + ") **" + ((int) (percentage * 100)) + "%**  ", '\u1CBC', pad) + createProgressbar(percentage), false);
+			}
 
-		for (int i = 0; i < embed.getFields().size(); i++) {
-			MessageEmbed.Field field = embed.getFields().get(i);
-			String option = field.getName();
-			if (option == null || !option.startsWith("#")) break;
-			int count = poll.getOption(i).size();
-			double percentage = totalCount == 0 ? 0 : ((double) count / totalCount);
-			pad = Math.max(pad, ("(" + count + ") **" + ((int) (percentage * 100)) + "%**  ").length());
-		}
-
-		for (int i = 0; i < embed.getFields().size(); i++) {
-			MessageEmbed.Field field = embed.getFields().get(i);
-			String option = field.getName();
-			if (option == null || !option.startsWith("#")) break;
-			int count = poll.getOption(i).size();
-			double percentage = totalCount == 0 ? 0 : ((double) count / totalCount);
-			builder.addField(option, Util.padRight("(" + count + ") **" + ((int) (percentage * 100)) + "%**  ", '\u1CBC', pad) + createProgressbar(percentage), false);
-		}
-
-		event.editMessageEmbeds(builder.build()).queue();
-		if (msg != null) event.getHook().sendMessage(msg).setEphemeral(true).queue();
+			event.editMessageEmbeds(builder.build()).queue();
+			if (msg != null) event.getHook().sendMessage(msg).setEphemeral(true).queue();
+		});
 	}
 
 	private String createProgressbar(double value) {

@@ -15,6 +15,10 @@ public class Poll extends DataClass {
 
 	private transient List<String>[] values;
 
+	private Poll() {
+		id = 0;
+	}
+
 	public Poll(long id, int options) {
 		this.id = id;
 		this.values = Util.createListArray(options);
@@ -22,8 +26,8 @@ public class Poll extends DataClass {
 	}
 
 
-	public static Poll getPoll(long id) {
-		return load(() -> new Poll(id, 0), Map.of("id", id)).orElseGet(() -> new Poll(id, 0));
+	public static Optional<Poll> getPoll(long id) {
+		return load(Poll::new, Map.of("id", id));
 	}
 
 	@Override
