@@ -11,6 +11,7 @@ import com.slimebot.commands.level.LeaderboardCommand;
 import com.slimebot.commands.level.LevelCommand;
 import com.slimebot.commands.level.RankCommand;
 import com.slimebot.commands.level.card.CardCommand;
+import com.slimebot.commands.poll.PollCommand;
 import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
@@ -167,7 +168,8 @@ public class Main {
 								config.registerCommand(ReportCommand.class);
 							} else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
 
-							config.registerCommand(PollCommand.class);
+							if (dbAvailable) config.registerCommand(PollCommand.class);
+							else logger.warn("Poll System aufgrund von fehlender Datenbank deaktiviert");
 						}
 				)
 				.useCommandCache(null);
