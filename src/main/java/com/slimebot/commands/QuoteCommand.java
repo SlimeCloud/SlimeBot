@@ -10,6 +10,7 @@ import de.mineking.discord.events.Listener;
 import de.mineking.discord.events.interaction.ButtonHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -17,6 +18,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApplicationCommand(name = "quote", description = "Zitiere jemanden", feature = "quote")
@@ -24,8 +26,8 @@ public class QuoteCommand {
 	@ApplicationCommandMethod
 	public static void quote(IReplyCallback event,
 	                         @Option(description = "Das Mitglied, das du zitieren möchtest") Member author,
-	                         @Option(description = "Die Aussage des Mitglieds") String message,
-	                         String url,
+	                         @Option(name = "message", description = "Die Aussage des Mitglieds") String content,
+	                         Message message,
 	                         TemporalAccessor timestamp
 	) {
 		event.deferReply(true).queue();
@@ -60,13 +62,22 @@ public class QuoteCommand {
 							.setColor(GuildConfig.getColor(author.getGuild()))
 							.setAuthor(author.getEffectiveName(), null, author.getEffectiveAvatarUrl())
 							.setDescription(
-									Arrays.stream(message.split("\n"))
+									Arrays.stream(content.split("\n"))
 											.map(s -> "> " + s)
 											.collect(Collectors.joining("\n"))
 							)
-							.appendDescription(url != null
-									? "\n\n" + url
+							.appendDescription(message != null
+									? "\n\n" + message.getJumpUrl()
 									: ""
+							)
+							.setImage(Optional.ofNullable(message)
+									.flatMap(mes -> mes.getAttachments().stream()
+											.filter(Message.Attachment::isImage)
+											.map(Message.Attachment::getUrl)
+											//TODO This might break with the discord cdn update wich would result in the requirement to retrieve the image data and reupload it.
+											// It might be still possible to use the cdn urls for embed images after the update so we should keep the simple solution for now
+											.findFirst()
+									).orElse(null)
 							)
 							.setFooter("Zitiert von: " + event.getMember().getUser().getName())
 							.setTimestamp(timestamp != null ? timestamp : Instant.now())
