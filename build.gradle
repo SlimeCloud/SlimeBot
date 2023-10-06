@@ -9,7 +9,7 @@ plugins {
 mainClassName = "com.slimebot.main.Main"
 
 group 'com.slimebot'
-version '2.7.3'
+version '2.11.0'
 
 repositories {
     mavenCentral()
@@ -33,7 +33,7 @@ dependencies {
     implementation 'org.jdbi:jdbi3-sqlobject:3.39.0'
     implementation 'org.jdbi:jdbi3-postgres:3.39.0'
 
-    implementation 'com.github.MineKingBot:DiscordUtils:52de74b'
+    implementation 'com.github.MineKingBot:DiscordUtils:644a720'
 
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
@@ -43,10 +43,10 @@ dependencies {
 }
 
 String getVersion() {
-    var version = project.version.toString()
+    String version = project.version.toString()
 
     try {
-        var commit = 'git rev-parse --verify --short HEAD'.execute().text.trim()
+        String commit = 'git rev-parse --verify --short HEAD'.execute().text.trim()
         version += "-" + commit
     } catch(IOException ignore) {
         version += "-unknown"
@@ -74,7 +74,7 @@ tasks.register("prepareSources", Copy) {
 }
 
 compileJava {
-    var javaSources = sourceSets["main"].allJava.filter {
+    FileTree javaSources = sourceSets["main"].allJava.filter {
         it.name != "BuildInfo.java"
     }.asFileTree
 

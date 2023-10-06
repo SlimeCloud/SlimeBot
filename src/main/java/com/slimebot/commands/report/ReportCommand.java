@@ -6,7 +6,7 @@ import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.report.Report;
 import de.mineking.discord.commands.CommandManager;
 import de.mineking.discord.commands.annotated.ApplicationCommand;
-import de.mineking.discord.commands.annotated.WhenFinished;
+import de.mineking.discord.commands.annotated.Setup;
 import de.mineking.discord.events.Listener;
 import de.mineking.discord.events.interaction.ButtonHandler;
 import de.mineking.discord.events.interaction.ModalHandler;
@@ -23,7 +23,7 @@ import java.time.Instant;
 public class ReportCommand {
 	public final CommandPermission permission = CommandPermission.TEAM;
 
-	@WhenFinished
+	@Setup
 	public void setup(CommandManager<CommandContext> cmdMan) {
 		cmdMan.registerCommand("report list", new ReportListCommand());
 	}

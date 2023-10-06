@@ -10,6 +10,8 @@ import de.mineking.discord.commands.annotated.option.defaultValue.IntegerDefault
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +21,8 @@ public class LeaderboardCommand {
 
 	@ApplicationCommandMethod
 	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Die maximale Anzahl a Nutzern, die angezeigt werden sollen", required = false, minValue = 2, maxValue = 10) @IntegerDefault(10) Integer limit) {
+		event.deferReply(true).queue();
+
 		List<Level> top = Level.getTopList(event.getGuild().getIdLong(), limit).stream()
 				.filter(l -> l.getLevel() > 0 || l.getXp() > 0)
 				.toList();
@@ -32,12 +36,12 @@ public class LeaderboardCommand {
 				.map(String::valueOf)
 				.collect(Collectors.joining(","));
 
-		event.replyEmbeds(new EmbedBuilder()
+		event.getHook().editOriginalEmbeds(new EmbedBuilder()
 				.setImage(String.format("https://quickchart.io/chart/render/%s?data1=%s&labels=%s",
 						Main.config.level.leaderboardTemplate,
-						data,
-						labels
-				).replace(" ", "%20"))
+						URLEncoder.encode(data, StandardCharsets.UTF_8),
+						URLEncoder.encode(labels, StandardCharsets.UTF_8)
+				))
 				.setColor(GuildConfig.getColor(event.getGuild()))
 				.build()
 		).queue();

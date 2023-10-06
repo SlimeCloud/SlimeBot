@@ -8,21 +8,22 @@ import com.slimebot.commands.config.engine.ConfigCategory;
 import com.slimebot.commands.config.engine.ConfigField;
 import com.slimebot.commands.config.engine.ConfigFieldType;
 import com.slimebot.commands.config.engine.FieldVerification;
+import com.slimebot.commands.config.setup.AutoDeleteFrame;
+import com.slimebot.commands.config.setup.MeetingInitFrame;
 import com.slimebot.commands.config.setup.StaffFrame;
 import com.slimebot.main.Main;
 import com.slimebot.main.config.Config;
 import lombok.Cleanup;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +39,8 @@ import java.util.Optional;
  * Anhand der bereits vorhandenden Beispiele sollte erkennbar sein, wie diese Annotationen zu verwenden sind.
  */
 @ConfigCategory(name = "guild", description = "Haupteinstellungen")
-@Getter
 @Slf4j
 public class GuildConfig {
-
 	private static final Map<Long, GuildConfig> guildConfig = new HashMap<>();
 
 	/**
@@ -115,7 +114,7 @@ public class GuildConfig {
 	 */
 	public synchronized void save() {
 		try (Writer writer = new FileWriter("guild/" + guild + ".json", StandardCharsets.UTF_8)) {
-			Main.gson.toJson(this, writer);
+			Main.prettyGson.toJson(this, writer);
 		} catch (Exception e) {
 			logger.error("Failed to save config for guild " + guild, e);
 		}
@@ -163,6 +162,15 @@ public class GuildConfig {
 	@ConfigCategory(name = "assignrole", description = "Join Role")
 	public AssignRoleConfig assignRole;
 
+	@ConfigCategory(name = "quote", description = "Zitate", updateCommands = true)
+	public QuoteConfig quote;
+
+	@ConfigCategory(name = "auto-delete", description = "Automatisches Nachrichtenlöschen", customFrames = AutoDeleteFrame.class)
+	public AutoDeleteConfig autoDelete;
+
+	@ConfigCategory(name = "meeting", description = "Team Besprechungen", customFrames = MeetingInitFrame.class)
+	public MeetingConfig meeting;
+
 	public Optional<Color> getColor() {
 		return Optional.ofNullable(color).map(Color::decode);
 	}
@@ -209,6 +217,18 @@ public class GuildConfig {
 		return Optional.ofNullable(assignRole);
 	}
 
+	public Optional<QuoteConfig> getQuoteConfig() {
+		return Optional.ofNullable(quote);
+	}
+
+	public Optional<MeetingConfig> getMeetingConfig() {
+		return Optional.ofNullable(meeting);
+	}
+
+	public Optional<AutoDeleteConfig> getAutoDeleteConfig() {
+		return Optional.ofNullable(autoDelete);
+	}
+
 	public StaffConfig getOrCreateStaff() {
 		return getStaffConfig().orElseGet(() -> staffMessage = new StaffConfig());
 	}
@@ -217,9 +237,25 @@ public class GuildConfig {
 		return getLevelConfig().orElseGet(() -> level = new LevelGuildConfig());
 	}
 
+	public AutoDeleteConfig getOrCreateAutoDelete() {
+		return getAutoDeleteConfig().orElseGet(() -> autoDelete = new AutoDeleteConfig());
+	}
+
 	//Internal helper methods
 	static Optional<GuildMessageChannel> getChannel(Long channel) {
-		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(GuildMessageChannel.class, id));
+		return getChannel(channel, GuildMessageChannel.class);
+	}
+
+	static Optional<GuildMessageChannel> getChannel(String channel) {
+		return getChannel(channel, GuildMessageChannel.class);
+	}
+
+	static <T extends GuildChannel> Optional<T> getChannel(Long channel, Class<T> type) {
+		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(type, id));
+	}
+
+	static <T extends GuildChannel> Optional<T> getChannel(String channel, Class<T> type) {
+		return Optional.ofNullable(channel).map(id -> Main.jdaInstance.getChannelById(type, id));
 	}
 
 	static Optional<Role> getRole(Long role) {

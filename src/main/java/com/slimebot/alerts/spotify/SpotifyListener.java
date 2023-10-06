@@ -7,12 +7,14 @@ import com.slimebot.main.config.guild.SpotifyNotificationConfig;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.apache.hc.core5.http.ParseException;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.requests.data.AbstractDataPagingRequest;
 
@@ -23,26 +25,25 @@ import java.util.function.Function;
 
 @Slf4j
 public class SpotifyListener {
+	private long tokenExpiry = 0;
 
 	private final SpotifyApi api;
 
 	public SpotifyListener() {
-		api = new SpotifyApi.Builder()
+		this.api = new SpotifyApi.Builder()
 				.setClientId(Main.config.spotify.clientId)
 				.setClientSecret(Main.config.spotify.clientSecret)
 				.build();
-		try {
-			api.setAccessToken(api.clientCredentials().build().execute().getAccessToken());
-		} catch (IOException | SpotifyWebApiException | ParseException e) {
-			logger.error("Spotify login fehlgeschlagen", e);
-		}
 	}
 
 	public void register() {
 		Main.scheduleAtFixedRate(1, TimeUnit.HOURS, this::check);
 	}
 
+
 	public void check() {
+		if (System.currentTimeMillis() > tokenExpiry - 10000) fetchToken();
+
 		List<String> known = Main.config.database != null
 				? Main.database.handle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list())
 				: Collections.emptyList();
@@ -79,20 +80,21 @@ public class SpotifyListener {
 	}
 
 	private <T, R extends AbstractDataPagingRequest.Builder<T, ?>> List<T> getLatestEntries(String id, Function<String, R> request) {
-		logger.info("Überprüfe auf Einträge bei {}...", id);
+		logger.info("Hole Einträge von User: {}...", id);
 
 		try {
 			Paging<T> albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).build().execute();
 
 			if (albumSimplifiedPaging.getTotal() > 20) {
-				logger.warn("Es wurden mehr als 20 Einträge gefunden. Es werden nur die 20 neuesten veröffentlicht");
+				logger.warn("Es wurden insgesamt mehr als 20 Einträge gefunden. Es werden nur die 20 neuesten verwendet");
 				albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal() - 20).build().execute();
 			}
 
 			List<T> albums = Arrays.asList(albumSimplifiedPaging.getItems());
-			logger.info("{} Einträge gefunden", albums.size());
+			logger.info("{} Releases gefunden", albums.size());
 			Collections.reverse(albums);
 			return albums;
+
 		} catch (Exception e) {
 			logger.error("Einträge können nicht geladen werden", e);
 			return Collections.emptyList();
@@ -111,7 +113,10 @@ public class SpotifyListener {
 								.replace("%notification%", notification)
 								.replace("%name%", name)
 								.replace("%url%", url)
-						).queue();
+						).queue(msg -> {
+							msg.createThreadChannel("Unterhaltet euch über diese Folge!").queue();
+							if (msg.getChannelType().equals(ChannelType.NEWS)) msg.crosspost().queue();
+						});
 					})
 			);
 		}
@@ -119,5 +124,15 @@ public class SpotifyListener {
 
 	public static Logger getLogger() {
 		return logger;
+	}
+
+	private void fetchToken() {
+		try {
+			ClientCredentials credentials = api.clientCredentials().build().execute();
+			api.setAccessToken(credentials.getAccessToken());
+			tokenExpiry = System.currentTimeMillis() + credentials.getExpiresIn() * 1000;
+		} catch (IOException | SpotifyWebApiException | ParseException e) {
+			logger.error("Spotify login fehlgeschlagen", e);
+		}
 	}
 }

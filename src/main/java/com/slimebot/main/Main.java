@@ -10,15 +10,14 @@ import com.slimebot.commands.config.setup.SetupCommand;
 import com.slimebot.commands.level.LeaderboardCommand;
 import com.slimebot.commands.level.LevelCommand;
 import com.slimebot.commands.level.RankCommand;
+import com.slimebot.commands.level.card.CardCommand;
+import com.slimebot.commands.poll.PollCommand;
 import com.slimebot.commands.report.MessageReportCommand;
 import com.slimebot.commands.report.ReportCommand;
 import com.slimebot.commands.report.UserReportCommand;
 import com.slimebot.commands.report.UserReportSlashCommand;
 import com.slimebot.database.Database;
-import com.slimebot.events.LevelListener;
-import com.slimebot.events.MemberJoinListener;
-import com.slimebot.events.ReadyListener;
-import com.slimebot.events.TimeoutListener;
+import com.slimebot.events.*;
 import com.slimebot.main.config.Config;
 import com.slimebot.main.config.guild.GuildConfig;
 import com.slimebot.message.StaffMessage;
@@ -33,13 +32,17 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.internal.requests.CompletedRestAction;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.Map;
@@ -50,7 +53,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class Main {
 	public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
-	public final static Gson gson = new GsonBuilder()
+
+	public final static Gson gson = new Gson();
+
+	public final static Gson prettyGson = new GsonBuilder()
 			.setPrettyPrinting()
 			.create();
 
@@ -103,7 +109,9 @@ public class Main {
 
 				//Events
 				.addEventListeners(new ReadyListener())
+				.addEventListeners(new AutoDeleteListener())
 				.addEventListeners(new TimeoutListener())
+				.addEventListeners(new MeetingListener())
 				.addEventListeners(new StaffMessage())
 				.addEventListeners(new MemberJoinListener());
 
@@ -147,11 +155,15 @@ public class Main {
 
 							config.registerCommand(SetupCommand.class);
 
+							config.registerCommand(QuoteCommand.class);
+							config.registerCommand(QuoteMessageCommand.class);
+
 							if (dbAvailable) {
 								if (Main.config.level != null) {
 									config.registerCommand(RankCommand.class);
 									config.registerCommand(LeaderboardCommand.class);
 									config.registerCommand(LevelCommand.class);
+									config.registerCommand(CardCommand.class);
 								} else logger.warn("Level System aufgrund fehlender Config deaktiviert");
 							} else logger.warn("Level System aufgrund von fehlender Datenbank deaktiviert");
 
@@ -161,6 +173,9 @@ public class Main {
 								config.registerCommand(UserReportSlashCommand.class);
 								config.registerCommand(ReportCommand.class);
 							} else logger.warn("Report System aufgrund von fehlender Datenbank deaktiviert");
+
+							if (dbAvailable) config.registerCommand(PollCommand.class);
+							else logger.warn("Poll System aufgrund von fehlender Datenbank deaktiviert");
 						}
 				)
 				.useCommandCache(null);
@@ -179,13 +194,23 @@ public class Main {
 	 * @param guild Der server, dessen Befehle geupdatet werden sollen.
 	 */
 	public static void updateGuildCommands(Guild guild) {
+		GuildConfig config = GuildConfig.getConfig(guild);
+
 		discordUtils.getCommandCache().updateGuildCommands(guild,
 				Map.of(
-						"fdmds", GuildConfig.getConfig(guild).getFdmds().isPresent(),
-						"level", GuildConfig.getConfig(guild).getLevelConfig().isPresent()
+						"fdmds", config.getFdmds().isPresent(),
+						"level", config.getLevelConfig().isPresent(),
+						"quote", config.getQuoteConfig().isPresent()
 				),
 				error -> logger.error("Failed to update guild commands for " + guild, error)
 		);
+	}
+
+	public static ZonedDateTime atTime(Instant in, int hour) {
+		return in.atZone(ZoneId.systemDefault())
+				.withHour(hour)
+				.withMinute(0)
+				.withSecond(0);
 	}
 
 	/**
@@ -230,5 +255,9 @@ public class Main {
 
 	public static Logger getLogger() {
 		return logger;
+	}
+
+	public static <T> RestAction<T> emptyAction(T value) {
+		return new CompletedRestAction<>(jdaInstance, value);
 	}
 }
