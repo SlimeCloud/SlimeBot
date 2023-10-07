@@ -1,23 +1,19 @@
 package com.slimebot.games;
 
-public abstract class SinglePlayerGame<T extends GamePlayer> extends Game {
+public abstract class SinglePlayerGame<T extends GamePlayer<G, T>, G extends SinglePlayerGame<T, G>> extends Game<T, G> {
+	public final T player;
 
-    public T player;
+	@SuppressWarnings("unchecked")
+	protected SinglePlayerGame(long guild, long channel, T player) {
+		super((Class<? extends T>) player.getClass(), guild, channel);
+		this.player = player;
 
-    /**
-     * @param guildId   id of the guild
-     * @param channelId id of the thread Channel
-     * @param player
-     */
-    protected SinglePlayerGame(long guildId, long channelId, T player) {
-        super(guildId, channelId);
-        this.player = player;
+		start();
+	}
 
-        start();
-    }
-
-    public void end() {
-        player.kill();
-        player = null;
-    }
+	@Override
+	public void end() {
+		super.end();
+		player.kill();
+	}
 }

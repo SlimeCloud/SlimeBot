@@ -1,93 +1,81 @@
 package com.slimebot.games;
 
 import com.slimebot.main.Main;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 
-public abstract class Game <T extends GamePlayer> extends ListenerAdapter {
-    public final UUID uuid = UUID.randomUUID();
-    public long channelId;
-    public final long guildId;
-    public short minPlayers;
-    public short maxPlayers;
-    public GameStatus status;
+public abstract class Game<T extends GamePlayer<? extends G, ? extends T>, G extends Game<? extends T, G>> extends ListenerAdapter {
+	public final UUID uuid = UUID.randomUUID();
+	public final Class<? extends T> playerClass;
 
-    /**
-     * @param guildId id of the guild
-     */
-    protected Game(long guildId, long channelId) {
-        this.guildId = guildId;
-        this.channelId = channelId;
+	public final long channel;
+	public final long guild;
 
-        status = GameStatus.WAITING;
+	public GameStatus status;
 
-        Main.jdaInstance.addEventListener(this);
+	/**
+	 * @param guild id of the guild
+	 */
+	protected Game(Class<? extends T> playerClass, long guild, long channel) {
+		this.playerClass = playerClass;
 
-        // End the game if its 15min WAITING
-        Main.executor.schedule(() -> {
-            if (status == GameStatus.WAITING) end();
-        }, 15, TimeUnit.MINUTES);
-    }
+		this.guild = guild;
+		this.channel = channel;
 
-    public void start() {
-        status = GameStatus.PLAYING;
-    }
+		status = GameStatus.WAITING;
+		Main.jdaInstance.addEventListener(this);
 
-    /**
-     * Important to call in the end of the game!
-     * Kills all players and removes eventListener
-     */
-    public void end() {
-        status = GameStatus.ENDED;
-        Main.jdaInstance.removeEventListener(this);
+		// End the game if its 15min WAITING
+		Main.executor.schedule(() -> {
+			if (status == GameStatus.WAITING) end();
+		}, 15, TimeUnit.MINUTES);
+	}
 
-        if(getChannel() != null) getChannel().delete().queueAfter(3, TimeUnit.MINUTES);
-    }
+	public void start() {
+		status = GameStatus.PLAYING;
+	}
 
-    public ThreadChannel getChannel() {
-        return Main.jdaInstance.getChannelById(ThreadChannel.class, channelId);
-    }
+	/**
+	 * Important to call in the end of the game!
+	 * Kills all players and removes eventListener
+	 */
+	public void end() {
+		status = GameStatus.ENDED;
+		Main.jdaInstance.removeEventListener(this);
 
-    public MessageCreateAction sendMessage(String content) {
-        return getChannel().sendMessage(content);
-    }
+		if (getChannel() != null && getChannel() instanceof ThreadChannel tc) tc.delete().queueAfter(3, TimeUnit.MINUTES);
+	}
 
-    public MessageCreateAction sendMessage(MessageCreateData message) {
-        return getChannel().sendMessage(message);
-    }
+	public MessageChannel getChannel() {
+		return Main.jdaInstance.getChannelById(MessageChannel.class, channel);
+	}
 
-    public MessageCreateAction sendMessageEmbeds(Collection<MessageEmbed> embeds) {
-        return getChannel().sendMessageEmbeds(embeds);
-    }
+	protected abstract void handleMessageEvent(T player, MessageReceivedEvent event);
 
-    public MessageCreateAction sendMessageEmbeds(MessageEmbed embed) {
-        return getChannel().sendMessageEmbeds(embed);
-    }
+	@Override
+	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+		if (status != GameStatus.PLAYING) return;
+		if (event.getChannel().getIdLong() != channel) return;
 
-    protected abstract void messageEvent(GamePlayer player, MessageReceivedEvent event);
+		GamePlayer.getFromId(playerClass, event.getAuthor().getIdLong()).ifPresentOrElse(
+				p -> {
+					if (p.game == this) handleMessageEvent(p, event);
+					else event.getMessage().delete().queue();
+				},
+				() -> event.getMessage().delete().queue()
+		);
+	}
 
-    @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-        if (status != GameStatus.PLAYING) return;
-        if (event.getChannel().getIdLong() != channelId) return;
-        GamePlayer.getFromId(GamePlayer.class, event.getMember().getIdLong()).ifPresentOrElse(p -> {
-            if (p.game == this) messageEvent(p, event);
-            else event.getMessage().delete();
-        }, () -> event.getMessage().delete().queue());
-    }
-
-    public enum GameStatus {
-        WAITING(),
-        PLAYING(),
-        ENDED()
-    }
+	public enum GameStatus {
+		WAITING,
+		PLAYING,
+		ENDED
+	}
 }

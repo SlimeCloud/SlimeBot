@@ -1,33 +1,30 @@
 package com.slimebot.games.wordchain;
 
-import com.slimebot.games.Game;
 import com.slimebot.games.GamePlayer;
 
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class WordchainPlayer extends GamePlayer {
-    public short lives;
+public class WordchainPlayer extends GamePlayer<WordchainGame, WordchainPlayer> {
+	public short lives;
 
-    public WordchainPlayer(long id, short lives, Game game) {
-        super(id, game);
-        this.lives = lives;
-    }
+	public WordchainPlayer(long id, short lives, WordchainGame game) {
+		super(id, game);
+		this.lives = lives;
+	}
 
-    public void damage(BiConsumer<WordchainPlayer, Short> messageConsumer) {
-        if (lives <= 1) {
-            this.game.sendMessage(":x: " + getAsMention() + " ist Ausgeschieden!").queue();
-            kick();
-            ((Wordchain) this.game).nextTurn();
-            return;
-        }
-        lives--;
+	public void damage(Consumer<Short> messageConsumer) {
+		lives--;
 
-        messageConsumer.accept(this, lives);
+		if (lives <= 0) {
+			this.game.getChannel().sendMessage(":x: " + getAsMention() + " ist Ausgeschieden!").queue();
+			kill();
 
-        ((Wordchain) this.game).nextTurn();
-    }
+			this.game.nextTurn();
+			return;
+		}
 
-    public void kick() {
-        kill();
-    }
+		messageConsumer.accept(lives);
+
+		this.game.nextTurn();
+	}
 }

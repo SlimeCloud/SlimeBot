@@ -1,67 +1,48 @@
 package com.slimebot.games;
 
-import com.slimebot.main.Main;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class GamePlayer {
-    public final long id;
-    public final Game<? extends GamePlayer> game;
-    public static List<GamePlayer> players = new ArrayList<>();
+public abstract class GamePlayer<G extends Game<T, G>, T extends GamePlayer<G, T>> {
+	public final static List<GamePlayer<?, ?>> players = new ArrayList<>();
 
-    protected GamePlayer(long id, Game game) {
-        this.id = id;
-        this.game = game;
+	public final long id;
+	public final G game;
 
-        players.add(this);
-    }
+	protected GamePlayer(long id,G game) {
+		this.id = id;
+		this.game = game;
 
-    public Optional<Member> getAsMember() {
-        AtomicReference<Member> member = new AtomicReference<>();
-        Objects.requireNonNull(Main.jdaInstance.getGuildById(game.guildId))
-                .retrieveMemberById(id)
-                .queue(member::set);
-        return Optional.of(member.get());
-    }
+		players.add(this);
+	}
 
-    public String getAsMention() {
-        return "<@" + id + ">";
-    }
+	public UserSnowflake getUser() {
+		return UserSnowflake.fromId(id);
+	}
 
-    /**
-     *
-     * @param id
-     * @return true if the player is in a game
-     */
-    public static boolean isInGame(long id) {
-        Optional<GamePlayer> player = getFromId(GamePlayer.class, id);
-        if(player.isPresent()) {
-            if(player.get().game.status == Game.GameStatus.ENDED) {
-                player.get().kill();
-                return false;
-            }
-                return true;
-        }
-        return false;
-    }
+	public String getAsMention() {
+		return "<@" + id + ">";
+	}
 
-    public static <T extends GamePlayer> Optional<T> getFromId(Class<T> gamePlayerClass, long id) {
-        return players.stream()
-                .filter(p -> p.id == id)
-                .map(gamePlayerClass::cast)
-                .findAny();
-    }
+	/**
+	 * Removes the player from the game
+	 */
+	public void kill() {
+		if (game instanceof MultiPlayerGame<?, ?> mg) mg.players.remove(this);
+		players.remove(this);
+	}
 
-    /**
-     * Removes the player from the game
-     */
-    public void kill() {
-        if (game instanceof MultiPlayerGame<?>) ((MultiPlayerGame<?>) game).players.remove(this);
-        players.remove(this);
-    }
+	public static <T extends GamePlayer<?, ?>> Optional<T> getFromId(Class<T> playerClass, long id) {
+		return players.stream()
+				.filter(p -> p.id == id)
+				.map(playerClass::cast)
+				.findAny();
+	}
+
+	public static boolean isInGame(long id) {
+		return getFromId(GamePlayer.class, id).isPresent();
+	}
 }
