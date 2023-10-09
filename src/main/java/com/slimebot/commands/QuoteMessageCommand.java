@@ -12,7 +12,7 @@ public class QuoteMessageCommand {
 		QuoteCommand.quote(event,
 				event.getTarget().getMember(),
 				event.getTarget().getContentRaw(),
-				event.getTarget().getJumpUrl(),
+				event.getTarget(),
 				event.getTarget().getTimeCreated()
 		);
 	}
