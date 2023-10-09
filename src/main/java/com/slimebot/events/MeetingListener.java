@@ -84,7 +84,7 @@ public class MeetingListener extends ListenerAdapter {
 										});
 									}
 								},
-								() -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS))
+								() -> sendEmptyMessage(event.getGuild(), event.getMessage().getEmbeds().get(0).getTimestamp().toInstant().plus(14, ChronoUnit.DAYS))
 						);
 			}
 			case "agenda:add" -> event.replyModal(agendaAddModal).queue();
