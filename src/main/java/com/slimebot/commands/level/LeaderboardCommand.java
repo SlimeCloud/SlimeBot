@@ -20,7 +20,7 @@ public class LeaderboardCommand {
 
 
 	@ApplicationCommandMethod
-	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Die maximale Anzahl a Nutzern, die angezeigt werden sollen", required = false, minValue = 2, maxValue = 10) @IntegerDefault(10) Integer limit) {
+	public void performCommand(SlashCommandInteractionEvent event, @Option(description = "Die maximale Anzahl an Nutzern, die angezeigt werden sollen", required = false, minValue = 2, maxValue = 10) @IntegerDefault(10) Integer limit) {
 		event.deferReply(true).queue();
 
 		List<Level> top = Level.getTopList(event.getGuild().getIdLong(), limit).stream()
