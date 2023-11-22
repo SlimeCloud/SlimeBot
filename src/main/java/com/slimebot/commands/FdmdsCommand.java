@@ -92,7 +92,7 @@ public class FdmdsCommand {
 			embedBuilder.setFooter(event.getMessage().getEmbeds().get(0).getFooter().getText())
 					.addField("Frage:", question, false);
 		} else if (event.getModalId().contains("send")) {
-			embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question.split(" ", 2)[0].toLowerCase() + " " + question.split(" ", 2)[1], false);
+			embedBuilder.addField("Frage:", "Heute würde ich gerne von euch wissen, " + question, false);
 		}
 		embedBuilder.addField("Auswahlmöglichkeiten:", choicesStr.toString(), false);
 
@@ -130,13 +130,11 @@ public class FdmdsCommand {
 		GuildConfig.getConfig(event.getGuild()).getFdmds().ifPresent(fdmds ->
 				fdmds.getChannel().ifPresentOrElse(
 						channel -> {
-
 							MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 							String question = embed.getFields().get(0).getValue();
 							String choices = embed.getFields().get(1).getValue();
 							String footerText = embed.getFooter().getText();
 							Member requester = event.getGuild().getMemberById(footerText.substring(footerText.lastIndexOf(' ') + 2, footerText.length() - 1));
-
 
 							StringBuilder text = new StringBuilder()
 									.append(fdmds.getRole().map(Role::getAsMention).orElse("")).append("\n")
@@ -155,6 +153,8 @@ public class FdmdsCommand {
 										for (int i = 0; i < choices.lines().count(); i++) {
 											m.addReaction(SlimeEmoji.fromId(i + 1).getEmoji()).queue();
 										}
+
+										m.createThreadChannel("Unterhaltet euch über diese Frage!").queue();
 
 										event.reply("Frage verschickt!").setEphemeral(true).queue();
 									});
