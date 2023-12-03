@@ -9,7 +9,7 @@ plugins {
 mainClassName = "com.slimebot.main.Main"
 
 group 'com.slimebot'
-version '2.11.0'
+version '2.12.1'
 
 repositories {
     mavenCentral()
@@ -17,29 +17,32 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-
+    implementation 'com.github.MineKingBot:DiscordUtils:644a720'
     implementation 'net.dv8tion:JDA:5.0.0-beta.11'
+
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.0.0'
-    implementation 'ch.qos.logback:logback-classic:1.4.8'
-    implementation 'io.github.cdimascio:java-dotenv:5.1.1'
     implementation 'org.kohsuke:github-api:1.315'
 
+    implementation 'io.github.cdimascio:java-dotenv:5.1.1'
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    implementation 'org.sejda.imageio:webp-imageio:0.1.6'
+    implementation 'ch.qos.logback:logback-classic:1.4.8'
 
     implementation 'org.postgresql:postgresql:42.6.0'
     implementation 'org.jdbi:jdbi3-core:3.39.0'
     implementation 'org.jdbi:jdbi3-sqlobject:3.39.0'
     implementation 'org.jdbi:jdbi3-postgres:3.39.0'
 
-    implementation 'com.github.MineKingBot:DiscordUtils:644a720'
 
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.28'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
 String getVersion() {

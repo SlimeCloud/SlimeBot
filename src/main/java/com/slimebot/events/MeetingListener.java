@@ -69,8 +69,7 @@ public class MeetingListener extends ListenerAdapter {
 														.build()
 										).queue(x -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS)));
 									} else {
-										ch.sendMessage(MessageCreateData.fromEditData(buildTodoMessage(event.getGuild(),
-												Arrays.stream(agenda.split("\n")).filter(MeetingListener::isValidAgenda).collect(Collectors.joining("\n"))))).queue(mes -> {
+										ch.sendMessage(MessageCreateData.fromEditData(buildTodoMessage(event.getGuild(), Arrays.stream(agenda.split("\n")).filter(MeetingListener::isValidAgenda).collect(Collectors.joining("\n"))))).queue(mes -> {
 											if (!ch.equals(event.getChannel())) {
 												event.getMessage().replyEmbeds(
 														new EmbedBuilder()
@@ -84,7 +83,7 @@ public class MeetingListener extends ListenerAdapter {
 										});
 									}
 								},
-								() -> sendEmptyMessage(event.getGuild(), Instant.now().plus(14, ChronoUnit.DAYS))
+								() -> sendEmptyMessage(event.getGuild(), event.getMessage().getEmbeds().get(0).getTimestamp().toInstant().plus(14, ChronoUnit.DAYS))
 						);
 			}
 			case "agenda:add" -> event.replyModal(agendaAddModal).queue();
@@ -106,7 +105,7 @@ public class MeetingListener extends ListenerAdapter {
 				EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
 
 				for (String a : event.getValue("text").getAsString().split("\n"))
-					modifyFieldValue(builder, 0, value -> value + (value.length() <= 1 ? "1. " : "\n" + (value.split("\n").length + 1) + ". ") + a);
+					modifyFieldValue(builder, 0, value -> value + (value.length() <= 1 ? "1. " : "\n" + (value.split("\n").length + 1) + ". ") + event.getUser().getAsMention() + ": " + a);
 
 				event.editMessageEmbeds(builder.build())
 						.setComponents(buildComponents(builder.getFields().get(0).getValue()))

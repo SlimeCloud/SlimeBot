@@ -42,7 +42,8 @@ public class AutoDeleteListener extends ListenerAdapter {
 
 	private RestAction<Boolean> buildThreadDelete(ThreadChannel thread) {
 		return thread.retrieveStartMessage()
-				.flatMap(mes -> shouldDelete(mes, thread.getParentChannel())
+				.mapToResult()
+				.flatMap(res -> res.isSuccess() && shouldDelete(res.get(), thread.getParentChannel())
 						? thread.delete().map(x -> true)
 						: Main.emptyAction(false)
 				);
