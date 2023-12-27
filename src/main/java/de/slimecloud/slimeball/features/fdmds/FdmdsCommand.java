@@ -169,8 +169,10 @@ public class FdmdsCommand {
 				fdmds.getChannel().sendMessage(text)
 						.addActionRow(Button.secondary("fdmds:create", "Frage einreichen"))
 						.queue(m -> {
-							for (int i = 0; i < choices.lines().count(); i++)
-								m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
+							for (int i = 0; i < choices.lines().count(); i++) m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
+
+							m.createThreadChannel("Unterhaltet euch über diese Frage!").queue();
+
 							event.reply("Frage verschickt!").setEphemeral(true).queue();
 						});
 			}
