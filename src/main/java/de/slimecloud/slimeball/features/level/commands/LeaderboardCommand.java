@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @ApplicationCommand(name = "leaderboard", description = "Zeigt das aktuelle Leaderboard", scope = Scope.GUILD, defer = true)
 public class LeaderboardCommand {
-	public final static int MAX_NAME_LENGTH = 13;
+	public final static int MAX_NAME_LENGTH = 10;
 	public final IRegistrationCondition<ICommandContext> condition = (manager, guild, cache) -> cache.<GuildConfig>getState("config").getLevel().isPresent();
 
 	@ApplicationCommandMethod
@@ -31,7 +31,7 @@ public class LeaderboardCommand {
 
 	) {
 		//Load leaderboard
-		List<Level> levels = bot.getLevel().getTopList(event.getGuild(), offset, max);
+		List<Level> levels = bot.getLevel().getTopList(event.getGuild(), 0, max + offset);
 
 		//Check for valid leaderboard
 		if (levels.isEmpty()) {
@@ -51,7 +51,8 @@ public class LeaderboardCommand {
 				.setDescription(
 						"```ansi\n" +
 								levels.stream()
-										.map(l -> "\033[1m" + StringUtil.padRight(StringUtils.abbreviate(event.getGuild().getMember(l.getUser()).getEffectiveName(), MAX_NAME_LENGTH), MAX_NAME_LENGTH) + "\033[0m" +
+										.skip(offset)
+										.map(l -> "\033[1m" + StringUtil.padRight(StringUtils.abbreviate(event.getGuild().getMember(l.getUser()).getEffectiveName(), MAX_NAME_LENGTH), MAX_NAME_LENGTH) + " #" + (levels.indexOf(l) + 1) + " \033[0m" +
 												"[" +
 												StringUtil.createProgressBar((double) l.getLevel() / highest, 30) +
 												"] \033[34;1m(" + l.getLevel() + ")\033[0m"
