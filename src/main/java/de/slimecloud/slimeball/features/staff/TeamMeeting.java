@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -35,6 +36,11 @@ public class TeamMeeting extends ListenerAdapter {
 			.build();
 
 	private final SlimeBot bot;
+
+	@Override
+	public void onGuildReady(@NotNull GuildReadyEvent event) {
+		bot.loadGuild(event.getGuild()).getMeeting().ifPresent(MeetingConfig::setupNotification);
+	}
 
 	@Override
 	public void onMessageDelete(@NotNull MessageDeleteEvent event) {

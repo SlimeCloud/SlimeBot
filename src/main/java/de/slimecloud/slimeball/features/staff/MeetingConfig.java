@@ -15,20 +15,18 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.utils.TimeFormat;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.DayOfWeek;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public class MeetingConfig extends ConfigCategory {
@@ -46,14 +44,33 @@ public class MeetingConfig extends ConfigCategory {
 	private Long event;
 
 	@Getter
-	private Long nextMeeting; //TODO use this to announce next meeting. Also start the event when the meeting starts
+	private Long nextMeeting;
 
 	@ConfigField(name = "Repository", command = "repository", description = "Die GitHub Repository, in der ToDo's erstellt werden", type = ConfigFieldType.STRING)
 	private String repository;
 
+	private final transient Set<Future<?>> futures = new HashSet<>();
+
 	@Override
 	public void enable() {
 		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(offset));
+	}
+
+	public void setupNotification() {
+		futures.forEach(f -> f.cancel(false));
+		futures.clear();
+
+		scheduleNotification(Duration.ofHours(1).toMillis());
+		scheduleNotification(Duration.ofMinutes(5).toMillis());
+	}
+
+	private void scheduleNotification(long delta) {
+		long time = nextMeeting - delta - System.currentTimeMillis();
+		if(time > 0) futures.add(bot.getExecutor().schedule(() -> getChannel().ifPresent(channel ->
+				channel.sendMessage(bot.loadGuild(channel.getGuild()).getTeamRole().map(Role::getAsMention).orElse("@Team") + ", " + TimeFormat.RELATIVE.format(nextMeeting) + " geht das Team-Meeting los!")
+						.setMessageReference(message)
+						.queue()
+		), time, TimeUnit.MILLISECONDS));
 	}
 
 	public void createNewMeeting(@NotNull Instant timestamp) {
@@ -70,6 +87,8 @@ public class MeetingConfig extends ConfigCategory {
 					.setDescription("Weitere Informationen: " + message.getJumpUrl())
 					.complete().getIdLong();
 		});
+
+		setupNotification();
 	}
 
 	@Override
@@ -79,6 +98,9 @@ public class MeetingConfig extends ConfigCategory {
 			channel.deleteMessageById(message).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
 			channel.getGuild().retrieveScheduledEventById(event).flatMap(ScheduledEvent::delete).queue(null, new ErrorHandler().ignore(ErrorResponse.SCHEDULED_EVENT));
 		});
+
+		futures.forEach(f -> f.cancel(false));
+		futures.clear();
 	}
 
 	@NotNull
