@@ -41,7 +41,7 @@ public class ContributorCommand {
 				).addActionRow(
 						Button.success("contributor:accept", "Annehmen"),
 						Button.danger("contributor:reject", "Ablehnen")
-				).flatMap(x -> event.reply("Vielen dank für deine Mithilfe!\nUnser Team wird dies Prüfen und dir die dann die Rolle zuweisen.").setEphemeral(true)).queue()
+				).flatMap(x -> event.reply("Vielen dank für deine Mithilfe!\nUnser Team wird dies Prüfen und dir dann die Rolle zuweisen.").setEphemeral(true)).queue()
 		);
 	}
 
