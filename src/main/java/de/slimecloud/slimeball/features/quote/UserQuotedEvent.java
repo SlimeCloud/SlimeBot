@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.events;
+package de.slimecloud.slimeball.features.quote;
 
 import de.cyklon.jevent.CancellableEvent;
 import lombok.AllArgsConstructor;

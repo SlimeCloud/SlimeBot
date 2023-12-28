@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.events;
+package de.slimecloud.slimeball.features.level;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Member;

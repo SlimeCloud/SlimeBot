@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.events;
+package de.slimecloud.slimeball.features.report;
 
 import de.cyklon.jevent.CancellableEvent;
 import de.slimecloud.slimeball.features.report.Report;

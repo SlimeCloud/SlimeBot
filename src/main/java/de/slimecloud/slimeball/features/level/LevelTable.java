@@ -5,8 +5,6 @@ import de.mineking.javautils.database.Order;
 import de.mineking.javautils.database.Table;
 import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.config.LevelConfig;
-import de.slimecloud.slimeball.events.UserGainXPEvent;
-import de.slimecloud.slimeball.events.UserLevelUpEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.MathUtil;
 import net.dv8tion.jda.api.entities.Guild;

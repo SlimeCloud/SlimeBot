@@ -2,7 +2,6 @@ package de.slimecloud.slimeball.features.moderation;
 
 import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.JEvent;
-import de.slimecloud.slimeball.events.UserTimeoutedEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;

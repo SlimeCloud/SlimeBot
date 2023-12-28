@@ -1,7 +1,6 @@
 package de.slimecloud.slimeball.features.level;
 
 import de.cyklon.jevent.EventHandler;
-import de.slimecloud.slimeball.events.UserLevelUpEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;

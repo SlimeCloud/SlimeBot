@@ -3,7 +3,7 @@ package de.slimecloud.slimeball.features.level.commands;
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
 import de.mineking.discordutils.commands.option.Option;
-import de.slimecloud.slimeball.events.UserGainXPEvent;
+import de.slimecloud.slimeball.features.level.UserGainXPEvent;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.entities.Member;

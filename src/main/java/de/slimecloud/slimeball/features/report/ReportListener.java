@@ -1,8 +1,6 @@
 package de.slimecloud.slimeball.features.report;
 
 import de.cyklon.jevent.EventHandler;
-import de.slimecloud.slimeball.events.ReportCreateEvent;
-import de.slimecloud.slimeball.events.UserReportedEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.jetbrains.annotations.NotNull;

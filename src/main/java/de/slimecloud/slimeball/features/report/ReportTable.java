@@ -6,8 +6,6 @@ import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
 import de.mineking.javautils.database.Table;
 import de.mineking.javautils.database.Where;
-import de.slimecloud.slimeball.events.ReportCreateEvent;
-import de.slimecloud.slimeball.events.UserReportedEvent;
 import de.slimecloud.slimeball.features.report.commands.DetailsCommand;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
