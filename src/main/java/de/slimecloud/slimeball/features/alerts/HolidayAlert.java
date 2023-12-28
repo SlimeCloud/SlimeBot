@@ -11,14 +11,14 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.Route;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class HolidayAlert {
-	public final static String apiHost = "https://ferien-api.de";
+	public final static String apiHost = "https://ferien-api.de/";
 	public final static Route apiRoute = Route.get("api/v1/holidays");
 
 	private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -30,12 +30,13 @@ public class HolidayAlert {
 		this.bot = bot;
 		this.host = bot.getDiscordUtils().getCustomRestActionManager().createHost(apiHost);
 
+		if(LocalDateTime.now().getHour() >= 6) check();
 		//Check every day at 6 AM
 		bot.scheduleDaily(6, this::check);
 	}
 
 	public void check() {
-		retrieveHolidays(formatter.format(Instant.now())).queue(this::sendMessage);
+		retrieveHolidays(formatter.format(LocalDateTime.now())).queue(this::sendMessage);
 	}
 
 	private void sendMessage(@NotNull List<Holiday> holidays) {

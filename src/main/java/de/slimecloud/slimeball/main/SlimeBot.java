@@ -242,9 +242,6 @@ public class SlimeBot extends ListenerAdapter {
 					if (github != null) github.init(manager);
 				})
 				.build();
-
-		//Register special listeners
-		new HolidayAlert(this);
 	}
 
 	@NotNull
@@ -267,6 +264,8 @@ public class SlimeBot extends ListenerAdapter {
 				else logger.warn("Spotify alerts disabled deu to missing database");
 			} else logger.warn("Spotify alerts disabled due to missing configuration");
 		}
+
+		new HolidayAlert(this);
 	}
 
 	private void startActivity() {
