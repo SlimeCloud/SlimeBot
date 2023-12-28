@@ -19,6 +19,7 @@ import de.slimecloud.slimeball.features.general.InfoCommand;
 import de.slimecloud.slimeball.features.general.PingCommand;
 import de.slimecloud.slimeball.features.github.BugCommand;
 import de.slimecloud.slimeball.features.github.BugContextCommand;
+import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.features.github.GitHubAPI;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
@@ -214,6 +215,7 @@ public class SlimeBot extends ListenerAdapter {
 					if (github != null) {
 						manager.registerCommand(BugCommand.class);
 						manager.registerCommand(BugContextCommand.class);
+						manager.registerCommand(ContributorCommand.class);
 					} else logger.warn("Bug reporting disabled due to missing github api");
 
 					if (polls != null) {
