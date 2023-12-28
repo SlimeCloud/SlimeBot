@@ -1,6 +1,7 @@
 package de.slimecloud.slimeball.features.report;
 
 import de.cyklon.jevent.EventHandler;
+import de.slimecloud.slimeball.events.ReportCreateEvent;
 import de.slimecloud.slimeball.events.UserReportedEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -32,8 +33,8 @@ public class ReportListener {
 		});
 	}
 
-	@EventHandler(priority = -1)
-	public void logReport(@NotNull UserReportedEvent event) {
+	@EventHandler
+	public void logReport(@NotNull ReportCreateEvent event) {
 		//Send log for team members
 		bot.loadGuild(event.getReport().getGuild()).getPunishmentChannel()
 				.ifPresent(channel -> channel.sendMessage(event.getReport().buildMessage("Neuer Report")).queue());

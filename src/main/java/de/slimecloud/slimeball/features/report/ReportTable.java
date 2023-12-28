@@ -6,6 +6,7 @@ import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
 import de.mineking.javautils.database.Table;
 import de.mineking.javautils.database.Where;
+import de.slimecloud.slimeball.events.ReportCreateEvent;
 import de.slimecloud.slimeball.events.UserReportedEvent;
 import de.slimecloud.slimeball.features.report.commands.DetailsCommand;
 import de.slimecloud.slimeball.main.SlimeBot;
@@ -47,6 +48,7 @@ public interface ReportTable extends Table<Report>, Listable<Report> {
 		//Call event and insert save if not canceled
 		if (!new UserReportedEvent(event, report).callEvent()) {
 			insert(report);
+			new ReportCreateEvent(report).callEvent();
 			return true;
 		} else return false;
 	}

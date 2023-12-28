@@ -75,11 +75,11 @@ public class Report implements ListEntry, DataClass<Report> {
 	@NotNull
 	public MessageEmbed buildEmbed(@NotNull String title) {
 		EmbedBuilder embed = new EmbedBuilder()
+				.setTitle(status.getEmoji() + " " + title + " #" + id)
 				.setColor(bot.getColor(guild))
 				.setTimestamp(timestamp)
 
 				//Add users
-				.setTitle(status.getEmoji() + " " + title + " #" + id)
 				.addField("Gemeldeter Nutzer", target.getAsMention(), true)
 				.addField("Gemeldet von", issuer.getAsMention(), true)
 				.addBlankField(true) //This is to get the other information to the next row
