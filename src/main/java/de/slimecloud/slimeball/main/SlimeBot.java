@@ -132,7 +132,7 @@ public class SlimeBot extends ListenerAdapter {
 
 			polls = (PollTable) database.getTable(PollTable.class, Poll.class, () -> new Poll(this), "polls").createTable();
 			level = (LevelTable) database.getTable(LevelTable.class, Level.class, () -> new Level(this), "levels").createTable();
-			levelProfiles = (RankCardTable) database.getTable(RankCardTable.class, CardProfile.class, () -> new CardProfile(this), "card_profiles").createTable();
+			levelProfiles = (RankCardTable) database.getTable(RankCardTable.class, CardProfile.class, () -> new CardProfile(this), "cardprofiles").createTable();
 		} else {
 			logger.warn("Database credentials missing! Some features will be disabled!");
 
