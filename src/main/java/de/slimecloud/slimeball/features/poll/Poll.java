@@ -64,7 +64,7 @@ public class Poll implements DataClass<Poll> {
 		values.forEach((name, values) -> {
 			double percentage = count == 0 ? 0 : values.size() / (double) count;
 
-			result.append("\033[1m").append(StringUtil.padRight(name, maxLength.get())).append("\033[0m").append(maxLength.get() > 8 ? "\n" : "")
+			result.append("\033[1m").append(StringUtil.padRight(name, maxLength.get())).append("\033[0m").append(maxLength.get() > 8 ? "\n" : ": ")
 					//Bar
 					.append("[").append(StringUtil.createProgressBar(percentage, 30)).append("]")
 					//Display percentage
