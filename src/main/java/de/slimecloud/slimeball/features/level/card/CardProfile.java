@@ -291,7 +291,7 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		return switch (rank) {
 			case 1 -> new Color(232, 187, 65);
 			case 2 -> new Color(121, 121, 121);
-			case 3 -> new Color(210, 83, 7);
+			case 3 -> new Color(182, 96, 48);
 			default -> Color.WHITE;
 		};
 	}
