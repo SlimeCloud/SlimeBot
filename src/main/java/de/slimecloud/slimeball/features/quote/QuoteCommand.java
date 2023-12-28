@@ -10,6 +10,7 @@ import de.mineking.discordutils.commands.option.Option;
 import de.mineking.discordutils.events.Listener;
 import de.mineking.discordutils.events.handlers.ButtonHandler;
 import de.slimecloud.slimeball.config.GuildConfig;
+import de.slimecloud.slimeball.events.UserQuotedEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -67,6 +68,9 @@ public class QuoteCommand {
 				).queue();
 				return;
 			}
+
+			//Call event
+			if(new UserQuotedEvent(event.getUser(), author, content, message).callEvent()) return;
 
 			//Send quotation
 			channel.sendMessage(author.getAsMention()).addEmbeds(new EmbedBuilder()
