@@ -51,7 +51,7 @@ public class ReportCommand {
 				(ctx, state) -> state.setState("filter", Filter.valueOf(ctx.getEvent().getOption("filter").getAsString())), //Set initial state
 				state -> bot.getReports(),
 				new StringSelectComponent("details", state -> state.<ListContext<Report>>getCache("context").entries().stream()
-						.map(r -> SelectOption.of("#" + r.getId() + StringUtils.abbreviate(r.getReason(), SelectOption.LABEL_MAX_LENGTH - 5), String.valueOf(r.getId()))
+						.map(r -> SelectOption.of("#" + r.getId() + StringUtils.abbreviate(r.getMessage(), SelectOption.LABEL_MAX_LENGTH - 5), String.valueOf(r.getId()))
 								.withDescription(r.isOpen() ? null : StringUtils.abbreviate(r.getCloseReason(), SelectOption.DESCRIPTION_MAX_LENGTH))
 								.withEmoji(Emoji.fromFormatted(r.getStatus().getEmoji()))
 						)
@@ -71,7 +71,7 @@ public class ReportCommand {
 
 	@Listener(type = ButtonHandler.class, filter = "report:close:(\\d+)")
 	public void handleCloseButton(@NotNull ButtonInteractionEvent event) {
-		String reportID = event.getComponentId().split(":")[3];
+		String reportID = event.getComponentId().split(":")[2];
 
 		event.replyModal(Modal.create("report:close", "Meldung schließen")
 				.addActionRow(TextInput.create("reason", "Wie Wurde mit dem Report Verfahren?", TextInputStyle.SHORT)

@@ -42,18 +42,18 @@ public class Report implements ListEntry, DataClass<Report> {
 	private UserSnowflake target;
 
 	@Column
-	private Instant timestamp;
+	private Instant time;
 
 	@Column
-	private String reason;
+	private String message;
 
 	@Column
 	private Status status;
 	@Column
 	private String closeReason;
 
-	public Report(@NotNull SlimeBot bot, @NotNull Type type, @NotNull Guild guild, @NotNull UserSnowflake issuer, @NotNull UserSnowflake target, @NotNull String reason) {
-		this(bot, 0, type, guild.getIdLong(), issuer, target, Instant.now(), reason, Status.OPEN, null);
+	public Report(@NotNull SlimeBot bot, @NotNull Type type, @NotNull Guild guild, @NotNull UserSnowflake issuer, @NotNull UserSnowflake target, @NotNull String message) {
+		this(bot, 0, type, guild.getIdLong(), issuer, target, Instant.now(), message, Status.OPEN, null);
 	}
 
 	@NotNull
@@ -77,7 +77,7 @@ public class Report implements ListEntry, DataClass<Report> {
 		EmbedBuilder embed = new EmbedBuilder()
 				.setTitle(status.getEmoji() + " " + title + " #" + id)
 				.setColor(bot.getColor(guild))
-				.setTimestamp(timestamp)
+				.setTimestamp(time)
 
 				//Add users
 				.addField("Gemeldeter Nutzer", target.getAsMention(), true)
@@ -92,7 +92,7 @@ public class Report implements ListEntry, DataClass<Report> {
 		if (!isOpen()) embed.addField("Verfahren", closeReason, true);
 
 		//Add reason
-		embed.addField(type == Type.MESSAGE ? "Gemeldete Nachricht" : "Meldegrund", reason, false);
+		embed.addField(type == Type.MESSAGE ? "Gemeldete Nachricht" : "Meldegrund", message, false);
 
 		return embed.build();
 	}
@@ -110,6 +110,6 @@ public class Report implements ListEntry, DataClass<Report> {
 	@Override
 	public String build(int index, @NotNull ListContext context) {
 		//Escaping the dot prevents discord from making this a numbered list. The problem with these is that the numbering is corrected automatically which might cause the displayed ids to be wrong.
-		return id + "\\. [" + status.getEmoji() + "] " + TimeFormat.DEFAULT.format(timestamp) + ": " + target.getAsMention() + " gemeldet von " + issuer.getAsMention();
+		return id + "\\. [" + status.getEmoji() + "] " + TimeFormat.DEFAULT.format(time) + ": " + target.getAsMention() + " gemeldet von " + issuer.getAsMention();
 	}
 }
