@@ -64,12 +64,14 @@ public class Poll implements DataClass<Poll> {
 		values.forEach((name, values) -> {
 			double percentage = count == 0 ? 0 : values.size() / (double) count;
 
-			result.append("\033[1m").append(StringUtil.padRight(name, maxLength.get())).append("\033[0m").append(": ")
+			result.append("\033[1m").append(StringUtil.padRight(name, maxLength.get())).append("\033[0m").append(maxLength.get() > 8 ? "\n" : "")
 					//Bar
 					.append("[").append(StringUtil.createProgressBar(percentage, 30)).append("]")
 					//Display percentage
 					.append(" \033[34;1m(").append((int) (percentage * 100)).append("%, ").append(values.size()).append(" Stimmen)\033[0m")
 					.append("\n");
+
+			if(maxLength.get() > 8) result.append("\n");
 		});
 
 		return "```ansi\n" + result + "```\n" + new HashSet<>(participants).size() + " Teilnehmer" + (max > 1 ? ", " + participants.size() + " Stimmen" : "");
