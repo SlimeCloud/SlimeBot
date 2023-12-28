@@ -6,6 +6,7 @@ import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import de.slimecloud.slimeball.features.alerts.SpotifyNotificationConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
+import de.slimecloud.slimeball.features.moderation.AutodleteFlag;
 import de.slimecloud.slimeball.features.staff.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
 import de.slimecloud.slimeball.main.Main;
@@ -18,7 +19,9 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,11 +30,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
+@Accessors(chain = true)
 @CategoryInfo(name = "Standard", command = "general", description = "Generelle Konfiguration des Servers")
 @ToString
 public class GuildConfig {
@@ -59,44 +62,41 @@ public class GuildConfig {
 	private transient String path;
 
 	@Setter
-	@Accessors(chain = true)
 	@ConfigField(name = "Farbe", command = "color", description = "Die primäre Farbe des Servers", type = ConfigFieldType.COLOR)
 	private String color;
 
 	@Setter
-	@Accessors(chain = true)
 	@ConfigField(name = "Team", command = "team", description = "Die Team-Rolle", type = ConfigFieldType.ROLE)
 	private Long teamRole;
 
 	@Getter
-	@Accessors(chain = true)
 	@ConfigField(name = "Beitritts Rollen", command = "autorole", description = "Rollen, die Mitgliedern beim Beitreten gegeben werden", type = ConfigFieldType.ROLE)
 	private final List<Long> joinRoles = new ArrayList<>();
 
 	@Setter
-	@Accessors(chain = true)
 	@ConfigField(name = "Gruß-Kanal", command = "greetings", description = "Kanal für Grußnachrichten", type = ConfigFieldType.MESSAGE_CHANNEL)
 	private Long greetingsChannel;
 
 	@Setter
-	@Accessors(chain = true)
 	@ConfigField(name = "Zitate-Kanal", command = "quote", description = "Kanal, in dem Zitate gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
 	private Long quoteChannel;
 
 	@Setter
-	@Accessors(chain = true)
 	@ConfigField(name = "Log-Kanal", command = "log", description = "Kanal, in dem Log-Nachrichten für den Bot gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
 	private Long logChannel;
 
 	@Setter
-	@Accessors(chain = true)
 	@ConfigField(name = "Straf-Kanal", command = "punishment", description = "Kanal, in dem Informationen über Moderations-Handlungen gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
 	private Long punishmentChannel;
 
 	@Setter
-	@Accessors(chain = true)
 	@ConfigField(name = "Contributor-Rolle", command = "contributor", description = "Rolle, die Mitglieder erhalten, die am SlimeBall Bot mitgewirkt haben", type = ConfigFieldType.ROLE)
 	private Long contributorRole;
+
+	//TODO Make this configurable via command
+	@Setter
+	private Map<Long, EnumSet<AutodleteFlag>> autodelete;
+
 
 
 	@Setter
@@ -203,6 +203,11 @@ public class GuildConfig {
 	@NotNull
 	public Optional<Role> getContributorRole() {
 		return Optional.ofNullable(contributorRole).map(bot.getJda()::getRoleById);
+	}
+
+	@NotNull
+	public Optional<EnumSet<AutodleteFlag>> getAutodelete(@NotNull Channel channel) {
+		return Optional.ofNullable(autodelete).map(a -> a.get(channel.getIdLong()));
 	}
 
 	@NotNull
