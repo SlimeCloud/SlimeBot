@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="com.slimebot.main.Main" />
+    <option name="MAIN_CLASS_NAME" value="de.slimecloud.slimeball.main.Main" />
     <module name="SlimeBot.main" />
     <option name="PROGRAM_PARAMETERS" value="test" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/run" />
