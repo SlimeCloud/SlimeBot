@@ -39,8 +39,10 @@ public class CategoryCommand extends Command<ICommandContext> {
 			if (info.required()) continue;
 
 			//Add subcommand for collections
-			if (Collection.class.isAssignableFrom(f.getType())) addSubcommand(new ConfigCollectionCommand(bot, manager, instance, f, category, info, menu));
-			else if (Map.class.isAssignableFrom(f.getType())) addSubcommand(new ConfigMapCommand(bot, manager, instance, f, category, info, menu));
+			if (Collection.class.isAssignableFrom(f.getType()))
+				addSubcommand(new ConfigCollectionCommand(bot, manager, instance, f, category, info, menu));
+			else if (Map.class.isAssignableFrom(f.getType()))
+				addSubcommand(new ConfigMapCommand(bot, manager, instance, f, category, info, menu));
 
 				//Add subcommand for normal fields
 			else addSubcommand(new ConfigFieldCommand(bot, manager, instance, f, category, info, menu));
@@ -72,7 +74,8 @@ public class CategoryCommand extends Command<ICommandContext> {
 				}
 
 				return temp;
-			} catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+			} catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
+			         InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
 		}, info, field.getType().getDeclaredFields(), menu);

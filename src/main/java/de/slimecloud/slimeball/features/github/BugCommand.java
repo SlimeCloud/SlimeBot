@@ -27,6 +27,41 @@ import java.util.concurrent.TimeUnit;
 
 @ApplicationCommand(name = "bug", description = "Melde einen Bug")
 public class BugCommand {
+	@NotNull
+	public static Modal createModal(@Nullable Message target) {
+		return Modal.create("bug" + (target == null ? "" : ":" + target.getJumpUrl()), "Melde einen Bug")
+				.addActionRow(TextInput.create("title", "Titel", TextInputStyle.SHORT)
+						.setMinLength(5)
+						.setPlaceholder("Eine kurze präzise Beschreibung des Bugs")
+						.build()
+				)
+				.addActionRow(TextInput.create("reproduction", "Schritte zum Reproduzieren", TextInputStyle.PARAGRAPH)
+						.setMinLength(10)
+						.setPlaceholder("""
+								1. Gehe zu '....'
+								2. Klicke auf '....'
+								3. Scrolle nach unten zu '....'"""
+						)
+						.build()
+				)
+				.addActionRow(TextInput.create("description", "Beschreibung", TextInputStyle.PARAGRAPH)
+						.setMinLength(10)
+						.setPlaceholder("Eine ausführliche Beschreibung des Bugs")
+						.build()
+				)
+				.addActionRow(TextInput.create("expected", "Erwartetes Verhalten", TextInputStyle.PARAGRAPH)
+						.setMinLength(10)
+						.setPlaceholder("Ich erwarte, dass '....' passiert")
+						.build()
+				)
+				.addActionRow(TextInput.create("solution", "Lösung", TextInputStyle.PARAGRAPH)
+						.setPlaceholder("Ich würde '....' ändern, damit '....' passiert")
+						.setRequired(false)
+						.build()
+				)
+				.build();
+	}
+
 	@Cooldown(interval = 5, unit = TimeUnit.MINUTES, identifier = "bug")
 	public void handleCooldown(@NotNull ICommandContext context) {
 		context.getEvent().reply("Du kannst nur alle 5 Minuten einen bug melden!").setEphemeral(true).queue();
@@ -66,40 +101,5 @@ public class BugCommand {
 		).addActionRow(Button.link(issue.getHtmlUrl().toString(), "Auf GitHub ansehen")).queue());
 
 		event.reply("Der Report wurde erfolgreich ausgeführt").setEphemeral(true).queue();
-	}
-
-	@NotNull
-	public static Modal createModal(@Nullable Message target) {
-		return Modal.create("bug" + (target == null ? "" : ":" + target.getJumpUrl()), "Melde einen Bug")
-				.addActionRow(TextInput.create("title", "Titel", TextInputStyle.SHORT)
-						.setMinLength(5)
-						.setPlaceholder("Eine kurze präzise Beschreibung des Bugs")
-						.build()
-				)
-				.addActionRow(TextInput.create("reproduction", "Schritte zum Reproduzieren", TextInputStyle.PARAGRAPH)
-						.setMinLength(10)
-						.setPlaceholder("""
-								1. Gehe zu '....'
-								2. Klicke auf '....'
-								3. Scrolle nach unten zu '....'"""
-						)
-						.build()
-				)
-				.addActionRow(TextInput.create("description", "Beschreibung", TextInputStyle.PARAGRAPH)
-						.setMinLength(10)
-						.setPlaceholder("Eine ausführliche Beschreibung des Bugs")
-						.build()
-				)
-				.addActionRow(TextInput.create("expected", "Erwartetes Verhalten", TextInputStyle.PARAGRAPH)
-						.setMinLength(10)
-						.setPlaceholder("Ich erwarte, dass '....' passiert")
-						.build()
-				)
-				.addActionRow(TextInput.create("solution", "Lösung", TextInputStyle.PARAGRAPH)
-						.setPlaceholder("Ich würde '....' ändern, damit '....' passiert")
-						.setRequired(false)
-						.build()
-				)
-				.build();
 	}
 }

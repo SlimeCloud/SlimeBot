@@ -146,14 +146,16 @@ public class SlimeBot extends ListenerAdapter {
 		}
 
 		//Initialize GitHub API
-		if (credentials.get("GITHUB_TOKEN") != null && config.getGithubRepository() != null) github = new GitHubAPI(credentials.get("GITHUB_TOKEN"));
+		if (credentials.get("GITHUB_TOKEN") != null && config.getGithubRepository() != null)
+			github = new GitHubAPI(credentials.get("GITHUB_TOKEN"));
 		else {
 			logger.warn("GitHub api disabled due to missing credentials");
 			github = null;
 		}
 
 		//Initialize Spotify API
-		if (credentials.get("SPOTIFY_CLIENT_ID") != null) spotify = new Spotify(credentials.get("SPOTIFY_CLIENT_ID"), credentials.get("SPOTIFY_CLIENT_SECRET"));
+		if (credentials.get("SPOTIFY_CLIENT_ID") != null)
+			spotify = new Spotify(credentials.get("SPOTIFY_CLIENT_ID"), credentials.get("SPOTIFY_CLIENT_SECRET"));
 		else {
 			logger.warn("Spotify api disabled due to missing credentials");
 			spotify = null;

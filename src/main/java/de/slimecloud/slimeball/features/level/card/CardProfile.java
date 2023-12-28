@@ -32,6 +32,8 @@ import java.lang.reflect.Field;
 @ToString
 public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	public final static Font font;
+	public final static Color TRANSPARENT = ColorUtil.ofCode(0);
+	public final static CardProfile DEFAULT = new CardProfile(null);
 
 	static {
 		try {
@@ -40,9 +42,6 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 			throw new RuntimeException(e);
 		}
 	}
-
-	public final static Color TRANSPARENT = ColorUtil.ofCode(0);
-	public final static CardProfile DEFAULT = new CardProfile(null);
 
 	private final SlimeBot bot;
 
@@ -192,7 +191,8 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		graphics.setStroke(new BasicStroke(adjustBorderWith(avatarBorderWidth)));
 		graphics.setColor(avatarBorderColor);
 
-		if (avatarStyle == Style.ROUND) graphics.drawRoundRect(offset, offset, avatarWidth, avatarWidth, avatarWidth, avatarWidth);
+		if (avatarStyle == Style.ROUND)
+			graphics.drawRoundRect(offset, offset, avatarWidth, avatarWidth, avatarWidth, avatarWidth);
 		else graphics.drawRect(offset, offset, avatarWidth, avatarWidth);
 
 		//Image
@@ -215,20 +215,23 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		graphics.setColor(progressbarBorderColor);
 		graphics.setStroke(new BasicStroke(adjustBorderWith(progressbarBorderWidth)));
 
-		if (progressbarStyle == Style.ROUND) graphics.drawRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, progressbarHeight, progressbarHeight);
+		if (progressbarStyle == Style.ROUND)
+			graphics.drawRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, progressbarHeight, progressbarHeight);
 		else graphics.drawRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight);
 
 
 		//Background
 		graphics.setColor(progressbarBGColor);
 
-		if (progressbarStyle == Style.ROUND) graphics.fillRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, progressbarHeight, progressbarHeight);
+		if (progressbarStyle == Style.ROUND)
+			graphics.fillRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, progressbarHeight, progressbarHeight);
 		else graphics.fillRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight);
 
 		//Content
 		graphics.setColor(progressbarColor);
 
-		if (progressbarStyle == Style.ROUND) graphics.fillRoundRect(horizontalOffset, verticalOffset, (int) (percentage * maxWidth), progressbarHeight, progressbarHeight, progressbarHeight);
+		if (progressbarStyle == Style.ROUND)
+			graphics.fillRoundRect(horizontalOffset, verticalOffset, (int) (percentage * maxWidth), progressbarHeight, progressbarHeight, progressbarHeight);
 		else graphics.fillRect(horizontalOffset, verticalOffset, (int) (maxWidth * percentage), progressbarHeight);
 	}
 

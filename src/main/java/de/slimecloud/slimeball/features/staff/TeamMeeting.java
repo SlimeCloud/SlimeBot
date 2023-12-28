@@ -38,6 +38,21 @@ public class TeamMeeting extends ListenerAdapter {
 
 	private final SlimeBot bot;
 
+	@NotNull
+	public static List<String> extractAgenda(@NotNull MessageEmbed embed) {
+		return extract(embed.getFields().get(0), e -> e.split("\\. ", 2)[1]);
+	}
+
+	@NotNull
+	public static List<String> extract(@NotNull MessageEmbed.Field field, @NotNull Function<String, String> handler) {
+		if (field.getValue().length() <= 1) return Collections.emptyList();
+
+		return Arrays.stream(field.getValue().split("\n"))
+				.filter(s -> !s.isEmpty())
+				.map(handler)
+				.toList();
+	}
+
 	@Override
 	public void onGuildReady(@NotNull GuildReadyEvent event) {
 		bot.loadGuild(event.getGuild()).getMeeting().ifPresent(MeetingConfig::setupNotification);
@@ -68,26 +83,29 @@ public class TeamMeeting extends ListenerAdapter {
 			MessageEmbed current = event.getMessage().getEmbeds().get(0);
 
 			switch (id[1]) {
-				case "yes" -> event.editMessage(config.buildMessage(event.getGuild(), current.getTimestamp().toInstant(), current, (y, m, n, a) -> {
-					String mention = event.getUser().getAsMention();
-					y.add(mention);
-					m.remove(mention);
-					n.remove(mention);
-				})).queue();
+				case "yes" ->
+						event.editMessage(config.buildMessage(event.getGuild(), current.getTimestamp().toInstant(), current, (y, m, n, a) -> {
+							String mention = event.getUser().getAsMention();
+							y.add(mention);
+							m.remove(mention);
+							n.remove(mention);
+						})).queue();
 
-				case "maybe" -> event.editMessage(config.buildMessage(event.getGuild(), current.getTimestamp().toInstant(), current, (y, m, n, a) -> {
-					String mention = event.getUser().getAsMention();
-					y.remove(mention);
-					m.add(mention);
-					n.remove(mention);
-				})).queue();
+				case "maybe" ->
+						event.editMessage(config.buildMessage(event.getGuild(), current.getTimestamp().toInstant(), current, (y, m, n, a) -> {
+							String mention = event.getUser().getAsMention();
+							y.remove(mention);
+							m.add(mention);
+							n.remove(mention);
+						})).queue();
 
-				case "no" -> event.editMessage(config.buildMessage(event.getGuild(), current.getTimestamp().toInstant(), current, (y, m, n, a) -> {
-					String mention = event.getUser().getAsMention();
-					y.remove(mention);
-					m.remove(mention);
-					n.add(mention);
-				})).queue();
+				case "no" ->
+						event.editMessage(config.buildMessage(event.getGuild(), current.getTimestamp().toInstant(), current, (y, m, n, a) -> {
+							String mention = event.getUser().getAsMention();
+							y.remove(mention);
+							m.remove(mention);
+							n.add(mention);
+						})).queue();
 
 				case "agenda" -> event.replyModal(agendaModal).queue();
 
@@ -102,7 +120,7 @@ public class TeamMeeting extends ListenerAdapter {
 										.setColor(bot.getColor(event.getGuild()))
 										.setDescription("Team-Besprechung erfolgreich beendet");
 
-								if(!issues.isEmpty()) {
+								if (!issues.isEmpty()) {
 									embed.appendDescription("\n\n### ToDo's\n");
 									issues.forEach(i -> embed.appendDescription("- [" + i.getTitle() + "](" + i.getHtmlUrl() + ")\n"));
 								}
@@ -145,13 +163,14 @@ public class TeamMeeting extends ListenerAdapter {
 						(y, m, n, a) -> a.remove(i)
 				)).queue();
 
-				case "agenda_edit" -> event.replyModal(Modal.create("meeting:agenda_edit:" + i, "Agendapunkt bearbeiten")
-						.addActionRow(TextInput.create("description", "Beschreibung", TextInputStyle.PARAGRAPH)
-								.setValue(extractAgenda(current).get(i).split(": ", 2)[1])
+				case "agenda_edit" ->
+						event.replyModal(Modal.create("meeting:agenda_edit:" + i, "Agendapunkt bearbeiten")
+								.addActionRow(TextInput.create("description", "Beschreibung", TextInputStyle.PARAGRAPH)
+										.setValue(extractAgenda(current).get(i).split(": ", 2)[1])
+										.build()
+								)
 								.build()
-						)
-						.build()
-				).queue();
+						).queue();
 			}
 		});
 	}
@@ -184,7 +203,8 @@ public class TeamMeeting extends ListenerAdapter {
 	}
 
 	public RestAction<List<GHIssue>> createTodos(@NotNull MeetingConfig config, @NotNull List<String> entries) {
-		if (entries.isEmpty() || bot.getGithub() == null || config.getRepository() == null) return new CompletedRestAction<>(bot.getJda(), Collections.emptyList());
+		if (entries.isEmpty() || bot.getGithub() == null || config.getRepository() == null)
+			return new CompletedRestAction<>(bot.getJda(), Collections.emptyList());
 
 		//Get repository and project
 		try {
@@ -192,16 +212,16 @@ public class TeamMeeting extends ListenerAdapter {
 
 			//Project id
 			return bot.getGithub().execute("""
-						query {
-							repository(owner: "%owner%", name: "%name%") {
-								projectsV2(first: 1) {
-									nodes {
-										id
+							query {
+								repository(owner: "%owner%", name: "%name%") {
+									projectsV2(first: 1) {
+										nodes {
+											id
+										}
 									}
 								}
 							}
-						}
-						""".replace("%owner%", repository.getOwnerName()).replace("%name%", repository.getName()),
+							""".replace("%owner%", repository.getOwnerName()).replace("%name%", repository.getName()),
 					//Extract id from response
 					data -> data
 							.getAsJsonObject("repository")
@@ -214,13 +234,13 @@ public class TeamMeeting extends ListenerAdapter {
 							GHIssue issue = repository.createIssue(e.split(": ", 2)[1]).create();
 
 							return bot.getGithub().execute("""
-										mutation {
-											addProjectV2ItemById(input: {
-												projectId: "%project%"
-												contentId: "%issue%"
-											}) { clientMutationId }
-										}
-										""".replace("%project%", id).replace("%issue%", issue.getNodeId()),
+											mutation {
+												addProjectV2ItemById(input: {
+													projectId: "%project%"
+													contentId: "%issue%"
+												}) { clientMutationId }
+											}
+											""".replace("%project%", id).replace("%issue%", issue.getNodeId()),
 									null
 							).mapToResult().map(x -> issue);
 						} catch (IOException ex) {
@@ -232,20 +252,5 @@ public class TeamMeeting extends ListenerAdapter {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	@NotNull
-	public static List<String> extractAgenda(@NotNull MessageEmbed embed) {
-		return extract(embed.getFields().get(0), e -> e.split("\\. ", 2)[1]);
-	}
-
-	@NotNull
-	public static List<String> extract(@NotNull MessageEmbed.Field field, @NotNull Function<String, String> handler) {
-		if (field.getValue().length() <= 1) return Collections.emptyList();
-
-		return Arrays.stream(field.getValue().split("\n"))
-				.filter(s -> !s.isEmpty())
-				.map(handler)
-				.toList();
 	}
 }

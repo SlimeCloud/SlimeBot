@@ -115,10 +115,12 @@ die `@ApplicationCommand`-Annotation haben. Sie müssen dann NICHT separat regis
 
 # 🔧 Konfiguration
 
-Für die Konfiguration von Servern gibt es die `GuildConfig` Klasse. Sie enthält Felder und Kategorien, die mit `@ConfigField` oder `@ConfigCategory` annotiert sind.
+Für die Konfiguration von Servern gibt es die `GuildConfig` Klasse. Sie enthält Felder und Kategorien, die
+mit `@ConfigField` oder `@ConfigCategory` annotiert sind.
 Aus diesen informationen wird automatisch ein `config`-Befehl erstellt.
 
-Um die Konfiguration eines Servers zu laden, kannst du `SlimeBall#loadGuild` verwenden. Um Zugriff zur SlimeBot instanz zu bekommen, solltest du sie per Konstruktor übergeben.
+Um die Konfiguration eines Servers zu laden, kannst du `SlimeBall#loadGuild` verwenden. Um Zugriff zur SlimeBot instanz
+zu bekommen, solltest du sie per Konstruktor übergeben.
 
 # 🗄️ Datenbank
 

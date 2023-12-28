@@ -62,7 +62,8 @@ public class CardCommand {
 				embed.addField(StringUtil.prettifyCamelCase(f.getName()), value == null ? "*Nicht gesetzt*" : value.toString(), false);
 			}
 
-			if (embed.getFields().isEmpty()) embed.setDescription("*Keine Konfiguration, es werden die Standardwerte verwendet*");
+			if (embed.getFields().isEmpty())
+				embed.setDescription("*Keine Konfiguration, es werden die Standardwerte verwendet*");
 
 			event.getHook().editOriginalEmbeds(embed.build()).setFiles(profile.getFile()).queue();
 		}
@@ -111,11 +112,12 @@ public class CardCommand {
 				last = category;
 
 				if (field.getType().isAssignableFrom(Style.class)) temp.add(new StyleComponent(field));
-				else temp.add(0, new ButtonComponent(field.getName(), ButtonColor.GRAY, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s ->
-						input.createState()
-								.setState("field", field.getName())
-								.display((IModalCallback) s.event)
-				));
+				else
+					temp.add(0, new ButtonComponent(field.getName(), ButtonColor.GRAY, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s ->
+							input.createState()
+									.setState("field", field.getName())
+									.display((IModalCallback) s.event)
+					));
 			}
 
 			if (!temp.isEmpty()) components.add(ComponentRow.of(temp));

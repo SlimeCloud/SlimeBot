@@ -50,8 +50,10 @@ public class EnableCommand extends Command<ICommandContext> {
 	public static OptionData getOption(@NotNull Field f) {
 		ConfigField info = f.getAnnotation(ConfigField.class);
 
-		if (Collection.class.isAssignableFrom(f.getType())) throw new IllegalArgumentException("Cannot use collection types in this context!");
-		if (Map.class.isAssignableFrom(f.getType())) throw new IllegalArgumentException("Cannot use map types in this context!");
+		if (Collection.class.isAssignableFrom(f.getType()))
+			throw new IllegalArgumentException("Cannot use collection types in this context!");
+		if (Map.class.isAssignableFrom(f.getType()))
+			throw new IllegalArgumentException("Cannot use map types in this context!");
 
 		return info.type().getConfiguration().apply(f.getType(), new OptionData(info.type().getType(), info.command(), info.description(), info.required()));
 	}

@@ -54,10 +54,12 @@ public class LevelListener extends ListenerAdapter {
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 		//Check for valid environment
-		if (!event.isFromGuild() || event.getAuthor().isBot() || isBlacklisted((GuildChannel) event.getChannel())) return;
+		if (!event.isFromGuild() || event.getAuthor().isBot() || isBlacklisted((GuildChannel) event.getChannel()))
+			return;
 
 		//Check timeout
-		if (messageTimeout.getOrDefault(event.getAuthor().getIdLong(), 0L) + config.getMessageCooldown() >= System.currentTimeMillis()) return;
+		if (messageTimeout.getOrDefault(event.getAuthor().getIdLong(), 0L) + config.getMessageCooldown() >= System.currentTimeMillis())
+			return;
 		messageTimeout.put(event.getAuthor().getIdLong(), System.currentTimeMillis());
 
 		//Add xp
@@ -67,7 +69,8 @@ public class LevelListener extends ListenerAdapter {
 	@Override
 	public void onGenericGuildVoice(@NotNull GenericGuildVoiceEvent event) {
 		if (event instanceof GuildVoiceUpdateEvent update) {
-			if (update.getChannelLeft() != null && update.getChannelJoined() == null) voiceUsers.remove(event.getMember().getIdLong());
+			if (update.getChannelLeft() != null && update.getChannelJoined() == null)
+				voiceUsers.remove(event.getMember().getIdLong());
 
 			//Update channels
 			updateChannel(update.getChannelLeft());
@@ -85,7 +88,8 @@ public class LevelListener extends ListenerAdapter {
 				.toList();
 
 		//If channel has 2 valid members and the channel is not blacklisted -> mark channel for leveling
-		if (validMembers.size() >= 2 && !isBlacklisted(channel)) validMembers.forEach(m -> voiceUsers.put(m.getIdLong(), channel.getGuild().getIdLong()));
+		if (validMembers.size() >= 2 && !isBlacklisted(channel))
+			validMembers.forEach(m -> voiceUsers.put(m.getIdLong(), channel.getGuild().getIdLong()));
 		else channel.getMembers().forEach(m -> voiceUsers.remove(m.getIdLong()));
 	}
 

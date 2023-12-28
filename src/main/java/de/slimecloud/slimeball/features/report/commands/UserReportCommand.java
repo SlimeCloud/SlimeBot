@@ -36,6 +36,19 @@ public class UserReportCommand {
 				.build();
 	}
 
+	public static void submitUserReport(@NotNull SlimeBot bot, @NotNull IReplyCallback event, @NotNull User target, @NotNull String reason) {
+		//Try report and check for successful insertion
+		if (!bot.getReports().reportUser(event, target, reason)) return;
+
+		event.replyEmbeds(new EmbedBuilder()
+				.setTitle(":white_check_mark: Report Erfolgreich")
+				.setColor(bot.getColor(event.getGuild()))
+				.setDescription(target.getAsMention() + " wurde erfolgreich gemeldet")
+				.setTimestamp(Instant.now())
+				.build()
+		).setEphemeral(true).queue();
+	}
+
 	@ApplicationCommandMethod
 	public void performCommand(@NotNull UserContextInteractionEvent event) {
 		event.replyModal(createMode(event.getTarget().getId())).queue();
@@ -48,18 +61,5 @@ public class UserReportCommand {
 				user -> submitUserReport(bot, event, user, event.getValue("reason").getAsString()),
 				new ErrorHandler().handle(ErrorResponse.UNKNOWN_USER, e -> event.reply("Nutzer nicht gefunden").setEphemeral(true).queue())
 		);
-	}
-
-	public static void submitUserReport(@NotNull SlimeBot bot, @NotNull IReplyCallback event, @NotNull User target, @NotNull String reason) {
-		//Try report and check for successful insertion
-		if (!bot.getReports().reportUser(event, target, reason)) return;
-
-		event.replyEmbeds(new EmbedBuilder()
-				.setTitle(":white_check_mark: Report Erfolgreich")
-				.setColor(bot.getColor(event.getGuild()))
-				.setDescription(target.getAsMention() + " wurde erfolgreich gemeldet")
-				.setTimestamp(Instant.now())
-				.build()
-		).setEphemeral(true).queue();
 	}
 }

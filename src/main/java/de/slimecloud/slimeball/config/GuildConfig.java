@@ -37,6 +37,56 @@ import java.util.*;
 @CategoryInfo(name = "Standard", command = "general", description = "Generelle Konfiguration des Servers")
 @ToString
 public class GuildConfig {
+	@Getter
+	@ConfigField(name = "Beitritts Rollen", command = "autorole", description = "Rollen, die Mitgliedern beim Beitreten gegeben werden", type = ConfigFieldType.ROLE)
+	private final List<Long> joinRoles = new ArrayList<>();
+	@ToString.Exclude
+	private transient SlimeBot bot;
+
+	private transient long guild;
+	private transient String path;
+
+	@Setter
+	@ConfigField(name = "Farbe", command = "color", description = "Die primäre Farbe des Servers", type = ConfigFieldType.COLOR)
+	private String color;
+
+	@Setter
+	@ConfigField(name = "Team", command = "team", description = "Die Team-Rolle", type = ConfigFieldType.ROLE)
+	private Long teamRole;
+	@Setter
+	@ConfigField(name = "Gruß-Kanal", command = "greetings", description = "Kanal für Grußnachrichten", type = ConfigFieldType.MESSAGE_CHANNEL)
+	private Long greetingsChannel;
+	@Setter
+	@ConfigField(name = "Zitate-Kanal", command = "quote", description = "Kanal, in dem Zitate gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
+	private Long quoteChannel;
+	@Setter
+	@ConfigField(name = "Log-Kanal", command = "log", description = "Kanal, in dem Log-Nachrichten für den Bot gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
+	private Long logChannel;
+	@Setter
+	@ConfigField(name = "Straf-Kanal", command = "punishment", description = "Kanal, in dem Informationen über Moderations-Handlungen gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
+	private Long punishmentChannel;
+	@Setter
+	@ConfigField(name = "Contributor-Rolle", command = "contributor", description = "Rolle, die Mitglieder erhalten, die am SlimeBall Bot mitgewirkt haben", type = ConfigFieldType.ROLE)
+	private Long contributorRole;
+	//TODO Make this configurable via command
+	@Setter
+	private Map<Long, EnumSet<AutodleteFlag>> autodelete;
+	@Setter
+	@CategoryInfo(name = "Spotify", command = "spotify", description = "Konfiguration für Spotify-Alerts")
+	private SpotifyNotificationConfig spotify;
+	@Setter
+	@CategoryInfo(name = "FdmdS", command = "fdmds", description = "Konfiguration für \"Frag doch mal den Schleim\"")
+	private FdmdsConfig fdmds;
+	@Setter
+	@CategoryInfo(name = "Level", command = "level", description = "Konfiguration für das Level-System")
+	private GuildLevelConfig level;
+	@Setter
+	@CategoryInfo(name = "Meeting", command = "meeting", description = "Konfiguration für Team-Meetings")
+	private MeetingConfig meeting;
+	@Setter
+	@CategoryInfo(name = "Team-Nachricht", command = "staff", description = "Kanfigration für die Team-Nachricht")
+	private StaffConfig staff;
+
 	@NotNull
 	public static GuildConfig readFromFile(@NotNull SlimeBot bot, long guild) {
 		String path = bot.getConfig().getGuildStorage().replace("%guild%", String.valueOf(guild));
@@ -53,69 +103,6 @@ public class GuildConfig {
 			throw new RuntimeException(e);
 		}
 	}
-
-	@ToString.Exclude
-	private transient SlimeBot bot;
-
-	private transient long guild;
-	private transient String path;
-
-	@Setter
-	@ConfigField(name = "Farbe", command = "color", description = "Die primäre Farbe des Servers", type = ConfigFieldType.COLOR)
-	private String color;
-
-	@Setter
-	@ConfigField(name = "Team", command = "team", description = "Die Team-Rolle", type = ConfigFieldType.ROLE)
-	private Long teamRole;
-
-	@Getter
-	@ConfigField(name = "Beitritts Rollen", command = "autorole", description = "Rollen, die Mitgliedern beim Beitreten gegeben werden", type = ConfigFieldType.ROLE)
-	private final List<Long> joinRoles = new ArrayList<>();
-
-	@Setter
-	@ConfigField(name = "Gruß-Kanal", command = "greetings", description = "Kanal für Grußnachrichten", type = ConfigFieldType.MESSAGE_CHANNEL)
-	private Long greetingsChannel;
-
-	@Setter
-	@ConfigField(name = "Zitate-Kanal", command = "quote", description = "Kanal, in dem Zitate gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
-	private Long quoteChannel;
-
-	@Setter
-	@ConfigField(name = "Log-Kanal", command = "log", description = "Kanal, in dem Log-Nachrichten für den Bot gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
-	private Long logChannel;
-
-	@Setter
-	@ConfigField(name = "Straf-Kanal", command = "punishment", description = "Kanal, in dem Informationen über Moderations-Handlungen gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
-	private Long punishmentChannel;
-
-	@Setter
-	@ConfigField(name = "Contributor-Rolle", command = "contributor", description = "Rolle, die Mitglieder erhalten, die am SlimeBall Bot mitgewirkt haben", type = ConfigFieldType.ROLE)
-	private Long contributorRole;
-
-	//TODO Make this configurable via command
-	@Setter
-	private Map<Long, EnumSet<AutodleteFlag>> autodelete;
-
-
-	@Setter
-	@CategoryInfo(name = "Spotify", command = "spotify", description = "Konfiguration für Spotify-Alerts")
-	private SpotifyNotificationConfig spotify;
-
-	@Setter
-	@CategoryInfo(name = "FdmdS", command = "fdmds", description = "Konfiguration für \"Frag doch mal den Schleim\"")
-	private FdmdsConfig fdmds;
-
-	@Setter
-	@CategoryInfo(name = "Level", command = "level", description = "Konfiguration für das Level-System")
-	private GuildLevelConfig level;
-
-	@Setter
-	@CategoryInfo(name = "Meeting", command = "meeting", description = "Konfiguration für Team-Meetings")
-	private MeetingConfig meeting;
-
-	@Setter
-	@CategoryInfo(name = "Team-Nachricht", command = "staff", description = "Kanfigration für die Team-Nachricht")
-	private StaffConfig staff;
 
 	@NotNull
 	private GuildConfig configure(@NotNull SlimeBot bot, @NotNull String path, long guild) {
