@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
@@ -32,7 +33,7 @@ public class TimeoutListener extends ListenerAdapter {
 			String reason = Optional.ofNullable(entry.getReason()).orElse("N/A");
 
 			//Call event and remove timout if canceled
-			if (new UserTimeoutedEvent(event.getMember(), entry.getUser(), reason).callEvent())
+			if (new UserTimeoutedEvent(event.getMember(), entry.getUser(), reason, event.getNewTimeOutEnd().toInstant()).callEvent())
 				event.getMember().removeTimeout().queue();
 
 			return false;
@@ -48,7 +49,8 @@ public class TimeoutListener extends ListenerAdapter {
 						.setColor(bot.getColor(event.getTarget().getGuild()))
 						.setTimestamp(Instant.now())
 						.setDescription("Du wurdest auf dem SlimeCloud Discord getimeouted")
-						.addField("Teammitglied", event.getTeam().getAsMention(), false)
+						.addField("Teammitglied", event.getTeam().getAsMention(), true)
+						.addField("Endet", TimeFormat.RELATIVE.format(event.getEnd()), true)
 						.addField("Grund", event.getReason(), false)
 						.build()
 		)).queue();
@@ -56,11 +58,12 @@ public class TimeoutListener extends ListenerAdapter {
 		//Send log for team members
 		bot.loadGuild(event.getTarget().getGuild()).getPunishmentChannel().ifPresent(channel -> channel.sendMessageEmbeds(
 				new EmbedBuilder()
-						.setTitle("\"" + event.getTarget().getEffectiveName() + "\"" + " wurde getimeouted")
+						.setTitle("\uD83D\uDE34  **" + event.getTarget().getEffectiveName() + "** wurde getimeouted")
 						.setColor(bot.getColor(event.getTarget().getGuild()))
 						.setTimestamp(Instant.now())
 						.addField("Nutzer", event.getTarget().getAsMention(), true)
 						.addField("Teammitglied", event.getTeam().getAsMention(), true)
+						.addField("Endet", TimeFormat.RELATIVE.format(event.getEnd()), true)
 						.addField("Grund", event.getReason(), false)
 						.build()
 		).queue());
