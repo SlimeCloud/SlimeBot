@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.internal.requests.CompletedRestAction;
 import org.jetbrains.annotations.NotNull;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHRepository;
@@ -93,12 +94,27 @@ public class TeamMeeting extends ListenerAdapter {
 				case "end" -> {
 					//Remove components from current meeting
 					event.editComponents().queue();
-					event.getMessage().replyEmbeds(new EmbedBuilder()
-							.setTitle("\uD83D\uDCDC  Besprechung beendet")
-							.setColor(bot.getColor(event.getGuild()))
-							.setDescription("Team-Besprechung erfolgreich beendet")
-							.build()
-					).queue();
+
+					createTodos(config, extractAgenda(event.getMessage().getEmbeds().get(0)))
+							.flatMap(issues -> {
+								EmbedBuilder embed = new EmbedBuilder()
+										.setTitle("\uD83D\uDCDC  Besprechung beendet")
+										.setColor(bot.getColor(event.getGuild()))
+										.setDescription("Team-Besprechung erfolgreich beendet");
+
+								if(!issues.isEmpty()) {
+									embed.appendDescription("\n\n### ToDo's\n");
+									issues.forEach(i -> embed.appendDescription("- [" + i.getTitle() + "](" + i.getHtmlUrl() + ")\n"));
+								}
+
+								return event.getMessage().replyEmbeds(embed.build());
+							}).onErrorFlatMap(e -> event.getMessage().replyEmbeds(new EmbedBuilder()
+									.setTitle("\uD83D\uDCDC  Besprechung beendet")
+									.setColor(bot.getColor(event.getGuild()))
+									.setDescription("Team-Besprechung erfolgreich beendet")
+									.appendDescription("\n\nFehler beim erstellen der ToDo's")
+									.build()
+							)).queue();
 
 					//Delete event
 					event.getGuild().retrieveScheduledEventById(config.getEvent()).flatMap(ScheduledEvent::delete).queue();
@@ -106,12 +122,6 @@ public class TeamMeeting extends ListenerAdapter {
 					//This will send a new message
 					config.createNewMeeting(current.getTimestamp().toInstant().plus(Duration.ofDays(14)));
 					guildConfig.save();
-
-					try {
-						createTodos(config, extractAgenda(event.getMessage().getEmbeds().get(0)));
-					} catch (IOException e) {
-						logger.error("Failed to create ToDo's", e);
-					}
 				}
 			}
 		});
@@ -173,16 +183,15 @@ public class TeamMeeting extends ListenerAdapter {
 		});
 	}
 
-	public void createTodos(@NotNull MeetingConfig config, @NotNull List<String> entries) throws IOException {
-		if (entries.isEmpty()) return;
-		if (bot.getGithub() == null) return;
-		if (config.getRepository() == null) return;
+	public RestAction<List<GHIssue>> createTodos(@NotNull MeetingConfig config, @NotNull List<String> entries) {
+		if (entries.isEmpty() || bot.getGithub() == null || config.getRepository() == null) return new CompletedRestAction<>(bot.getJda(), Collections.emptyList());
 
 		//Get repository and project
-		GHRepository repository = bot.getGithub().getApi().getRepository(config.getRepository());
+		try {
+			GHRepository repository = bot.getGithub().getApi().getRepository(config.getRepository());
 
-		//Project id
-		bot.getGithub().execute("""
+			//Project id
+			return bot.getGithub().execute("""
 						query {
 							repository(owner: "%owner%", name: "%name%") {
 								projectsV2(first: 1) {
@@ -193,18 +202,18 @@ public class TeamMeeting extends ListenerAdapter {
 							}
 						}
 						""".replace("%owner%", repository.getOwnerName()).replace("%name%", repository.getName()),
-				//Extract id from response
-				data -> data
-						.getAsJsonObject("repository")
-						.getAsJsonObject("projectsV2")
-						.getAsJsonArray("nodes").get(0).getAsJsonObject()
-						.getAsJsonPrimitive("id").getAsString()
-		).flatMap(id -> RestAction.allOf(entries.stream()
-				.map(e -> {
-					try {
-						GHIssue issue = repository.createIssue(e.split(": ", 2)[1]).create();
+					//Extract id from response
+					data -> data
+							.getAsJsonObject("repository")
+							.getAsJsonObject("projectsV2")
+							.getAsJsonArray("nodes").get(0).getAsJsonObject()
+							.getAsJsonPrimitive("id").getAsString()
+			).flatMap(id -> RestAction.allOf(entries.stream()
+					.map(e -> {
+						try {
+							GHIssue issue = repository.createIssue(e.split(": ", 2)[1]).create();
 
-						return bot.getGithub().execute("""
+							return bot.getGithub().execute("""
 										mutation {
 											addProjectV2ItemById(input: {
 												projectId: "%project%"
@@ -212,14 +221,17 @@ public class TeamMeeting extends ListenerAdapter {
 											}) { clientMutationId }
 										}
 										""".replace("%project%", id).replace("%issue%", issue.getNodeId()),
-								null
-						).mapToResult();
-					} catch (IOException ex) {
-						throw new RuntimeException(ex);
-					}
-				})
-				.toList()
-		)).queue();
+									null
+							).mapToResult().map(x -> issue);
+						} catch (IOException ex) {
+							throw new RuntimeException(ex);
+						}
+					})
+					.toList()
+			));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@NotNull
