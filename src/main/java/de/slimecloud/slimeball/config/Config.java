@@ -14,17 +14,34 @@ import java.util.Optional;
 @Getter
 public class Config {
 	@Required
-	private final List<LogForwarding> logForwarding = Collections.emptyList();
-	private final List<Long> timeoutIgnore = Collections.emptyList();
-	@Required
 	private String defaultColor;
+
 	@Required
 	private String guildStorage;
+
 	@Required
 	private ActivityConfig activity;
+
+	@Required
+	private final List<LogForwarding> logForwarding = Collections.emptyList();
+
 	private SpotifyConfig spotify;
+
 	private LevelConfig level;
+
+	private final List<Long> timeoutIgnore = Collections.emptyList();
+
 	private String githubRepository;
+
+	@NotNull
+	public Optional<SpotifyConfig> getSpotify() {
+		return Optional.ofNullable(spotify);
+	}
+
+	@NotNull
+	public Optional<LevelConfig> getLevel() {
+		return Optional.ofNullable(level);
+	}
 
 	@NotNull
 	public static Config readFromFile(@NotNull String path) throws Exception {
@@ -44,15 +61,5 @@ public class Config {
 			if (value == null && f.isAnnotationPresent(Required.class))
 				throw new IllegalArgumentException("Required config value " + f.getName() + " has no value");
 		}
-	}
-
-	@NotNull
-	public Optional<SpotifyConfig> getSpotify() {
-		return Optional.ofNullable(spotify);
-	}
-
-	@NotNull
-	public Optional<LevelConfig> getLevel() {
-		return Optional.ofNullable(level);
 	}
 }

@@ -44,8 +44,7 @@ public class ConfigCommand {
 			f.setAccessible(true);
 
 			//Add categories
-			if (f.isAnnotationPresent(CategoryInfo.class))
-				command.addSubcommand(CategoryCommand.getCommand(bot, cmdManager, f, resetMenu));
+			if (f.isAnnotationPresent(CategoryInfo.class)) command.addSubcommand(CategoryCommand.getCommand(bot, cmdManager, f, resetMenu));
 			else if (f.isAnnotationPresent(ConfigField.class)) fields.add(f);
 		}
 

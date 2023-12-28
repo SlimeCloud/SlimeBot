@@ -24,11 +24,6 @@ import org.jetbrains.annotations.NotNull;
 public class ContributorCommand {
 	public final IRegistrationCondition<ICommandContext> condition = (manager, guild, cache) -> cache.<GuildConfig>getState("config").getLogChannel().isPresent();
 
-	@NotNull
-	public static UserSnowflake getUser(@NotNull MessageEmbed embed) {
-		return UserSnowflake.fromId(embed.getAuthor().getIconUrl().split("/")[4]); //Avatar Pattern: "https://cdn.discordapp.com/avatars/%s/%s.%s"
-	}
-
 	@ApplicationCommandMethod
 	public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
 	                           @Option(description = "Wie heißt du auf GitHub?") String user,
@@ -76,5 +71,10 @@ public class ContributorCommand {
 				.queue();
 
 		event.reply(user.getAsMention() + " wurde die Contributor Rolle nicht gegeben.").queue();
+	}
+
+	@NotNull
+	public static UserSnowflake getUser(@NotNull MessageEmbed embed) {
+		return UserSnowflake.fromId(embed.getAuthor().getIconUrl().split("/")[4]); //Avatar Pattern: "https://cdn.discordapp.com/avatars/%s/%s.%s"
 	}
 }

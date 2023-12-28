@@ -13,7 +13,6 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -27,7 +26,6 @@ Do you have any idea how to fix this bug?
 
 **ToDos**
 A todo list for fixing the error
-
 - [ ] example
 - [x] todo
 

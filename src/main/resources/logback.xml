@@ -4,8 +4,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss} %boldCyan(%-26.-26thread) %boldGreen(%-20.-20logger{0}) %highlight(%-6level)
-                %msg%n%throwable
+            <pattern>%d{HH:mm:ss} %boldCyan(%-26.-26thread) %boldGreen(%-20.-20logger{0}) %highlight(%-6level) %msg%n%throwable
             </pattern>
         </encoder>
     </appender>
@@ -19,8 +18,7 @@
         </rollingPolicy>
 
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-26.-26thread %-36.-36class{36} #%-24.-24method{24} L%-5.-5line %-20.-20logger{0}
-                %-6level %msg%n%throwable
+            <pattern>%d{HH:mm:ss.SSS} %-26.-26thread %-36.-36class{36} #%-24.-24method{24} L%-5.-5line %-20.-20logger{0} %-6level %msg%n%throwable
             </pattern>
         </encoder>
     </appender>

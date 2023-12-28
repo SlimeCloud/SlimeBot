@@ -30,7 +30,7 @@ public class HolidayAlert {
 		this.bot = bot;
 		this.host = bot.getDiscordUtils().getCustomRestActionManager().createHost(apiHost);
 
-		if (LocalDateTime.now().getHour() >= 6) check();
+		if(LocalDateTime.now().getHour() >= 6) check();
 		//Check every day at 6 AM
 		bot.scheduleDaily(6, this::check);
 	}

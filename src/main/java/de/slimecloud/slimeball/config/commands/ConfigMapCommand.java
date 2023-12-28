@@ -25,17 +25,13 @@ public class ConfigMapCommand extends Command<ICommandContext> {
 		addSubcommand(new ListCommand(manager, field, menu));
 	}
 
+	private interface TriConsumer<A, B, C> {
+		void accept(A a, B b, C c);
+	}
+
 	@SuppressWarnings("unchecked")
 	private static <K, V> void modify(@NotNull Object map, @NotNull TriConsumer<Map<K, V>, K, V> handler, @NotNull Object key, @Nullable Object value) {
 		handler.accept((Map<K, V>) map, (K) key, (V) value);
-	}
-
-	@Override
-	public void performCommand(@NotNull ICommandContext context) throws Exception {
-	}
-
-	private interface TriConsumer<A, B, C> {
-		void accept(A a, B b, C c);
 	}
 
 	public static class AddCommand extends Command<ICommandContext> {
@@ -151,5 +147,9 @@ public class ConfigMapCommand extends Command<ICommandContext> {
 					.setState("f", field.getName())
 					.display(context.getEvent());
 		}
+	}
+
+	@Override
+	public void performCommand(@NotNull ICommandContext context) throws Exception {
 	}
 }

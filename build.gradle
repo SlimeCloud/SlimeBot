@@ -57,7 +57,7 @@ String getVersion() {
     try {
         String commit = 'git rev-parse --verify --short HEAD'.execute().text.trim()
         version += "-" + commit
-    } catch (IOException ignore) {
+    } catch(IOException ignore) {
         version += "-unknown"
     }
 

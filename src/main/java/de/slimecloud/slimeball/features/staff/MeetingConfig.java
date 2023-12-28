@@ -31,19 +31,25 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class MeetingConfig extends ConfigCategory {
 	public final static ZoneOffset offset = ZoneOffset.ofHours(1);
-	private final transient Set<Future<?>> futures = new HashSet<>();
+
 	@ConfigField(name = "Kanal", command = "channel", description = "Kanal, in dem Team-Meetings organisiert werden", type = ConfigFieldType.MESSAGE_CHANNEL, required = true)
 	private Long channel;
+
 	@ConfigField(name = "Sprachkanal", command = "voice", description = "Der Sprachkanal, in dem Team-Meetings stattfinden", type = ConfigFieldType.VOICE_CHANNEL, required = true)
 	private Long voice;
+
 	@Getter
 	private Long message;
 	@Getter
 	private Long event;
+
 	@Getter
 	private Long nextMeeting;
+
 	@ConfigField(name = "Repository", command = "repository", description = "Die GitHub Repository, in der ToDo's erstellt werden", type = ConfigFieldType.STRING)
 	private String repository;
+
+	private final transient Set<Future<?>> futures = new HashSet<>();
 
 	@Override
 	public void enable() {

@@ -27,4 +27,4 @@ public class InfoCommand {
 				.build()
 		).setEphemeral(true).queue();
 	}
-}	
+}

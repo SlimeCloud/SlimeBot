@@ -4,10 +4,6 @@ import de.mineking.discordutils.console.RedirectTarget;
 import de.slimecloud.slimeball.config.engine.Required;
 
 public record LogForwarding(@Required Type type, @Required Long id) {
-	public RedirectTarget build() {
-		return type.build(id);
-	}
-
 	enum Type {
 		USER {
 			@Override
@@ -23,5 +19,9 @@ public record LogForwarding(@Required Type type, @Required Long id) {
 		};
 
 		public abstract RedirectTarget build(long id);
+	}
+
+	public RedirectTarget build() {
+		return type.build(id);
 	}
 }

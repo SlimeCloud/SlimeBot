@@ -91,8 +91,7 @@ public class FdmdsCommand {
 				.addField("Frage", question, false)
 				.addField("Auswahlmöglichkeiten", choices.toString(), false);
 
-		if (event.getModalId().contains("send"))
-			embed.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl());
+		if (event.getModalId().contains("send")) embed.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl());
 		else {
 			MessageEmbed.AuthorInfo current = event.getMessage().getEmbeds().get(0).getAuthor();
 			embed.setAuthor(current.getName(), current.getUrl(), current.getIconUrl()).setFooter("Bearbeitet von " + event.getUser().getGlobalName());
@@ -170,8 +169,7 @@ public class FdmdsCommand {
 				fdmds.getChannel().sendMessage(text)
 						.addActionRow(Button.secondary("fdmds:create", "Frage einreichen"))
 						.queue(m -> {
-							for (int i = 0; i < choices.lines().count(); i++)
-								m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
+							for (int i = 0; i < choices.lines().count(); i++) m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
 
 							m.createThreadChannel("Unterhaltet euch über diese Frage!").queue();
 

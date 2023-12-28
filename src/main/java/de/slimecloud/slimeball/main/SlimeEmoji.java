@@ -26,11 +26,6 @@ public enum SlimeEmoji {
 	}
 
 	@NotNull
-	public static SlimeEmoji number(int i) {
-		return valueOf("NUMBER_" + i);
-	}
-
-	@NotNull
 	public Emoji getEmoji(@NotNull Guild guild) {
 		return guild.getEmojisByName(name, true).stream()
 				.findFirst()
@@ -41,5 +36,10 @@ public enum SlimeEmoji {
 	@NotNull
 	public String toString(@NotNull Guild guild) {
 		return getEmoji(guild).getFormatted();
+	}
+
+	@NotNull
+	public static SlimeEmoji number(int i) {
+		return valueOf("NUMBER_" + i);
 	}
 }

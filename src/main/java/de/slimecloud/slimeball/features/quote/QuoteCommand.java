@@ -31,6 +31,11 @@ import java.util.stream.Collectors;
 public class QuoteCommand {
 	public final IRegistrationCondition<ICommandContext> condition = (manager, guild, cache) -> cache.<GuildConfig>getState("config").getQuoteChannel().isPresent();
 
+	@Cooldown(interval = 1, unit = TimeUnit.DAYS, uses = 2, identifier = "quote")
+	public void handleCooldown(@NotNull ICommandContext context) {
+		context.getEvent().reply(":timer: :x: Du kannst nur 2 mal pro Tag zitieren!").setEphemeral(true).queue();
+	}
+
 	@ApplicationCommandMethod
 	public static void quote(@NotNull SlimeBot bot, @NotNull IReplyCallback event,
 	                         @Option(description = "Das Mitglied, das du zitieren möchtest") Member author,
@@ -77,11 +82,6 @@ public class QuoteCommand {
 					Button.secondary("quote:guidance", "Wie zitiere ich?")
 			).flatMap(mes -> event.getHook().editOriginal(author.getAsMention() + " zitiert")).queue();
 		});
-	}
-
-	@Cooldown(interval = 1, unit = TimeUnit.DAYS, uses = 2, identifier = "quote")
-	public void handleCooldown(@NotNull ICommandContext context) {
-		context.getEvent().reply(":timer: :x: Du kannst nur 2 mal pro Tag zitieren!").setEphemeral(true).queue();
 	}
 
 	@Listener(type = ButtonHandler.class, filter = "quote:guidance")

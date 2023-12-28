@@ -38,10 +38,6 @@ public class ConfigCollectionCommand extends Command<ICommandContext> {
 		handler.accept((Collection<T>) collection, (T) value);
 	}
 
-	@Override
-	public void performCommand(@NotNull ICommandContext context) throws Exception {
-	}
-
 	public static class AddCommand extends Command<ICommandContext> {
 		private final SlimeBot bot;
 		private final Function<GuildConfig, Object> instance;
@@ -145,5 +141,9 @@ public class ConfigCollectionCommand extends Command<ICommandContext> {
 					.setState("f", field.getName())
 					.display(context.getEvent());
 		}
+	}
+
+	@Override
+	public void performCommand(@NotNull ICommandContext context) throws Exception {
 	}
 }
