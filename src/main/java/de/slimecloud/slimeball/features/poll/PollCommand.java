@@ -33,10 +33,10 @@ public class PollCommand {
 
 	@ApplicationCommandMethod
 	public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-	                           @Option( description = "Die Frage") String question,
+	                           @Option(description = "Die Frage") String question,
 	                           @OptionArray(minCount = 2, maxCount = 5) @Option(name = "choice", description = "Die Auswahlmöglichkeiten") String[] options,
 	                           @IntegerDefault(1) @Option(description = "Die maximale Anzahl pro Nutzer", required = false, minValue = 1) int max,
-                               @Option(description = "Rolle, die erwähnt wird", required = false) Role role
+	                           @Option(description = "Rolle, die erwähnt wird", required = false) Role role
 	) {
 		ReplyCallbackAction action = role == null ? event.deferReply() : event.reply(role.getAsMention());
 

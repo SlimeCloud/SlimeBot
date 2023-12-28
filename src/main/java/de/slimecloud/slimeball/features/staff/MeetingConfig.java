@@ -66,7 +66,7 @@ public class MeetingConfig extends ConfigCategory {
 
 	private void scheduleNotification(long delta) {
 		long time = nextMeeting - delta - System.currentTimeMillis();
-		if(time > 0) futures.add(bot.getExecutor().schedule(() -> getChannel().ifPresent(channel ->
+		if (time > 0) futures.add(bot.getExecutor().schedule(() -> getChannel().ifPresent(channel ->
 				channel.sendMessage(bot.loadGuild(channel.getGuild()).getTeamRole().map(Role::getAsMention).orElse("@Team") + ", " + TimeFormat.RELATIVE.format(nextMeeting) + " geht das Team-Meeting los!")
 						.setMessageReference(message)
 						.queue()

@@ -58,7 +58,7 @@ public class QuoteCommand {
 			}
 
 			//Call event
-			if(new UserQuotedEvent(event.getUser(), author, content, message).callEvent()) return;
+			if (new UserQuotedEvent(event.getUser(), author, content, message).callEvent()) return;
 
 			//Send quotation
 			channel.sendMessage(author.getAsMention()).addEmbeds(new EmbedBuilder()

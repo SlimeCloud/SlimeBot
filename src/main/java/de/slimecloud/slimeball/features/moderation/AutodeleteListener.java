@@ -28,14 +28,14 @@ public class AutodeleteListener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-		if(!event.isFromGuild()) return;
+		if (!event.isFromGuild()) return;
 		check(event.getMessage(), event.getMessage().getChannel(), false);
 	}
 
 	@Override
 	public void onChannelCreate(@NotNull ChannelCreateEvent event) {
-		if(!(event.getChannel() instanceof ThreadChannel thread)) return;
-		if(!(thread.getParentChannel() instanceof IPostContainer)) return;
+		if (!(event.getChannel() instanceof ThreadChannel thread)) return;
+		if (!(thread.getParentChannel() instanceof IPostContainer)) return;
 
 		thread.retrieveStartMessage().queue(
 				message -> check(message, thread.getParentChannel(), true),
@@ -44,11 +44,11 @@ public class AutodeleteListener extends ListenerAdapter {
 	}
 
 	private void check(@NotNull Message message, @NotNull Channel channel, boolean thread) {
-		if(!message.isFromGuild()) return;
-		if(message.isWebhookMessage()) return;
+		if (!message.isFromGuild()) return;
+		if (message.isWebhookMessage()) return;
 
 		bot.loadGuild(message.getGuild()).getAutodelete(channel).ifPresent(filters -> {
-			if(filters.stream().anyMatch(f -> f.getFilter().test(message))) return;
+			if (filters.stream().anyMatch(f -> f.getFilter().test(message))) return;
 			new AutodeleteFlagedEvent(thread, channel, message).callEvent();
 		});
 	}
@@ -56,12 +56,12 @@ public class AutodeleteListener extends ListenerAdapter {
 	@EventHandler(priority = -1)
 	public void delete(@NotNull AutodeleteFlagedEvent event) {
 		//Ignore team members
-		if(bot.loadGuild(event.getMessage().getGuild()).getTeamRole().map(event.getMessage().getMember().getRoles()::contains).orElse(false)) {
+		if (bot.loadGuild(event.getMessage().getGuild()).getTeamRole().map(event.getMessage().getMember().getRoles()::contains).orElse(false)) {
 			event.setCancelled(true);
 			return;
 		}
 
-		if(event.isThread()) event.getMessage().getChannel().delete().queue();
+		if (event.isThread()) event.getMessage().getChannel().delete().queue();
 		else event.getMessage().delete().queue();
 	}
 

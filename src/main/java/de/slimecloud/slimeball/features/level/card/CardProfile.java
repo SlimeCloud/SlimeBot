@@ -117,11 +117,11 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 			Field field = getClass().getDeclaredField(name);
 			field.setAccessible(true);
 
-			if(value.isEmpty()) field.set(this, field.get(DEFAULT));
+			if (value.isEmpty()) field.set(this, field.get(DEFAULT));
 			else {
 				ConfigFieldType type = field.getAnnotation(KeyType.class).value();
 
-				if(!type.getCheck().test(field.getType(), value)) throw new ValidationException(null);
+				if (!type.getCheck().test(field.getType(), value)) throw new ValidationException(null);
 				field.set(this, type.getParse().apply(field.getType(), value));
 			}
 		} catch (NoSuchFieldException | IllegalAccessException e) {

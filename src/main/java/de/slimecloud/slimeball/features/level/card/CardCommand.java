@@ -96,19 +96,19 @@ public class CardCommand {
 			List<Component<?>> temp = new ArrayList<>();
 			String last = null;
 
-			for(Field field : CardProfile.class.getDeclaredFields()) {
-				if(!field.isAnnotationPresent(Column.class) || field.getAnnotation(Column.class).key()) continue;
+			for (Field field : CardProfile.class.getDeclaredFields()) {
+				if (!field.isAnnotationPresent(Column.class) || field.getAnnotation(Column.class).key()) continue;
 				field.setAccessible(true);
 
 				String category = StringUtil.parseCamelCase(field.getName())[0];
-				if(!category.equals(last) && !temp.isEmpty()) {
+				if (!category.equals(last) && !temp.isEmpty()) {
 					components.add(ComponentRow.of(temp));
 					temp = new ArrayList<>();
 				}
 
 				last = category;
 
-				if(field.getType().isAssignableFrom(Style.class)) temp.add(0, new StyleComponent(field));
+				if (field.getType().isAssignableFrom(Style.class)) temp.add(0, new StyleComponent(field));
 				else temp.add(new ButtonComponent(field.getName(), ButtonColor.GRAY, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s -> {
 					input.createState()
 							.setState("field", field.getName())
@@ -116,7 +116,7 @@ public class CardCommand {
 				}));
 			}
 
-			if(!temp.isEmpty()) components.add(ComponentRow.of(temp));
+			if (!temp.isEmpty()) components.add(ComponentRow.of(temp));
 
 			//Build main menu
 			this.menu = manager.createMenu(
