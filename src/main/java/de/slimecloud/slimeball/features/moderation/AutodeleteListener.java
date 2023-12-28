@@ -54,6 +54,9 @@ public class AutodeleteListener extends ListenerAdapter {
 
 	@EventHandler(priority = -1)
 	public void delete(@NotNull AutodeleteFlagedEvent event) {
+		//Ignore bots
+		if (event.getMessage().getAuthor().isBot()) return;
+
 		//Ignore team members
 		if (bot.loadGuild(event.getMessage().getGuild()).getTeamRole().map(event.getMessage().getMember().getRoles()::contains).orElse(false)) {
 			event.setCancelled(true);
