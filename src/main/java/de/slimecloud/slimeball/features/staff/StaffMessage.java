@@ -4,8 +4,8 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +19,7 @@ public class StaffMessage extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
+	public void onGuildMemberRoleRemove(@NotNull GuildMemberRoleRemoveEvent event) {
 		update(event.getGuild());
 	}
 
