@@ -46,26 +46,14 @@ public class QuoteCommand {
 	) {
 		//Check author
 		if (author.equals(event.getMember())) {
-			event.getHook().editOriginalEmbeds(new EmbedBuilder()
-					.setTitle(":x: Eigenzitat")
-					.setColor(bot.getColor(event.getGuild()))
-					.setDescription("Du kannst dich nicht selbst zitieren")
-					.setTimestamp(Instant.now())
-					.build()
-			).queue();
+			event.getHook().editOriginal(":x: Du kannst dich nicht selbst zitieren!").queue();
 			return;
 		}
 
 		bot.loadGuild(event.getGuild()).getQuoteChannel().ifPresent(channel -> {
 			//Check channel
 			if (channel.equals(event.getChannel())) {
-				event.getHook().editOriginalEmbeds(new EmbedBuilder()
-						.setTitle(":x: Unerlaubter Kanal")
-						.setColor(bot.getColor(event.getGuild()))
-						.setDescription("Du kannst keine Nachrichten im Zitate Kanal zitieren!")
-						.setTimestamp(Instant.now())
-						.build()
-				).queue();
+				event.getHook().editOriginal(":x: Du kannst keine Zitate zitieren!").queue();
 				return;
 			}
 
