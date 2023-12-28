@@ -92,7 +92,9 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
 	private Color fontColor = Color.WHITE;
-
+	@Column
+	@KeyType(ConfigFieldType.COLOR)
+	private Color fontSecondaryColor = Color.GRAY;
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
 	private Color fontLevelColor = new Color(97, 180, 237);
@@ -242,7 +244,7 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 
 		//Required XP
 		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
-		graphics.setColor(Color.GRAY);
+		graphics.setColor(fontSecondaryColor);
 
 		String required = " / " + LevelTable.calculateRequiredXP(level.getLevel() + 1) + " XP";
 		int requiredWidth = graphics.getFontMetrics().stringWidth(required);
