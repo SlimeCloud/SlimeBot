@@ -60,7 +60,6 @@ public enum ConfigFieldType {
 					.findAny().orElseThrow(),
 			Object::toString
 	),
-	ENUM_SET(null, null, null, null, (t, o) -> null, null),
 
 	STRING(OptionType.STRING, o -> o, OptionMapping::getAsString, x -> true, x -> x, Objects::toString),
 	INTEGER(OptionType.INTEGER, o -> o, OptionMapping::getAsInt, StringUtil::isInteger, Integer::parseInt, Objects::toString),
