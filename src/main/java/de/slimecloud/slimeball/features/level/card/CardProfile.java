@@ -89,6 +89,16 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	@KeyType(ConfigFieldType.INTEGER)
 	private int backgroundBorderWidth = 10;
 
+	@Column
+	@KeyType(ConfigFieldType.COLOR)
+	private Color fontColor = Color.WHITE;
+	@Column
+	@KeyType(ConfigFieldType.COLOR)
+	private Color fontSecondaryColor = Color.GRAY;
+	@Column
+	@KeyType(ConfigFieldType.COLOR)
+	private Color fontLevelColor = new Color(97, 180, 237);
+
 	public CardProfile(@NotNull SlimeBot bot, @Nullable Member member) {
 		super(2000, 400);
 		this.bot = bot;
@@ -227,14 +237,14 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		int verticalOffset = height - offset - height / 6 - offset;
 
 		//Name
-		graphics.setColor(Color.WHITE);
+		graphics.setColor(fontColor);
 		graphics.setFont(CustomFont.getFont(font, getFontSize(50)));
 
 		graphics.drawString(member.getEffectiveName(), offset + (height - 2 * offset) + offset, verticalOffset);
 
 		//Required XP
 		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
-		graphics.setColor(Color.GRAY);
+		graphics.setColor(fontSecondaryColor);
 
 		String required = " / " + LevelTable.calculateRequiredXP(level.getLevel() + 1) + " XP";
 		int requiredWidth = graphics.getFontMetrics().stringWidth(required);
@@ -243,7 +253,7 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 
 		//Current XP
 		graphics.setFont(CustomFont.getFont(font, getFontSize(40)));
-		graphics.setColor(Color.WHITE);
+		graphics.setColor(fontColor);
 
 		String current = String.valueOf(level.getXp());
 		int currentWidth = graphics.getFontMetrics().stringWidth(current);
@@ -255,7 +265,7 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		String levelString = String.valueOf(level.getLevel());
 		String levelName = "LEVEL ";
 
-		graphics.setColor(new Color(97, 180, 237));
+		graphics.setColor(fontLevelColor);
 
 		float levelHeight = getFontSize(55);
 		graphics.setFont(CustomFont.getFont(font, levelHeight));
@@ -287,12 +297,12 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		return (float) ((0.8 * base * width) / 1e3);
 	}
 
-	private static Color getColor(int rank) {
+	private Color getColor(int rank) {
 		return switch (rank) {
 			case 1 -> new Color(232, 187, 65);
 			case 2 -> new Color(121, 121, 121);
 			case 3 -> new Color(182, 96, 48);
-			default -> Color.WHITE;
+			default -> fontColor;
 		};
 	}
 }

@@ -62,6 +62,8 @@ public class CardCommand {
 				embed.addField(StringUtil.prettifyCamelCase(f.getName()), value == null ? "*Nicht gesetzt*" : value.toString(), false);
 			}
 
+			if (embed.getFields().isEmpty()) embed.setDescription("*Keine Konfiguration, es werden die Standardwerte verwendet*");
+
 			event.getHook().editOriginalEmbeds(embed.build()).setFiles(profile.getFile()).queue();
 		}
 	}
@@ -76,7 +78,7 @@ public class CardCommand {
 					"card.edit.modal",
 					state -> StringUtil.prettifyCamelCase(state.getState("field")),
 					List.of(new TextComponent("value", "Der neue Wert für diese Eigenschaft", TextInputStyle.SHORT)
-							.setPlaceholder(s -> s.<String>getState("field").contains("Color") ? "Hex-Code, z.B. #00ff00" : null)
+							.setPlaceholder(s -> (s.<String>getState("field").contains("Color") ? "Hex-Code, z.B. #00ff00. " : "") + "Leer lassen um zurück zusetzten")
 							.setRequired(s -> false)
 					),
 					(state, response) -> {
@@ -108,12 +110,12 @@ public class CardCommand {
 
 				last = category;
 
-				if (field.getType().isAssignableFrom(Style.class)) temp.add(0, new StyleComponent(field));
-				else temp.add(new ButtonComponent(field.getName(), ButtonColor.GRAY, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s -> {
-					input.createState()
-							.setState("field", field.getName())
-							.display((IModalCallback) s.event);
-				}));
+				if (field.getType().isAssignableFrom(Style.class)) temp.add(new StyleComponent(field));
+				else temp.add(0, new ButtonComponent(field.getName(), ButtonColor.GRAY, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s ->
+						input.createState()
+								.setState("field", field.getName())
+								.display((IModalCallback) s.event)
+				));
 			}
 
 			if (!temp.isEmpty()) components.add(ComponentRow.of(temp));

@@ -218,10 +218,12 @@ public class SlimeBot extends ListenerAdapter {
 						manager.registerCommand(ContributorCommand.class);
 					} else logger.warn("Bug reporting disabled due to missing github api");
 
+					//Register poll commands
 					if (polls != null) {
 						manager.registerCommand(PollCommand.class);
 					} else logger.warn("Poll system disabled due to missing database");
 
+					//Register leveling commands
 					if (database != null && config.getLevel().isPresent()) {
 						manager.registerCommand(RankCommand.class);
 						manager.registerCommand(CardCommand.class);
