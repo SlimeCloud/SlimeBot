@@ -110,12 +110,12 @@ public class CardCommand {
 
 				last = category;
 
-				if (field.getType().isAssignableFrom(Style.class)) temp.add(0, new StyleComponent(field));
-				else temp.add(new ButtonComponent(field.getName(), ButtonColor.GRAY, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s -> {
-					input.createState()
-							.setState("field", field.getName())
-							.display((IModalCallback) s.event);
-				}));
+				if (field.getType().isAssignableFrom(Style.class)) temp.add(new StyleComponent(field));
+				else temp.add(0, new ButtonComponent(field.getName(), ButtonColor.GRAY, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s ->
+						input.createState()
+								.setState("field", field.getName())
+								.display((IModalCallback) s.event)
+				));
 			}
 
 			if (!temp.isEmpty()) components.add(ComponentRow.of(temp));
