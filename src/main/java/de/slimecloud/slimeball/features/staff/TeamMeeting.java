@@ -102,7 +102,7 @@ public class TeamMeeting extends ListenerAdapter {
 										.setColor(bot.getColor(event.getGuild()))
 										.setDescription("Team-Besprechung erfolgreich beendet");
 
-								if(!issues.isEmpty()) {
+								if (!issues.isEmpty()) {
 									embed.appendDescription("\n\n### ToDo's\n");
 									issues.forEach(i -> embed.appendDescription("- [" + i.getTitle() + "](" + i.getHtmlUrl() + ")\n"));
 								}
@@ -192,16 +192,16 @@ public class TeamMeeting extends ListenerAdapter {
 
 			//Project id
 			return bot.getGithub().execute("""
-						query {
-							repository(owner: "%owner%", name: "%name%") {
-								projectsV2(first: 1) {
-									nodes {
-										id
+							query {
+								repository(owner: "%owner%", name: "%name%") {
+									projectsV2(first: 1) {
+										nodes {
+											id
+										}
 									}
 								}
 							}
-						}
-						""".replace("%owner%", repository.getOwnerName()).replace("%name%", repository.getName()),
+							""".replace("%owner%", repository.getOwnerName()).replace("%name%", repository.getName()),
 					//Extract id from response
 					data -> data
 							.getAsJsonObject("repository")
@@ -214,13 +214,13 @@ public class TeamMeeting extends ListenerAdapter {
 							GHIssue issue = repository.createIssue(e.split(": ", 2)[1]).create();
 
 							return bot.getGithub().execute("""
-										mutation {
-											addProjectV2ItemById(input: {
-												projectId: "%project%"
-												contentId: "%issue%"
-											}) { clientMutationId }
-										}
-										""".replace("%project%", id).replace("%issue%", issue.getNodeId()),
+											mutation {
+												addProjectV2ItemById(input: {
+													projectId: "%project%"
+													contentId: "%issue%"
+												}) { clientMutationId }
+											}
+											""".replace("%project%", id).replace("%issue%", issue.getNodeId()),
 									null
 							).mapToResult().map(x -> issue);
 						} catch (IOException ex) {

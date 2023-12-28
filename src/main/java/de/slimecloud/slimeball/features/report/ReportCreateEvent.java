@@ -1,7 +1,6 @@
 package de.slimecloud.slimeball.features.report;
 
 import de.cyklon.jevent.Event;
-import de.slimecloud.slimeball.features.report.Report;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
