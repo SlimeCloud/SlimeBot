@@ -62,6 +62,8 @@ public class CardCommand {
 				embed.addField(StringUtil.prettifyCamelCase(f.getName()), value == null ? "*Nicht gesetzt*" : value.toString(), false);
 			}
 
+			if (embed.getFields().isEmpty()) embed.setDescription("*Keine Konfiguration, es werden die Standardwerte verwendet*");
+
 			event.getHook().editOriginalEmbeds(embed.build()).setFiles(profile.getFile()).queue();
 		}
 	}
