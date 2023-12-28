@@ -160,14 +160,14 @@ public class TeamMeeting extends ListenerAdapter {
 						event.getGuild(),
 						current.getTimestamp().toInstant(),
 						current,
-						(y, m, n, a) -> a.add(event.getUser().getAsMention() + ": " + event.getValue("description").getAsString())
+						(y, m, n, a) -> a.add(event.getUser().getAsMention() + ": " + event.getValue("description").getAsString().replace("\n", " "))
 				)).queue();
 
 				case "agenda_edit" -> event.editMessage(config.buildMessage(
 						event.getGuild(),
 						current.getTimestamp().toInstant(),
 						current,
-						(y, m, n, a) -> a.set(Integer.parseInt(id[2]), event.getUser().getAsMention() + ": " + event.getValue("description").getAsString())
+						(y, m, n, a) -> a.set(Integer.parseInt(id[2]), event.getUser().getAsMention() + ": " + event.getValue("description").getAsString().replace("\n", " "))
 				)).queue();
 			}
 		});
