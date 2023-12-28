@@ -188,6 +188,7 @@ public class MeetingConfig extends ConfigCategory {
 								Button.danger("meeting:end", "Meeting beenden")
 						)
 				)
+				.setContent(bot.loadGuild(guild).getTeamRole().map(IMentionable::getAsMention).orElse("") + "\nBeginnt " + TimeFormat.RELATIVE.format(nextMeeting))
 				.build();
 	}
 
