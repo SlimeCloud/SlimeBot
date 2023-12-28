@@ -78,7 +78,7 @@ public class CardCommand {
 					"card.edit.modal",
 					state -> StringUtil.prettifyCamelCase(state.getState("field")),
 					List.of(new TextComponent("value", "Der neue Wert für diese Eigenschaft", TextInputStyle.SHORT)
-							.setPlaceholder(s -> s.<String>getState("field").contains("Color") ? "Hex-Code, z.B. #00ff00" : null)
+							.setPlaceholder(s -> (s.<String>getState("field").contains("Color") ? "Hex-Code, z.B. #00ff00. " : "") + "Leer lassen um zurück zusetzten")
 							.setRequired(s -> false)
 					),
 					(state, response) -> {
