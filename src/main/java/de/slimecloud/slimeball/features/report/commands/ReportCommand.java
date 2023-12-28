@@ -51,7 +51,7 @@ public class ReportCommand {
 				(ctx, state) -> state.setState("filter", Filter.valueOf(ctx.getEvent().getOption("filter").getAsString())), //Set initial state
 				state -> bot.getReports(),
 				new StringSelectComponent("details", state -> state.<ListContext<Report>>getCache("context").entries().stream()
-						.map(r -> SelectOption.of("#" + r.getId() + StringUtils.abbreviate(r.getMessage(), SelectOption.LABEL_MAX_LENGTH - 5), String.valueOf(r.getId()))
+						.map(r -> SelectOption.of("#" + r.getId() + ": " + StringUtils.abbreviate(r.getMessage(), SelectOption.LABEL_MAX_LENGTH - 5), String.valueOf(r.getId()))
 								.withDescription(r.isOpen() ? null : StringUtils.abbreviate(r.getCloseReason(), SelectOption.DESCRIPTION_MAX_LENGTH))
 								.withEmoji(Emoji.fromFormatted(r.getStatus().getEmoji()))
 						)
@@ -73,15 +73,9 @@ public class ReportCommand {
 	public void handleCloseButton(@NotNull ButtonInteractionEvent event) {
 		String reportID = event.getComponentId().split(":")[2];
 
-		event.replyModal(Modal.create("report:close", "Meldung schließen")
+		event.replyModal(Modal.create("report:close:" + reportID, "Meldung schließen")
 				.addActionRow(TextInput.create("reason", "Wie Wurde mit dem Report Verfahren?", TextInputStyle.SHORT)
 						.setPlaceholder("z. B. Warn, Kick, Mute, Ban, Nichts etc..")
-						.setRequired(true)
-						.build()
-				)
-				.addActionRow(TextInput.create("id", "ID des Reports der geschlossen wird", TextInputStyle.SHORT)
-						.setPlaceholder("Dieses Feld wird automatisch ausgefüllt!")
-						.setValue(reportID)
 						.setRequired(true)
 						.build()
 				)
@@ -89,10 +83,10 @@ public class ReportCommand {
 		).queue();
 	}
 
-	@Listener(type = ModalHandler.class, filter = "report:close")
+	@Listener(type = ModalHandler.class, filter = "report:close:(\\d+)")
 	public void handleCloseModal(@NotNull SlimeBot bot, @NotNull ModalInteractionEvent event) {
 		try {
-			bot.getReports().getReport(Integer.parseInt(event.getValue("id").getAsString())).ifPresentOrElse(
+			bot.getReports().getReport(Integer.parseInt(event.getModalId().split(":")[2])).ifPresentOrElse(
 					report -> {
 						report.close(event.getValue("reason").getAsString());
 

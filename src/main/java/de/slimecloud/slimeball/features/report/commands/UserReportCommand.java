@@ -25,14 +25,7 @@ import java.time.Instant;
 public class UserReportCommand {
 	@NotNull
 	public static Modal createMode(@NotNull String targetUser) {
-		return Modal.create("report:user", "Nutzer melden")
-				.addActionRow(TextInput.create("user", "ID des Nutzers (NICHT ÄNDERN!)", TextInputStyle.SHORT)
-						.setPlaceholder("Snowflake ID des Nutzers")
-						.setRequiredRange(17, 19) //Discord Snowflake IDs are 17 to 19 digits long
-						.setValue(targetUser)
-						.setRequired(true)
-						.build()
-				)
+		return Modal.create("report:user:" + targetUser, "Nutzer melden")
 				.addActionRow(TextInput.create("reason", "Warum möchtest du diese Person Reporten?", TextInputStyle.SHORT)
 						.setPlaceholder("Hier deine Begründung")
 						.setMinLength(15)
@@ -48,17 +41,13 @@ public class UserReportCommand {
 		event.replyModal(createMode(event.getTarget().getId())).queue();
 	}
 
-	@Listener(type = ModalHandler.class, filter = "report:user")
+	@Listener(type = ModalHandler.class, filter = "report:user:(\\d+)")
 	public void handleReportModal(@NotNull SlimeBot bot, @NotNull ModalInteractionEvent event) {
-		try {
-			//Retrieve (will use cache if present)
-			event.getJDA().retrieveUserById(event.getValue("user").getAsString()).queue(
-					user -> submitUserReport(bot, event, user, event.getValue("reason").getAsString()),
-					new ErrorHandler().handle(ErrorResponse.UNKNOWN_USER, e -> event.reply("Nutzer nicht gefunden").setEphemeral(true).queue())
-			);
-		} catch (NumberFormatException e) {
-			event.reply("Ungültige Nutzer ID").setEphemeral(true).queue();
-		}
+		//Retrieve (will use cache if present)
+		event.getJDA().retrieveUserById(event.getModalId().split(":")[2]).queue(
+				user -> submitUserReport(bot, event, user, event.getValue("reason").getAsString()),
+				new ErrorHandler().handle(ErrorResponse.UNKNOWN_USER, e -> event.reply("Nutzer nicht gefunden").setEphemeral(true).queue())
+		);
 	}
 
 	public static void submitUserReport(@NotNull SlimeBot bot, @NotNull IReplyCallback event, @NotNull User target, @NotNull String reason) {
