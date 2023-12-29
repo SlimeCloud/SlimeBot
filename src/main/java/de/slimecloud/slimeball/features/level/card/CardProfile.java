@@ -186,9 +186,11 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		if (backgroundImage != null) graphics.drawImage(backgroundImage, 0, 0, width, height, null);
 
 		//Border
-		graphics.setColor(backgroundBorderColor);
-		graphics.setStroke(new BasicStroke(adjustBorderWith(backgroundBorderWidth)));
-		graphics.drawRoundRect(0, 0, width, height, height / 8, height / 8);
+		if(backgroundBorderWidth > 0) {
+			graphics.setColor(backgroundBorderColor);
+			graphics.setStroke(new BasicStroke(adjustBorderWith(backgroundBorderWidth)));
+			graphics.drawRoundRect(0, 0, width, height, height / 8, height / 8);
+		}
 	}
 
 	private void applyAvatar(@NotNull Graphics2D graphics, @NotNull Member member) {
@@ -205,11 +207,13 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		avatar = ImageUtil.resize(avatar, avatarWidth, avatarWidth);
 
 		//Border
-		graphics.setStroke(new BasicStroke(adjustBorderWith(avatarBorderWidth)));
-		graphics.setColor(avatarBorderColor);
+		if(avatarBorderWidth > 0) {
+			graphics.setColor(avatarBorderColor);
+			graphics.setStroke(new BasicStroke(adjustBorderWith(avatarBorderWidth)));
 
-		if (avatarStyle == Style.ROUND) graphics.drawRoundRect(offset, offset, avatarWidth, avatarWidth, avatarWidth, avatarWidth);
-		else graphics.drawRect(offset, offset, avatarWidth, avatarWidth);
+			if (avatarStyle == Style.ROUND) graphics.drawRoundRect(offset, offset, avatarWidth, avatarWidth, avatarWidth, avatarWidth);
+			else graphics.drawRect(offset, offset, avatarWidth, avatarWidth);
+		}
 
 		//Image
 		graphics.setClip(avatarStyle == Style.ROUND ? new Ellipse2D.Double(offset, offset, avatarWidth, avatarWidth) : null);
@@ -228,12 +232,13 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		int maxWidth = width - offset - horizontalOffset;
 
 		//Border
-		graphics.setColor(progressbarBorderColor);
-		graphics.setStroke(new BasicStroke(adjustBorderWith(progressbarBorderWidth)));
+		if(progressbarBorderWidth > 0) {
+			graphics.setColor(progressbarBorderColor);
+			graphics.setStroke(new BasicStroke(adjustBorderWith(progressbarBorderWidth)));
 
-		if (progressbarStyle == Style.ROUND) graphics.drawRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, progressbarHeight, progressbarHeight);
-		else graphics.drawRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight);
-
+			if (progressbarStyle == Style.ROUND) graphics.drawRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, progressbarHeight, progressbarHeight);
+			else graphics.drawRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight);
+		}
 
 		//Background
 		graphics.setColor(progressbarBGColor);
