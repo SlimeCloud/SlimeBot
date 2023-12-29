@@ -1,52 +1,54 @@
 {
-    "activity": {
-        "type": "PLAYING",
-        "text": "mit Slimebällen"
+  "defaultColor": "#569d3c",
+  "guildStorage": "guild/%guild%.json",
+
+  "activity": {
+    "interval": 10,
+    "activities": [
+      {"type": "PLAYING", "text": "mit Schleimbällen"},
+      {"type": "WATCHING", "text": "GamingguidesDE"},
+      {"type": "LISTENING", "text": "Vegastep"}
+    ]
+  },
+
+  "logForwarding": [
+    {"type": "CHANNEL", "id": 1122526257721131108}
+  ],
+
+  "spotify": {
+    "music": {
+      "message": "%notification%\n## 🎶 ALARM ALARM 🎶\nNeuer Musik Release. 🥳\nGönn dir unbedingt das neue Album: [**%name%**](%url%)",
+      "artistIds": [
+        "0ZzsW7JiW4Ok3H7nFl4yV1"
+      ]
     },
 
-    "database": {
-        "host": "localhost/slime",
-        "user": "slime",
-        "password": "-- your database password"
-    },
+    "podcast": {
+      "message": "%notification%\n## 🎙️ ALARM ALARM 🎙️\nNeue Podcast-Folge!\nRein da!In der heutigen Folge: [**%name%**](%url%)",
+      "artistIds": [
+        "0HNYFHg2WNq1P56qK6defn"
+      ]
+    }
+  },
 
-    "spotify": {
-        "clientId": "-- your client id --",
-        "clientSecret": "-- your client secret --",
+  "level": {
+    "levelUpMessage": "Herzlichen Glückwunsch %user%! Du bist jetzt level %level%!",
 
-        "music": {
-            "message": "%notification%\n## 🎶 ALARM ALARM 🎶\nNeuer Musik Release. 🥳\nGönn dir unbedingt das neue Album: [**%name%**](%url%)",
-            "artistIds": [
-                "0ZzsW7JiW4Ok3H7nFl4yV1"
-            ]
-        },
+    "messageCooldown": 5000,
+    "minMessageXP": 5,
+    "maxMessageXP": 15,
+    "minWordLength": 3,
+    "minWordXP": 0.1,
+    "maxWordXP": 0.5,
 
-        "podcast": {
-            "message": "%notification%\n## 🎙️ ALARM ALARM 🎙️\nNeue Podcast-Folge!\nRein da!In der heutigen Folge: [**%name%**](%url%)",
-            "artistIds": [
-                "0HNYFHg2WNq1P56qK6defn"
-            ]
-        }
-    },
+    "voiceLevelingInterval": 60,
+    "minVoiceXP": 3,
+    "maxVoiceXP": 5
+  },
 
-    "level": {
-        "levelUpMessage": "Herzlichen Glückwunsch, %user% du bist jetzt level %level%!",
-        "leaderboardTemplate": "zm-ae245f8c-2fc8-4f3b-913b-62f8d78aad75",
-        "minVoiceXP": 1,
-        "maxVoiceXP": 3,
-        "minMessageXP": 5,
-        "maxMessageXP": 15,
-        "minWordLength": 3,
-        "minWordXP": 0.05,
-        "maxWordXP": 0.1,
-        "messageCooldown": 15000,
-        "voiceLevelingInterval": 60
-    },
+  "timeoutIgnore": [
+    458302301187342336
+  ],
 
-    "github": {
-        "repository": "SlimeCloud/java-SlimeBot",
-        "accessToken": "-- your personal access token --"
-    },
-
-    "color": "#569d3c"
+  "githubRepository": "SlimeCloud/java-SlimeBot"
 }
