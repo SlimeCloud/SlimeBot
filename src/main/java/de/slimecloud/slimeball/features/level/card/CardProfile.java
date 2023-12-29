@@ -26,6 +26,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 @Slf4j
 @Getter
@@ -139,6 +140,21 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		}
 
 		return this;
+	}
+
+	@NotNull
+	public String get(@NotNull String name) {
+		try {
+			Field field = getClass().getDeclaredField(name);
+			field.setAccessible(true);
+
+			Object value = field.get(this);
+
+			if (field.isAnnotationPresent(KeyType.class)) return field.getAnnotation(KeyType.class).value().getString().apply(value);
+			else return Objects.toString(value);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public CardProfile render() {

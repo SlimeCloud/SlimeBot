@@ -78,6 +78,7 @@ public class CardCommand {
 					"card.edit.modal",
 					state -> StringUtil.prettifyCamelCase(state.getState("field")),
 					List.of(new TextComponent("value", "Der neue Wert für diese Eigenschaft", TextInputStyle.SHORT)
+							.setValue(s -> bot.getLevelProfiles().getProfile(s.event.getMember()).get(s.getState("field")))
 							.setPlaceholder(s -> (s.<String>getState("field").contains("Color") ? "Hex-Code, z.B. #00ff00. " : "") + "Leer lassen um zurück zusetzten")
 							.setRequired(s -> false)
 					),
