@@ -12,10 +12,7 @@ import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -36,6 +33,9 @@ public class WrappedData implements DataClass<WrappedData> {
 	@Column
 	@Json
 	private Map<String, Double> emotes = new HashMap<>();
+
+	@Column
+	private List<Integer> wordCount = new ArrayList<>();
 
 	@Column
 	private int media = 0;

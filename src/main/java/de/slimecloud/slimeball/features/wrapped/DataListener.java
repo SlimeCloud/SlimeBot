@@ -78,6 +78,9 @@ public class DataListener extends ListenerAdapter {
 		//Save links
 		data.setLinks(data.getLinks() + (int) Arrays.stream(event.getMessage().getContentRaw().split("\\s")).filter(StringUtil::isValidURL).count());
 
+		//Save word count
+		data.getWordCount().add(event.getMessage().getContentRaw().split("\\s").length);
+
 		//Save changes
 		data.update();
 	}
