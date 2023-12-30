@@ -44,6 +44,9 @@ import de.slimecloud.slimeball.features.report.commands.UserReportCommand;
 import de.slimecloud.slimeball.features.report.commands.UserReportSlashCommand;
 import de.slimecloud.slimeball.features.staff.StaffMessage;
 import de.slimecloud.slimeball.features.staff.TeamMeeting;
+import de.slimecloud.slimeball.features.wrapped.DataListener;
+import de.slimecloud.slimeball.features.wrapped.WrappedData;
+import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
 import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
 import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
 import de.slimecloud.slimeball.main.extensions.UserSnowflakeTypeMapper;
@@ -103,8 +106,9 @@ public class SlimeBot extends ListenerAdapter {
 	private final CardDataTable profileData;
 	private final GuildCardTable cardProfiles;
 
-	private final GitHubAPI github;
+	private final WrappedDataTable wrappedData;
 
+	private final GitHubAPI github;
 	private final Spotify spotify;
 
 	public SlimeBot(@NotNull Config config, @NotNull Dotenv credentials) throws IOException {
@@ -130,9 +134,12 @@ public class SlimeBot extends ListenerAdapter {
 			reportBlocks = (ReportBlockTable) database.getTable(ReportBlockTable.class, ReportBlock.class, ReportBlock::new, "report_blocks").createTable();
 
 			polls = (PollTable) database.getTable(PollTable.class, Poll.class, () -> new Poll(this), "polls").createTable();
+
 			level = (LevelTable) database.getTable(LevelTable.class, Level.class, () -> new Level(this), "levels").createTable();
 			profileData = (CardDataTable) database.getTable(CardDataTable.class, CardProfileData.class, () -> new CardProfileData(this), "card_data").createTable();
 			cardProfiles = (GuildCardTable) database.getTable(GuildCardTable.class, GuildCardProfile.class, () -> new GuildCardProfile(this), "guild_card_profiles").createTable();
+
+			wrappedData = (WrappedDataTable) database.getTable(WrappedDataTable.class, WrappedData.class, () -> new WrappedData(this), "wrapped_data").createTable();
 		} else {
 			logger.warn("Database credentials missing! Some features will be disabled!");
 
@@ -143,6 +150,7 @@ public class SlimeBot extends ListenerAdapter {
 			level = null;
 			profileData = null;
 			cardProfiles = null;
+			wrappedData = null;
 		}
 
 		//Initialize GitHub API
@@ -179,6 +187,8 @@ public class SlimeBot extends ListenerAdapter {
 
 				.addEventListeners(new StaffMessage(this))
 				.addEventListeners(new TeamMeeting(this))
+
+				.addEventListeners(new DataListener(this))
 
 				.build();
 
@@ -233,7 +243,7 @@ public class SlimeBot extends ListenerAdapter {
 					} else logger.warn("Level system disabled due to missing database or level config");
 
 					/*
-					Automatically update commands
+					Automatically update comDiscordWrmands
 					The parameter function loads the guild configuration and provides it as cache to all commands.
 					Tish way, the configuration does not have to be reloaded for every registration check.
 
