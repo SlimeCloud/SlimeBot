@@ -1,7 +1,6 @@
 package de.slimecloud.slimeball.features.level.card;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -63,6 +62,7 @@ public enum Style {
 
 	@NotNull
 	public abstract Shape getShape(int x, int y, int width, int height);
+
 	public abstract int getArc(int base);
 
 	@NotNull

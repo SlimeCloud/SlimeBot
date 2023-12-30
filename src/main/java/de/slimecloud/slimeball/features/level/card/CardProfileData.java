@@ -127,9 +127,9 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 
 	@NotNull
 	public CardPermission getPermission(@NotNull UserSnowflake user) {
-		if(owner == null) return CardPermission.READ;
-		if(owner.getIdLong() == user.getIdLong()) return CardPermission.WRITE;
-		if(isPublic) return CardPermission.READ;
+		if (owner == null) return CardPermission.READ;
+		if (owner.getIdLong() == user.getIdLong()) return CardPermission.WRITE;
+		if (isPublic) return CardPermission.READ;
 		return CardPermission.NONE;
 	}
 
@@ -214,7 +214,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		if (backgroundImage != null) graphics.drawImage(backgroundImage, 0, 0, width, height, null);
 
 		//Border
-		if(backgroundBorderWidth > 0) {
+		if (backgroundBorderWidth > 0) {
 			graphics.setColor(backgroundBorderColor);
 			graphics.setStroke(new BasicStroke(adjustBorderWith(backgroundBorderWidth)));
 			graphics.drawRoundRect(0, 0, width, height, height / 8, height / 8);
@@ -235,7 +235,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		avatar = ImageUtil.resize(avatar, avatarWidth, avatarWidth);
 
 		//Border
-		if(avatarBorderWidth > 0) {
+		if (avatarBorderWidth > 0) {
 			graphics.setColor(avatarBorderColor);
 			graphics.setStroke(new BasicStroke(adjustBorderWith(avatarBorderWidth)));
 
@@ -262,7 +262,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		int arc = progressbarStyle.getArc(progressbarHeight);
 
 		//Border
-		if(progressbarBorderWidth > 0) {
+		if (progressbarBorderWidth > 0) {
 			graphics.setColor(progressbarBorderColor);
 			graphics.setStroke(new BasicStroke(adjustBorderWith(progressbarBorderWidth)));
 

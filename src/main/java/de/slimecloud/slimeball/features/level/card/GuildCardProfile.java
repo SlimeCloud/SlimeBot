@@ -28,7 +28,7 @@ public class GuildCardProfile implements DataClass<GuildCardProfile> {
 	public GuildCardProfile(@NotNull SlimeBot bot, @Nullable Member member) {
 		this.bot = bot;
 
-		if(member == null) {
+		if (member == null) {
 			this.guild = 0;
 			this.user = null;
 		} else {

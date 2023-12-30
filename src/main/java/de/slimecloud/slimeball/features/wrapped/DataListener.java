@@ -24,7 +24,6 @@ import org.apache.commons.collections4.Bag;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -83,10 +82,10 @@ public class DataListener extends ListenerAdapter {
 		int links = 0;
 		int words = 0;
 
-		for(String s : event.getMessage().getContentRaw().split("\\s+")) {
-			if(s.isBlank()) continue;
+		for (String s : event.getMessage().getContentRaw().split("\\s+")) {
+			if (s.isBlank()) continue;
 
-			if(StringUtil.isValidURL(s)) links++;
+			if (StringUtil.isValidURL(s)) links++;
 			else words++;
 		}
 

@@ -182,13 +182,13 @@ public class CardCommand {
 			CardProfileData data = profile.getData();
 
 			//If id is 0 this is a default profile
-			if(data.getId() == 0) {
+			if (data.getId() == 0) {
 				data.update(); //Create new storage, will generate id
 				profile.setId(data.getId()).update(); //Set newly generated data as current profile
 			}
 
 			//Check if member is owner
-			if(data.getPermission(event.getMember()).canWrite()) menu.display(event);
+			if (data.getPermission(event.getMember()).canWrite()) menu.display(event);
 			else confirmation.display(event);
 		}
 	}
@@ -209,12 +209,12 @@ public class CardCommand {
 	public static class LoadCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-                                   @Option(description = "ID der konfiguration", minValue = 1) int id
+		                           @Option(description = "ID der konfiguration", minValue = 1) int id
 		) {
 			//We can pass null as owner here because it is only used when id <= 0 which is impossible here
 			bot.getProfileData().getData(id, null).ifPresentOrElse(
 					data -> {
-						if(data.getPermission(event.getMember()).canRead()) {
+						if (data.getPermission(event.getMember()).canRead()) {
 							bot.getCardProfiles().getProfile(event.getMember()).setId(data.getId()).update();
 							event.reply("Profil mit ID **" + id + "** geladen")
 									.setFiles(data.render(event.getMember()).getFile())
