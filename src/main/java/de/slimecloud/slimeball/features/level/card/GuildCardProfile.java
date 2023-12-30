@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.features.level.card;
 
+import de.mineking.javautils.ID;
 import de.mineking.javautils.database.Column;
 import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Table;
@@ -21,7 +22,7 @@ public class GuildCardProfile implements DataClass<GuildCardProfile> {
 
 	@Setter
 	@Column
-	private int id;
+	private ID id;
 
 	public GuildCardProfile(@NotNull SlimeBot bot, @Nullable Member member) {
 		this.bot = bot;
@@ -34,7 +35,7 @@ public class GuildCardProfile implements DataClass<GuildCardProfile> {
 			user = member;
 		}
 
-		this.id = 0;
+		this.id = null;
 	}
 
 	public GuildCardProfile(@NotNull SlimeBot bot) {
@@ -54,6 +55,6 @@ public class GuildCardProfile implements DataClass<GuildCardProfile> {
 
 	@NotNull
 	public CardProfileData getData() {
-		return bot.getProfileData().getData(id, user).orElseThrow();
+		return bot.getProfileData().getData(id.asString(), user).orElseThrow();
 	}
 }

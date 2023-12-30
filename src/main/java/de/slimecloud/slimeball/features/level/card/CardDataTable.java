@@ -4,12 +4,14 @@ import de.mineking.discordutils.list.ListContext;
 import de.mineking.discordutils.list.Listable;
 import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
+import de.mineking.javautils.ID;
 import de.mineking.javautils.database.Table;
 import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.List;
@@ -17,8 +19,8 @@ import java.util.Optional;
 
 public interface CardDataTable extends Table<CardProfileData>, Listable<CardProfileData> {
 	@NotNull
-	default Optional<CardProfileData> getData(int id, @NotNull UserSnowflake owner) {
-		if (id <= 0) return Optional.of(new CardProfileData(getManager().getData("bot"), owner));
+	default Optional<CardProfileData> getData(@Nullable String id, @NotNull UserSnowflake owner) {
+		if (id == null) return Optional.of(new CardProfileData(getManager().getData("bot"), owner));
 		return selectOne(Where.equals("id", id));
 	}
 

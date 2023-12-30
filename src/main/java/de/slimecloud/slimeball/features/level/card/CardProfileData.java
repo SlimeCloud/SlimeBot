@@ -2,6 +2,7 @@ package de.slimecloud.slimeball.features.level.card;
 
 import de.mineking.discordutils.list.ListContext;
 import de.mineking.discordutils.list.ListEntry;
+import de.mineking.javautils.ID;
 import de.mineking.javautils.database.Column;
 import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Table;
@@ -48,8 +49,8 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 
 	private final SlimeBot bot;
 
-	@Column(autoincrement = true, key = true)
-	private int id;
+	@Column(key = true)
+	private ID id;
 	@Column
 	private UserSnowflake owner;
 
@@ -111,7 +112,6 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		super(2000, 400);
 		this.bot = bot;
 
-		this.id = 0;
 		this.owner = owner;
 	}
 
@@ -135,8 +135,8 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 
 	@NotNull
 	public CardProfileData createCopy(@NotNull UserSnowflake owner) {
-		//Setting the id to 0 will make JavaUtils create a new column
-		this.id = 0;
+		//Setting the id to null will make JavaUtils create a new column
+		this.id = null;
 		this.owner = owner;
 
 		return this;

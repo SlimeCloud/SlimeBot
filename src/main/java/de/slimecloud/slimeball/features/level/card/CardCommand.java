@@ -181,8 +181,8 @@ public class CardCommand {
 			GuildCardProfile profile = bot.getCardProfiles().getProfile(event.getMember());
 			CardProfileData data = profile.getData();
 
-			//If id is 0 this is a default profile
-			if (data.getId() == 0) {
+			//If id is null this is a default profile
+			if (data.getId() == null) {
 				data.update(); //Create new storage, will generate id
 				profile.setId(data.getId()).update(); //Set newly generated data as current profile
 			}
@@ -209,7 +209,7 @@ public class CardCommand {
 	public static class LoadCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-		                           @Option(description = "ID des Profils", minValue = 1) int id
+		                           @Option(description = "ID des Profils") String id
 		) {
 			//We can pass null as owner here because it is only used when id <= 0 which is impossible here
 			bot.getProfileData().getData(id, null).ifPresentOrElse(
@@ -230,7 +230,7 @@ public class CardCommand {
 	public static class PublishCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-                                   @Option(description = "ID des Profils", minValue = 1) int id
+                                   @Option(description = "ID des Profils") String id
 		) {
 			//We can pass null as owner here because it is only used when id <= 0 which is impossible here
 			bot.getProfileData().getData(id, null).ifPresentOrElse(
