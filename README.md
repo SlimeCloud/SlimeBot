@@ -11,22 +11,21 @@ Wenn du Fragen hast oder dich mit anderen Entwicklern austauschen möchtest, kan
 der [#👾│tüftlerecke](https://discord.com/channels/1077255218728796192/1098707158750724186) auf
 dem [SlimeCloud Discord Server](https://discord.gg/slimecloud) vorbeischauen.
 
-Dieses Projekt steht unter
-der [GNU Affero General Public License v3.0](https://github.com/SlimeCloud/java-SlimeBot/blob/master/LICENSE) Lizenz!
+Dieses Projekt steht unter der [GNU Affero General Public License v3.0](https://github.com/SlimeCloud/java-SlimeBot/blob/master/LICENSE) Lizenz!
 
 # 💻 Hosting
 
 Der SlimeBall Bot benötigt eine Infrastruktur um zu funktionieren.
-Um alle Features nutzen zu können, benötigst du eine PostgreSQL Datenbank. Es wird vorausgesetzt, dass du eine solche
+Um alle Features nutzen zu können, benötigst du eine **PostgreSQL Datenbank**. Es wird vorausgesetzt, dass du eine solche
 bereits zur Verfügung hast.
 
 Der SlimeBall Bot ist in der Programmiersprache Java geschrieben. Du benötigst zum Ausführen also ein JRE 17!
 
 Zum Starten benötigst du 3 Dateien:
 
-- SlimeBot.jar
-- config
-- credentials
+- `SlimeBot.jar`
+- `config`
+- `credentials`
 
 Für jeden Commit wird automatisch eine JAR Datei erstellt. Du kannst diese
 also [hier](https://github.com/SlimeCloud/java-SlimeBot/actions) herunterladen.
