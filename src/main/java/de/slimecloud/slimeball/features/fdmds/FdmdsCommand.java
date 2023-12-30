@@ -10,6 +10,7 @@ import de.mineking.discordutils.events.Listener;
 import de.mineking.discordutils.events.handlers.ButtonHandler;
 import de.mineking.discordutils.events.handlers.ModalHandler;
 import de.slimecloud.slimeball.config.GuildConfig;
+import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.main.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -63,6 +64,11 @@ public class FdmdsCommand {
 	public void handleFdmdsModal(@NotNull SlimeBot bot, @NotNull ModalInteractionEvent event) {
 		String question = event.getValue("question").getAsString();
 		String[] temp = event.getValue("choices").getAsString().split("\n");
+
+		if(event.getModalId().contains("send")) {
+			//Call event
+			new FdmdsSubmitedEvent(event.getMember(), question).callEvent();
+		}
 
 		//Verify input
 		if (temp.length <= 1) {
@@ -135,6 +141,10 @@ public class FdmdsCommand {
 			String choices = embed.getFields().get(1).getValue();
 
 			if (embed.getAuthor() != null) {
+				//Call event
+				new FdmdsCreateEvent(ContributorCommand.getUser(embed), event.getMember(), question).callEvent();
+
+				//Create and send embed
 				EmbedBuilder builder = new EmbedBuilder()
 						.setColor(bot.getColor(event.getGuild()))
 						.setAuthor(embed.getAuthor().getName(), embed.getAuthor().getUrl(), embed.getAuthor().getIconUrl())
@@ -145,8 +155,12 @@ public class FdmdsCommand {
 						.setContent(fdmds.getRole().map(Role::getAsMention).orElse(null))
 						.addActionRow(Button.secondary("fdmds:create", "Frage einreichen"))
 						.queue(m -> {
-							for (int i = 0; i < choices.lines().count(); i++)
-								m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
+							//Add reactions
+							for (int i = 0; i < choices.lines().count(); i++) m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
+
+							//Create thread
+							m.createThreadChannel("Unterhaltet euch über diese Frage!").queue();
+
 							event.reply("Frage verschickt!").setEphemeral(true).queue();
 						});
 			}

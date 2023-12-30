@@ -9,28 +9,23 @@ import lombok.Getter;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
+@Getter
 @AllArgsConstructor
 public class Level implements DataClass<Level>, Comparable<Level> {
 	private final SlimeBot bot;
 
 	@Column(key = true)
-	@Getter
 	private final long guild;
-
 	@Column(key = true)
-	@Getter
 	private final UserSnowflake user;
 
 	@Column
-	@Getter
 	private final int level;
 
 	@Column
-	@Getter
 	private final int xp;
 
 	@Column
-	@Getter
 	private final int messages;
 
 	public Level(@NotNull SlimeBot bot) {
