@@ -52,7 +52,7 @@ public enum Style {
 
 		@Override
 		public int getArc(int base) {
-			return base / 4;
+			return base / 2;
 		}
 
 		@Override
