@@ -193,7 +193,8 @@ public class CardCommand {
 		}
 	}
 
-	@ApplicationCommand(name = "default", description = "Lädt das Standard-Profil")
+	//The description does not describe what actually happens but how it feels for the user. Describing what actually happens would lead to confusion
+	@ApplicationCommand(name = "default", description = "Erstellt und lädt ein neues Standard-Profil; dein bisheriges Profil wird NICHT gelöscht!")
 	public static class ResetCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
