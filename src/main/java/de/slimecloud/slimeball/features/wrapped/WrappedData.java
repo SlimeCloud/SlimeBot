@@ -55,6 +55,10 @@ public class WrappedData implements DataClass<WrappedData> {
 	@Column
 	private Set<Long> fdmdsParticipant = new HashSet<>();
 
+	@Column
+	@Json
+	private Map<String, Double> xpPerDay = new HashMap<>();
+
 	public WrappedData(@NotNull SlimeBot bot) {
 		this(bot, 0, null);
 	}

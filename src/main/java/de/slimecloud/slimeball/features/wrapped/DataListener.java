@@ -3,9 +3,11 @@ package de.slimecloud.slimeball.features.wrapped;
 import com.vdurmont.emoji.EmojiParser;
 import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.JEvent;
+import de.slimecloud.slimeball.features.alerts.HolidayAlert;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsCreateEvent;
 import de.slimecloud.slimeball.features.fdmds.FdmdsSubmitedEvent;
+import de.slimecloud.slimeball.features.level.UserGainXPEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.StringUtil;
 import net.dv8tion.jda.api.entities.UserSnowflake;
@@ -21,6 +23,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.collections4.Bag;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -128,6 +131,20 @@ public class DataListener extends ListenerAdapter {
 
 		//Update data
 		data.setFdmdsAccepted(data.getFdmdsAccepted() + 1);
+
+		//Save changes
+		data.update();
+	}
+
+	@EventHandler
+	public void onXp(@NotNull UserGainXPEvent event) {
+		//Load current data
+		WrappedData data = bot.getWrappedData().getData(event.getUser().getGuild().getIdLong(), event.getUser());
+
+		int delta = event.getNewXp() - event.getOldXp();
+
+		//Update data
+		data.getXpPerDay().compute(HolidayAlert.formatter.format(LocalDateTime.now()), (k, v) -> v == null ? delta : v + delta);
 
 		//Save changes
 		data.update();

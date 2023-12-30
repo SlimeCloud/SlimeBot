@@ -21,7 +21,7 @@ public class HolidayAlert {
 	public final static String apiHost = "https://ferien-api.de/";
 	public final static Route apiRoute = Route.get("api/v1/holidays");
 
-	private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	public final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	private final SlimeBot bot;
 	private final HttpHost host;
