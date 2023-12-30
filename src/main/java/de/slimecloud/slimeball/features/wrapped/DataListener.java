@@ -9,6 +9,7 @@ import de.slimecloud.slimeball.features.fdmds.FdmdsSubmitedEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.StringUtil;
 import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
@@ -64,7 +65,7 @@ public class DataListener extends ListenerAdapter {
 		WrappedData data = bot.getWrappedData().getData(event.getMember());
 
 		//Save message in corresponding channel
-		data.getMessages().compute(event.getMessage().getChannelId(), (k, v) -> v == null ? 1 : v + 1);
+		data.getMessages().compute(event.getChannel() instanceof ThreadChannel tc ? tc.getParentChannel().getId() : event.getChannel().getId(), (k, v) -> v == null ? 1 : v + 1);
 
 		//Save custom emoji usages
 		Bag<CustomEmoji> emojis = event.getMessage().getMentions().getCustomEmojisBag();
