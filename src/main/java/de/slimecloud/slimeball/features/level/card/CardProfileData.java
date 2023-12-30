@@ -66,7 +66,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 	private Color progressbarBGColor = new Color(150, 150, 150, 50);
 	@Column
 	@KeyType(ConfigFieldType.ENUM)
-	private Style progressbarStyle = Style.ROUND;
+	private Style progressbarStyle = Style.ROUND_SQUARE;
 
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
@@ -77,7 +77,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 
 	@Column
 	@KeyType(ConfigFieldType.ENUM)
-	private Style avatarStyle = Style.ROUND;
+	private Style avatarStyle = Style.ROUND_SQUARE;
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
 	private Color avatarBorderColor = TRANSPARENT;
