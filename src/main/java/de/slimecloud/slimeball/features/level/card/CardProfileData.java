@@ -1,5 +1,7 @@
 package de.slimecloud.slimeball.features.level.card;
 
+import de.mineking.discordutils.list.ListContext;
+import de.mineking.discordutils.list.ListEntry;
 import de.mineking.javautils.database.Column;
 import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Table;
@@ -30,7 +32,7 @@ import java.util.Objects;
 @Slf4j
 @Getter
 @ToString
-public class CardProfileData extends Graphic implements DataClass<CardProfileData> {
+public class CardProfileData extends Graphic implements DataClass<CardProfileData>, ListEntry {
 	public final static Font font;
 
 	static {
@@ -138,6 +140,12 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		this.owner = owner;
 
 		return this;
+	}
+
+	@NotNull
+	@Override
+	public String build(int index, @NotNull ListContext<? extends ListEntry> context) {
+		return (index + 1) + ". ID: **" + id + "**, von " + owner.getAsMention();
 	}
 
 	public CardProfileData set(@NotNull String name, @NotNull String value) {

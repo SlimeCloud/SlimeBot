@@ -2,10 +2,13 @@ package de.slimecloud.slimeball.features.level.card;
 
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
+import de.mineking.discordutils.commands.Command;
+import de.mineking.discordutils.commands.Setup;
 import de.mineking.discordutils.commands.condition.IRegistrationCondition;
 import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.context.ICommandContext;
 import de.mineking.discordutils.commands.option.Option;
+import de.mineking.discordutils.list.ListManager;
 import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.MessageRenderer;
 import de.mineking.discordutils.ui.UIManager;
@@ -26,18 +29,34 @@ import de.slimecloud.slimeball.util.StringUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
+import net.dv8tion.jda.api.interactions.commands.Command.Choice;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 @ApplicationCommand(name = "card", description = "Verwaltet deine Rank-Card", scope = Scope.GUILD)
 public class CardCommand {
 	public final IRegistrationCondition<ICommandContext> condition = (manager, guild, cache) -> cache.<GuildConfig>getState("config").getLevel().isPresent();
+
+	@Setup
+	public static void setup(@NotNull SlimeBot bot, @NotNull Command<ICommandContext> command, @NotNull ListManager<ICommandContext> manager) {
+		command.addSubcommand(manager.createCommand(
+				(ctx, state) -> state.setState("filter", ctx.getEvent().getOption("filter").getAsString()),
+				state -> bot.getProfileData()
+		).withDescription("Zeigt alle Profile an").addOption(new OptionData(OptionType.STRING, "filter", "Ein Filter der angibt, welche Profile angezeigt werden", true).addChoices(
+				Arrays.stream(Filter.values())
+						.map(f -> new Choice(f.getName(), f.name()))
+						.toList()
+		)));
+	}
 
 	@ApplicationCommand(name = "info", description = "Zeigt deine aktuellen Einstellungen an", defer = true)
 	public static class InfoCommand {
