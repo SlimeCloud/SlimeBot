@@ -45,6 +45,9 @@ public interface CardDataTable extends Table<CardProfileData>, Listable<CardProf
 	@NotNull
 	@Override
 	default List<CardProfileData> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<CardProfileData> context) {
-		return selectMany(Filter.valueOf(state.getState("filter")).getFilter().apply(context.event().getUser()));
+		return selectMany(Where.allOf(
+				Filter.valueOf(state.getState("filter")).getFilter().apply(context.event().getUser()),
+				Where.equals("owner", context.event().getUser().getIdLong()).or(Where.equals("public", true))
+		));
 	}
 }
