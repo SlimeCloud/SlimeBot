@@ -34,7 +34,7 @@
   "level": {
     "levelUpMessage": "Herzlichen Glückwunsch %user%! Du bist jetzt level %level%!",
 
-    "messageCooldown": 5000,
+    "messageCooldown": 30000,
     "minMessageXP": 5,
     "maxMessageXP": 15,
     "minWordLength": 3,
