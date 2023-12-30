@@ -4,7 +4,6 @@ import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 @Setter
-@Accessors(chain = true)
 public class SpotifyNotificationConfig extends ConfigCategory {
 	@ConfigField(name = "Musik-Kanal", command = "music", description = "Kanal, in dem Benachrichtigungen über Musik-Releases gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
 	private Long musicChannel;

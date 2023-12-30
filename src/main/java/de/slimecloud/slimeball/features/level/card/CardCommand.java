@@ -205,11 +205,11 @@ public class CardCommand {
 		}
 	}
 
-	@ApplicationCommand(name = "load", description = "Lädt eine bestehende Konfiguration")
+	@ApplicationCommand(name = "load", description = "Lädt ein bestehendes Profil")
 	public static class LoadCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-		                           @Option(description = "ID der konfiguration", minValue = 1) int id
+		                           @Option(description = "ID des Profils", minValue = 1) int id
 		) {
 			//We can pass null as owner here because it is only used when id <= 0 which is impossible here
 			bot.getProfileData().getData(id, null).ifPresentOrElse(
@@ -217,6 +217,27 @@ public class CardCommand {
 						if (data.getPermission(event.getMember()).canRead()) {
 							bot.getCardProfiles().getProfile(event.getMember()).setId(data.getId()).update();
 							event.reply("Profil mit ID **" + id + "** geladen")
+									.setFiles(data.render(event.getMember()).getFile())
+									.setEphemeral(true).queue();
+						} else event.reply(":no_entry_sign: Du hast keinen Zugriff auf dieses Profil").setEphemeral(true).queue();
+					},
+					() -> event.reply(":x: Kein Profil mit der angegebenen ID gefunden").setEphemeral(true).queue()
+			);
+		}
+	}
+
+	@ApplicationCommand(name = "publish", description = "Macht eines deiner Profile für andere Mitglieder zugänglich")
+	public static class PublishCommand {
+		@ApplicationCommandMethod
+		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
+                                   @Option(description = "ID des Profils", minValue = 1) int id
+		) {
+			//We can pass null as owner here because it is only used when id <= 0 which is impossible here
+			bot.getProfileData().getData(id, null).ifPresentOrElse(
+					data -> {
+						if (data.getPermission(event.getMember()).canWrite()) {
+							data.setPublic(true).update();
+							event.reply("Profil mit ID **" + id + "** kann jetzt von anderen Mitgliedern verwendet werden")
 									.setFiles(data.render(event.getMember()).getFile())
 									.setEphemeral(true).queue();
 						} else event.reply(":no_entry_sign: Du hast keinen Zugriff auf dieses Profil").setEphemeral(true).queue();

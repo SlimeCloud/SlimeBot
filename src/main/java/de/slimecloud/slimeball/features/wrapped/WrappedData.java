@@ -8,7 +8,6 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +15,6 @@ import java.util.*;
 
 @Getter
 @Setter
-@Accessors(chain = true)
 @RequiredArgsConstructor
 public class WrappedData implements DataClass<WrappedData> {
 	private final SlimeBot bot;

@@ -5,7 +5,6 @@ import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Table;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +20,6 @@ public class GuildCardProfile implements DataClass<GuildCardProfile> {
 	private final UserSnowflake user;
 
 	@Setter
-	@Accessors(chain = true)
 	@Column
 	private int id;
 
