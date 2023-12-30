@@ -1,8 +1,8 @@
 package de.slimecloud.slimeball.features.wrapped;
 
+import com.vdurmont.emoji.EmojiParser;
 import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.JEvent;
-import de.mineking.javautils.database.TypeMapper;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsCreateEvent;
 import de.slimecloud.slimeball.features.fdmds.FdmdsSubmitedEvent;
@@ -68,7 +68,9 @@ public class DataListener extends ListenerAdapter {
 
 		//Save custom emoji usages
 		Bag<CustomEmoji> emojis = event.getMessage().getMentions().getCustomEmojisBag();
-		emojis.uniqueSet().forEach(emoji -> data.getEmotes().compute(emoji.getId(), (k, v) -> v == null ? emojis.getCount(emoji) : v + emojis.getCount(emoji)));
+		emojis.uniqueSet().forEach(emoji -> data.getEmotes().compute(emoji.getAsReactionCode(), (k, v) -> v == null ? emojis.getCount(emoji) : v + emojis.getCount(emoji)));
+
+		EmojiParser.extractEmojis(event.getMessage().getContentRaw()).forEach(e -> data.getEmotes().compute(e, (k, v) -> v == null ? 1 : v + 1));
 
 		//Save attachments
 		data.setMedia(data.getMedia() + event.getMessage().getAttachments().size());
@@ -85,16 +87,19 @@ public class DataListener extends ListenerAdapter {
 		if (event.getUser().isBot()) return;
 		if (!event.isFromGuild()) return;
 
-		//Check if channel is FdmdS channel
-		if (!bot.loadGuild(event.getGuild()).getFdmds().map(FdmdsConfig::getChannel)
-				.map(channel -> channel.getIdLong() == event.getChannel().getIdLong())
-				.orElse(false)) return;
-
 		//Load current data
 		WrappedData data = bot.getWrappedData().getData(event.getMember());
 
-		//Add message. Because it is a set, duplicates don't matter
-		data.getFdmdsParticipant().add(event.getMessageIdLong());
+		//Check if channel is FdmdS channel
+		if (!bot.loadGuild(event.getGuild()).getFdmds().map(FdmdsConfig::getChannel)
+				.map(channel -> channel.getIdLong() == event.getChannel().getIdLong())
+				.orElse(false)) {
+			//If not fdmds: count as emoji
+			data.getEmotes().compute(event.getEmoji().getAsReactionCode(), (k, v) -> v == null ? 1 : v + 1);
+		} else {
+			//Add message. Because it is a set, duplicates don't matter
+			data.getFdmdsParticipant().add(event.getMessageIdLong());
+		}
 
 		//Save changes
 		data.update();
