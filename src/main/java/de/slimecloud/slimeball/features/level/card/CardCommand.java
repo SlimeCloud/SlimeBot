@@ -29,6 +29,7 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
 import de.slimecloud.slimeball.util.StringUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
@@ -215,8 +216,12 @@ public class CardCommand {
 			event.replyChoices(
 					bot.getProfileData().selectAll().stream()
 							.filter(d -> d.getPermission(event.getUser()).canRead())
-							.map(d -> d.getId().asString())
-							.map(i -> new Choice(i, i))
+							.map(d -> {
+								String id = d.getId().asString();
+								Member m = event.getGuild().getMember(d.getOwner());
+
+								return new Choice(id + " (von " + (m != null ? m.getEffectiveName() : "Unbekannt") + ")", id);
+							})
 							.toList()
 			).queue();
 		}
@@ -247,8 +252,12 @@ public class CardCommand {
 			event.replyChoices(
 				bot.getProfileData().getAll(event.getUser()).stream()
 						.filter(d -> !d.isPublic())
-						.map(d -> d.getId().asString())
-						.map(i -> new Choice(i, i))
+						.map(d -> {
+							String id = d.getId().asString();
+							Member m = event.getGuild().getMember(d.getOwner());
+
+							return new Choice(id + " (von " + (m != null ? m.getEffectiveName() : "Unbekannt") + ")", id);
+						})
 						.toList()
 			).queue();
 		}
