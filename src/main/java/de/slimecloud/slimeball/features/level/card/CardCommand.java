@@ -5,6 +5,7 @@ import de.mineking.discordutils.commands.ApplicationCommandMethod;
 import de.mineking.discordutils.commands.condition.IRegistrationCondition;
 import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.context.ICommandContext;
+import de.mineking.discordutils.commands.option.Option;
 import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.MessageRenderer;
 import de.mineking.discordutils.ui.UIManager;
@@ -14,8 +15,10 @@ import de.mineking.discordutils.ui.components.types.Component;
 import de.mineking.discordutils.ui.components.types.ComponentRow;
 import de.mineking.discordutils.ui.modal.ModalMenu;
 import de.mineking.discordutils.ui.modal.TextComponent;
+import de.mineking.discordutils.ui.state.UpdateState;
 import de.mineking.javautils.database.Column;
 import de.slimecloud.slimeball.config.GuildConfig;
+import de.slimecloud.slimeball.config.engine.KeyType;
 import de.slimecloud.slimeball.config.engine.ValidationException;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
@@ -40,20 +43,20 @@ public class CardCommand {
 	public static class InfoCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) throws Exception {
-			CardProfile profile = bot.getLevelProfiles().getProfile(event.getMember()).render();
+			CardProfileData profile = bot.getCardProfiles().getProfile(event.getMember()).getData().render(event.getMember());
 
 			EmbedBuilder embed = new EmbedBuilder()
 					.setTitle("RankCard Einstellungen")
 					.setColor(bot.getColor(event.getGuild()))
 					.setImage("attachment://image.png");
 
-			for (Field f : CardProfile.class.getDeclaredFields()) {
+			for (Field f : CardProfileData.class.getDeclaredFields()) {
 				if (!f.isAnnotationPresent(Column.class) || f.getAnnotation(Column.class).key()) continue;
 
 				f.setAccessible(true);
 
 				Object value = f.get(profile);
-				Object def = f.get(CardProfile.DEFAULT);
+				Object def = f.get(CardProfileData.DEFAULT);
 
 				if (Objects.equals(value, def)) continue;
 
@@ -71,6 +74,7 @@ public class CardCommand {
 	@ApplicationCommand(name = "edit", description = "Öffnet ein Menü um deine Einstellungen zu verändern", defer = true)
 	public static class EditCommand {
 		private final MessageMenu menu;
+		private final MessageMenu confirmation;
 
 		public EditCommand(@NotNull SlimeBot bot, @NotNull UIManager manager) {
 			//Modal input menu
@@ -78,13 +82,13 @@ public class CardCommand {
 					"card.edit.modal",
 					state -> StringUtil.prettifyCamelCase(state.getState("field")),
 					List.of(new TextComponent("value", "Der neue Wert für diese Eigenschaft", TextInputStyle.SHORT)
-							.setValue(s -> bot.getLevelProfiles().getProfile(s.event.getMember()).get(s.getState("field")))
+							.setValue(s -> bot.getCardProfiles().getProfile(s.event.getMember()).getData().get(s.getState("field")))
 							.setPlaceholder(s -> (s.<String>getState("field").contains("Color") ? "Hex-Code, z.B. #00ff00. " : "") + "Leer lassen um zurück zusetzten")
 							.setRequired(s -> false)
 					),
 					(state, response) -> {
 						try {
-							bot.getLevelProfiles().getProfile(state.event.getMember()).set(state.getState("field"), response.getString("value")).update();
+							bot.getCardProfiles().getProfile(state.event.getMember()).getData().set(state.getState("field"), response.getString("value")).update();
 							manager.getMenu("card.edit").display(state.event);
 						} catch (ValidationException e) {
 							manager.getMenu("card.edit").display(state.event);
@@ -99,8 +103,8 @@ public class CardCommand {
 			List<Component<?>> temp = new ArrayList<>();
 			String last = null;
 
-			for (Field field : CardProfile.class.getDeclaredFields()) {
-				if (!field.isAnnotationPresent(Column.class) || field.getAnnotation(Column.class).key()) continue;
+			for (Field field : CardProfileData.class.getDeclaredFields()) {
+				if (!field.isAnnotationPresent(KeyType.class)) continue;
 				field.setAccessible(true);
 
 				String category = StringUtil.parseCamelCase(field.getName())[0];
@@ -125,29 +129,80 @@ public class CardCommand {
 			this.menu = manager.createMenu(
 					"card.edit",
 					MessageRenderer.embed(s -> new EmbedBuilder()
-							.setTitle("Aktuelle RankCard")
+							.setTitle("Aktuelle RankCard (ID: **" + s.<CardProfileData>getCache("profile").getId() + "**)")
 							.setColor(bot.getColor(s.event.getGuild()))
 							.setImage("attachment://image.png")
 							.build()
-					).withFile(s -> s.<CardProfile>getCache("profile").render().getFile()),
+					).withFile(s -> s.<CardProfileData>getCache("profile").render(s.event.getMember()).getFile()),
 					components
-			).cache(state -> state.setCache("profile", bot.getLevelProfiles().getProfile(state.event.getMember())));
+			).cache(state -> state.setCache("profile", bot.getCardProfiles().getProfile(state.event.getMember()).getData()));
+
+			//Build confirmation
+			this.confirmation = manager.createMenu(
+					"card.confirm",
+					MessageRenderer.embed(s -> new EmbedBuilder()
+							.setTitle("Keine Rechte zum Bearbeiten")
+							.setColor(bot.getColor(s.event.getGuild()))
+							.setDescription("Du bist nicht der eigentümer des Profiles, das du aktuell verwendest. Um es zu bearbeiten, musst du eine Kopie des Profils erstellen")
+							.build()
+					),
+					ComponentRow.of(
+							new ButtonComponent("confirm", ButtonColor.GREEN, "Profil kopieren").appendHandler(s -> {
+								bot.getCardProfiles().getProfile(s.event.getMember()).getData().createCopy(s.event.getMember()).update();
+								menu.display(s.event);
+							}),
+							new ButtonComponent("cancel", ButtonColor.RED, "Abbrechen").appendHandler(UpdateState::close)
+					)
+			);
 		}
 
 		@ApplicationCommandMethod
-		public void performCommand(@NotNull SlashCommandInteractionEvent event) {
-			menu.display(event);
+		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
+			//Load current profile
+			GuildCardProfile profile = bot.getCardProfiles().getProfile(event.getMember());
+			CardProfileData data = profile.getData();
+
+			//If id is 0 this is a default profile
+			if(data.getId() == 0) {
+				data.update(); //Create new storage, will generate id
+				profile.setId(data.getId()).update(); //Set newly generated data as current profile
+			}
+
+			//Check if member is owner
+			if(data.getPermission(event.getMember()).canWrite()) menu.display(event);
+			else confirmation.display(event);
 		}
 	}
 
-	@ApplicationCommand(name = "reset", description = "Setzt deine Einstellungen zurück")
+	@ApplicationCommand(name = "default", description = "Lädt das Standard-Profil")
 	public static class ResetCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
-			bot.getLevelProfiles().reset(event.getMember());
+			bot.getCardProfiles().reset(event.getMember());
 
 			//Send confirmation
-			event.reply("Einstellungen zurückgesetzt").setEphemeral(true).queue();
+			event.reply("Standardprofil geladen").setEphemeral(true).queue();
+		}
+	}
+
+	@ApplicationCommand(name = "load", description = "Lädt eine bestehende Konfiguration")
+	public static class LoadCommand {
+		@ApplicationCommandMethod
+		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
+                                   @Option(description = "ID der konfiguration", minValue = 1) int id
+		) {
+			//We can pass null as owner here because it is only used when id <= 0 which is impossible here
+			bot.getProfileData().getData(id, null).ifPresentOrElse(
+					data -> {
+						if(data.getPermission(event.getMember()).canRead()) {
+							bot.getCardProfiles().getProfile(event.getMember()).setId(data.getId()).update();
+							event.reply("Profil mit ID **" + id + "** geladen")
+									.setFiles(data.render(event.getMember()).getFile())
+									.setEphemeral(true).queue();
+						} else event.reply(":no_entry_sign: Du hast keinen Zugriff auf dieses Profil").setEphemeral(true).queue();
+					},
+					() -> event.reply(":x: Kein Profil mit der angegebenen ID gefunden").setEphemeral(true).queue()
+			);
 		}
 	}
 }

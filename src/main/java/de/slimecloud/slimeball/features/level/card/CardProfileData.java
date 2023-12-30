@@ -14,12 +14,12 @@ import de.slimecloud.slimeball.util.graphic.CustomFont;
 import de.slimecloud.slimeball.util.graphic.Graphic;
 import de.slimecloud.slimeball.util.graphic.ImageUtil;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -31,7 +31,7 @@ import java.util.Objects;
 @Slf4j
 @Getter
 @ToString
-public class CardProfile extends Graphic implements DataClass<CardProfile> {
+public class CardProfileData extends Graphic implements DataClass<CardProfileData> {
 	public final static Font font;
 
 	static {
@@ -43,14 +43,18 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	}
 
 	public final static Color TRANSPARENT = ColorUtil.ofCode(0);
-	public final static CardProfile DEFAULT = new CardProfile(null);
+	public final static CardProfileData DEFAULT = new CardProfileData(null);
 
 	private final SlimeBot bot;
 
-	@Column(key = true)
-	private final long guild;
-	@Column(key = true)
-	private final UserSnowflake user;
+	@Column(autoincrement = true, key = true)
+	private int id;
+	@Column
+	private UserSnowflake owner;
+
+	@Setter
+	@Column(name = "public")
+	private boolean isPublic = false;
 
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
@@ -59,6 +63,7 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	@KeyType(ConfigFieldType.COLOR)
 	private Color progressbarBGColor = new Color(150, 150, 150, 50);
 	@Column
+	@KeyType(ConfigFieldType.ENUM)
 	private Style progressbarStyle = Style.ROUND;
 
 	@Column
@@ -69,6 +74,7 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	private int progressbarBorderWidth = 5;
 
 	@Column
+	@KeyType(ConfigFieldType.ENUM)
 	private Style avatarStyle = Style.ROUND;
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
@@ -100,30 +106,42 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	@KeyType(ConfigFieldType.COLOR)
 	private Color fontLevelColor = new Color(97, 180, 237);
 
-	public CardProfile(@NotNull SlimeBot bot, @Nullable Member member) {
+	public CardProfileData(@NotNull SlimeBot bot, @NotNull UserSnowflake owner) {
 		super(2000, 400);
 		this.bot = bot;
 
-		if (member != null) {
-			this.guild = member.getGuild().getIdLong();
-			this.user = member;
-		} else {
-			this.guild = 0;
-			this.user = null;
-		}
+		this.id = 0;
+		this.owner = owner;
 	}
 
-	public CardProfile(@NotNull SlimeBot bot) {
+	public CardProfileData(@NotNull SlimeBot bot) {
 		this(bot, null);
 	}
 
 	@NotNull
 	@Override
-	public Table<CardProfile> getTable() {
-		return bot.getLevelProfiles();
+	public Table<CardProfileData> getTable() {
+		return bot.getProfileData();
 	}
 
-	public CardProfile set(@NotNull String name, @NotNull String value) {
+	@NotNull
+	public CardPermission getPermission(@NotNull UserSnowflake user) {
+		if(owner == null) return CardPermission.READ;
+		if(owner.getIdLong() == user.getIdLong()) return CardPermission.WRITE;
+		if(isPublic) return CardPermission.READ;
+		return CardPermission.NONE;
+	}
+
+	@NotNull
+	public CardProfileData createCopy(@NotNull UserSnowflake owner) {
+		//Setting the id to 0 will make JavaUtils create a new column
+		this.id = 0;
+		this.owner = owner;
+
+		return this;
+	}
+
+	public CardProfileData set(@NotNull String name, @NotNull String value) {
 		try {
 			Field field = getClass().getDeclaredField(name);
 			field.setAccessible(true);
@@ -157,7 +175,11 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		}
 	}
 
-	public CardProfile render() {
+	private Member member;
+
+	@NotNull
+	public CardProfileData render(@NotNull Member member) {
+		this.member = member;
 		finish();
 		return this;
 	}
@@ -165,8 +187,7 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	@Override
 	protected void drawGraphic(@NotNull Graphics2D graphics) {
 		//Get info
-		Level level = bot.getLevel().getLevel(guild, user);
-		Member member = bot.getJda().getGuildById(guild).retrieveMember(user).complete();
+		Level level = bot.getLevel().getLevel(member);
 
 		//Render
 		applyBackground(graphics);

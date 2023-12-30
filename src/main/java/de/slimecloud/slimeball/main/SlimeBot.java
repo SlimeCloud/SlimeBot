@@ -23,10 +23,7 @@ import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.features.github.GitHubAPI;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
-import de.slimecloud.slimeball.features.level.card.CardCommand;
-import de.slimecloud.slimeball.features.level.card.CardProfile;
-import de.slimecloud.slimeball.features.level.card.RankCardTable;
-import de.slimecloud.slimeball.features.level.card.RankCommand;
+import de.slimecloud.slimeball.features.level.card.*;
 import de.slimecloud.slimeball.features.level.commands.LeaderboardCommand;
 import de.slimecloud.slimeball.features.level.commands.LevelCommand;
 import de.slimecloud.slimeball.features.moderation.AutodeleteListener;
@@ -103,7 +100,8 @@ public class SlimeBot extends ListenerAdapter {
 	private final PollTable polls;
 
 	private final LevelTable level;
-	private final RankCardTable levelProfiles;
+	private final CardDataTable profileData;
+	private final GuildCardTable cardProfiles;
 
 	private final GitHubAPI github;
 
@@ -133,7 +131,8 @@ public class SlimeBot extends ListenerAdapter {
 
 			polls = (PollTable) database.getTable(PollTable.class, Poll.class, () -> new Poll(this), "polls").createTable();
 			level = (LevelTable) database.getTable(LevelTable.class, Level.class, () -> new Level(this), "levels").createTable();
-			levelProfiles = (RankCardTable) database.getTable(RankCardTable.class, CardProfile.class, () -> new CardProfile(this), "card_profiles").createTable();
+			profileData = (CardDataTable) database.getTable(CardDataTable.class, CardProfileData.class, () -> new CardProfileData(this), "card_data").createTable();
+			cardProfiles = (GuildCardTable) database.getTable(GuildCardTable.class, GuildCardProfile.class, () -> new GuildCardProfile(this), "guild_card_profiles").createTable();
 		} else {
 			logger.warn("Database credentials missing! Some features will be disabled!");
 
@@ -142,7 +141,8 @@ public class SlimeBot extends ListenerAdapter {
 			reportBlocks = null;
 			polls = null;
 			level = null;
-			levelProfiles = null;
+			profileData = null;
+			cardProfiles = null;
 		}
 
 		//Initialize GitHub API

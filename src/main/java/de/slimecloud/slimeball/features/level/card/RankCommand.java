@@ -23,8 +23,8 @@ public class RankCommand {
 		event.deferReply().queue();
 
 		event.getHook().editOriginalAttachments(
-				bot.getLevelProfiles().getProfile(target != null ? target : event.getMember())
-						.render()
+				bot.getCardProfiles().getProfile(target != null ? target : event.getMember()).getData()
+						.render(target != null ? target : event.getMember())
 						.getFile()
 		).queue();
 	}
