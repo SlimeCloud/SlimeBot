@@ -79,11 +79,19 @@ public class DataListener extends ListenerAdapter {
 		//Save attachments
 		data.setMedia(data.getMedia() + event.getMessage().getAttachments().size());
 
-		//Save links
-		data.setLinks(data.getLinks() + (int) Arrays.stream(event.getMessage().getContentRaw().split("\\s")).filter(StringUtil::isValidURL).count());
+		//Save links & wordcount
+		int links = 0;
+		int words = 0;
 
-		//Save word count
-		data.getWordCount().add(event.getMessage().getContentRaw().split("\\s+").length);
+		for(String s : event.getMessage().getContentRaw().split("\\s+")) {
+			if(s.isBlank()) continue;
+
+			if(StringUtil.isValidURL(s)) links++;
+			else words++;
+		}
+
+		data.setLinks(data.getLinks() + links);
+		data.getWordCount().add(words);
 
 		//Save changes
 		data.update();
