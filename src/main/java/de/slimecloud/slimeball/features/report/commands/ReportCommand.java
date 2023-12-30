@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -88,14 +89,15 @@ public class ReportCommand {
 					report -> {
 						report.close(event.getValue("reason").getAsString());
 
-						event.replyEmbeds(
+						event.editMessage(MessageEditData.fromCreateData(report.buildMessage("Report geschlossen"))).queue();
+						event.getHook().sendMessageEmbeds(
 								new EmbedBuilder()
 										.setColor(bot.getColor(event.getGuild()))
 										.setTimestamp(Instant.now())
 										.setTitle("Report **#" + report.getId() + "** geschlossen")
 										.setDescription("Der Report **#" + report.getId() + "** erfolgreich geschlossen")
 										.build()
-						).queue();
+						).setEphemeral(true).queue();
 					},
 					() -> event.reply("Report nicht gefunden!").setEphemeral(true).queue()
 			);
