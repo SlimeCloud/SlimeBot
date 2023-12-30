@@ -20,7 +20,7 @@ public class StyleComponent extends ButtonComponent {
 		appendHandler(state -> {
 			try {
 				CardProfileData profile = state.getCache("profile");
-				field.set(profile, field.get(profile) == Style.ROUND ? Style.SQUARE : Style.ROUND);
+				field.set(profile, Style.ofId(((Style) field.get(profile)).ordinal() + 1));
 				profile.update();
 
 				state.update();

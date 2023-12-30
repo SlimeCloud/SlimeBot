@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -232,12 +231,12 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 			graphics.setColor(avatarBorderColor);
 			graphics.setStroke(new BasicStroke(adjustBorderWith(avatarBorderWidth)));
 
-			if (avatarStyle == Style.ROUND) graphics.drawRoundRect(offset, offset, avatarWidth, avatarWidth, avatarWidth, avatarWidth);
-			else graphics.drawRect(offset, offset, avatarWidth, avatarWidth);
+			graphics.drawRoundRect(offset, offset, avatarWidth, avatarWidth, avatarStyle.getArc(avatarWidth), avatarStyle.getArc(avatarWidth));
 		}
 
 		//Image
-		graphics.setClip(avatarStyle == Style.ROUND ? new Ellipse2D.Double(offset, offset, avatarWidth, avatarWidth) : null);
+		graphics.setClip(avatarStyle.getShape(offset, offset, avatarWidth, avatarWidth));
+
 		graphics.drawImage(avatar, offset, offset, avatarWidth, avatarWidth, null);
 		graphics.setClip(null);
 	}
@@ -252,26 +251,25 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		int verticalOffset = height - offset - progressbarHeight;
 		int maxWidth = width - offset - horizontalOffset;
 
+		int arc = progressbarStyle.getArc(progressbarHeight);
+
 		//Border
 		if(progressbarBorderWidth > 0) {
 			graphics.setColor(progressbarBorderColor);
 			graphics.setStroke(new BasicStroke(adjustBorderWith(progressbarBorderWidth)));
 
-			if (progressbarStyle == Style.ROUND) graphics.drawRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, progressbarHeight, progressbarHeight);
-			else graphics.drawRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight);
+			graphics.drawRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, arc, arc);
 		}
 
 		//Background
 		graphics.setColor(progressbarBGColor);
 
-		if (progressbarStyle == Style.ROUND) graphics.fillRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, progressbarHeight, progressbarHeight);
-		else graphics.fillRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight);
+		graphics.fillRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, arc, arc);
 
 		//Content
 		graphics.setColor(progressbarColor);
 
-		if (progressbarStyle == Style.ROUND) graphics.fillRoundRect(horizontalOffset, verticalOffset, (int) (percentage * maxWidth), progressbarHeight, progressbarHeight, progressbarHeight);
-		else graphics.fillRect(horizontalOffset, verticalOffset, (int) (maxWidth * percentage), progressbarHeight);
+		graphics.fillRoundRect(horizontalOffset, verticalOffset, (int) (percentage * maxWidth), progressbarHeight, arc, arc);
 	}
 
 	private void applyText(@NotNull Graphics2D graphics, @NotNull Level level, @NotNull Member member) {
