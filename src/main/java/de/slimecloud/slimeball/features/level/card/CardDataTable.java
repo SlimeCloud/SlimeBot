@@ -19,9 +19,14 @@ import java.util.Optional;
 
 public interface CardDataTable extends Table<CardProfileData>, Listable<CardProfileData> {
 	@NotNull
-	default Optional<CardProfileData> getData(@Nullable String id, @NotNull UserSnowflake owner) {
+	default Optional<CardProfileData> getData(@Nullable ID id, @NotNull UserSnowflake owner) {
 		if (id == null) return Optional.of(new CardProfileData(getManager().getData("bot"), owner));
-		return selectOne(Where.equals("id", id));
+		return selectOne(Where.equals("id", id.asString()));
+	}
+
+	@NotNull
+	default List<CardProfileData> getAll(@NotNull UserSnowflake user) {
+		return selectMany(Where.equals("owner", user.getIdLong()));
 	}
 
 	/*

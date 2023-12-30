@@ -49,6 +49,7 @@ import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
 import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
 import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
+import de.slimecloud.slimeball.main.extensions.IDOptionParser;
 import de.slimecloud.slimeball.main.extensions.UserSnowflakeTypeMapper;
 import de.slimecloud.slimeball.util.ColorUtil;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -199,6 +200,7 @@ public class SlimeBot extends ListenerAdapter {
 				.useUIManager(null)
 				.useCommandManager(e -> () -> e, e -> () -> e, manager -> {
 					manager.registerOptionParser(new ColorOptionParser());
+					manager.registerOptionParser(new IDOptionParser());
 
 					manager.registerCommand(ConfigCommand.class);
 

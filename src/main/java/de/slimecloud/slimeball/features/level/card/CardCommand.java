@@ -7,6 +7,7 @@ import de.mineking.discordutils.commands.Setup;
 import de.mineking.discordutils.commands.condition.IRegistrationCondition;
 import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.context.ICommandContext;
+import de.mineking.discordutils.commands.option.Autocomplete;
 import de.mineking.discordutils.commands.option.Option;
 import de.mineking.discordutils.list.ListManager;
 import de.mineking.discordutils.ui.MessageMenu;
@@ -19,6 +20,7 @@ import de.mineking.discordutils.ui.components.types.ComponentRow;
 import de.mineking.discordutils.ui.modal.ModalMenu;
 import de.mineking.discordutils.ui.modal.TextComponent;
 import de.mineking.discordutils.ui.state.UpdateState;
+import de.mineking.javautils.ID;
 import de.mineking.javautils.database.Column;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.engine.KeyType;
@@ -27,6 +29,7 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
 import de.slimecloud.slimeball.util.StringUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
@@ -207,9 +210,20 @@ public class CardCommand {
 
 	@ApplicationCommand(name = "load", description = "Lädt ein bestehendes Profil")
 	public static class LoadCommand {
+		@Autocomplete("id")
+		public void handleAutocomplete(@NotNull SlimeBot bot, @NotNull CommandAutoCompleteInteractionEvent event) {
+			event.replyChoices(
+					bot.getProfileData().selectAll().stream()
+							.filter(d -> d.getPermission(event.getUser()).canRead())
+							.map(d -> d.getId().asString())
+							.map(i -> new Choice(i, i))
+							.toList()
+			).queue();
+		}
+
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-		                           @Option(description = "ID des Profils") String id
+		                           @Option(description = "ID des Profils") ID id
 		) {
 			//We can pass null as owner here because it is only used when id <= 0 which is impossible here
 			bot.getProfileData().getData(id, null).ifPresentOrElse(
@@ -228,11 +242,22 @@ public class CardCommand {
 
 	@ApplicationCommand(name = "publish", description = "Macht eines deiner Profile für andere Mitglieder zugänglich")
 	public static class PublishCommand {
+		@Autocomplete("id")
+		public void handleAutocomplete(@NotNull SlimeBot bot, @NotNull CommandAutoCompleteInteractionEvent event) {
+			event.replyChoices(
+				bot.getProfileData().getAll(event.getUser()).stream()
+						.filter(d -> !d.isPublic())
+						.map(d -> d.getId().asString())
+						.map(i -> new Choice(i, i))
+						.toList()
+			).queue();
+		}
+
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-                                   @Option(description = "ID des Profils") String id
+                                   @Option(description = "ID des Profils") ID id
 		) {
-			//We can pass null as owner here because it is only used when id <= 0 which is impossible here
+			//We can pass null as owner here because it is only used when id = null which is impossible here
 			bot.getProfileData().getData(id, null).ifPresentOrElse(
 					data -> {
 						if (data.getPermission(event.getMember()).canWrite()) {

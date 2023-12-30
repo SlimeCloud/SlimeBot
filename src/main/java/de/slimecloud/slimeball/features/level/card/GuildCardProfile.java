@@ -17,7 +17,7 @@ public class GuildCardProfile implements DataClass<GuildCardProfile> {
 	@Column(key = true)
 	private final long guild;
 
-	@Column
+	@Column(key = true)
 	private final UserSnowflake user;
 
 	@Setter
@@ -55,6 +55,6 @@ public class GuildCardProfile implements DataClass<GuildCardProfile> {
 
 	@NotNull
 	public CardProfileData getData() {
-		return bot.getProfileData().getData(id.asString(), user).orElseThrow();
+		return bot.getProfileData().getData(id, user).orElseThrow();
 	}
 }
