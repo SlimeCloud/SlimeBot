@@ -17,16 +17,19 @@ repositories {
     mavenCentral()
     maven { url 'https://maven.mineking.dev/releases' }
     maven { url 'https://maven.mineking.dev/snapshots' }
+
+    maven { url 'https://jitpack.io/' }
 }
 
 dependencies {
     implementation 'net.dv8tion:JDA:5.0.0-beta.18'
 
     implementation 'de.mineking:DiscordUtils:3.6.2'
-    implementation 'de.mineking:JavaUtils:1.0.8'
+    implementation 'de.mineking:JavaUtils:1.0.9'
     implementation 'de.cyklon:JEvent:1.0.2'
 
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.0.0'
+    implementation 'com.github.minndevelopment:emoji-java:master-SNAPSHOT'
     implementation 'org.kohsuke:github-api:1.315'
 
     implementation 'io.github.cdimascio:java-dotenv:5.1.1'
