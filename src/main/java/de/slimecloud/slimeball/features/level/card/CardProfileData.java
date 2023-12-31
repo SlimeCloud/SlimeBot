@@ -89,6 +89,17 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 	private int avatarBorderWidth = 10;
 
 	@Column
+	@KeyType(ConfigFieldType.ENUM)
+	private Style decorationStyle = Style.ROUND_SQUARE;
+	@Column
+	@KeyType(ConfigFieldType.COLOR)
+	private Color decorationBorderColor = new Color(68, 140, 41, 255);
+	@Column
+	@KeyType(ConfigFieldType.INTEGER)
+	private int decorationBorderWidth = 5;
+
+
+	@Column
 	@KeyType(ConfigFieldType.COLOR)
 	private Color backgroundColor = new Color(30, 30, 30, 200);
 	@Column
@@ -110,6 +121,8 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
 	private Color fontLevelColor = new Color(97, 180, 237);
+
+
 
 	public CardProfileData(@NotNull SlimeBot bot, @NotNull UserSnowflake owner) {
 		super(2000, 400);
@@ -357,11 +370,17 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		//Offset + avatar + offset (Could be simplified to height, but it is easier to understand this way)
 		int x = offset + (this.height - 2 * offset) + offset;
 
+		graphics.setColor(decorationBorderColor);
+		graphics.setStroke(new BasicStroke(adjustBorderWith(decorationBorderWidth)));
+
 		for (String d : decorations) {
 			try {
 				BufferedImage decoration = ImageIO.read(new File(bot.getConfig().getLevel().get().getDecorationFolder(), d));
 
-				graphics.setClip(Style.VERY_ROUND_SQUARE.getShape(x, offset, height, height));
+				graphics.setClip(null);
+				graphics.drawRoundRect(x, offset, height, height, decorationStyle.getArc(height), decorationStyle.getArc(height));
+
+				graphics.setClip(decorationStyle.getShape(x, offset, height, height));
 				graphics.drawImage(decoration, x, offset, height, height, null);
 
 				x += (int) (height * 1.5);

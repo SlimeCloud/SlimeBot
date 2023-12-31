@@ -29,35 +29,17 @@ public enum Style {
 		@NotNull
 		@Override
 		public Shape getShape(int x, int y, int width, int height) {
-			return new RoundRectangle2D.Double(x, y, width, height, (double) width / 4, (double) height / 4);
+			return new RoundRectangle2D.Double(x, y, width, height, getArc(width), getArc(height));
 		}
 
 		@Override
 		public int getArc(int base) {
-			return base / 4;
+			return (int) (Math.sqrt(base) * 5);
 		}
 
 		@Override
 		public String toString() {
 			return "Abgerundet";
-		}
-	},
-
-	VERY_ROUND_SQUARE {
-		@NotNull
-		@Override
-		public Shape getShape(int x, int y, int width, int height) {
-			return new RoundRectangle2D.Double(x, y, width, height, (double) width / 1.5, (double) height / 1.5);
-		}
-
-		@Override
-		public int getArc(int base) {
-			return (int) (base / 1.5);
-		}
-
-		@Override
-		public String toString() {
-			return "Stark Abgerundet";
 		}
 	},
 	ROUND {
