@@ -32,6 +32,8 @@
   },
 
   "level": {
+    "decorationFolder": "decorations",
+
     "levelUpMessage": "Herzlichen Glückwunsch %user%! Du bist jetzt level %level%!",
 
     "messageCooldown": 5000,

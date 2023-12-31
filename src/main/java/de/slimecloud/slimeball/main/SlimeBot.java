@@ -106,6 +106,7 @@ public class SlimeBot extends ListenerAdapter {
 	private final LevelTable level;
 	private final CardDataTable profileData;
 	private final GuildCardTable cardProfiles;
+	private final CardDecorationTable cardDecorations;
 
 	private final WrappedDataTable wrappedData;
 
@@ -139,6 +140,7 @@ public class SlimeBot extends ListenerAdapter {
 			level = (LevelTable) database.getTable(LevelTable.class, Level.class, () -> new Level(this), "levels").createTable();
 			profileData = (CardDataTable) database.getTable(CardDataTable.class, CardProfileData.class, () -> new CardProfileData(this), "card_data").createTable();
 			cardProfiles = (GuildCardTable) database.getTable(GuildCardTable.class, GuildCardProfile.class, () -> new GuildCardProfile(this), "guild_card_profiles").createTable();
+			cardDecorations = (CardDecorationTable) database.getTable(CardDecorationTable.class, UserCardDecoration.class, () -> new UserCardDecoration(this), "guild_card_decorations").createTable();
 
 			wrappedData = (WrappedDataTable) database.getTable(WrappedDataTable.class, WrappedData.class, () -> new WrappedData(this), "wrapped_data").createTable();
 		} else {
@@ -151,6 +153,7 @@ public class SlimeBot extends ListenerAdapter {
 			level = null;
 			profileData = null;
 			cardProfiles = null;
+			cardDecorations = null;
 			wrappedData = null;
 		}
 
@@ -239,6 +242,7 @@ public class SlimeBot extends ListenerAdapter {
 					if (database != null && config.getLevel().isPresent()) {
 						manager.registerCommand(RankCommand.class);
 						manager.registerCommand(CardCommand.class);
+						manager.registerCommand(DecorationCommand.class);
 
 						manager.registerCommand(LeaderboardCommand.class);
 						manager.registerCommand(LevelCommand.class);

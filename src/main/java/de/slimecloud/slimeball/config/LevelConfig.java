@@ -6,6 +6,9 @@ import lombok.Getter;
 @Getter
 public class LevelConfig {
 	@Required
+	private String decorationFolder;
+
+	@Required
 	private String levelUpMessage;
 
 	@Required

@@ -24,11 +24,14 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Objects;
+import java.util.Set;
 
 @Slf4j
 @Getter
@@ -202,6 +205,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		applyProgressBar(graphics, level);
 
 		applyText(graphics, level, member);
+		applyDecorations(graphics, member);
 	}
 
 	private void applyBackground(@NotNull Graphics2D graphics) {
@@ -342,6 +346,29 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
 		int rankNameWidth = graphics.getFontMetrics().stringWidth(levelName);
 		graphics.drawString(rankName, width - offset - rankWidth - rankNameWidth - 2 * offset - levelWidth - levelNameWidth, offset + levelHeight);
+	}
+
+	private void applyDecorations(@NotNull Graphics2D graphics, @NotNull Member member) {
+		Set<String> decorations = bot.getCardDecorations().getDecorations(member);
+
+		int offset = (int) (height * 0.1);
+		int height = (int) getFontSize(50);
+
+		//Offset + avatar + offset (Could be simplified to height, but it is easier to understand this way)
+		int x = offset + (this.height - 2 * offset) + offset;
+
+		for (String d : decorations) {
+			try {
+				BufferedImage decoration = ImageIO.read(new File(bot.getConfig().getLevel().get().getDecorationFolder(), d));
+
+				graphics.setClip(Style.ROUND_SQUARE.getShape(x, offset, height, height));
+				graphics.drawImage(decoration, x, offset, height, height, null);
+
+				x += (int) (height * 1.5);
+			} catch (IOException e) {
+				logger.error("Failed to read decoration", e);
+			}
+		}
 	}
 
 	private int adjustBorderWith(int value) {
