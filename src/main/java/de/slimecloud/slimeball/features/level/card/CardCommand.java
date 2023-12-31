@@ -251,22 +251,22 @@ public class CardCommand {
 		@Autocomplete("id")
 		public void handleAutocomplete(@NotNull SlimeBot bot, @NotNull CommandAutoCompleteInteractionEvent event) {
 			event.replyChoices(
-				bot.getProfileData().getAll(event.getUser()).stream()
-						.filter(d -> !d.isPublic())
-						.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()))
-						.map(d -> {
-							String id = d.getId().asString();
-							Member m = event.getGuild().getMember(d.getOwner());
+					bot.getProfileData().getAll(event.getUser()).stream()
+							.filter(d -> !d.isPublic())
+							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()))
+							.map(d -> {
+								String id = d.getId().asString();
+								Member m = event.getGuild().getMember(d.getOwner());
 
-							return new Choice(id + " (von " + (m != null ? m.getEffectiveName() : "Unbekannt") + ")", id);
-						})
-						.toList()
+								return new Choice(id + " (von " + (m != null ? m.getEffectiveName() : "Unbekannt") + ")", id);
+							})
+							.toList()
 			).queue();
 		}
 
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-                                   @Option(description = "ID des Profils") ID id
+		                           @Option(description = "ID des Profils") ID id
 		) {
 			//We can pass null as owner here because it is only used when id = null which is impossible here
 			bot.getProfileData().getData(id, null).ifPresentOrElse(
