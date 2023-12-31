@@ -216,6 +216,7 @@ public class CardCommand {
 			event.replyChoices(
 					bot.getProfileData().selectAll().stream()
 							.filter(d -> d.getPermission(event.getUser()).canRead())
+							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()))
 							.map(d -> {
 								String id = d.getId().asString();
 								Member m = event.getGuild().getMember(d.getOwner());
@@ -252,6 +253,7 @@ public class CardCommand {
 			event.replyChoices(
 				bot.getProfileData().getAll(event.getUser()).stream()
 						.filter(d -> !d.isPublic())
+						.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()))
 						.map(d -> {
 							String id = d.getId().asString();
 							Member m = event.getGuild().getMember(d.getOwner());

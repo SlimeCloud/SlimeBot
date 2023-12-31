@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.main.extensions;
 
+import de.mineking.discordutils.commands.CommandCancellation;
 import de.mineking.discordutils.commands.CommandManager;
 import de.mineking.discordutils.commands.option.IOptionParser;
 import de.mineking.javautils.ID;
@@ -26,6 +27,15 @@ public class IDOptionParser implements IOptionParser {
 	@Nullable
 	@Override
 	public Object parse(@NotNull CommandManager<?, ?> manager, @NotNull GenericCommandInteractionEvent event, @NotNull String name, @NotNull Parameter param, @NotNull Class<?> type, @NotNull Type generic) {
-		return event.getOption(name, o -> ID.decode(o.getAsString()));
+		try {
+			return event.getOption(name, o -> {
+				ID id = ID.decode(o.getAsString());
+				id.getTimeCreated(); //Throws exception when invalid
+				return id;
+			});
+		} catch (IllegalArgumentException e) {
+			event.reply(":x: Ungültige ID").setEphemeral(true).queue();
+			throw new CommandCancellation();
+		}
 	}
 }
