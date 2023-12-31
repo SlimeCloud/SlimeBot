@@ -322,19 +322,26 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		graphics.drawString(levelString, width - offset - levelWidth, offset + levelHeight);
 
 		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
-		int nameWidth = graphics.getFontMetrics().stringWidth(levelName);
-		graphics.drawString(levelName, width - offset - levelWidth - nameWidth, offset + levelHeight);
+		int levelNameWidth = graphics.getFontMetrics().stringWidth(levelName);
+		graphics.drawString(levelName, width - offset - levelWidth - levelNameWidth, offset + levelHeight);
 
 		//Rank
 		int rank = level.getRank() + 1;
 		if (rank == 0) return;
 
 		String rankString = "#" + rank;
+		String rankName = "RANK ";
 
 		graphics.setColor(getColor(rank));
-		graphics.setFont(CustomFont.getFont(font, getFontSize(50)));
 
-		graphics.drawString(rankString, width - offset - levelWidth - nameWidth - graphics.getFontMetrics().stringWidth(rankString) - 4 * offset, offset + levelHeight);
+		graphics.setFont(CustomFont.getFont(font, levelHeight));
+		int rankWidth = graphics.getFontMetrics().stringWidth(rankString);
+
+		graphics.drawString(rankString, width - offset - rankWidth - 2 * offset - levelWidth - levelNameWidth, offset + levelHeight);
+
+		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
+		int rankNameWidth = graphics.getFontMetrics().stringWidth(levelName);
+		graphics.drawString(rankName, width - offset - rankWidth - rankNameWidth - 2 * offset - levelWidth - levelNameWidth, offset + levelHeight);
 	}
 
 	private int adjustBorderWith(int value) {
