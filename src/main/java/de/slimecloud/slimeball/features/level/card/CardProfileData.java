@@ -361,7 +361,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 			try {
 				BufferedImage decoration = ImageIO.read(new File(bot.getConfig().getLevel().get().getDecorationFolder(), d));
 
-				graphics.setClip(Style.ROUND_SQUARE.getShape(x, offset, height, height));
+				graphics.setClip(Style.VERY_ROUND_SQUARE.getShape(x, offset, height, height));
 				graphics.drawImage(decoration, x, offset, height, height, null);
 
 				x += (int) (height * 1.5);
