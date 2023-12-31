@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
+import java.nio.BufferUnderflowException;
 
 public class IDOptionParser implements IOptionParser {
 	@Override
@@ -33,7 +34,7 @@ public class IDOptionParser implements IOptionParser {
 				id.getTimeCreated(); //Throws exception when invalid
 				return id;
 			});
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException | BufferUnderflowException e) {
 			event.reply(":x: Ungültige ID").setEphemeral(true).queue();
 			throw new CommandCancellation();
 		}
