@@ -334,15 +334,19 @@ public class CardCommand {
 							//Set new state
 							data.setPublic(isPublic).update();
 
-							event.reply("Profil mit ID **" + id + "** kann jetzt von anderen Mitgliedern verwendet werden")
+							if(isPublic) event.reply("Profil mit ID **" + id + "** kann jetzt von anderen Mitgliedern verwendet werden")
 									.setFiles(data.render(event.getMember()).getFile())
 									.setEphemeral(true).queue();
 
 							//Remove profile from all users that are not the owner
-							if(!isPublic) bot.getCardProfiles().delete(Where.allOf(
-									Where.equals("id", data.getId()),
-									Where.not(Where.equals("user", data.getOwner().getIdLong()))
-							));
+							if(!isPublic) {
+								event.reply("Profil mit ID **" + id + "** kann nicht mehr von anderen Mitgliedern verwendet werden").setEphemeral(true).queue();
+
+								bot.getCardProfiles().delete(Where.allOf(
+										Where.equals("id", data.getId()),
+										Where.not(Where.equals("user", data.getOwner().getIdLong()))
+								));
+							}
 						} else event.reply(":no_entry_sign: Du hast keinen Zugriff auf dieses Profil").setEphemeral(true).queue();
 					},
 					() -> event.reply(":x: Kein Profil mit der angegebenen ID gefunden").setEphemeral(true).queue()
