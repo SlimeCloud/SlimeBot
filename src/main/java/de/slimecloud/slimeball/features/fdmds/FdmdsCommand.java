@@ -92,9 +92,8 @@ public class FdmdsCommand {
 
 		//Build embed
 		EmbedBuilder embed = new EmbedBuilder()
-				.setTitle("Vorschlag für \"Frag doch mal den Schleim\"")
 				.setColor(bot.getColor(event.getGuild()))
-				.addField("Frage", question, false)
+				.setDescription(question)
 				.addField("Auswahlmöglichkeiten", choices.toString(), false);
 
 		if (event.getModalId().contains("send")) embed.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl());
