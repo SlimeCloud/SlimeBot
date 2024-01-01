@@ -23,11 +23,10 @@ public class RoleMemberCount extends ListenerAdapter {
 
 
 	private int getMemberCount(@NotNull Guild guild, @NotNull Role role) {
-		return guild.getMembers()
+		return (int) guild.getMembers()
 				.stream()
 				.filter(m -> m.getRoles().contains(role))
-				.toList()
-				.size();
+				.count();
 	}
 
 	@SuppressWarnings("ConstantConditions")
