@@ -115,7 +115,7 @@ public class GuildConfig {
 	private MeetingConfig meeting;
 
 	@Setter
-	@CategoryInfo(name = "Team-Nachricht", command = "staff", description = "Kanfigration für die Team-Nachricht")
+	@CategoryInfo(name = "Team-Nachricht", command = "staff", description = "Konfiguration für die Team-Nachricht")
 	private StaffConfig staff;
 
 	@Setter
