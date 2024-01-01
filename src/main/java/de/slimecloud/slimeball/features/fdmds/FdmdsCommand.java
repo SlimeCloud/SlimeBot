@@ -65,7 +65,7 @@ public class FdmdsCommand {
 		String question = event.getValue("question").getAsString();
 		String[] temp = event.getValue("choices").getAsString().split("\n");
 
-		if(event.getModalId().contains("send")) {
+		if (event.getModalId().contains("send")) {
 			//Call event
 			new FdmdsSubmitedEvent(event.getMember(), question).callEvent();
 		}

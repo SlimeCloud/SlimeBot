@@ -20,11 +20,16 @@ public class RankCommand {
 	public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
 	                           @Option(name = "target", description = "Der Nutzer, dessen Rank angezeigt werden soll", required = false) Member target
 	) {
+		if (target != null && target.getUser().isBot()) {
+			event.reply(":x: Bots können nicht leveln!").setEphemeral(true).queue();
+			return;
+		}
+
 		event.deferReply().queue();
 
 		event.getHook().editOriginalAttachments(
-				bot.getLevelProfiles().getProfile(target != null ? target : event.getMember())
-						.render()
+				bot.getCardProfiles().getProfile(target != null ? target : event.getMember()).getData()
+						.render(target != null ? target : event.getMember())
 						.getFile()
 		).queue();
 	}

@@ -26,7 +26,7 @@ public class ColorOptionParser extends OptionParser {
 		return event.getOption(name, o -> {
 			Color color = ColorUtil.parseColor(o.getAsString()); //Try to parse color
 			if (color == null) {
-				event.reply("Ungültige Farbe!").setEphemeral(true).queue();
+				event.reply(":x: Ungültige Farbe").setEphemeral(true).queue();
 				throw new CommandCancellation(); //This will silently cancel the command execution
 			}
 			return color;
