@@ -339,7 +339,7 @@ public class CardCommand {
 									.setEphemeral(true).queue();
 
 							//Remove profile from all users that are not the owner
-							if(!isPublic) {
+							else {
 								event.reply("Profil mit ID **" + id + "** kann nicht mehr von anderen Mitgliedern verwendet werden").setEphemeral(true).queue();
 
 								bot.getCardProfiles().delete(Where.allOf(
