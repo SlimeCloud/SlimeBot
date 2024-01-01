@@ -70,7 +70,11 @@ public class MemberCount extends ListenerAdapter {
 		Guild guild = event.getGuild();
 		VoiceChannel channel = getChannel(guild.getIdLong());
 		if (channel==null) return;
-		String format = getFormat(guild.getIdLong(), Map.of("members", guild.getMembers().size()));
+		String format = getFormat(guild.getIdLong(), Map.of("members", guild
+				.getMembers()
+				.stream()
+				.filter(m -> !m.getUser().isBot())
+				.count()));
 		channel.getManager().setName(format).queue();
 	}
 }
