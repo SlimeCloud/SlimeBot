@@ -12,24 +12,26 @@ import java.util.Map;
 @Getter
 public class StatisticConfig extends ConfigCategory {
 
-	@ConfigField(name = "MemberCount Kanal", command = "member_count_channel", description = "Der kanal der für die MemberCount Statistic verwendet werden soll", type = ConfigFieldType.VOICE_CHANNEL)
+	@ConfigField(name = "MemberCount Kanal", command = "member_channel", description = "-", type = ConfigFieldType.VOICE_CHANNEL)
 	private Long memberCountChannel;
 
-	@ConfigField(name = "MemberCount Formatierung", command = "member_count_format", description = "Die Formatierung für den MemberCount Statistic Kanal", type = ConfigFieldType.STRING)
+	@ConfigField(name = "MemberCount Formatierung", command = "member_format", description = "-", type = ConfigFieldType.STRING)
 	private String memberCountFormat = "Total Members: %members%";
 
-	@ConfigField(name = "RoleMemberCount Default Formatierung", command = "role_member_count_default_format", description = "Die Standard formatierung für RoleMemberCount kanäle, sollte keine formatierung für die rolle festgelegt sein", type = ConfigFieldType.STRING)
+	@ConfigField(name = "RoleMemberCount Default Formatierung", command = "default_format", description = "-", type = ConfigFieldType.STRING)
 	private String defaultRoleFormat = "%role_name%: %members%";
 
-	@ConfigField(name = "RoleMemberCount Kanal", command = "role_member_count_channel", description = "Der kanal der für die MemberCount Statistic verwendet werden soll", type = ConfigFieldType.VOICE_CHANNEL)
+	@ConfigField(name = "RoleMemberCount Kanal", command = "role_channel", description = "-", type = ConfigFieldType.VOICE_CHANNEL)
 	@KeyType(ConfigFieldType.ROLE)
 	private Map<Long, Long> roleMemberCountChannel = new HashMap<>();
 
-	@ConfigField(name = "RoleMemberCount Formatierung", command = "role_member_count_format", description = "Die Formatierung für den RoleMemberCount Statistic Kanal", type = ConfigFieldType.STRING)
+	@ConfigField(name = "RoleMemberCount Formatierung", command = "role_format", description = "-", type = ConfigFieldType.STRING)
 	@KeyType(ConfigFieldType.ROLE)
 	private Map<Long, String> roleMemberCountFormat = new HashMap<>();
 
 
-
-
+	@Override
+	public void update() {
+		
+	}
 }
