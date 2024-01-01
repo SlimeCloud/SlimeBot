@@ -45,7 +45,9 @@
 
     "voiceLevelingInterval": 60,
     "minVoiceXP": 3,
-    "maxVoiceXP": 5
+    "maxVoiceXP": 5,
+
+    "maxUserProfiles": 3
   },
 
   "timeoutIgnore": [

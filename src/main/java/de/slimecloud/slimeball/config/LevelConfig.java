@@ -30,4 +30,7 @@ public class LevelConfig {
 	private Double minVoiceXP;
 	@Required
 	private Double maxVoiceXP;
+
+	@Required
+	private Integer maxUserProfiles;
 }
