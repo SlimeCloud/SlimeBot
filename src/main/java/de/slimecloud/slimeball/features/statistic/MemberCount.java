@@ -40,21 +40,15 @@ public class MemberCount extends ListenerAdapter {
 		return bot.getJda().getVoiceChannelById(channel.apply(config));
 	}
 
-	@Nullable
-	private String getFormat(long guild) {
+	@NotNull
+	@SuppressWarnings("ConstantConditions")
+	private String getFormat(long guild, @NotNull Map<String, Object> values) {
 		StatisticConfig config = getConfig(guild);
 		if (config==null) return null;
-		return format.apply(config);
-	}
-
-	@SuppressWarnings("ConstantConditions")
-	private void update(long guild, @NotNull Map<String, Object> values) {
-		VoiceChannel channel = getChannel(guild);
-		if (channel==null) return;
-		AtomicString format = new AtomicString(getFormat(guild));
-		if (format.isEmpty()) return;
+		AtomicString format = new AtomicString(this.format.apply(config));
+		if (format.isEmpty()) return values.values().toString();
 		values.forEach((k, v) -> format.set(format.get().replace("%" + k + "%", String.valueOf(v))));
-		channel.getManager().setName(format.get()).queue();
+		return format.get();
 	}
 
 	@Override
@@ -74,6 +68,9 @@ public class MemberCount extends ListenerAdapter {
 
 	private void update(@NotNull GenericGuildEvent event) {
 		Guild guild = event.getGuild();
-		update(guild.getIdLong(), Map.of("members", guild.getMembers().size()));
+		VoiceChannel channel = getChannel(guild.getIdLong());
+		if (channel==null) return;
+		String format = getFormat(guild.getIdLong(), Map.of("members", guild.getMembers().size()));
+		channel.getManager().setName(format).queue();
 	}
 }
