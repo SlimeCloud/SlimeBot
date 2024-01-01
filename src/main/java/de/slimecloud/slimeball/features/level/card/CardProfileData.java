@@ -28,6 +28,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -386,6 +387,8 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 				graphics.drawImage(decoration, x, offset, width, height, null);
 
 				x += width + height / 2;
+			} catch (FileNotFoundException e) {
+				logger.warn("Decoration {} not found", d);
 			} catch (IOException e) {
 				logger.error("Failed to read decoration", e);
 			}
