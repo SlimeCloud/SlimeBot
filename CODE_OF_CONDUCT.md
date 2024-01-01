@@ -14,7 +14,7 @@ Daher sollten hier ausschließlich sachliche und themenbezogene Diskussionen und
 
 # Sprache
 
-Die bevorzugte Sprache innerhalb dieser Repository ist Englisch. Zwar sind Dateien wie README.md oder auch diese auf Deutsch verfasst, inf Commit-Nachrichten und Issues sollte jedoch die Englische Sprache verwendet werden.
+Die bevorzugte Sprache innerhalb dieser Repository ist Englisch. Zwar sind Dateien wie README.md oder auch diese auf Deutsch verfasst, in Commit-Nachrichten und Issues sollte jedoch die Englische Sprache verwendet werden.
 
 # Gültigkeit
 
