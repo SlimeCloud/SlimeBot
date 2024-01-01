@@ -117,7 +117,10 @@ public class FdmdsCommand {
 			event.getMessage().editMessage(message.build()).queue();
 			event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
 		} else bot.loadGuild(event.getGuild()).getFdmds().map(FdmdsConfig::getLogChannel).ifPresent(channel -> {
-			channel.sendMessage(MessageCreateData.fromEditData(message.build())).queue();
+			channel.sendMessage(MessageCreateData.fromEditData(message.build())).queue(mes -> {
+				mes.addReaction(SlimeEmoji.UP.getEmoji(mes.getGuild())).queue();
+				mes.addReaction(SlimeEmoji.DOWN.getEmoji(mes.getGuild())).queue();
+			});
 			event.reply("Frage erfolgreich eingereicht! Das Team wird die Frage kontrollieren und anschließend veröffentlicht.").setEphemeral(true).queue();
 		});
 	}

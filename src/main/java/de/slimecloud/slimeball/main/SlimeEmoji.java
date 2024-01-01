@@ -8,6 +8,9 @@ public enum SlimeEmoji {
 	WAVE("slimewave"),
 	BONK("bonk"),
 
+	UP("slimesymvup"),
+	DOWN("slimesymvdw"),
+
 	NUMBER_0("slime0"),
 	NUMBER_1("slime1"),
 	NUMBER_2("slime2"),
