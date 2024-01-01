@@ -48,6 +48,7 @@ import de.slimecloud.slimeball.features.report.commands.UserReportSlashCommand;
 import de.slimecloud.slimeball.features.staff.StaffMessage;
 import de.slimecloud.slimeball.features.staff.TeamMeeting;
 import de.slimecloud.slimeball.features.statistic.MemberCount;
+import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
@@ -192,6 +193,7 @@ public class SlimeBot extends ListenerAdapter {
 				.addEventListeners(new DataListener(this))
 
 				.addEventListeners(new MemberCount(this))
+				.addEventListeners(new RoleMemberCount(this))
 
 				.build();
 
