@@ -49,7 +49,7 @@ public class ReportCommand {
 
 		//Register list command to show all reports
 		command.addSubcommand(list.createCommand(
-				(ctx, state) -> state.setState("filter", Filter.valueOf(ctx.getEvent().getOption("filter").getAsString())), //Set initial state
+				(ctx, state) -> state.setState("filter", ctx.getEvent().getOption("filter").getAsString()), //Set initial state
 				state -> bot.getReports(),
 				new StringSelectComponent("details", state -> state.<ListContext<Report>>getCache("context").entries().stream()
 						.map(r -> SelectOption.of("#" + r.getId() + ": " + StringUtils.abbreviate(r.getMessage(), SelectOption.LABEL_MAX_LENGTH - 5), String.valueOf(r.getId()))
@@ -62,11 +62,9 @@ public class ReportCommand {
 					state.sendReply(bot.getReports().getReport(Integer.parseInt(values.get(0).getValue())).get().buildMessage("Details zu Report")); //Send details message
 				}).setPlaceholder("Details anzeigen")
 		).withDescription("Zeigt alle Reports an").addOption(new OptionData(OptionType.STRING, "filter", "Ein Filter der angibt, welche Reports angezeigt werden sollen", true).addChoices(
-				Arrays.asList(
-						new Choice("Alle", "ALL"),
-						new Choice("Geschlossen", "CLOSED"),
-						new Choice("Offen", "OPEN")
-				)
+				Arrays.stream(Filter.values())
+						.map(f -> new Choice(f.getName(), f.name()))
+						.toList()
 		)));
 	}
 
