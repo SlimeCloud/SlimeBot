@@ -21,7 +21,6 @@ import de.mineking.discordutils.ui.modal.ModalMenu;
 import de.mineking.discordutils.ui.modal.TextComponent;
 import de.mineking.discordutils.ui.state.UpdateState;
 import de.mineking.javautils.ID;
-import de.mineking.javautils.database.Column;
 import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.engine.KeyType;
@@ -77,7 +76,7 @@ public class CardCommand {
 					.setImage("attachment://image.png");
 
 			for (Field f : CardProfileData.class.getDeclaredFields()) {
-				if (!f.isAnnotationPresent(Column.class) || f.getAnnotation(Column.class).key()) continue;
+				if (!f.isAnnotationPresent(KeyType.class)) continue;
 
 				f.setAccessible(true);
 
