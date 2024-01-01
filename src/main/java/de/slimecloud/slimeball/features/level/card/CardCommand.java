@@ -189,7 +189,7 @@ public class CardCommand {
 
 			//If id is null this is a default profile
 			if (data.getId() == null) {
-				if(bot.getProfileData().getAll(event.getUser()).size() >= bot.getConfig().getLevel().get().getMaxUserProfiles()) {
+				if (bot.getProfileData().getAll(event.getUser()).size() >= bot.getConfig().getLevel().get().getMaxUserProfiles()) {
 					event.getHook().editOriginal(":x: Du hast bereits die maximale Anzahl an Profiles erreicht! Verwende " + bot.getDiscordUtils().getCommandManager().getCommand(DeleteCommand.class).getAsMention(event.getGuild().getIdLong()) + " um ein unbenutztes Profil zu löschen").queue();
 					return;
 				}
@@ -243,7 +243,7 @@ public class CardCommand {
 			bot.getProfileData().getData(id, null).ifPresentOrElse(
 					data -> {
 						//Cannot delete public profiles for security reasons
-						if(data.isPublic()) {
+						if (data.isPublic()) {
 							event.reply(":x: Du kannst kein öffentliches Profil löschen. Stelle es zunächst wieder auf privat!").setEphemeral(true).queue();
 							return;
 						}
@@ -323,7 +323,7 @@ public class CardCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
 		                           @Option(description = "ID des Profils") ID id,
-                                   @Option(description = "Ob das Profil öffentlich sein soll", name = "public") boolean isPublic
+		                           @Option(description = "Ob das Profil öffentlich sein soll", name = "public") boolean isPublic
 		) {
 			//We can pass null as owner here because it is only used when id = null which is impossible here
 			bot.getProfileData().getData(id, null).ifPresentOrElse(
@@ -333,11 +333,11 @@ public class CardCommand {
 							//Set new state
 							data.setPublic(isPublic).update();
 
-							if(isPublic) event.reply("Profil mit ID **" + id + "** kann jetzt von anderen Mitgliedern verwendet werden")
+							if (isPublic) event.reply("Profil mit ID **" + id + "** kann jetzt von anderen Mitgliedern verwendet werden")
 									.setFiles(data.render(event.getMember()).getFile())
 									.setEphemeral(true).queue();
 
-							//Remove profile from all users that are not the owner
+								//Remove profile from all users that are not the owner
 							else {
 								event.reply("Profil mit ID **" + id + "** kann nicht mehr von anderen Mitgliedern verwendet werden").setEphemeral(true).queue();
 

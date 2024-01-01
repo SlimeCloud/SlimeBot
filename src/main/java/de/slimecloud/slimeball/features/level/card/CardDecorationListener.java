@@ -18,7 +18,7 @@ public class CardDecorationListener extends ListenerAdapter {
 
 	@Override
 	public void onGuildMemberUpdateBoostTime(@NotNull GuildMemberUpdateBoostTimeEvent event) {
-		if(event.getNewTimeBoosted() != null) bot.getCardDecorations().grantDecoration(event.getMember(), "booster.png");
+		if (event.getNewTimeBoosted() != null) bot.getCardDecorations().grantDecoration(event.getMember(), "booster.png");
 		else bot.getCardDecorations().revokeDecoration(event.getMember(), "booster.png");
 	}
 

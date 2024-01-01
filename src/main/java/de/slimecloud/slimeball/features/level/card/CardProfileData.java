@@ -124,7 +124,6 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 	private Color fontLevelColor = new Color(97, 180, 237);
 
 
-
 	public CardProfileData(@NotNull SlimeBot bot, @NotNull UserSnowflake owner) {
 		super(2000, 400);
 		this.bot = bot;
