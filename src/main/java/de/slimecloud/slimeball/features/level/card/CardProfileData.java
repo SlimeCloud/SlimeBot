@@ -377,13 +377,15 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 			try {
 				BufferedImage decoration = ImageIO.read(new File(bot.getConfig().getLevel().get().getDecorationFolder(), d));
 
+				int width = (int) (decoration.getWidth() * ((double) height / decoration.getHeight()));
+
 				graphics.setClip(null);
-				graphics.drawRoundRect(x, offset, height, height, decorationStyle.getArc(height), decorationStyle.getArc(height));
+				graphics.drawRoundRect(x, offset, width, height, decorationStyle.getArc(height), decorationStyle.getArc(height));
 
-				graphics.setClip(decorationStyle.getShape(x, offset, height, height));
-				graphics.drawImage(decoration, x, offset, height, height, null);
+				graphics.setClip(decorationStyle.getShape(x, offset, width, height));
+				graphics.drawImage(decoration, x, offset, width, height, null);
 
-				x += (int) (height * 1.5);
+				x += width + height / 2;
 			} catch (IOException e) {
 				logger.error("Failed to read decoration", e);
 			}
