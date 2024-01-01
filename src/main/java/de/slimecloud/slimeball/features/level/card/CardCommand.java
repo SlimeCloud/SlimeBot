@@ -52,6 +52,8 @@ public class CardCommand {
 
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull Command<ICommandContext> command, @NotNull ListManager<ICommandContext> manager) {
+		bot.getJda().addEventListener(new CardDecorationListener(bot));
+
 		command.addSubcommand(manager.createCommand(
 				(ctx, state) -> state.setState("filter", ctx.getEvent().getOption("filter").getAsString()),
 				state -> bot.getProfileData()
