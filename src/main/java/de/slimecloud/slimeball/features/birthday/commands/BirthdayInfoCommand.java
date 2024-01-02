@@ -31,7 +31,7 @@ public class BirthdayInfoCommand {
 			builder.setDescription(String.format("Ich kenne %S's Geburtstag noch nicht.", target.getAsMention()));
 			builder.setColor(new Color(0xDD2222));
 		} else {
-			builder.setDescription(String.format("%s hat in %s geburtstag!", target.getAsMention(), TimeFormat.RELATIVE.format(birthday.getDate())));
+			builder.setDescription(String.format("%s hat in %s geburtstag!", target.getAsMention(), TimeFormat.RELATIVE.format(birthday.getInstant())));
 			builder.setColor(bot.getColor(event.getGuild()));
 		}
 

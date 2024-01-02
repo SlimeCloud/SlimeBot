@@ -6,10 +6,13 @@ import de.mineking.javautils.database.Table;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 @AllArgsConstructor
@@ -23,7 +26,7 @@ public class Birthday implements DataClass<Birthday>, Comparable<Birthday> {
 	private final UserSnowflake user;
 
 	@Column
-	private final LocalDateTime date;
+	private final Instant instant;
 
 	public Birthday(SlimeBot bot) {
 		this(bot, 0, null, null);
@@ -49,8 +52,6 @@ public class Birthday implements DataClass<Birthday>, Comparable<Birthday> {
 
 	@Override
 	public int compareTo(@NotNull Birthday o) {
-		if (date.isBefore(o.date)) return 1;
-		if (date.isEqual(o.date)) return 0;
-		return -1;
+		return Long.compare(instant.toEpochMilli(), o.instant.toEpochMilli());
 	}
 }

@@ -132,7 +132,6 @@ public class SlimeBot extends ListenerAdapter {
 			database.putData("bot", this);
 			database.addMapper(new SnowflakeTypeMapper());
 			database.addMapper(new ColorTypeMapper());
-			database.addMapper(new LocalDateTimeTypeMapper());
 
 			//Initialize tables
 			reports = (ReportTable) database.getTable(ReportTable.class, Report.class, () -> new Report(this), "reports").createTable();

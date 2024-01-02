@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -20,12 +21,12 @@ public interface BirthdayTable extends Table<Birthday> {
 	}
 
 	@NotNull
-	default Birthday set(@NotNull Member member, @NotNull LocalDateTime date) {
+	default Birthday set(@NotNull Member member, @NotNull Instant date) {
 		return set(member.getGuild().getIdLong(), member, date);
 	}
 
 	@NotNull
-	default Birthday set(long guild, @NotNull UserSnowflake user, @NotNull LocalDateTime date) {
+	default Birthday set(long guild, @NotNull UserSnowflake user, @NotNull Instant date) {
 		return new Birthday(getManager().getData("bot"), guild, user, date).update();
 	}
 
