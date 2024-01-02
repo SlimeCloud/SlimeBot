@@ -28,19 +28,15 @@ public class BirthdayInfoCommand {
 
 		Birthday birthday = bot.getBirthdayTable().get(target).orElse(null);
 
-		EmbedBuilder builder = new EmbedBuilder();
-
 		if (birthday==null) {
-			builder.setDescription(String.format("Ich kenne %S's Geburtstag noch nicht.", target.getAsMention()));
-			builder.setColor(new Color(0xDD2222));
+			event.getHook().editOriginal(String.format(":x: Ich kenne %S's Geburtstag noch nicht.", target.getAsMention())).queue();
 		} else {
 			ZonedDateTime zdt = birthday.getInstant().atZone(ZoneId.systemDefault());
 			String format = zdt.getYear()==0 ? zdt.format(DateTimeFormatter.ofPattern("d/M")) : TimeFormat.RELATIVE.format(birthday.getInstant());
-			builder.setDescription(String.format("%s hat in %s geburtstag!", target.getAsMention(), format));
-			builder.setColor(bot.getColor(event.getGuild()));
+			event.getHook().editOriginal(String.format(":birthday: %s hat in %s geburtstag!", target.getAsMention(), format)).queue();
 		}
 
-		event.getHook().editOriginalEmbeds(builder.build()).queue();
+
 
 	}
 

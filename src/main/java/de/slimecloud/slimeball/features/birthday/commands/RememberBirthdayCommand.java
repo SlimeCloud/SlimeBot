@@ -24,16 +24,11 @@ public class RememberBirthdayCommand {
 			ZonedDateTime dateTime = LocalDateTime.of(year==null ? 0 : year, month, day, 0, 0).atZone(ZoneId.systemDefault());
 			bot.getBirthdayTable().set(event.getMember(), dateTime.toInstant());
 
-			String date = year==null ? dateTime.format(DateTimeFormatter.ofPattern("d/M")) : TimeFormat.DATE_SHORT.format(dateTime);
+			String date = year==null ? String.format("`%s`", dateTime.format(DateTimeFormatter.ofPattern("dd.MM"))) : TimeFormat.DATE_SHORT.format(dateTime);
 
-			MessageEmbed embed = new EmbedBuilder()
-					.setColor(bot.getColor(event.getGuild()))
-					.setDescription(String.format("Dein geburtstag wurde auf den %s gesetzt", date))
-					.build();
-
-			event.getHook().editOriginalEmbeds(embed).queue();
+			event.getHook().editOriginal(String.format("Dein geburtstag wurde auf den %s gesetzt", date)).queue();
 		} catch (DateTimeException e) {
-			event.getHook().editOriginal(":x:" + e.getMessage()).queue();
+			event.getHook().editOriginal(":x: " + e.getMessage()).queue();
 		}
 	}
 
