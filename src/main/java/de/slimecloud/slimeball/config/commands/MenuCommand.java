@@ -18,10 +18,10 @@ import de.slimecloud.slimeball.config.engine.CategoryInfo;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
+import de.slimecloud.slimeball.util.ErrorConsumer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -39,12 +39,24 @@ public class MenuCommand {
 					CategoryInfo info = f.getAnnotation(CategoryInfo.class);
 					f.setAccessible(true);
 
-					return new MenuComponent<>(createCategory(bot, manager, s -> getInstance(bot, s, f), info, f.getType().getDeclaredFields()), ButtonColor.GRAY, info.name()).asDisabled(s -> getInstance(bot, s, f) == null);
+					return new MenuComponent<>(createCategory(bot, manager, c -> {
+						try {
+							return f.get(c);
+						} catch (IllegalAccessException e) {
+							throw new RuntimeException(e);
+						}
+					}, info, f.getType().getDeclaredFields()), ButtonColor.GRAY, info.name()).asDisabled(s -> {
+						try {
+							return f.get(bot.loadGuild(s.event.getGuild())) == null;
+						} catch (IllegalAccessException e) {
+							throw new RuntimeException(e);
+						}
+					});
 				})
 				.toList()
 		);
 
-		components.add(0, new MenuComponent<>(createCategory(bot, manager, s -> null, GuildConfig.class.getAnnotation(CategoryInfo.class), GuildConfig.class.getDeclaredFields()), ButtonColor.BLUE, "Allgemein"));
+		components.add(0, new MenuComponent<>(createCategory(bot, manager, c -> c, GuildConfig.class.getAnnotation(CategoryInfo.class), GuildConfig.class.getDeclaredFields()), ButtonColor.BLUE, "Allgemein"));
 
 		menu = manager.createMenu(
 				"config",
@@ -60,17 +72,8 @@ public class MenuCommand {
 		);
 	}
 
-	@Nullable
-	private static Object getInstance(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Field field) {
-		try {
-			return field.get(bot.loadGuild(state.event.getGuild()));
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	@NotNull
-	private static MessageMenu createCategory(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<DataState<?>, Object> instance, @NotNull CategoryInfo category, @NotNull Field[] fields) {
+	private static MessageMenu createCategory(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<GuildConfig, Object> instance, @NotNull CategoryInfo category, @NotNull Field[] fields) {
 		//Get field components
 		List<ComponentRow> components = ComponentRow.ofMany(Arrays.stream(fields)
 				.filter(f -> f.isAnnotationPresent(ConfigField.class))
@@ -93,7 +96,7 @@ public class MenuCommand {
 						.setColor(bot.getColor(s.event.getGuild()))
 						.setDescription(category.description())
 						.appendDescription("\n## Aktuelle Konfiguration\n")
-						.appendDescription("```json\n" + Main.formattedJson.toJson(instance.apply(s)) + "```")
+						.appendDescription("```json\n" + Main.formattedJson.toJson(instance.apply(bot.loadGuild(s.event.getGuild()))) + "```")
 						.build()
 				),
 				components
@@ -101,7 +104,7 @@ public class MenuCommand {
 	}
 
 	@NotNull
-	private static MessageMenu createFieldMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<DataState<?>, Object> instance, CategoryInfo category, @NotNull Field field) {
+	private static MessageMenu createFieldMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<GuildConfig, Object> instance, CategoryInfo category, @NotNull Field field) {
 		ConfigField info = field.getAnnotation(ConfigField.class);
 
 		if (List.class.isAssignableFrom(field.getType())) return createListValueMenu(bot, manager, instance, category, info, field);
@@ -109,30 +112,29 @@ public class MenuCommand {
 		return createValueMenu(bot, manager, instance, category, info, field);
 	}
 
+	private static void handle(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Function<GuildConfig, Object> instance, @NotNull ErrorConsumer<Object> handler) {
+		GuildConfig config = bot.loadGuild(state.event.getGuild());
+		try {
+			handler.accept(instance.apply(config));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		config.save();
+	}
+
 	@NotNull
-	private static MessageMenu createValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<DataState<?>, Object> instance, @NotNull CategoryInfo category, @NotNull ConfigField info, @NotNull Field field) {
+	private static MessageMenu createValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<GuildConfig, Object> instance, @NotNull CategoryInfo category, @NotNull ConfigField info, @NotNull Field field) {
 		field.setAccessible(true);
 
 		List<Component<?>> components = new ArrayList<>();
 
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
-			try {
-				field.set(instance.apply(s), null);
-				s.update();
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
+			handle(bot, s, instance, o -> field.set(o, null));
+			s.update();
 		}));
 
-		Component<?> component = info.type().createComponent(manager, field.getType(), "config." + category.command() + "." + info.command(), "value", "Wert festlegen", (s, v) -> {
-			try {
-				field.set(instance.apply(s), v);
-				s.update();
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
-		});
+		Component<?> component = info.type().createComponent(manager, field.getType(), "config." + category.command() + "." + info.command(), "value", "Wert festlegen", (s, v) -> handle(bot, s, instance, o -> field.set(o, v)));
 
 		if (component instanceof EntitySelectComponent || component instanceof StringSelectComponent) components.add(0, component);
 		else components.add(component);
@@ -141,7 +143,7 @@ public class MenuCommand {
 				"config." + category.command() + "." + info.command(),
 				MessageRenderer.embed(s -> {
 					try {
-						Object value = field.get(instance.apply(s));
+						Object value = field.get(instance.apply(bot.loadGuild(s.event.getGuild())));
 
 						return new EmbedBuilder()
 								.setTitle(category.name() + " → " + info.name())
@@ -160,40 +162,25 @@ public class MenuCommand {
 
 	@NotNull
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	private static MessageMenu createListValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<DataState<?>, Object> instance, @NotNull CategoryInfo category, @NotNull ConfigField info, @NotNull Field field) {
+	private static MessageMenu createListValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<GuildConfig, Object> instance, @NotNull CategoryInfo category, @NotNull ConfigField info, @NotNull Field field) {
 		field.setAccessible(true);
 
 		List<Component<?>> components = new ArrayList<>();
 
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
-			try {
-				field.set(instance.apply(s), new ArrayList<>());
-				s.update();
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
+			handle(bot, s, instance, o -> field.set(o, new ArrayList<>()));
+			s.update();
 		}));
 
-		Component<?> add = info.type().createComponent(manager, field.getType(), "config." + category.command() + "." + info.command(), "add", "Wert hinzufügen", (s, v) -> {
-			try {
-				((Collection) field.get(instance.apply(s))).add(v);
-				s.update();
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
-		});
+		Component<?> add = info.type().createComponent(manager, field.getType(), "config." + category.command() + "." + info.command(), "add", "Wert hinzufügen", (s, v) -> handle(bot, s, instance, o -> ((Collection) field.get(o)).add(v)));
 
-		Component<?> remove = new StringSelectComponent("remove", s -> ((Collection<?>) instance.apply(s)).stream()
+		Component<?> remove = new StringSelectComponent("remove", s -> ((Collection<?>) instance.apply(bot.loadGuild(s.event.getGuild()))).stream()
 				.map(e -> info.type().createSelectOption(bot, e))
 				.toList()
 		).setPlaceholder("Wert entfernen").appendHandler((s, v) -> {
-			try {
-				((Collection) field.get(instance.apply(s))).remove(v);
-				s.update();
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
+			handle(bot, s, instance, o -> ((Collection) field.get(o)).remove(v));
+			s.update();
 		});
 
 		if (add instanceof EntitySelectComponent || add instanceof StringSelectComponent) {
@@ -208,7 +195,7 @@ public class MenuCommand {
 				"config." + category.command() + "." + info.command(),
 				MessageRenderer.embed(s -> {
 					try {
-						Collection<?> value = (Collection<?>) field.get(instance.apply(s));
+						Collection<?> value = (Collection<?>) field.get(instance.apply(bot.loadGuild(s.event.getGuild())));
 
 						return new EmbedBuilder()
 								.setTitle(info.name())
@@ -226,7 +213,7 @@ public class MenuCommand {
 	}
 
 	@NotNull
-	private static MessageMenu createMapValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<DataState<?>, Object> instance, @NotNull CategoryInfo category, @NotNull ConfigField info, @NotNull Field field) {
+	private static MessageMenu createMapValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<GuildConfig, Object> instance, @NotNull CategoryInfo category, @NotNull ConfigField info, @NotNull Field field) {
 		field.setAccessible(true);
 
 		return manager.createMenu(
