@@ -3,6 +3,7 @@ package de.slimecloud.slimeball.features.staff;
 import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
+import de.slimecloud.slimeball.config.engine.KeyType;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -17,6 +18,8 @@ import java.util.Optional;
 
 @Getter
 public class StaffConfig extends ConfigCategory {
+	@ConfigField(name = "Einträge", command = "entries", description = "Einträge für die Nachricht", type = ConfigFieldType.STRING)
+	@KeyType(ConfigFieldType.STRING)
 	private final LinkedHashMap<String, String> roles = new LinkedHashMap<>();
 
 	@ConfigField(name = "Kanal", command = "channel", description = "Kanal, in dem die Team-Rollen erklärt werden", type = ConfigFieldType.MESSAGE_CHANNEL, required = true)
