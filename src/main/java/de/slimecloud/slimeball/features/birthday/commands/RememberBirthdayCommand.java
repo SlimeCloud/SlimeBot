@@ -2,7 +2,6 @@ package de.slimecloud.slimeball.features.birthday.commands;
 
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
-import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.option.Option;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
-@ApplicationCommand(name = "remember", description = "Speichere dein Geburtstag", scope = Scope.GUILD_GLOBAL, defer = true)
+@ApplicationCommand(name = "remember", description = "Speichere dein Geburtstag", defer = true)
 public class RememberBirthdayCommand {
 
 	@ApplicationCommandMethod

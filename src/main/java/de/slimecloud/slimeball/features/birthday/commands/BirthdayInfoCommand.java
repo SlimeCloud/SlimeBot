@@ -2,7 +2,6 @@ package de.slimecloud.slimeball.features.birthday.commands;
 
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
-import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.option.Option;
 import de.slimecloud.slimeball.features.birthday.Birthday;
 import de.slimecloud.slimeball.main.SlimeBot;
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-@ApplicationCommand(name = "info", description = "zeigt dein Geburtstag, oder den des angegebenen Nutzers am", scope = Scope.GUILD_GLOBAL)
+@ApplicationCommand(name = "info", description = "zeigt dein Geburtstag, oder den des angegebenen Nutzers am")
 public class BirthdayInfoCommand {
 
 	@ApplicationCommandMethod
