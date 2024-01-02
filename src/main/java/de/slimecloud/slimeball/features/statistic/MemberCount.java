@@ -17,12 +17,11 @@ import java.util.function.Function;
 
 
 public class MemberCount extends ListenerAdapter {
-
 	private final SlimeBot bot;
 	private final Function<StatisticConfig, Long> channel;
 	private final Function<StatisticConfig, String> format;
 
-	public MemberCount(SlimeBot bot) {
+	public MemberCount(@NotNull SlimeBot bot) {
 		this.bot = bot;
 		this.channel = StatisticConfig::getMemberCountChannel;
 		this.format = StatisticConfig::getMemberCountFormat;
@@ -36,7 +35,7 @@ public class MemberCount extends ListenerAdapter {
 	@Nullable
 	private VoiceChannel getChannel(long guild) {
 		StatisticConfig config = getConfig(guild);
-		if (config==null) return null;
+		if (config == null) return null;
 		return bot.getJda().getVoiceChannelById(channel.apply(config));
 	}
 
@@ -44,10 +43,13 @@ public class MemberCount extends ListenerAdapter {
 	@SuppressWarnings("ConstantConditions")
 	private String getFormat(long guild, @NotNull Map<String, Object> values) {
 		StatisticConfig config = getConfig(guild);
-		if (config==null) return null;
+		if (config == null) return null;
+
 		AtomicString format = new AtomicString(this.format.apply(config));
 		if (format.isEmpty()) return values.values().toString();
+
 		values.forEach((k, v) -> format.set(format.get().replace("%" + k + "%", String.valueOf(v))));
+
 		return format.get();
 	}
 
@@ -68,13 +70,16 @@ public class MemberCount extends ListenerAdapter {
 
 	private void update(@NotNull GenericGuildEvent event) {
 		Guild guild = event.getGuild();
+
 		VoiceChannel channel = getChannel(guild.getIdLong());
-		if (channel==null) return;
+		if (channel == null) return;
+
 		String format = getFormat(guild.getIdLong(), Map.of("members", guild
 				.getMembers()
 				.stream()
 				.filter(m -> !m.getUser().isBot())
 				.count()));
+
 		channel.getManager().setName(format).queue();
 	}
 }

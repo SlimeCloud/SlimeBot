@@ -32,6 +32,6 @@ public class StatisticConfig extends ConfigCategory {
 
 	@Override
 	public void update() {
-		
+
 	}
 }
