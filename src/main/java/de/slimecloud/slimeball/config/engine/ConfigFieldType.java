@@ -342,7 +342,7 @@ public enum ConfigFieldType {
 						List.of(new TextComponent("value", "Neuer Wert", TextInputStyle.SHORT)),
 						(s, m) -> {
 							if (validate(type, m.getString("value"))) {
-								handler.accept(s, m.getString("value"));
+								handler.accept(s, parse(type, m.getString("value")));
 								manager.getMenu(menu).display(s.event);
 							} else {
 								manager.getMenu(menu).display(s.event);
