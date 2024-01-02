@@ -19,19 +19,13 @@ import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @ApplicationCommand(name = "menu", description = "Öffnet ein Menü für die Konfiguration")
@@ -117,9 +111,9 @@ public class MenuCommand {
 
 	@NotNull
 	private static MessageMenu createValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<DataState<?>, Object> instance, @NotNull CategoryInfo category, @NotNull ConfigField info, @NotNull Field field) {
-		List<Component<?>> components = new ArrayList<>();
-
 		field.setAccessible(true);
+
+		List<Component<?>> components = new ArrayList<>();
 
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
@@ -130,59 +124,16 @@ public class MenuCommand {
 			}
 		}));
 
-		switch (info.type()) {
-			case ALL_CHANNEL -> components.add(0, new EntitySelectComponent("value", EntitySelectMenu.SelectTarget.CHANNEL).setPlaceholder("Wert festlegen").appendHandler((s, v) -> {
-				try {
-					field.set(instance, v.getChannels().get(0));
-					s.update();
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}
-				s.update();
-			}));
-			case MESSAGE_CHANNEL -> components.add(0, new EntitySelectComponent("value", EntitySelectMenu.SelectTarget.CHANNEL).setPlaceholder("Wert festlegen").setChannelTypes(ChannelType.TEXT, ChannelType.NEWS).appendHandler((s, v) -> {
-				try {
-					field.set(instance, v.getChannels().get(0));
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}
-				s.update();
-			}));
-			case VOICE_CHANNEL -> components.add(0, new EntitySelectComponent("value", EntitySelectMenu.SelectTarget.CHANNEL).setPlaceholder("Wert festlegen").setChannelTypes(ChannelType.VOICE, ChannelType.STAGE).appendHandler((s, v) -> {
-				try {
-					field.set(instance, v.getChannels().get(0));
-					s.update();
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}
-				s.update();
-			}));
+		Component<?> component = info.type().createComponent(manager, field.getType(), "config." + category.command() + "." + info.command(), "value", "Wert festlegen", (s, v) -> {
+			try {
+				field.set(instance.apply(s), v);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+		});
 
-			case ROLE -> components.add(0, new EntitySelectComponent("value", EntitySelectMenu.SelectTarget.ROLE).setPlaceholder("Wert festlegen").appendHandler((s, v) -> {
-				try {
-					field.set(instance, v.getRoles().get(0));
-					s.update();
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}
-				s.update();
-			}));
-			case ENUM ->
-					components.add(0, new StringSelectComponent("value", Arrays.stream(field.getType().getEnumConstants()).map(x -> SelectOption.of(x.toString(), ((Enum<?>) x).name())).toList()).setPlaceholder("Wert festlegen").appendHandler((s, v) -> {
-						try {
-							field.set(instance, Arrays.stream(field.getType().getEnumConstants()).filter(x -> ((Enum<?>) x).name().equals(v.get(0).getValue())).findFirst().orElseThrow());
-							s.update();
-						} catch (IllegalAccessException e) {
-							throw new RuntimeException(e);
-						}
-						s.update();
-					}));
-
-			default -> components.add(new ButtonComponent("value", ButtonColor.BLUE, "Wert festlegen").appendHandler(s -> {
-				s.sendReply(MessageCreateData.fromContent("..."));
-				s.update();
-			}));
-		}
+		if (component instanceof EntitySelectComponent || component instanceof StringSelectComponent) components.add(0, component);
+		else components.add(component);
 
 		return manager.createMenu(
 				"config." + category.command() + "." + info.command(),
@@ -195,7 +146,7 @@ public class MenuCommand {
 								.setColor(bot.getColor(s.event.getGuild()))
 								.setDescription(info.description())
 								.appendDescription("\n## Aktueller Wert\n")
-								.appendDescription(info.type().getString().apply(value))
+								.appendDescription(info.type().toString(value))
 								.build();
 					} catch (IllegalAccessException e) {
 						throw new RuntimeException(e);
@@ -206,8 +157,43 @@ public class MenuCommand {
 	}
 
 	@NotNull
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	private static MessageMenu createListValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<DataState<?>, Object> instance, @NotNull CategoryInfo category, @NotNull ConfigField info, @NotNull Field field) {
 		field.setAccessible(true);
+
+		List<Component<?>> components = new ArrayList<>();
+
+		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
+		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
+			try {
+				field.set(instance.apply(s), new ArrayList<>());
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+		}));
+
+		Component<?> add = info.type().createComponent(manager, field.getType(), "config." + category.command() + "." + info.command(), "add", "Wert hinzufügen", (s, v) -> {
+			try {
+				((Collection) field.get(instance.apply(s))).add(v);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+		});
+
+		Component<?> remove = new StringSelectComponent("remove", s -> ((Collection<?>) instance.apply(s)).stream()
+				.map(e -> SelectOption.of(null, null)) //TODO
+				.toList()
+		).setPlaceholder("Wert entfernen").appendHandler((s, v) -> {
+
+		});
+
+		if (add instanceof EntitySelectComponent || add instanceof StringSelectComponent) {
+			components.add(0, add);
+			components.add(1, remove);
+		} else {
+			components.add(add);
+			components.add(remove);
+		}
 
 		return manager.createMenu(
 				"config." + category.command() + "." + info.command(),
@@ -215,7 +201,8 @@ public class MenuCommand {
 						.setTitle(info.name())
 						.setColor(bot.getColor(s.event.getGuild()))
 						.build()
-				)
+				),
+				ComponentRow.ofMany(components)
 		);
 	}
 

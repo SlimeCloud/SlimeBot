@@ -8,6 +8,7 @@ import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.engine.CategoryInfo;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ValidationException;
+import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -53,7 +54,7 @@ public class EnableCommand extends Command<ICommandContext> {
 		if (Collection.class.isAssignableFrom(f.getType())) throw new IllegalArgumentException("Cannot use collection types in this context!");
 		if (Map.class.isAssignableFrom(f.getType())) throw new IllegalArgumentException("Cannot use map types in this context!");
 
-		return info.type().getConfiguration().apply(f.getType(), new OptionData(info.type().getType(), info.command(), info.description(), info.required()));
+		return info.type().createOption(f.getType(), info).setRequired(info.required());
 	}
 
 	@Override
@@ -63,20 +64,16 @@ public class EnableCommand extends Command<ICommandContext> {
 		//Load config
 		GuildConfig config = bot.loadGuild(context.getEvent().getGuild());
 
-		if (field.get(config) instanceof ConfigCategory c) c.disable(context.getEvent().getGuild());
+		if (field.get(config) != null) {
+			context.getEvent().getHook().editOriginal(":x: Feature ist bereits aktiviert!").queue();
+			return;
+		}
+
+		//Get or create category instance
+		Object instance = this.instance.apply(config);
 
 		//Basic enable
-		if (options.isEmpty()) {
-			//Create instance
-			Object instance = field.getType().getConstructor().newInstance();
-			if (instance instanceof ConfigCategory c) {
-				c.bot = bot;
-				c.enable(context.getEvent().getGuild());
-			}
-
-			//Set
-			field.set(config, instance);
-		} else {
+		if (!options.isEmpty()) {
 			//Extract values from options
 			Map<Field, Object> values = new HashMap<>();
 			try {
@@ -89,9 +86,6 @@ public class EnableCommand extends Command<ICommandContext> {
 				return;
 			}
 
-			//Get category instance
-			Object instance = this.instance.apply(config);
-
 			values.forEach((f, v) -> {
 				try {
 					f.set(instance, v);
@@ -99,17 +93,17 @@ public class EnableCommand extends Command<ICommandContext> {
 					throw new RuntimeException(e);
 				}
 			});
+		}
 
-			//Call init method
-			if (instance instanceof ConfigCategory c) {
-				c.bot = bot;
-				c.enable(context.getEvent().getGuild());
-			}
+		//Call init method
+		if (instance instanceof ConfigCategory c) {
+			c.bot = bot;
+			c.enable(context.getEvent().getGuild());
 		}
 
 		//Save
 		config.save();
-		context.getEvent().getHook().editOriginal("Feature **" + category.name() + "** aktiviert").queue();
+		context.getEvent().getHook().editOriginal("✅ Feature **" + category.name() + "** aktiviert\n```json\n" + Main.formattedJson.toJson(instance) + "```").queue();
 
 		//Update commands to add commands that might be affected by this
 		bot.updateGuildCommands(context.getEvent().getGuild());

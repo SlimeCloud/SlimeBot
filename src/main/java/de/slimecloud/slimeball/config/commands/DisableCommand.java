@@ -39,6 +39,6 @@ public class DisableCommand extends Command<ICommandContext> {
 		//Update commands to remove commands that might be affected by this
 		bot.updateGuildCommands(context.getEvent().getGuild());
 
-		context.getEvent().reply("Feature **" + category.name() + "** deaktiviert").setEphemeral(true).queue();
+		context.getEvent().reply("✅ Feature **" + category.name() + "** deaktiviert").setEphemeral(true).queue();
 	}
 }
