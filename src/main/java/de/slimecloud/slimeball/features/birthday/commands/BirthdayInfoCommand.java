@@ -13,6 +13,9 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @ApplicationCommand(name = "birthday", description = "zeigt dein Geburtstag, oder den des angegebenen Nutzers am", scope = Scope.GUILD_GLOBAL)
 public class BirthdayInfoCommand {
@@ -31,7 +34,9 @@ public class BirthdayInfoCommand {
 			builder.setDescription(String.format("Ich kenne %S's Geburtstag noch nicht.", target.getAsMention()));
 			builder.setColor(new Color(0xDD2222));
 		} else {
-			builder.setDescription(String.format("%s hat in %s geburtstag!", target.getAsMention(), TimeFormat.RELATIVE.format(birthday.getInstant())));
+			ZonedDateTime zdt = birthday.getInstant().atZone(ZoneId.systemDefault());
+			String format = zdt.getYear()==0 ? zdt.format(DateTimeFormatter.ofPattern("d/M")) : TimeFormat.RELATIVE.format(birthday.getInstant());
+			builder.setDescription(String.format("%s hat in %s geburtstag!", target.getAsMention(), format));
 			builder.setColor(bot.getColor(event.getGuild()));
 		}
 
