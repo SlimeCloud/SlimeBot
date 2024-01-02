@@ -6,6 +6,7 @@ import de.mineking.javautils.database.Table;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +16,7 @@ public class Level implements DataClass<Level>, Comparable<Level> {
 	private final SlimeBot bot;
 
 	@Column(key = true)
-	private final long guild;
+	private final Guild guild;
 	@Column(key = true)
 	private final UserSnowflake user;
 
@@ -29,11 +30,11 @@ public class Level implements DataClass<Level>, Comparable<Level> {
 	private final int messages;
 
 	public Level(@NotNull SlimeBot bot) {
-		this(bot, 0, null, 0, 0, 0);
+		this(bot, null, null, 0, 0, 0);
 	}
 
 	@NotNull
-	public static Level empty(@NotNull SlimeBot bot, long guild, @NotNull UserSnowflake user) {
+	public static Level empty(@NotNull SlimeBot bot, @NotNull Guild guild, @NotNull UserSnowflake user) {
 		return new Level(bot, guild, user, 0, 0, 0);
 	}
 
@@ -65,7 +66,7 @@ public class Level implements DataClass<Level>, Comparable<Level> {
 	}
 
 	public int getRank() {
-		return bot.getLevel().getTopList(bot.getJda().getGuildById(guild), 0, null).stream()
+		return bot.getLevel().getTopList(guild, 0, null).stream()
 				.map(l -> l.getUser().getIdLong())
 				.toList().indexOf(user.getIdLong());
 	}

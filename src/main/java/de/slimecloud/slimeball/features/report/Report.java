@@ -35,7 +35,7 @@ public class Report implements ListEntry, DataClass<Report> {
 	private Type type;
 
 	@Column
-	private long guild;
+	private Guild guild;
 	@Column
 	private UserSnowflake issuer;
 	@Column
@@ -53,7 +53,7 @@ public class Report implements ListEntry, DataClass<Report> {
 	private String closeReason;
 
 	public Report(@NotNull SlimeBot bot, @NotNull Type type, @NotNull Guild guild, @NotNull UserSnowflake issuer, @NotNull UserSnowflake target, @NotNull String message) {
-		this(bot, 0, type, guild.getIdLong(), issuer, target, Instant.now(), message, Status.OPEN, null);
+		this(bot, 0, type, guild, issuer, target, Instant.now(), message, Status.OPEN, null);
 	}
 
 	@NotNull

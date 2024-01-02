@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface WrappedDataTable extends Table<WrappedData> {
 	@NotNull
-	default WrappedData getData(long guild, UserSnowflake user) {
+	default WrappedData getData(@NotNull Guild guild, @NotNull UserSnowflake user) {
 		return selectOne(Where.allOf(
 				Where.equals("guild", guild),
 				Where.equals("user", user.getIdLong())
@@ -20,7 +20,7 @@ public interface WrappedDataTable extends Table<WrappedData> {
 
 	@NotNull
 	default WrappedData getData(@NotNull Member member) {
-		return getData(member.getGuild().getIdLong(), member);
+		return getData(member.getGuild(), member);
 	}
 
 	@NotNull

@@ -2,7 +2,8 @@ package de.slimecloud.slimeball.main.extensions;
 
 import de.mineking.javautils.database.DatabaseManager;
 import de.mineking.javautils.database.TypeMapper;
-import net.dv8tion.jda.api.entities.UserSnowflake;
+import de.slimecloud.slimeball.main.SlimeBot;
+import net.dv8tion.jda.api.entities.Guild;
 import org.jdbi.v3.core.argument.Argument;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jetbrains.annotations.NotNull;
@@ -14,21 +15,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 
-public class UserSnowflakeTypeMapper implements TypeMapper<Long, UserSnowflake> {
+public class GuildTypeMapper implements TypeMapper<Long, Guild> {
 	@Override
-	public boolean accepts(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field field) {
-		return UserSnowflake.class.isAssignableFrom(type);
+	public boolean accepts(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f) {
+		return Guild.class.isAssignableFrom(type);
 	}
 
 	@NotNull
 	@Override
-	public String getType(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field field) {
+	public String getType(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f) {
 		return "bigint";
 	}
 
 	@NotNull
 	@Override
-	public Argument createArgument(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable UserSnowflake value) {
+	public Argument createArgument(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable Guild value) {
 		return new Argument() {
 			@Override
 			public void apply(int position, PreparedStatement statement, StatementContext ctx) throws SQLException {
@@ -44,7 +45,7 @@ public class UserSnowflakeTypeMapper implements TypeMapper<Long, UserSnowflake> 
 
 	@NotNull
 	@Override
-	public String string(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable UserSnowflake value) {
+	public String string(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable Guild value) {
 		return value == null ? "null" : value.getId();
 	}
 
@@ -56,7 +57,7 @@ public class UserSnowflakeTypeMapper implements TypeMapper<Long, UserSnowflake> 
 
 	@Nullable
 	@Override
-	public UserSnowflake parse(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field field, @Nullable Long value) {
-		return value == null ? null : UserSnowflake.fromId(value);
+	public Guild parse(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field field, @Nullable Long value) {
+		return value == null ? null : manager.<SlimeBot>getData("bot").getJda().getGuildById(value);
 	}
 }

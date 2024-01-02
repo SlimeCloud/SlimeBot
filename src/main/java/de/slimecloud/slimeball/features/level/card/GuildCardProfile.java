@@ -6,6 +6,7 @@ import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Table;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.Setter;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ public class GuildCardProfile implements DataClass<GuildCardProfile> {
 	private final SlimeBot bot;
 
 	@Column(key = true)
-	private final long guild;
+	private final Guild guild;
 
 	@Column(key = true)
 	private final UserSnowflake user;
@@ -28,10 +29,10 @@ public class GuildCardProfile implements DataClass<GuildCardProfile> {
 		this.bot = bot;
 
 		if (member == null) {
-			this.guild = 0;
+			this.guild = null;
 			this.user = null;
 		} else {
-			guild = member.getGuild().getIdLong();
+			guild = member.getGuild();
 			user = member;
 		}
 

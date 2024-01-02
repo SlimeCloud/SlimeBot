@@ -47,10 +47,7 @@ import de.slimecloud.slimeball.features.staff.TeamMeeting;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
-import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
-import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
-import de.slimecloud.slimeball.main.extensions.IDOptionParser;
-import de.slimecloud.slimeball.main.extensions.UserSnowflakeTypeMapper;
+import de.slimecloud.slimeball.main.extensions.*;
 import de.slimecloud.slimeball.util.ColorUtil;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
@@ -129,6 +126,7 @@ public class SlimeBot extends ListenerAdapter {
 
 			database.putData("bot", this);
 			database.addMapper(new UserSnowflakeTypeMapper());
+			database.addMapper(new GuildTypeMapper());
 			database.addMapper(new ColorTypeMapper());
 
 			//Initialize tables
