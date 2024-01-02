@@ -182,7 +182,7 @@ public enum ConfigFieldType {
 		@NotNull
 		@Override
 		public String toString(@NotNull Object value) {
-			return "<@" + value + ">";
+			return "<@&" + value + ">";
 		}
 	},
 
