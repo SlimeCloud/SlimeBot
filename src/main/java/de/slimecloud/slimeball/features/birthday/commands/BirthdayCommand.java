@@ -13,6 +13,7 @@ public class BirthdayCommand {
 	public static void setup(@NotNull Command<?> command) {
 		command.addSubcommand(BirthdayInfoCommand.class);
 		command.addSubcommand(RememberBirthdayCommand.class);
+		command.addSubcommand(ForgetBirthdayCommand.class);
 	}
 
 }
