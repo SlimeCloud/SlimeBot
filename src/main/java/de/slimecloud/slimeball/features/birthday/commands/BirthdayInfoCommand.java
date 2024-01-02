@@ -9,14 +9,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 
-@ApplicationCommand(name = "info", description = "zeigt den Geburtstag eines Mitglieds an")
+@ApplicationCommand(name = "info", description = "zeigt den Geburtstag eines Mitglieds an", defer = true)
 public class BirthdayInfoCommand {
 	@ApplicationCommandMethod
 	public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
 	                           @Option(name = "target", description = "Der Nutzer, dessen Geburtstag angezeigt werden soll", required = false) Member target
 	) {
-		event.deferReply().setEphemeral(true).queue();
-
 		Member member = target == null ? event.getMember() : target;
 
 		bot.getBirthdays().get(member).ifPresentOrElse(
