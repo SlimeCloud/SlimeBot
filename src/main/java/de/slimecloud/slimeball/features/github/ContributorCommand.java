@@ -50,6 +50,9 @@ public class ContributorCommand {
 		UserSnowflake user = getUser(event.getMessage().getEmbeds().get(0));
 
 		bot.loadGuild(event.getGuild()).getContributorRole().ifPresent(role -> {
+			//Call event
+			new ContributorAcceptedEvent(user, event.getMember()).callEvent();
+
 			event.getGuild().addRoleToMember(user, role).reason("Hat am GitHub Projekt mitgearbeitet").queue();
 
 			event.getMessage().delete().queue();

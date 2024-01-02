@@ -15,7 +15,6 @@ import de.slimecloud.slimeball.util.ColorUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -33,7 +32,6 @@ import java.util.List;
 import java.util.*;
 
 @Slf4j
-@Accessors(chain = true)
 @CategoryInfo(name = "Standard", command = "general", description = "Generelle Konfiguration des Servers")
 @ToString
 public class GuildConfig {

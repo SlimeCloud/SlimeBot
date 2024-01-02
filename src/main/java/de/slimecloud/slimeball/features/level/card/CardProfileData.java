@@ -1,5 +1,8 @@
 package de.slimecloud.slimeball.features.level.card;
 
+import de.mineking.discordutils.list.ListContext;
+import de.mineking.discordutils.list.ListEntry;
+import de.mineking.javautils.ID;
 import de.mineking.javautils.database.Column;
 import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Table;
@@ -14,23 +17,27 @@ import de.slimecloud.slimeball.util.graphic.CustomFont;
 import de.slimecloud.slimeball.util.graphic.Graphic;
 import de.slimecloud.slimeball.util.graphic.ImageUtil;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Objects;
+import java.util.Set;
 
 @Slf4j
 @Getter
 @ToString
-public class CardProfile extends Graphic implements DataClass<CardProfile> {
+public class CardProfileData extends Graphic implements DataClass<CardProfileData>, ListEntry {
 	public final static Font font;
 
 	static {
@@ -42,14 +49,18 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	}
 
 	public final static Color TRANSPARENT = ColorUtil.ofCode(0);
-	public final static CardProfile DEFAULT = new CardProfile(null);
+	public final static CardProfileData DEFAULT = new CardProfileData(null);
 
 	private final SlimeBot bot;
 
 	@Column(key = true)
-	private final long guild;
-	@Column(key = true)
-	private final UserSnowflake user;
+	private ID id;
+	@Column
+	private UserSnowflake owner;
+
+	@Setter
+	@Column(name = "public")
+	private boolean isPublic = false;
 
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
@@ -58,7 +69,8 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	@KeyType(ConfigFieldType.COLOR)
 	private Color progressbarBGColor = new Color(150, 150, 150, 50);
 	@Column
-	private Style progressbarStyle = Style.ROUND;
+	@KeyType(ConfigFieldType.ENUM)
+	private Style progressbarStyle = Style.ROUND_SQUARE;
 
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
@@ -68,13 +80,25 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	private int progressbarBorderWidth = 5;
 
 	@Column
-	private Style avatarStyle = Style.ROUND;
+	@KeyType(ConfigFieldType.ENUM)
+	private Style avatarStyle = Style.ROUND_SQUARE;
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
 	private Color avatarBorderColor = TRANSPARENT;
 	@Column
 	@KeyType(ConfigFieldType.INTEGER)
 	private int avatarBorderWidth = 10;
+
+	@Column
+	@KeyType(ConfigFieldType.ENUM)
+	private Style decorationStyle = Style.ROUND_SQUARE;
+	@Column
+	@KeyType(ConfigFieldType.COLOR)
+	private Color decorationBorderColor = new Color(68, 140, 41, 255);
+	@Column
+	@KeyType(ConfigFieldType.INTEGER)
+	private int decorationBorderWidth = 5;
+
 
 	@Column
 	@KeyType(ConfigFieldType.COLOR)
@@ -99,30 +123,48 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	@KeyType(ConfigFieldType.COLOR)
 	private Color fontLevelColor = new Color(97, 180, 237);
 
-	public CardProfile(@NotNull SlimeBot bot, @Nullable Member member) {
+
+	public CardProfileData(@NotNull SlimeBot bot, @NotNull UserSnowflake owner) {
 		super(2000, 400);
 		this.bot = bot;
 
-		if (member != null) {
-			this.guild = member.getGuild().getIdLong();
-			this.user = member;
-		} else {
-			this.guild = 0;
-			this.user = null;
-		}
+		this.owner = owner;
 	}
 
-	public CardProfile(@NotNull SlimeBot bot) {
+	public CardProfileData(@NotNull SlimeBot bot) {
 		this(bot, null);
 	}
 
 	@NotNull
 	@Override
-	public Table<CardProfile> getTable() {
-		return bot.getLevelProfiles();
+	public Table<CardProfileData> getTable() {
+		return bot.getProfileData();
 	}
 
-	public CardProfile set(@NotNull String name, @NotNull String value) {
+	@NotNull
+	public CardPermission getPermission(@NotNull UserSnowflake user) {
+		if (owner == null) return CardPermission.READ;
+		if (owner.getIdLong() == user.getIdLong()) return CardPermission.WRITE;
+		if (isPublic) return CardPermission.READ;
+		return CardPermission.NONE;
+	}
+
+	@NotNull
+	public CardProfileData createCopy(@NotNull UserSnowflake owner) {
+		//Setting the id to null will make JavaUtils create a new column
+		this.id = null;
+		this.owner = owner;
+
+		return this;
+	}
+
+	@NotNull
+	@Override
+	public String build(int index, @NotNull ListContext<? extends ListEntry> context) {
+		return (index + 1) + ". ID: **" + id + "**, von " + owner.getAsMention();
+	}
+
+	public CardProfileData set(@NotNull String name, @NotNull String value) {
 		try {
 			Field field = getClass().getDeclaredField(name);
 			field.setAccessible(true);
@@ -141,7 +183,26 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		return this;
 	}
 
-	public CardProfile render() {
+	@NotNull
+	public String get(@NotNull String name) {
+		try {
+			Field field = getClass().getDeclaredField(name);
+			field.setAccessible(true);
+
+			Object value = field.get(this);
+
+			if (field.isAnnotationPresent(KeyType.class)) return field.getAnnotation(KeyType.class).value().getString().apply(value);
+			else return Objects.toString(value);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private Member member;
+
+	@NotNull
+	public CardProfileData render(@NotNull Member member) {
+		this.member = member;
 		finish();
 		return this;
 	}
@@ -149,8 +210,7 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 	@Override
 	protected void drawGraphic(@NotNull Graphics2D graphics) {
 		//Get info
-		Level level = bot.getLevel().getLevel(guild, user);
-		Member member = bot.getJda().getGuildById(guild).retrieveMember(user).complete();
+		Level level = bot.getLevel().getLevel(member);
 
 		//Render
 		applyBackground(graphics);
@@ -158,6 +218,7 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		applyProgressBar(graphics, level);
 
 		applyText(graphics, level, member);
+		applyDecorations(graphics, member);
 	}
 
 	private void applyBackground(@NotNull Graphics2D graphics) {
@@ -170,9 +231,11 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		if (backgroundImage != null) graphics.drawImage(backgroundImage, 0, 0, width, height, null);
 
 		//Border
-		graphics.setColor(backgroundBorderColor);
-		graphics.setStroke(new BasicStroke(adjustBorderWith(backgroundBorderWidth)));
-		graphics.drawRoundRect(0, 0, width, height, height / 8, height / 8);
+		if (backgroundBorderWidth > 0) {
+			graphics.setColor(backgroundBorderColor);
+			graphics.setStroke(new BasicStroke(adjustBorderWith(backgroundBorderWidth)));
+			graphics.drawRoundRect(0, 0, width, height, height / 8, height / 8);
+		}
 	}
 
 	private void applyAvatar(@NotNull Graphics2D graphics, @NotNull Member member) {
@@ -189,14 +252,16 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		avatar = ImageUtil.resize(avatar, avatarWidth, avatarWidth);
 
 		//Border
-		graphics.setStroke(new BasicStroke(adjustBorderWith(avatarBorderWidth)));
-		graphics.setColor(avatarBorderColor);
+		if (avatarBorderWidth > 0) {
+			graphics.setColor(avatarBorderColor);
+			graphics.setStroke(new BasicStroke(adjustBorderWith(avatarBorderWidth)));
 
-		if (avatarStyle == Style.ROUND) graphics.drawRoundRect(offset, offset, avatarWidth, avatarWidth, avatarWidth, avatarWidth);
-		else graphics.drawRect(offset, offset, avatarWidth, avatarWidth);
+			graphics.drawRoundRect(offset, offset, avatarWidth, avatarWidth, avatarStyle.getArc(avatarWidth), avatarStyle.getArc(avatarWidth));
+		}
 
 		//Image
-		graphics.setClip(avatarStyle == Style.ROUND ? new Ellipse2D.Double(offset, offset, avatarWidth, avatarWidth) : null);
+		graphics.setClip(avatarStyle.getShape(offset, offset, avatarWidth, avatarWidth));
+
 		graphics.drawImage(avatar, offset, offset, avatarWidth, avatarWidth, null);
 		graphics.setClip(null);
 	}
@@ -211,25 +276,25 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		int verticalOffset = height - offset - progressbarHeight;
 		int maxWidth = width - offset - horizontalOffset;
 
+		int arc = progressbarStyle.getArc(progressbarHeight);
+
 		//Border
-		graphics.setColor(progressbarBorderColor);
-		graphics.setStroke(new BasicStroke(adjustBorderWith(progressbarBorderWidth)));
+		if (progressbarBorderWidth > 0) {
+			graphics.setColor(progressbarBorderColor);
+			graphics.setStroke(new BasicStroke(adjustBorderWith(progressbarBorderWidth)));
 
-		if (progressbarStyle == Style.ROUND) graphics.drawRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, progressbarHeight, progressbarHeight);
-		else graphics.drawRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight);
-
+			graphics.drawRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, arc, arc);
+		}
 
 		//Background
 		graphics.setColor(progressbarBGColor);
 
-		if (progressbarStyle == Style.ROUND) graphics.fillRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, progressbarHeight, progressbarHeight);
-		else graphics.fillRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight);
+		graphics.fillRoundRect(horizontalOffset, verticalOffset, maxWidth, progressbarHeight, arc, arc);
 
 		//Content
 		graphics.setColor(progressbarColor);
 
-		if (progressbarStyle == Style.ROUND) graphics.fillRoundRect(horizontalOffset, verticalOffset, (int) (percentage * maxWidth), progressbarHeight, progressbarHeight, progressbarHeight);
-		else graphics.fillRect(horizontalOffset, verticalOffset, (int) (maxWidth * percentage), progressbarHeight);
+		graphics.fillRoundRect(horizontalOffset, verticalOffset, (int) (percentage * maxWidth), progressbarHeight, arc, arc);
 	}
 
 	private void applyText(@NotNull Graphics2D graphics, @NotNull Level level, @NotNull Member member) {
@@ -274,19 +339,59 @@ public class CardProfile extends Graphic implements DataClass<CardProfile> {
 		graphics.drawString(levelString, width - offset - levelWidth, offset + levelHeight);
 
 		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
-		int nameWidth = graphics.getFontMetrics().stringWidth(levelName);
-		graphics.drawString(levelName, width - offset - levelWidth - nameWidth, offset + levelHeight);
+		int levelNameWidth = graphics.getFontMetrics().stringWidth(levelName);
+		graphics.drawString(levelName, width - offset - levelWidth - levelNameWidth, offset + levelHeight);
 
 		//Rank
 		int rank = level.getRank() + 1;
 		if (rank == 0) return;
 
 		String rankString = "#" + rank;
+		String rankName = "RANK ";
 
 		graphics.setColor(getColor(rank));
-		graphics.setFont(CustomFont.getFont(font, getFontSize(50)));
 
-		graphics.drawString(rankString, width - offset - levelWidth - nameWidth - graphics.getFontMetrics().stringWidth(rankString) - 4 * offset, offset + levelHeight);
+		graphics.setFont(CustomFont.getFont(font, levelHeight));
+		int rankWidth = graphics.getFontMetrics().stringWidth(rankString);
+
+		graphics.drawString(rankString, width - offset - rankWidth - 2 * offset - levelWidth - levelNameWidth, offset + levelHeight);
+
+		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
+		int rankNameWidth = graphics.getFontMetrics().stringWidth(levelName);
+		graphics.drawString(rankName, width - offset - rankWidth - rankNameWidth - 2 * offset - levelWidth - levelNameWidth, offset + levelHeight);
+	}
+
+	private void applyDecorations(@NotNull Graphics2D graphics, @NotNull Member member) {
+		Set<String> decorations = bot.getCardDecorations().getDecorations(member);
+
+		int offset = (int) (height * 0.1);
+		int height = (int) getFontSize(50);
+
+		//Offset + avatar + offset (Could be simplified to height, but it is easier to understand this way)
+		int x = offset + (this.height - 2 * offset) + offset;
+
+		graphics.setColor(decorationBorderColor);
+		graphics.setStroke(new BasicStroke(adjustBorderWith(decorationBorderWidth)));
+
+		for (String d : decorations) {
+			try {
+				BufferedImage decoration = ImageIO.read(new File(bot.getConfig().getLevel().get().getDecorationFolder(), d));
+
+				int width = (int) (decoration.getWidth() * ((double) height / decoration.getHeight()));
+
+				graphics.setClip(null);
+				graphics.drawRoundRect(x, offset, width, height, decorationStyle.getArc(height), decorationStyle.getArc(height));
+
+				graphics.setClip(decorationStyle.getShape(x, offset, width, height));
+				graphics.drawImage(decoration, x, offset, width, height, null);
+
+				x += width + height / 2;
+			} catch (FileNotFoundException e) {
+				logger.warn("Decoration {} not found", d);
+			} catch (IOException e) {
+				logger.error("Failed to read decoration", e);
+			}
+		}
 	}
 
 	private int adjustBorderWith(int value) {

@@ -6,6 +6,7 @@ import de.mineking.javautils.database.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +18,7 @@ public class ReportBlock implements ListEntry {
 	private UserSnowflake user;
 
 	@Column
-	private long guild;
+	private Guild guild;
 
 	@Column
 	private String reason;

@@ -65,7 +65,7 @@ public class FdmdsCommand {
 		String question = event.getValue("question").getAsString();
 		String[] temp = event.getValue("choices").getAsString().split("\n");
 
-		if(event.getModalId().contains("send")) {
+		if (event.getModalId().contains("send")) {
 			//Call event
 			new FdmdsSubmitedEvent(event.getMember(), question).callEvent();
 		}
@@ -92,9 +92,8 @@ public class FdmdsCommand {
 
 		//Build embed
 		EmbedBuilder embed = new EmbedBuilder()
-				.setTitle("Vorschlag für \"Frag doch mal den Schleim\"")
 				.setColor(bot.getColor(event.getGuild()))
-				.addField("Frage", question, false)
+				.setDescription(question)
 				.addField("Auswahlmöglichkeiten", choices.toString(), false);
 
 		if (event.getModalId().contains("send")) embed.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl());
@@ -117,7 +116,10 @@ public class FdmdsCommand {
 			event.getMessage().editMessage(message.build()).queue();
 			event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
 		} else bot.loadGuild(event.getGuild()).getFdmds().map(FdmdsConfig::getLogChannel).ifPresent(channel -> {
-			channel.sendMessage(MessageCreateData.fromEditData(message.build())).queue();
+			channel.sendMessage(MessageCreateData.fromEditData(message.build())).queue(mes -> {
+				mes.addReaction(SlimeEmoji.UP.getEmoji(mes.getGuild())).queue();
+				mes.addReaction(SlimeEmoji.DOWN.getEmoji(mes.getGuild())).queue();
+			});
 			event.reply("Frage erfolgreich eingereicht! Das Team wird die Frage kontrollieren und anschließend veröffentlicht.").setEphemeral(true).queue();
 		});
 	}

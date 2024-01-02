@@ -24,7 +24,6 @@ import org.apache.commons.collections4.Bag;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +48,7 @@ public class DataListener extends ListenerAdapter {
 		//Start schedule
 		bot.getExecutor().scheduleAtFixedRate(() -> voiceUsers.forEach((user, channel) -> {
 			//Read current data
-			WrappedData data = bot.getWrappedData().getData(bot.getJda().getVoiceChannelById(channel).getGuild().getIdLong(), UserSnowflake.fromId(user));
+			WrappedData data = bot.getWrappedData().getData(bot.getJda().getVoiceChannelById(channel).getGuild(), UserSnowflake.fromId(user));
 
 			data.getVoice().compute(String.valueOf(channel), (k, v) -> v == null ? 1 : v + 1);
 
@@ -83,10 +82,10 @@ public class DataListener extends ListenerAdapter {
 		int links = 0;
 		int words = 0;
 
-		for(String s : event.getMessage().getContentRaw().split("\\s+")) {
-			if(s.isBlank()) continue;
+		for (String s : event.getMessage().getContentRaw().split("\\s+")) {
+			if (s.isBlank()) continue;
 
-			if(StringUtil.isValidURL(s)) links++;
+			if (StringUtil.isValidURL(s)) links++;
 			else words++;
 		}
 
@@ -135,7 +134,7 @@ public class DataListener extends ListenerAdapter {
 	@EventHandler
 	public void handleFdmdsCreated(@NotNull FdmdsCreateEvent event) {
 		//Load current data
-		WrappedData data = bot.getWrappedData().getData(event.getTeam().getGuild().getIdLong(), event.getUser());
+		WrappedData data = bot.getWrappedData().getData(event.getTeam().getGuild(), event.getUser());
 
 		//Update data
 		data.setFdmdsAccepted(data.getFdmdsAccepted() + 1);
@@ -147,7 +146,7 @@ public class DataListener extends ListenerAdapter {
 	@EventHandler
 	public void onXp(@NotNull UserGainXPEvent event) {
 		//Load current data
-		WrappedData data = bot.getWrappedData().getData(event.getUser().getGuild().getIdLong(), event.getUser());
+		WrappedData data = bot.getWrappedData().getData(event.getUser().getGuild(), event.getUser());
 
 		int delta = event.getNewXp() - event.getOldXp();
 

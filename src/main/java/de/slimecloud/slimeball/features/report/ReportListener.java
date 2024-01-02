@@ -17,7 +17,7 @@ public class ReportListener {
 	@EventHandler
 	public void handleReport(@NotNull UserReportedEvent event) {
 		//Cancel if reporter is blocked
-		bot.getReportBlocks().isBlocked(event.getReport().getIssuer(), event.getReport().getGuild()).ifPresent(block -> {
+		bot.getReportBlocks().isBlocked(event.getReport().getGuild(), event.getReport().getIssuer()).ifPresent(block -> {
 			event.getEvent().replyEmbeds(
 					new EmbedBuilder()
 							.setTitle("\uD83D\uDC6E Blockiert")

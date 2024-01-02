@@ -11,7 +11,7 @@ plugins {
 mainClassName = "de.slimecloud.slimeball.main.Main"
 
 group 'com.slimebot'
-version '3.1.0'
+version '3.2.0'
 
 repositories {
     mavenCentral()
@@ -25,7 +25,7 @@ dependencies {
     implementation 'net.dv8tion:JDA:5.0.0-beta.18'
 
     implementation 'de.mineking:DiscordUtils:3.6.5'
-    implementation 'de.mineking:JavaUtils:1.0.9'
+    implementation 'de.mineking:JavaUtils:1.1.1'
     implementation 'de.cyklon:JEvent:1.0.2'
 
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.0.0'
@@ -60,7 +60,7 @@ String getVersion() {
     try {
         String commit = 'git rev-parse --verify --short HEAD'.execute().text.trim()
         version += "-" + commit
-    } catch(IOException ignore) {
+    } catch (IOException ignore) {
         version += "-unknown"
     }
 

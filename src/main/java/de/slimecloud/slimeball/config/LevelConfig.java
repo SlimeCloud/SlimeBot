@@ -6,6 +6,9 @@ import lombok.Getter;
 @Getter
 public class LevelConfig {
 	@Required
+	private String decorationFolder;
+
+	@Required
 	private String levelUpMessage;
 
 	@Required
@@ -27,4 +30,7 @@ public class LevelConfig {
 	private Double minVoiceXP;
 	@Required
 	private Double maxVoiceXP;
+
+	@Required
+	private Integer maxUserProfiles;
 }
