@@ -7,7 +7,7 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
-@ApplicationCommand(name = "forget-birthday", description = "Lösche dein Geburtstag", scope = Scope.GUILD_GLOBAL, defer = true)
+@ApplicationCommand(name = "forget", description = "Lösche dein Geburtstag", scope = Scope.GUILD_GLOBAL, defer = true)
 public class ForgetBirthdayCommand {
 
 	@ApplicationCommandMethod
