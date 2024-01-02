@@ -122,6 +122,15 @@ public class MenuCommand {
 		config.save();
 	}
 
+	@SuppressWarnings("unchecked")
+	private static <T> T getValue(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Function<GuildConfig, Object> instance, @NotNull Field field) {
+		try {
+			return (T) field.get(instance.apply(bot.loadGuild(state.event.getGuild())));
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@NotNull
 	private static MessageMenu createValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<GuildConfig, Object> instance, @NotNull CategoryInfo category, @NotNull ConfigField info, @NotNull Field field) {
 		field.setAccessible(true);
@@ -142,19 +151,15 @@ public class MenuCommand {
 		return manager.createMenu(
 				"config." + category.command() + "." + info.command(),
 				MessageRenderer.embed(s -> {
-					try {
-						Object value = field.get(instance.apply(bot.loadGuild(s.event.getGuild())));
+					Object value = getValue(bot, s, instance, field);
 
-						return new EmbedBuilder()
-								.setDescription("## " + category.name() + " → " + info.name() + "\n")
-								.setColor(bot.getColor(s.event.getGuild()))
-								.appendDescription(info.description())
-								.appendDescription("\n### Aktueller Wert\n")
-								.appendDescription(value == null ? "*nicht gesetzt*" : info.type().toString(value))
-								.build();
-					} catch (IllegalAccessException e) {
-						throw new RuntimeException(e);
-					}
+					return new EmbedBuilder()
+							.setDescription("## " + category.name() + " → " + info.name() + "\n")
+							.setColor(bot.getColor(s.event.getGuild()))
+							.appendDescription(info.description())
+							.appendDescription("\n### Aktueller Wert\n")
+							.appendDescription(value == null ? "*nicht gesetzt*" : info.type().toString(value))
+							.build();
 				}),
 				ComponentRow.ofMany(components)
 		);
@@ -175,11 +180,11 @@ public class MenuCommand {
 
 		Component<?> add = info.type().createComponent(manager, field.getType(), "config." + category.command() + "." + info.command(), "add", "Wert hinzufügen", (s, v) -> handle(bot, s, instance, o -> ((Collection) field.get(o)).add(v)));
 
-		Component<?> remove = new StringSelectComponent("remove", s -> ((Collection<?>) instance.apply(bot.loadGuild(s.event.getGuild()))).stream()
+		Component<?> remove = new StringSelectComponent("remove", s -> MenuCommand.<Collection<?>>getValue(bot, s, instance, field).stream()
 				.map(e -> info.type().createSelectOption(bot, e))
 				.toList()
 		).setPlaceholder("Wert entfernen").appendHandler((s, v) -> {
-			handle(bot, s, instance, o -> ((Collection) field.get(o)).remove(v));
+			handle(bot, s, instance, o -> ((Collection<?>) field.get(o)).remove(info.type().parse(field.getType(), v.get(0).getValue())));
 			s.update();
 		});
 
@@ -194,19 +199,15 @@ public class MenuCommand {
 		return manager.createMenu(
 				"config." + category.command() + "." + info.command(),
 				MessageRenderer.embed(s -> {
-					try {
-						Collection<?> value = (Collection<?>) field.get(instance.apply(bot.loadGuild(s.event.getGuild())));
+					Collection<?> value = getValue(bot, s, instance, field);
 
-						return new EmbedBuilder()
-								.setDescription("## " + info.name() + "\n")
-								.setColor(bot.getColor(s.event.getGuild()))
-								.appendDescription(info.description())
-								.appendDescription("\n### Aktuelle Einträge\n")
-								.appendDescription(value.stream().map(e -> "- " + info.type().toString(e)).collect(Collectors.joining("\n")))
-								.build();
-					} catch (IllegalAccessException e) {
-						throw new RuntimeException(e);
-					}
+					return new EmbedBuilder()
+							.setDescription("## " + info.name() + "\n")
+							.setColor(bot.getColor(s.event.getGuild()))
+							.appendDescription(info.description())
+							.appendDescription("\n### Aktuelle Einträge\n")
+							.appendDescription(value.isEmpty() ? "*Keine Einträge*" : value.stream().map(e -> "- " + info.type().toString(e)).collect(Collectors.joining("\n")))
+							.build();
 				}),
 				ComponentRow.ofMany(components)
 		);
