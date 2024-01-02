@@ -91,6 +91,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Getter
 public class SlimeBot extends ListenerAdapter {
+	public final static ZoneOffset timezone = ZoneOffset.ofHours(1);
+
 	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
 
 	private final Config config;
@@ -113,7 +115,7 @@ public class SlimeBot extends ListenerAdapter {
 
 	private final WrappedDataTable wrappedData;
 
-	private final BirthdayTable birthdayTable;
+	private final BirthdayTable birthdays;
 
 	private final GitHubAPI github;
 	private final Spotify spotify;
@@ -149,7 +151,7 @@ public class SlimeBot extends ListenerAdapter {
 
 			wrappedData = (WrappedDataTable) database.getTable(WrappedDataTable.class, WrappedData.class, () -> new WrappedData(this), "wrapped_data").createTable();
 
-			birthdayTable = (BirthdayTable) database.getTable(BirthdayTable.class, Birthday.class, () -> new Birthday(this), "birthdays").createTable();
+			birthdays = (BirthdayTable) database.getTable(BirthdayTable.class, Birthday.class, () -> new Birthday(this), "birthdays").createTable();
 		} else {
 			logger.warn("Database credentials missing! Some features will be disabled!");
 
@@ -162,7 +164,7 @@ public class SlimeBot extends ListenerAdapter {
 			cardProfiles = null;
 			cardDecorations = null;
 			wrappedData = null;
-			birthdayTable = null;
+			birthdays = null;
 		}
 
 		//Initialize GitHub API
