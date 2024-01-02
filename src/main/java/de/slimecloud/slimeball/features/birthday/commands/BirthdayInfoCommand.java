@@ -15,7 +15,7 @@ public class BirthdayInfoCommand {
 	public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
 	                           @Option(name = "target", description = "Der Nutzer, dessen Geburtstag angezeigt werden soll", required = false) Member target
 	) {
-		event.deferReply().queue();
+		event.deferReply().setEphemeral(true).queue();
 
 		Member member = target == null ? event.getMember() : target;
 
