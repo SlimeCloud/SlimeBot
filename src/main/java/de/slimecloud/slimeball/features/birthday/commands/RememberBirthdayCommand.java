@@ -5,8 +5,6 @@ import de.mineking.discordutils.commands.ApplicationCommandMethod;
 import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.option.Option;
 import de.slimecloud.slimeball.main.SlimeBot;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +24,7 @@ public class RememberBirthdayCommand {
 
 			String date = year==null ? String.format("`%s`", dateTime.format(DateTimeFormatter.ofPattern("dd.MM"))) : TimeFormat.DATE_SHORT.format(dateTime);
 
-			event.getHook().editOriginal(String.format("Dein geburtstag wurde auf den %s gesetzt", date)).queue();
+			event.getHook().editOriginal(String.format(":birthday: Dein Geburtstag wurde auf den %s gesetzt", date)).queue();
 		} catch (DateTimeException e) {
 			event.getHook().editOriginal(":x: " + e.getMessage()).queue();
 		}
