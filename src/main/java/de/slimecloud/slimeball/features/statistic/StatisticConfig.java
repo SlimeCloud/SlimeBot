@@ -11,6 +11,8 @@ import java.util.Map;
 
 @Getter
 public class StatisticConfig extends ConfigCategory {
+	//TODO new config system as soon as it is ready
+
 
 	@ConfigField(name = "MemberCount Kanal", command = "member_channel", description = "-", type = ConfigFieldType.VOICE_CHANNEL)
 	private Long memberCountChannel;
