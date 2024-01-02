@@ -61,10 +61,10 @@ public class MenuCommand {
 		menu = manager.createMenu(
 				"config",
 				MessageRenderer.embed(s -> new EmbedBuilder()
-						.setTitle("Konfiguration für **" + s.event.getGuild().getName() + "**")
+						.setDescription("## Konfiguration für **" + s.event.getGuild().getName() + "**\n")
 						.setColor(bot.getColor(s.event.getGuild()))
 						.setThumbnail(s.event.getGuild().getIconUrl())
-						.setDescription("Verwende die Buttons unter dieser Nachricht, um einzelne Kategorien zu konfigurieren\n")
+						.appendDescription("Verwende die Buttons unter dieser Nachricht, um einzelne Kategorien zu konfigurieren\n")
 						.appendDescription("Bevor die Konfiguration hier angepasst werden kann, muss eine Kategorie mit `/config <category> enable` aktiviert werden")
 						.build()
 				),
@@ -92,10 +92,10 @@ public class MenuCommand {
 		return manager.createMenu(
 				"config." + category.command(),
 				MessageRenderer.embed(s -> new EmbedBuilder()
-						.setTitle(category.name())
+						.setDescription("## " + category.name() + "\n")
 						.setColor(bot.getColor(s.event.getGuild()))
-						.setDescription(category.description())
-						.appendDescription("\n## Aktuelle Konfiguration\n")
+						.appendDescription(category.description())
+						.appendDescription("\n### Aktuelle Konfiguration\n")
 						.appendDescription("```json\n" + Main.formattedJson.toJson(instance.apply(bot.loadGuild(s.event.getGuild()))) + "```")
 						.build()
 				),
@@ -146,10 +146,10 @@ public class MenuCommand {
 						Object value = field.get(instance.apply(bot.loadGuild(s.event.getGuild())));
 
 						return new EmbedBuilder()
-								.setTitle(category.name() + " → " + info.name())
+								.setDescription("## " + category.name() + " → " + info.name() + "\n")
 								.setColor(bot.getColor(s.event.getGuild()))
-								.setDescription(info.description())
-								.appendDescription("\n## Aktueller Wert\n")
+								.appendDescription(info.description())
+								.appendDescription("\n### Aktueller Wert\n")
 								.appendDescription(value == null ? "*nicht gesetzt*" : info.type().toString(value))
 								.build();
 					} catch (IllegalAccessException e) {
@@ -198,10 +198,10 @@ public class MenuCommand {
 						Collection<?> value = (Collection<?>) field.get(instance.apply(bot.loadGuild(s.event.getGuild())));
 
 						return new EmbedBuilder()
-								.setTitle(info.name())
+								.setDescription("## " + info.name() + "\n")
 								.setColor(bot.getColor(s.event.getGuild()))
-								.setDescription(info.description())
-								.appendDescription("\n## Aktuelle Einträge\n")
+								.appendDescription(info.description())
+								.appendDescription("\n### Aktuelle Einträge\n")
 								.appendDescription(value.stream().map(e -> "- " + info.type().toString(e)).collect(Collectors.joining("\n")))
 								.build();
 					} catch (IllegalAccessException e) {
