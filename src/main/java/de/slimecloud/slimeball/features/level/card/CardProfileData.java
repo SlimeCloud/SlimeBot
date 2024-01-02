@@ -173,8 +173,8 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 			else {
 				ConfigFieldType type = field.getAnnotation(KeyType.class).value();
 
-				if (!type.getCheck().test(field.getType(), value)) throw new ValidationException(null);
-				field.set(this, type.getParse().apply(field.getType(), value));
+				if (!type.validate(field.getType(), value)) throw new ValidationException(null);
+				field.set(this, type.parse(field.getType(), value));
 			}
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			logger.error("Error updating '{}'", name, e);
@@ -191,7 +191,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 
 			Object value = field.get(this);
 
-			if (field.isAnnotationPresent(KeyType.class)) return field.getAnnotation(KeyType.class).value().getString().apply(value);
+			if (field.isAnnotationPresent(KeyType.class)) return field.getAnnotation(KeyType.class).value().toString(value);
 			else return Objects.toString(value);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new RuntimeException(e);
