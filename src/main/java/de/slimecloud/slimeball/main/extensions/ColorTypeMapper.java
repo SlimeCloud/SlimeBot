@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class ColorTypeMapper implements TypeMapper<Integer, Color> {
 	@Override
 	public boolean accepts(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f) {
-		return type.isAssignableFrom(Color.class);
+		return Color.class.isAssignableFrom(type);
 	}
 
 	@NotNull
@@ -26,14 +26,14 @@ public class ColorTypeMapper implements TypeMapper<Integer, Color> {
 
 	@NotNull
 	@Override
-	public Argument createArgument(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable Color value) {
-		return (pos, stmt, ctx) -> stmt.setObject(pos, value == null ? null : value.getRGB());
+	public Argument createArgument(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable Integer value) {
+		return (pos, stmt, ctx) -> stmt.setObject(pos, value);
 	}
 
 	@NotNull
 	@Override
-	public String string(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable Color value) {
-		return value == null ? "null" : String.valueOf(value.getRGB());
+	public Integer string(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable Color value) {
+		return value == null ? null : value.getRGB();
 	}
 
 	@Nullable

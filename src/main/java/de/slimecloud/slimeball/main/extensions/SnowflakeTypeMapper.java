@@ -34,11 +34,11 @@ public class SnowflakeTypeMapper implements TypeMapper<Long, ISnowflake> {
 
 	@NotNull
 	@Override
-	public Argument createArgument(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable ISnowflake value) {
+	public Argument createArgument(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable Long value) {
 		return new Argument() {
 			@Override
 			public void apply(int position, PreparedStatement statement, StatementContext ctx) throws SQLException {
-				statement.setLong(position, value == null ? null : value.getIdLong());
+				statement.setLong(position, value);
 			}
 
 			@Override
@@ -48,10 +48,10 @@ public class SnowflakeTypeMapper implements TypeMapper<Long, ISnowflake> {
 		};
 	}
 
-	@NotNull
+	@Nullable
 	@Override
-	public String string(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable ISnowflake value) {
-		return value == null ? "null" : value.getId();
+	public Long string(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable ISnowflake value) {
+		return value == null ? null : value.getIdLong();
 	}
 
 	@Nullable
