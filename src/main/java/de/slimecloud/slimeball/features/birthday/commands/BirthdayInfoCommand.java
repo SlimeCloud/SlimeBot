@@ -6,19 +6,19 @@ import de.mineking.discordutils.commands.option.Option;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 
 @ApplicationCommand(name = "info", description = "zeigt den Geburtstag eines Mitglieds an", defer = true)
 public class BirthdayInfoCommand {
 	@ApplicationCommandMethod
+	@SuppressWarnings("ConstantConditions")
 	public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
 	                           @Option(name = "target", description = "Der Nutzer, dessen Geburtstag angezeigt werden soll", required = false) Member target
 	) {
 		Member member = target == null ? event.getMember() : target;
 
 		bot.getBirthdays().get(member).ifPresentOrElse(
-				birthday -> event.getHook().editOriginal(":birthday: " + member.getAsMention() + " hat " + TimeFormat.RELATIVE.format(birthday.getNextBirthday()) + " Geburtstag!").queue(),
+				birthday -> event.getHook().editOriginal(":birthday: " + member.getAsMention() + " hat " + birthday.getFormat() + " Geburtstag!").queue(),
 				() -> event.getHook().editOriginal(":x: Ich kenne " + member.getAsMention() + "'s Geburtstag noch nicht.").queue()
 		);
 	}

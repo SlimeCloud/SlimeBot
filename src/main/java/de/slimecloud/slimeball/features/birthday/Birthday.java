@@ -47,14 +47,23 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 	@NotNull
 	@Override
 	public String build(int index, @NotNull ListContext<? extends ListEntry> context) {
-		return String.format("%s %s", TimeFormat.RELATIVE.format(getNextBirthday()), user.getAsMention());
+		return String.format("%s %s", getFormat(), user.getAsMention());
 	}
 
 	@NotNull
 	public ZonedDateTime getNextBirthday() {
 		ZonedDateTime now = ZonedDateTime.now(SlimeBot.timezone);
 		ZonedDateTime date = time.atZone(SlimeBot.timezone).withYear(now.getYear());
+		ZonedDateTime end = date.withHour(23).withMinute(59).withSecond(59);
 
-		return date.withYear(now.isAfter(date) ? now.getYear() + 1 : now.getYear());
+		return date.withYear(now.isAfter(end) ? now.getYear() + 1 : now.getYear());
+	}
+
+	@NotNull
+	public String getFormat() {
+		ZonedDateTime zdt = getNextBirthday();
+		ZonedDateTime now = ZonedDateTime.now();
+		boolean today = zdt.getYear()==now.getYear() && zdt.getMonth()==now.getMonth() && zdt.getDayOfMonth()==now.getDayOfMonth();
+		return today ? "`Heute`" : TimeFormat.RELATIVE.format(zdt);
 	}
 }
