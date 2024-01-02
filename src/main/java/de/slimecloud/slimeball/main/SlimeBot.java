@@ -12,6 +12,9 @@ import de.slimecloud.slimeball.config.commands.ConfigCommand;
 import de.slimecloud.slimeball.features.alerts.HolidayAlert;
 import de.slimecloud.slimeball.features.alerts.Spotify;
 import de.slimecloud.slimeball.features.alerts.SpotifyAlert;
+import de.slimecloud.slimeball.features.birthday.Birthday;
+import de.slimecloud.slimeball.features.birthday.commands.BirthdayCommand;
+import de.slimecloud.slimeball.features.birthday.BirthdayTable;
 import de.slimecloud.slimeball.features.fdmds.FdmdsCommand;
 import de.slimecloud.slimeball.features.general.BonkCommand;
 import de.slimecloud.slimeball.features.general.BulkAddRoleCommand;
@@ -110,6 +113,8 @@ public class SlimeBot extends ListenerAdapter {
 
 	private final WrappedDataTable wrappedData;
 
+	private final BirthdayTable birthdayTable;
+
 	private final GitHubAPI github;
 	private final Spotify spotify;
 
@@ -143,6 +148,8 @@ public class SlimeBot extends ListenerAdapter {
 			cardDecorations = (CardDecorationTable) database.getTable(CardDecorationTable.class, UserCardDecoration.class, () -> new UserCardDecoration(this), "guild_card_decorations").createTable();
 
 			wrappedData = (WrappedDataTable) database.getTable(WrappedDataTable.class, WrappedData.class, () -> new WrappedData(this), "wrapped_data").createTable();
+
+			birthdayTable = (BirthdayTable) database.getTable(BirthdayTable.class, Birthday.class, () -> new Birthday(this), "birthdays").createTable();
 		} else {
 			logger.warn("Database credentials missing! Some features will be disabled!");
 
@@ -155,6 +162,7 @@ public class SlimeBot extends ListenerAdapter {
 			cardProfiles = null;
 			cardDecorations = null;
 			wrappedData = null;
+			birthdayTable = null;
 		}
 
 		//Initialize GitHub API
@@ -247,6 +255,9 @@ public class SlimeBot extends ListenerAdapter {
 						manager.registerCommand(LeaderboardCommand.class);
 						manager.registerCommand(LevelCommand.class);
 					} else logger.warn("Level system disabled due to missing database or level config");
+
+					//Register birthday commands
+					manager.registerCommand(BirthdayCommand.class);
 
 					/*
 					Automatically update comDiscordWrmands
