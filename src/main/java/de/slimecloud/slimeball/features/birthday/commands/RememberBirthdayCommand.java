@@ -14,13 +14,12 @@ import org.jetbrains.annotations.NotNull;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
-@ApplicationCommand(name = "remember-birthday", description = "Speichere dein Geburtstag", scope = Scope.GUILD_GLOBAL)
+@ApplicationCommand(name = "remember-birthday", description = "Speichere dein Geburtstag", scope = Scope.GUILD_GLOBAL, defer = true)
 public class RememberBirthdayCommand {
 
 	@ApplicationCommandMethod
 	@SuppressWarnings("ConstantConditions")
 	public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event, @Option(name = "day", description = "der tag an dem du geburtstag hast", minValue = 1, maxValue = 31) Integer day, @Option(name = "month", description = "der monat in dem du geburtstag hast") Month month, @Option(name = "year", description = "das jahr in dem du geburtstag hast", minValue = 1900, maxValue = 2024, required = false) Integer year) {
-		event.deferReply(true).queue();
 		try {
 			ZonedDateTime dateTime = LocalDateTime.of(year==null ? 0 : year, month, day, 0, 0).atZone(ZoneId.systemDefault());
 			bot.getBirthdayTable().set(event.getMember(), dateTime.toInstant());
@@ -34,7 +33,7 @@ public class RememberBirthdayCommand {
 
 			event.getHook().editOriginalEmbeds(embed).queue();
 		} catch (DateTimeException e) {
-			event.getHook().editOriginal(e.getMessage()).queue();
+			event.getHook().editOriginal(":x:" + e.getMessage()).queue();
 		}
 	}
 
