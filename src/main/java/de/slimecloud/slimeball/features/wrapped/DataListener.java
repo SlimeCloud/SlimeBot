@@ -34,7 +34,7 @@ public class DataListener extends ListenerAdapter {
 
 	public DataListener(@NotNull SlimeBot bot) {
 		this.bot = bot;
-		JEvent.getManager().registerListener(this);
+		JEvent.getDefaultManager().registerListener(this);
 	}
 
 	@Override

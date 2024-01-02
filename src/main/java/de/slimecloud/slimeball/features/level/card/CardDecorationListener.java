@@ -13,7 +13,7 @@ public class CardDecorationListener extends ListenerAdapter {
 
 	public CardDecorationListener(@NotNull SlimeBot bot) {
 		this.bot = bot;
-		JEvent.getManager().registerListener(this);
+		JEvent.getDefaultManager().registerListener(this);
 	}
 
 	@Override

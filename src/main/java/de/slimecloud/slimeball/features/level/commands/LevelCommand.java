@@ -22,7 +22,7 @@ public class LevelCommand {
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull Command<?> command) {
 		bot.getJda().addEventListener(new LevelListener(bot));
-		JEvent.getManager().registerListener(new LevelUpListener(bot));
+		JEvent.getDefaultManager().registerListener(new LevelUpListener(bot));
 
 		command.addSubcommand(AddCommand.class);
 		command.addSubcommand(RemoveCommand.class);
