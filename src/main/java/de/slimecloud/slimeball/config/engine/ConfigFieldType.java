@@ -339,7 +339,7 @@ public enum ConfigFieldType {
 		return new MenuComponent<>(
 				manager.createModal(menu + "." + name,
 						s -> display,
-						List.of(new TextComponent("value", "", TextInputStyle.SHORT)),
+						List.of(new TextComponent("value", "Neuer Wert", TextInputStyle.SHORT)),
 						(s, m) -> {
 							if (validate(type, m.getString("value"))) {
 								handler.accept(s, m.getString("value"));
