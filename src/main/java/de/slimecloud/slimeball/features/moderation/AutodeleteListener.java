@@ -22,7 +22,7 @@ public class AutodeleteListener extends ListenerAdapter {
 
 	public AutodeleteListener(@NotNull SlimeBot bot) {
 		this.bot = bot;
-		JEvent.getManager().registerListener(this);
+		JEvent.getDefaultManager().registerListener(this);
 	}
 
 	@Override

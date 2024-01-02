@@ -41,7 +41,7 @@ public class ReportCommand {
 
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull Command<ICommandContext> command, @NotNull ListManager<ICommandContext> list) {
-		JEvent.getManager().registerListener(new ReportListener(bot));
+		JEvent.getDefaultManager().registerListener(new ReportListener(bot));
 
 		//Add subcommands
 		command.addSubcommand(BlockCommand.class);
