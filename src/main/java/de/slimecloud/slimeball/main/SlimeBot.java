@@ -50,7 +50,7 @@ import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
 import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
 import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
 import de.slimecloud.slimeball.main.extensions.IDOptionParser;
-import de.slimecloud.slimeball.main.extensions.UserSnowflakeTypeMapper;
+import de.slimecloud.slimeball.main.extensions.SnowflakeTypeMapper;
 import de.slimecloud.slimeball.util.ColorUtil;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
@@ -128,7 +128,7 @@ public class SlimeBot extends ListenerAdapter {
 			database.getDriver().installPlugin(new PostgresPlugin());
 
 			database.putData("bot", this);
-			database.addMapper(new UserSnowflakeTypeMapper());
+			database.addMapper(new SnowflakeTypeMapper());
 			database.addMapper(new ColorTypeMapper());
 
 			//Initialize tables

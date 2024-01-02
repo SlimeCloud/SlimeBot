@@ -44,19 +44,19 @@ public interface LevelTable extends Table<Level> {
 	}
 
 	@NotNull
-	default Level getLevel(long guild, UserSnowflake user) {
+	default Level getLevel(@NotNull Guild guild, @NotNull UserSnowflake user) {
 		return selectOne(Where.allOf(
 				Where.equals("user", user.getIdLong()),
-				Where.equals("guild", guild)
+				Where.equals("guild", guild.getIdLong())
 		)).orElseGet(() -> Level.empty(getManager().getData("bot"), guild, user));
 	}
 
 	@NotNull
 	default Level getLevel(@NotNull Member user) {
-		return getLevel(user.getGuild().getIdLong(), user);
+		return getLevel(user.getGuild(), user);
 	}
 
-	default void reset(long guild, @NotNull UserSnowflake user) {
+	default void reset(@NotNull Guild guild, @NotNull UserSnowflake user) {
 		getLevel(guild, user).withXp(0).withLevel(0).update();
 	}
 

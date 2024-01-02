@@ -8,6 +8,7 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +21,7 @@ public class WrappedData implements DataClass<WrappedData> {
 	private final SlimeBot bot;
 
 	@Column(key = true)
-	private final long guild;
+	private final Guild guild;
 	@Column(key = true)
 	private final UserSnowflake user;
 
@@ -58,11 +59,11 @@ public class WrappedData implements DataClass<WrappedData> {
 	private Map<String, Double> xpPerDay = new HashMap<>();
 
 	public WrappedData(@NotNull SlimeBot bot) {
-		this(bot, 0, null);
+		this(bot, null, null);
 	}
 
 	@NotNull
-	public static WrappedData empty(@NotNull SlimeBot bot, long guild, @NotNull UserSnowflake user) {
+	public static WrappedData empty(@NotNull SlimeBot bot, @NotNull Guild guild, @NotNull UserSnowflake user) {
 		return new WrappedData(bot, guild, user);
 	}
 

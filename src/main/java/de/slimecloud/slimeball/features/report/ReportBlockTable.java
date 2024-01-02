@@ -8,6 +8,7 @@ import de.mineking.javautils.database.Table;
 import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,7 @@ public interface ReportBlockTable extends Table<ReportBlock>, Listable<ReportBlo
 	default boolean blockUser(@NotNull UserSnowflake team, @NotNull Member member, @NotNull String reason) {
 		//Call event and insert save if not canceled
 		if (!new UserReportBlockEvent(team, member, reason).callEvent()) {
-			insert(new ReportBlock(member, member.getGuild().getIdLong(), reason));
+			insert(new ReportBlock(member, member.getGuild(), reason));
 			return true;
 		} else return false;
 	}
@@ -38,15 +39,17 @@ public interface ReportBlockTable extends Table<ReportBlock>, Listable<ReportBlo
 		));
 	}
 
-	default Optional<ReportBlock> isBlocked(@NotNull UserSnowflake user, long guild) {
+	@NotNull
+	default Optional<ReportBlock> isBlocked(@NotNull Guild guild, @NotNull UserSnowflake user) {
 		return selectOne(Where.allOf(
 				Where.equals("user", user.getIdLong()),
-				Where.equals("guild", guild)
+				Where.equals("guild", guild.getIdLong())
 		));
 	}
 
+	@NotNull
 	default Optional<ReportBlock> isBlocked(@NotNull Member member) {
-		return isBlocked(member, member.getGuild().getIdLong());
+		return isBlocked(member.getGuild(), member);
 	}
 
 	/*
