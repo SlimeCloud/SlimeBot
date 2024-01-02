@@ -13,19 +13,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.function.Function;
 
 
 public class MemberCount extends ListenerAdapter {
 
 	private final SlimeBot bot;
-	private final Function<StatisticConfig, Long> channel;
-	private final Function<StatisticConfig, String> format;
 
 	public MemberCount(SlimeBot bot) {
 		this.bot = bot;
-		this.channel = StatisticConfig::getMemberCountChannel;
-		this.format = StatisticConfig::getMemberCountFormat;
 	}
 
 	@Nullable
@@ -37,7 +32,7 @@ public class MemberCount extends ListenerAdapter {
 	private VoiceChannel getChannel(long guild) {
 		StatisticConfig config = getConfig(guild);
 		if (config==null) return null;
-		return bot.getJda().getVoiceChannelById(channel.apply(config));
+		return bot.getJda().getVoiceChannelById(config.getMemberCountChannel());
 	}
 
 	@NotNull
@@ -45,7 +40,7 @@ public class MemberCount extends ListenerAdapter {
 	private String getFormat(long guild, @NotNull Map<String, Object> values) {
 		StatisticConfig config = getConfig(guild);
 		if (config==null) return null;
-		AtomicString format = new AtomicString(this.format.apply(config));
+		AtomicString format = new AtomicString(config.getMemberCountFormat());
 		if (format.isEmpty()) return values.values().toString();
 		values.forEach((k, v) -> format.set(format.get().replace("%" + k + "%", String.valueOf(v))));
 		return format.get();
