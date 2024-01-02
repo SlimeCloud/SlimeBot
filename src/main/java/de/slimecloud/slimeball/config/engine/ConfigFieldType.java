@@ -4,11 +4,13 @@ import de.mineking.discordutils.ui.UIManager;
 import de.mineking.discordutils.ui.components.select.EntitySelectComponent;
 import de.mineking.discordutils.ui.components.select.StringSelectComponent;
 import de.mineking.discordutils.ui.components.types.Component;
-import de.mineking.discordutils.ui.state.DataState;
+import de.mineking.discordutils.ui.state.UpdateState;
+import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
 import de.slimecloud.slimeball.util.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -30,16 +32,28 @@ public enum ConfigFieldType {
 	ALL_CHANNEL(OptionMapping::getAsLong) {
 		@NotNull
 		@Override
+		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
+			return SelectOption.of(bot.getJda().getChannelById(Channel.class, (Long) value).getName(), value.toString());
+		}
+
+		@NotNull
+		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
 			return new OptionData(OptionType.CHANNEL, info.command(), info.description());
 		}
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.CHANNEL)
 					.setPlaceholder(display)
 					.appendHandler((s, v) -> handler.accept(s, v.getChannels().get(0).getIdLong()));
+		}
+
+		@NotNull
+		@Override
+		public Object parse(@NotNull Class<?> type, @NotNull String value) {
+			return Long.parseLong(value);
 		}
 
 		@NotNull
@@ -52,6 +66,12 @@ public enum ConfigFieldType {
 	MESSAGE_CHANNEL(OptionMapping::getAsLong) {
 		@NotNull
 		@Override
+		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
+			return SelectOption.of(bot.getJda().getChannelById(Channel.class, (Long) value).getName(), value.toString());
+		}
+
+		@NotNull
+		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
 			return new OptionData(OptionType.CHANNEL, info.command(), info.description())
 					.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS, ChannelType.FORUM);
@@ -59,11 +79,17 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.CHANNEL)
 					.setPlaceholder(display)
 					.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS, ChannelType.FORUM)
 					.appendHandler((s, v) -> handler.accept(s, v.getChannels().get(0).getIdLong()));
+		}
+
+		@NotNull
+		@Override
+		public Object parse(@NotNull Class<?> type, @NotNull String value) {
+			return Long.parseLong(value);
 		}
 
 		@NotNull
@@ -76,6 +102,12 @@ public enum ConfigFieldType {
 	VOICE_CHANNEL(OptionMapping::getAsLong) {
 		@NotNull
 		@Override
+		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
+			return SelectOption.of(bot.getJda().getChannelById(Channel.class, (Long) value).getName(), value.toString());
+		}
+
+		@NotNull
+		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
 			return new OptionData(OptionType.CHANNEL, info.command(), info.description())
 					.setChannelTypes(ChannelType.VOICE, ChannelType.STAGE);
@@ -83,11 +115,17 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.CHANNEL)
 					.setPlaceholder(display)
 					.setChannelTypes(ChannelType.VOICE, ChannelType.STAGE)
 					.appendHandler((s, v) -> handler.accept(s, v.getChannels().get(0).getIdLong()));
+		}
+
+		@NotNull
+		@Override
+		public Object parse(@NotNull Class<?> type, @NotNull String value) {
+			return Long.parseLong(value);
 		}
 
 		@NotNull
@@ -100,16 +138,28 @@ public enum ConfigFieldType {
 	ROLE(OptionMapping::getAsLong) {
 		@NotNull
 		@Override
+		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
+			return SelectOption.of(bot.getJda().getRoleById((Long) value).getName(), value.toString());
+		}
+
+		@NotNull
+		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
 			return new OptionData(OptionType.ROLE, info.command(), info.description());
 		}
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.ROLE)
 					.setPlaceholder(display)
 					.appendHandler((s, v) -> handler.accept(s, v.getRoles().get(0).getIdLong()));
+		}
+
+		@NotNull
+		@Override
+		public Object parse(@NotNull Class<?> type, @NotNull String value) {
+			return Long.parseLong(value);
 		}
 
 		@NotNull
@@ -124,6 +174,12 @@ public enum ConfigFieldType {
 	ENUM(StringUtil::extractEnum) {
 		@NotNull
 		@Override
+		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
+			return SelectOption.of(value.toString(), ((Enum<?>) value).name());
+		}
+
+		@NotNull
+		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
 			return new OptionData(OptionType.STRING, info.command(), info.description())
 					.addChoices(Arrays.stream(type.getEnumConstants())
@@ -134,11 +190,24 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler) {
 			return new StringSelectComponent(name, Arrays.stream(type.getEnumConstants())
 					.map(e -> SelectOption.of(e.toString(), ((Enum<?>) e).name()))
 					.toList()
 			).setPlaceholder(display).appendHandler((s, v) -> handler.accept(s, v.get(0).getValue()));
+		}
+
+		@Override
+		public boolean validate(@NotNull Class<?> type, @NotNull String value) {
+			return Arrays.stream(type.getEnumConstants()).anyMatch(e -> ((Enum<?>) e).name().equals(value));
+		}
+
+		@NotNull
+		@Override
+		public Object parse(@NotNull Class<?> type, @NotNull String value) {
+			return Arrays.stream(type.getEnumConstants())
+					.filter(e -> ((Enum<?>) e).name().equals(value))
+					.findFirst().orElseThrow();
 		}
 	},
 
@@ -153,7 +222,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler) {
 			return null;
 		}
 
@@ -179,7 +248,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler) {
 			return null;
 		}
 
@@ -205,8 +274,14 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler) {
 			return null;
+		}
+
+		@NotNull
+		@Override
+		public Object parse(@NotNull Class<?> type, @NotNull String value) {
+			return value;
 		}
 	},
 
@@ -219,8 +294,19 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler) {
 			return null;
+		}
+
+		@Override
+		public boolean validate(@NotNull Class<?> type, @NotNull String value) {
+			return StringUtil.isInteger(value);
+		}
+
+		@NotNull
+		@Override
+		public Object parse(@NotNull Class<?> type, @NotNull String value) {
+			return Integer.parseInt(value);
 		}
 	},
 
@@ -233,8 +319,19 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler) {
 			return null;
+		}
+
+		@Override
+		public boolean validate(@NotNull Class<?> type, @NotNull String value) {
+			return StringUtil.isNumeric(value);
+		}
+
+		@NotNull
+		@Override
+		public Object parse(@NotNull Class<?> type, @NotNull String value) {
+			return Double.parseDouble(value);
 		}
 	};;
 
@@ -243,17 +340,20 @@ public enum ConfigFieldType {
 	@NotNull
 	public abstract OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info);
 
+	@NotNull
+	public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
+		return SelectOption.of(value.toString(), value.toString());
+	}
+
+	@NotNull
+	public abstract Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<UpdateState, Object> handler);
+
 	public boolean validate(@NotNull Class<?> type, @NotNull String value) {
-		throw new RuntimeException();
+		return true;
 	}
 
 	@NotNull
-	public Object parse(@NotNull Class<?> type, @NotNull String value) {
-		throw new RuntimeException();
-	}
-
-	@NotNull
-	public abstract Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler);
+	public abstract Object parse(@NotNull Class<?> type, @NotNull String value);
 
 	@NotNull
 	public String toString(@NotNull Object value) {

@@ -20,13 +20,13 @@ import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @ApplicationCommand(name = "menu", description = "Öffnet ein Menü für die Konfiguration")
 public class MenuCommand {
@@ -119,6 +119,7 @@ public class MenuCommand {
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
 			try {
 				field.set(instance.apply(s), null);
+				s.update();
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
@@ -127,6 +128,7 @@ public class MenuCommand {
 		Component<?> component = info.type().createComponent(manager, field.getType(), "config." + category.command() + "." + info.command(), "value", "Wert festlegen", (s, v) -> {
 			try {
 				field.set(instance.apply(s), v);
+				s.update();
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
@@ -146,7 +148,7 @@ public class MenuCommand {
 								.setColor(bot.getColor(s.event.getGuild()))
 								.setDescription(info.description())
 								.appendDescription("\n## Aktueller Wert\n")
-								.appendDescription(info.type().toString(value))
+								.appendDescription(value == null ? "*nicht gesetzt*" : info.type().toString(value))
 								.build();
 					} catch (IllegalAccessException e) {
 						throw new RuntimeException(e);
@@ -167,6 +169,7 @@ public class MenuCommand {
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
 			try {
 				field.set(instance.apply(s), new ArrayList<>());
+				s.update();
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
@@ -175,16 +178,22 @@ public class MenuCommand {
 		Component<?> add = info.type().createComponent(manager, field.getType(), "config." + category.command() + "." + info.command(), "add", "Wert hinzufügen", (s, v) -> {
 			try {
 				((Collection) field.get(instance.apply(s))).add(v);
+				s.update();
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
 		});
 
 		Component<?> remove = new StringSelectComponent("remove", s -> ((Collection<?>) instance.apply(s)).stream()
-				.map(e -> SelectOption.of(null, null)) //TODO
+				.map(e -> info.type().createSelectOption(bot, e))
 				.toList()
 		).setPlaceholder("Wert entfernen").appendHandler((s, v) -> {
-
+			try {
+				((Collection) field.get(instance.apply(s))).remove(v);
+				s.update();
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
 		});
 
 		if (add instanceof EntitySelectComponent || add instanceof StringSelectComponent) {
@@ -197,11 +206,21 @@ public class MenuCommand {
 
 		return manager.createMenu(
 				"config." + category.command() + "." + info.command(),
-				MessageRenderer.embed(s -> new EmbedBuilder()
-						.setTitle(info.name())
-						.setColor(bot.getColor(s.event.getGuild()))
-						.build()
-				),
+				MessageRenderer.embed(s -> {
+					try {
+						Collection<?> value = (Collection<?>) field.get(instance.apply(s));
+
+						return new EmbedBuilder()
+								.setTitle(info.name())
+								.setColor(bot.getColor(s.event.getGuild()))
+								.setDescription(info.description())
+								.appendDescription("\n## Aktuelle Einträge\n")
+								.appendDescription(value.stream().map(e -> "- " + info.type().toString(e)).collect(Collectors.joining("\n")))
+								.build();
+					} catch (IllegalAccessException e) {
+						throw new RuntimeException(e);
+					}
+				}),
 				ComponentRow.ofMany(components)
 		);
 	}
