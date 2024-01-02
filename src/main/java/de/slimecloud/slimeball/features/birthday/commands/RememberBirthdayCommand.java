@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
-@ApplicationCommand(name = "remember-birthday", description = "Speichere dein Geburtstag", scope = Scope.GUILD_GLOBAL, defer = true)
+@ApplicationCommand(name = "remember", description = "Speichere dein Geburtstag", scope = Scope.GUILD_GLOBAL, defer = true)
 public class RememberBirthdayCommand {
 
 	@ApplicationCommandMethod
