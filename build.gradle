@@ -24,7 +24,7 @@ repositories {
 dependencies {
     implementation 'net.dv8tion:JDA:5.0.0-beta.18'
 
-    implementation 'de.mineking:DiscordUtils:e6f94e0'
+    implementation 'de.mineking:DiscordUtils:3.6.6'
     implementation 'de.mineking:JavaUtils:1.2.0'
     implementation 'de.cyklon:JEvent:1.0.2'
 
