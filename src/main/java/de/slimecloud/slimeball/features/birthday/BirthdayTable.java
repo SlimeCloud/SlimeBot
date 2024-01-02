@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
-
 	default void remove(@NotNull Member member) {
 		remove(member.getGuild().getIdLong(), member);
 	}

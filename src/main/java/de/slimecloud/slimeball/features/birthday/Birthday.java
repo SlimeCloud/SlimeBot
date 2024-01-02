@@ -71,7 +71,7 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 		zdt = LocalDateTime.of(now.getYear(), zdt.getMonth(), zdt.getDayOfMonth(), 0, 0).atZone(zone);
 
 		boolean passed = now.isAfter(zdt);
-		int nextBdYear = now.getYear()+(passed ? 1 : 0);
+		int nextBdYear = now.getYear() + (passed ? 1 : 0);
 		LocalDateTime ldt = LocalDateTime.of(nextBdYear, zdt.getMonth(), zdt.getDayOfMonth(), 0, 0);
 		return ldt.atZone(zone);
 	}
