@@ -10,8 +10,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @ApplicationCommand(name = "info", description = "zeigt dein Geburtstag, oder den des angegebenen Nutzers am")
@@ -25,16 +23,10 @@ public class BirthdayInfoCommand {
 
 		Birthday birthday = bot.getBirthdayTable().get(target).orElse(null);
 
-		if (birthday==null) {
-			event.getHook().editOriginal(String.format(":x: Ich kenne %S's Geburtstag noch nicht.", target.getAsMention())).queue();
-		} else {
-			ZonedDateTime zdt = birthday.getInstant().atZone(ZoneId.systemDefault());
-			ZonedDateTime now = ZonedDateTime.now();
-			boolean passed = now.isAfter(zdt);
-			int nextBdYear = now.getYear()+(passed ? 1 : 0);
-			LocalDateTime ldt = LocalDateTime.of(nextBdYear, zdt.getMonth(), zdt.getDayOfMonth(), 0, 0);
-
-			String format = TimeFormat.RELATIVE.format(ldt.atZone(ZoneId.systemDefault()));
+		if (birthday==null) event.getHook().editOriginal(String.format(":x: Ich kenne %s's Geburtstag noch nicht.", target.getAsMention())).queue();
+		else {
+			ZonedDateTime zdt = birthday.getNextBirthday();
+			String format = TimeFormat.RELATIVE.format(zdt);
 			event.getHook().editOriginal(String.format(":birthday: %s hat %s Geburtstag!", target.getAsMention(), format)).queue();
 		}
 
