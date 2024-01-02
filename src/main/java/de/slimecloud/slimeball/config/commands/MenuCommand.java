@@ -28,7 +28,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @ApplicationCommand(name = "menu", description = "Öffnet ein Menü für die Konfiguration")
@@ -107,8 +110,8 @@ public class MenuCommand {
 	private static MessageMenu createFieldMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<DataState<?>, Object> instance, CategoryInfo category, @NotNull Field field) {
 		ConfigField info = field.getAnnotation(ConfigField.class);
 
-		if(List.class.isAssignableFrom(field.getType())) return createListValueMenu(bot, manager, instance, category, info, field);
-		if(Map.class.isAssignableFrom(field.getType())) return createMapValueMenu(bot, manager, instance, category, info, field);
+		if (List.class.isAssignableFrom(field.getType())) return createListValueMenu(bot, manager, instance, category, info, field);
+		if (Map.class.isAssignableFrom(field.getType())) return createMapValueMenu(bot, manager, instance, category, info, field);
 		return createValueMenu(bot, manager, instance, category, info, field);
 	}
 
@@ -164,15 +167,16 @@ public class MenuCommand {
 				}
 				s.update();
 			}));
-			case ENUM -> components.add(0, new StringSelectComponent("value", Arrays.stream(field.getType().getEnumConstants()).map(x -> SelectOption.of(x.toString(), ((Enum<?>) x).name())).toList()).setPlaceholder("Wert festlegen").appendHandler((s, v) -> {
-				try {
-					field.set(instance, Arrays.stream(field.getType().getEnumConstants()).filter(x -> ((Enum<?>) x).name().equals(v.get(0).getValue())).findFirst().orElseThrow());
-					s.update();
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}
-				s.update();
-			}));
+			case ENUM ->
+					components.add(0, new StringSelectComponent("value", Arrays.stream(field.getType().getEnumConstants()).map(x -> SelectOption.of(x.toString(), ((Enum<?>) x).name())).toList()).setPlaceholder("Wert festlegen").appendHandler((s, v) -> {
+						try {
+							field.set(instance, Arrays.stream(field.getType().getEnumConstants()).filter(x -> ((Enum<?>) x).name().equals(v.get(0).getValue())).findFirst().orElseThrow());
+							s.update();
+						} catch (IllegalAccessException e) {
+							throw new RuntimeException(e);
+						}
+						s.update();
+					}));
 
 			default -> components.add(new ButtonComponent("value", ButtonColor.BLUE, "Wert festlegen").appendHandler(s -> {
 				s.sendReply(MessageCreateData.fromContent("..."));
@@ -182,11 +186,21 @@ public class MenuCommand {
 
 		return manager.createMenu(
 				"config." + category.command() + "." + info.command(),
-				MessageRenderer.embed(s -> new EmbedBuilder()
-						.setTitle(info.name())
-						.setColor(bot.getColor(s.event.getGuild()))
-						.build()
-				),
+				MessageRenderer.embed(s -> {
+					try {
+						Object value = field.get(instance.apply(s));
+
+						return new EmbedBuilder()
+								.setTitle(category.name() + " → " + info.name())
+								.setColor(bot.getColor(s.event.getGuild()))
+								.setDescription(info.description())
+								.appendDescription("\n## Aktueller Wert\n")
+								.appendDescription(info.type().getString().apply(value))
+								.build();
+					} catch (IllegalAccessException e) {
+						throw new RuntimeException(e);
+					}
+				}),
 				ComponentRow.ofMany(components)
 		);
 	}
@@ -217,16 +231,6 @@ public class MenuCommand {
 						.build()
 				)
 		);
-	}
-
-	@Nullable
-	private static Object getEmptyValue(@NotNull Field f) {
-		if (f.getType().isAssignableFrom(List.class)) return new ArrayList<>();
-		else if (f.getType().isAssignableFrom(Set.class)) return new HashSet<>();
-		else if (f.getType().isAssignableFrom(Map.class)) return new HashMap<>();
-		else if (f.getType().isAssignableFrom(LinkedHashMap.class)) return new LinkedHashMap<>();
-
-		return null;
 	}
 
 	@ApplicationCommandMethod
