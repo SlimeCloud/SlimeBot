@@ -63,7 +63,7 @@ public class EnableCommand extends Command<ICommandContext> {
 		//Load config
 		GuildConfig config = bot.loadGuild(context.getEvent().getGuild());
 
-		if (field.get(config) instanceof ConfigCategory c) c.disable();
+		if (field.get(config) instanceof ConfigCategory c) c.disable(context.getEvent().getGuild());
 
 		//Basic enable
 		if (options.isEmpty()) {
@@ -71,7 +71,7 @@ public class EnableCommand extends Command<ICommandContext> {
 			Object instance = field.getType().getConstructor().newInstance();
 			if (instance instanceof ConfigCategory c) {
 				c.bot = bot;
-				c.enable();
+				c.enable(context.getEvent().getGuild());
 			}
 
 			//Set
@@ -103,7 +103,7 @@ public class EnableCommand extends Command<ICommandContext> {
 			//Call init method
 			if (instance instanceof ConfigCategory c) {
 				c.bot = bot;
-				c.enable();
+				c.enable(context.getEvent().getGuild());
 			}
 		}
 

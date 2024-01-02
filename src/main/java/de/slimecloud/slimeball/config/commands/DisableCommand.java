@@ -31,7 +31,7 @@ public class DisableCommand extends Command<ICommandContext> {
 
 		//Get current to call disable method
 		Object current = field.get(config);
-		if (current instanceof ConfigCategory c) c.disable();
+		if (current instanceof ConfigCategory c) c.disable(context.getEvent().getGuild());
 
 		field.set(config, null);
 		config.save();

@@ -24,7 +24,7 @@ public class StaffConfig extends ConfigCategory {
 	private Long message;
 
 	@Override
-	public void enable() {
+	public void enable(@NotNull Guild guild) {
 		message = getChannel().map(channel -> channel
 				.sendMessage("*Noch nicht konfiguriert*")
 				.complete().getIdLong()
@@ -32,14 +32,14 @@ public class StaffConfig extends ConfigCategory {
 	}
 
 	@Override
-	public void disable() {
+	public void disable(@NotNull Guild guild) {
 		if (message == null) return;
 		getChannel().ifPresent(channel -> channel.deleteMessageById(message).queue());
 	}
 
 	@Override
-	public void update() {
-		if (message == null) enable();
+	public void update(@NotNull Guild guild) {
+		if (message == null) enable(guild);
 		getChannel().ifPresent(channel -> channel.editMessageById(message, buildMessage(channel.getGuild())).queue());
 	}
 

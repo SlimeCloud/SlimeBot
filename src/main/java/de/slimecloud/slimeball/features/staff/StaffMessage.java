@@ -29,6 +29,6 @@ public class StaffMessage extends ListenerAdapter {
 	}
 
 	public void update(@NotNull Guild guild) {
-		bot.loadGuild(guild).getStaff().ifPresent(StaffConfig::update);
+		bot.loadGuild(guild).getStaff().ifPresent(s -> s.update(guild));
 	}
 }
