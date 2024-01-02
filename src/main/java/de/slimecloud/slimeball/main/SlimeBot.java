@@ -50,10 +50,7 @@ import de.slimecloud.slimeball.features.staff.TeamMeeting;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
-import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
-import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
-import de.slimecloud.slimeball.main.extensions.IDOptionParser;
-import de.slimecloud.slimeball.main.extensions.SnowflakeTypeMapper;
+import de.slimecloud.slimeball.main.extensions.*;
 import de.slimecloud.slimeball.util.ColorUtil;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
@@ -135,6 +132,7 @@ public class SlimeBot extends ListenerAdapter {
 			database.putData("bot", this);
 			database.addMapper(new SnowflakeTypeMapper());
 			database.addMapper(new ColorTypeMapper());
+			database.addMapper(new LocalDateTimeTypeMapper());
 
 			//Initialize tables
 			reports = (ReportTable) database.getTable(ReportTable.class, Report.class, () -> new Report(this), "reports").createTable();
