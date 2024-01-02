@@ -17,7 +17,7 @@ public class AtomicString implements java.io.Serializable, Comparable<String>, C
 
 	@NotNull
 	public String getSafe() {
-		return value==null ? "" : value;
+		return value == null ? "" : value;
 	}
 
 	@Override

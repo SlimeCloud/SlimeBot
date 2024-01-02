@@ -16,10 +16,9 @@ import java.util.Map;
 
 
 public class MemberCount extends ListenerAdapter {
-
 	private final SlimeBot bot;
 
-	public MemberCount(SlimeBot bot) {
+	public MemberCount(@NotNull SlimeBot bot) {
 		this.bot = bot;
 	}
 
@@ -31,7 +30,7 @@ public class MemberCount extends ListenerAdapter {
 	@Nullable
 	private VoiceChannel getChannel(long guild) {
 		StatisticConfig config = getConfig(guild);
-		if (config==null) return null;
+		if (config == null) return null;
 		return bot.getJda().getVoiceChannelById(config.getMemberCountChannel());
 	}
 
@@ -39,10 +38,13 @@ public class MemberCount extends ListenerAdapter {
 	@SuppressWarnings("ConstantConditions")
 	private String getFormat(long guild, @NotNull Map<String, Object> values) {
 		StatisticConfig config = getConfig(guild);
-		if (config==null) return null;
+		if (config == null) return null;
+
 		AtomicString format = new AtomicString(config.getMemberCountFormat());
 		if (format.isEmpty()) return values.values().toString();
+
 		values.forEach((k, v) -> format.set(format.get().replace("%" + k + "%", String.valueOf(v))));
+
 		return format.get();
 	}
 
@@ -63,13 +65,16 @@ public class MemberCount extends ListenerAdapter {
 
 	private void update(@NotNull GenericGuildEvent event) {
 		Guild guild = event.getGuild();
+
 		VoiceChannel channel = getChannel(guild.getIdLong());
-		if (channel==null) return;
+		if (channel == null) return;
+
 		String format = getFormat(guild.getIdLong(), Map.of("members", guild
 				.getMembers()
 				.stream()
 				.filter(m -> !m.getUser().isBot())
 				.count()));
+
 		channel.getManager().setName(format).queue();
 	}
 }

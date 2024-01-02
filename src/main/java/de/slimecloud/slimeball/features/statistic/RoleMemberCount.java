@@ -21,7 +21,6 @@ import java.util.Map;
 public class RoleMemberCount extends ListenerAdapter {
 	private final SlimeBot bot;
 
-
 	private int getMemberCount(@NotNull Guild guild, @NotNull Role role) {
 		return (int) guild.getMembers()
 				.stream()
@@ -29,11 +28,14 @@ public class RoleMemberCount extends ListenerAdapter {
 				.count();
 	}
 
+	@NotNull
 	@SuppressWarnings("ConstantConditions")
 	private String getFormat(@NotNull StatisticConfig config, long role, @NotNull Map<String, Object> values) {
 		AtomicString format = new AtomicString(config.getRoleMemberCountFormat().get(role));
 		if (format.isEmpty()) format.set(config.getDefaultRoleFormat());
+
 		values.forEach((k, v) -> format.set(format.get().replace("%" + k + "%", String.valueOf(v))));
+
 		return format.get();
 	}
 
@@ -65,14 +67,17 @@ public class RoleMemberCount extends ListenerAdapter {
 	@SuppressWarnings("ConstantConditions")
 	private void update(@NotNull GenericGuildEvent event) {
 		Guild guild = event.getGuild();
+
 		StatisticConfig config = bot.loadGuild(guild.getIdLong()).getStatistic().orElse(null);
-		if (config==null) return;
+		if (config == null) return;
+
 		config.getRoleMemberCountChannel().forEach((k, v) -> update(config, guild, guild.getRoleById(k), guild.getVoiceChannelById(v)));
 	}
 
 	private void update(@NotNull StatisticConfig config, @NotNull Guild guild, @NotNull Role role, @NotNull VoiceChannel channel) {
 		int memberCount = getMemberCount(guild, role);
 		String format = getFormat(config, role.getIdLong(), Map.of("role_name", role.getName(), "members", memberCount));
+
 		channel.getManager().setName(format).queue();
 	}
 }
