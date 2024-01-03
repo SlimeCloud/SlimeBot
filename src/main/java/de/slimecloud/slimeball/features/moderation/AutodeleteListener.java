@@ -76,6 +76,7 @@ public class AutodeleteListener extends ListenerAdapter {
 				.addField(
 						"Folgende Nachrichten werden akzeptiert",
 						bot.loadGuild(event.getMessage().getGuild()).getAutodelete(event.getChannel())
+								.filter(f -> !f.isEmpty())
 								.map(f -> "```" +
 										f.stream()
 												.map(AutodeleteFlag::getName)
