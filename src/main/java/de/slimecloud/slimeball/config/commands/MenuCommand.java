@@ -42,20 +42,24 @@ public class MenuCommand {
 	private final MessageMenu menu;
 
 	public MenuCommand(@NotNull SlimeBot bot, @NotNull UIManager manager) {
+		//Create components for categories
 		List<Component<?>> components = new ArrayList<>(Arrays.stream(GuildConfig.class.getDeclaredFields())
-				.filter(f -> f.isAnnotationPresent(CategoryInfo.class))
+				.filter(f -> f.isAnnotationPresent(CategoryInfo.class)) //Field with category annotation
 				.map(f -> {
 					CategoryInfo info = f.getAnnotation(CategoryInfo.class);
 					f.setAccessible(true);
 
+					//Create component
 					return new MenuComponent<>(createCategory(bot, manager, c -> {
 						try {
+							//Return category instance for a guild config instance via reflection
 							return f.get(c);
 						} catch (IllegalAccessException e) {
 							throw new RuntimeException(e);
 						}
 					}, info, f.getType().getDeclaredFields()), ButtonColor.GRAY, info.name()).asDisabled(s -> {
 						try {
+							//Disable if category is null -> use has to use config enable command first
 							return f.get(bot.loadGuild(s.event.getGuild())) == null;
 						} catch (IllegalAccessException e) {
 							throw new RuntimeException(e);
@@ -65,8 +69,10 @@ public class MenuCommand {
 				.toList()
 		);
 
+		//Create component for general category
 		components.add(0, new MenuComponent<>(createCategory(bot, manager, c -> c, GuildConfig.class.getAnnotation(CategoryInfo.class), GuildConfig.class.getDeclaredFields()), ButtonColor.BLUE, "Allgemein"));
 
+		//Create menu
 		menu = manager.createMenu(
 				"config",
 				MessageRenderer.embed(s -> new EmbedBuilder()
@@ -85,20 +91,23 @@ public class MenuCommand {
 	private static MessageMenu createCategory(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Function<GuildConfig, Object> instance, @NotNull CategoryInfo category, @NotNull Field[] fields) {
 		//Get field components
 		List<ComponentRow> components = ComponentRow.ofMany(Arrays.stream(fields)
-				.filter(f -> f.isAnnotationPresent(ConfigField.class))
+				.filter(f -> f.isAnnotationPresent(ConfigField.class)) //Field with annotation
 				.map(f -> {
 					f.setAccessible(true);
 					ConfigField info = f.getAnnotation(ConfigField.class);
 
+					//Create component
 					return new MenuComponent<>(
 							createFieldMenu(bot, manager, f.getGenericType(), instance, (s, c) -> {
 								try {
+									//Get field value from guild config instance via reflection
 									return f.get(instance.apply(c));
 								} catch (IllegalAccessException e) {
 									throw new RuntimeException(e);
 								}
 							}, (s, c, v) -> {
 								try {
+									//Set field value to guild config instance via reflection
 									f.set(instance.apply(c), v);
 								} catch (IllegalAccessException e) {
 									throw new RuntimeException(e);
@@ -111,7 +120,7 @@ public class MenuCommand {
 				.toList()
 		);
 
-		//Add button to go back to main menu
+		//Add button to go back to main menu. We have to get the menu by name here because the menu doesn't exist yet
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config").display(s.event)));
 
 		//Create menu
@@ -160,6 +169,7 @@ public class MenuCommand {
 	private static MessageMenu createFieldMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Type generic, @NotNull Function<GuildConfig, Object> categoryInstance, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field, @Nullable ConfigFieldType keyType) {
 		Class<?> type = getClass(generic);
 
+		//Decide which menu to create based on actual field type
 		if (EnumSet.class.isAssignableFrom(type)) return createEnumSetValueMenu(bot, manager, generic, categoryInstance, getter, setter, display, category, field);
 		if (Collection.class.isAssignableFrom(type)) return createListValueMenu(bot, manager, type, generic, categoryInstance, getter, setter, display, category, field);
 		if (Map.class.isAssignableFrom(type)) return createMapValueMenu(bot, manager, type, generic, categoryInstance, getter, setter, display, category, field, keyType);
@@ -169,7 +179,11 @@ public class MenuCommand {
 	private static void set(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Function<GuildConfig, Object> category, @NotNull Setter setter, @Nullable Object value) {
 		GuildConfig config = bot.loadGuild(state.event.getGuild());
 		setter.set(state, config, value);
+
+		//Call update method on category
 		if (category.apply(config) instanceof ConfigCategory c) c.update(state.event.getGuild());
+
+		//Save changes
 		config.save();
 	}
 
@@ -182,7 +196,11 @@ public class MenuCommand {
 	private static <T> void handle(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Function<GuildConfig, Object> category, @NotNull Getter getter, @NotNull Consumer<T> handler) {
 		GuildConfig config = bot.loadGuild(state.event.getGuild());
 		handler.accept((T) getter.get(state, config));
+
+		//Call update method on category
 		if (category.apply(config) instanceof ConfigCategory c) c.update(state.event.getGuild());
+
+		//Save changes
 		config.save();
 	}
 
@@ -190,17 +208,22 @@ public class MenuCommand {
 	private static MessageMenu createValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Class<?> type, @NotNull Function<GuildConfig, Object> categoryInstance, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field) {
 		List<Component<?>> components = new ArrayList<>();
 
+		//Add base components
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
+			//For normal fields the default value is 'null'
 			set(bot, s, categoryInstance, setter, null);
 			s.update();
 		}));
 
+		//Create component for setting the field value. Will be select menu or button that opens modal
 		Component<?> component = field.type().createComponent(manager, type, "config." + category.command() + "." + field.command(), "value", "Wert festlegen", (s, v) -> set(bot, s, categoryInstance, setter, v));
 
+		//Add component to the very top if it is as select menu
 		if (component instanceof EntitySelectComponent || component instanceof StringSelectComponent) components.add(0, component);
 		else components.add(component);
 
+		//Create menu
 		return manager.createMenu(
 				"config." + category.command() + "." + field.command(),
 				MessageRenderer.embed(s -> {
@@ -226,14 +249,18 @@ public class MenuCommand {
 
 		List<Component<?>> components = new ArrayList<>();
 
+		//Add base components
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
+			//We use empty collections as default here so that we don't have to handle the 'null' case
 			set(bot, s, categoryInstance, setter, createEmptyCollection(type, generic));
 			s.update();
 		}));
 
+		//Create component for adding new values. Will be a select menu or a button that opens a modal
 		Component<?> add = field.type().createComponent(manager, componentClass, "config." + category.command() + "." + field.command(), "add", "Wert hinzufügen", (s, v) -> MenuCommand.<Collection>handle(bot, s, categoryInstance, getter, c -> c.add(v)));
 
+		//Add remove select with current values
 		Component<?> remove = new StringSelectComponent("remove", s -> MenuCommand.<Collection<?>>get(bot, s, getter).stream()
 				.map(e -> field.type().createSelectOption(bot, e))
 				.toList()
@@ -242,6 +269,7 @@ public class MenuCommand {
 			s.update();
 		});
 
+		//Add component to the very top if it is as select menu
 		if (add instanceof EntitySelectComponent || add instanceof StringSelectComponent) {
 			components.add(0, add);
 			components.add(1, remove);
@@ -250,6 +278,7 @@ public class MenuCommand {
 			components.add(remove);
 		}
 
+		//Create menu
 		return manager.createMenu(
 				"config." + category.command() + "." + field.command(),
 				MessageRenderer.embed(s -> {
@@ -274,12 +303,14 @@ public class MenuCommand {
 
 		List<Component<?>> components = new ArrayList<>();
 
+		//Add base components
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
 			set(bot, s, categoryInstance, setter, emptyEnumSet(componentClass));
 			s.update();
 		}));
 
+		//Add component to select which flags to use
 		components.add(new StringSelectComponent("value", s -> Arrays.stream(componentClass.getEnumConstants())
 				.map(e -> SelectOption.of(e.toString(), ((Enum<?>) e).name())
 						.withDefault(MenuCommand.<EnumSet<?>>get(bot, s, getter).contains(e))
@@ -287,6 +318,7 @@ public class MenuCommand {
 				.toList()
 		).setMinValues(0).setMaxValues(componentClass.getEnumConstants().length).appendHandler((s, v) -> {
 			MenuCommand.<EnumSet>handle(bot, s, categoryInstance, getter, c -> {
+				//Clear current values and add selected ones
 				c.clear();
 				c.addAll(v.stream().map(x -> Arrays.stream(componentClass.getEnumConstants()).map(e -> (Enum<?>) e).filter(e -> e.name().equals(x.getValue())).findFirst().orElseThrow()).toList());
 			});
@@ -294,6 +326,7 @@ public class MenuCommand {
 			s.update();
 		}));
 
+		//Create menu
 		return manager.createMenu(
 				"config." + category.command() + "." + field.command(),
 				MessageRenderer.embed(s -> {
@@ -319,25 +352,32 @@ public class MenuCommand {
 		Type valueType = getGenericType(generic, 1);
 		Class<?> valueClass = getClass(valueType);
 
+		//Check if type arguments are valid
 		if (Map.class.isAssignableFrom(keyClass) || Collection.class.isAssignableFrom(keyClass)) throw new UnsupportedOperationException();
 		if (Map.class.isAssignableFrom(valueClass)) throw new UnsupportedOperationException("Cannot create config menu with map inside of map");
 
 		List<Component<?>> components = new ArrayList<>();
 
+		//Add base components
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
 			set(bot, s, categoryInstance, setter, type.isAssignableFrom(HashMap.class) ? new HashMap<>() : new LinkedHashMap<>());
 			s.update();
 		}));
 
+		//Create virtual info environment for sub-menus
 		CategoryInfo valueCategory = createCategory(category.name() + " → " + field.name(), category.command() + "." + field.command(), field.description());
 		ConfigField valueField = createField("?", "value", field.description(), field.type());
 
+		//The value menu shows the current value for a key. This can also be used to change the value
 		MessageMenu valueMenu = createFieldMenu(bot, manager, valueType, categoryInstance,
+				//Implementation for getter method
 				(s, c) -> ((Map) getter.get(s, c)).computeIfAbsent(s.getRawState("key", keyClass), x -> Collection.class.isAssignableFrom(valueClass) ? createEmptyCollection(valueClass, valueType) : null),
+				//Implementation for setter method
 				(s, c, v) -> {
 					Map value = (Map) getter.get(s, c);
 
+					//Read key from state
 					Object key = keyType.parse(keyClass, s.getRawState("key", keyClass));
 
 					if (v != null) value.put(key, v);
@@ -346,11 +386,13 @@ public class MenuCommand {
 				s -> keyType.toString(s.getRawState("key", keyClass)), valueCategory, valueField, null
 		);
 
+		//Add components that opens the value menu to add a new entry
 		Component<?> add = keyType.createComponent(manager, keyClass, "config." + category.command() + "." + field.command(), "add", "Wert hinzufügen", (s, k) -> {
 			valueMenu.createState(s).setState("key", k).display(s.event);
 			throw new RenderTermination();
 		});
 
+		//Add component to remove th value for an existing key
 		Component<?> remove = new StringSelectComponent("remove", s -> MenuCommand.<Map<?, ?>>get(bot, s, getter).keySet().stream()
 				.map(e -> keyType.createSelectOption(bot, e))
 				.toList()
@@ -359,12 +401,13 @@ public class MenuCommand {
 			s.update();
 		});
 
+		//Add component that opens the value menu for an existing key
 		Component<?> edit = new StringSelectComponent("edit", s -> MenuCommand.<Map<?, ?>>get(bot, s, getter).keySet().stream()
 				.map(e -> keyType.createSelectOption(bot, e))
 				.toList()
 		).setPlaceholder("Wert bearbeiten").appendHandler((s, v) -> valueMenu.createState(s).setState("key", v.get(0).getValue()).display(s.event));
 
-
+		//Add component to the very top if it is as select menu
 		if (add instanceof EntitySelectComponent || add instanceof StringSelectComponent) {
 			components.add(0, add);
 			components.add(1, remove);
