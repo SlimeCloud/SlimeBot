@@ -373,7 +373,7 @@ public enum ConfigFieldType {
 				(s, m) -> {
 					if (validate(type, m.getString("value"))) {
 						handler.accept(s, parse(type, m.getString("value")));
-						manager.getMenu(menu).display(s.event);
+						manager.getMenu(menu).createState(s).display(s.event);
 					} else {
 						manager.getMenu(menu).display(s.event);
 						s.event.getHook().sendMessage(":x: Ungültiger Wert").setEphemeral(true).queue();
