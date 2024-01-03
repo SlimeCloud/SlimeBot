@@ -20,10 +20,10 @@ public class StaffMessage extends ListenerAdapter {
 		if (!event.isFromGuild()) return;
 
 		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
-		guildConfig.getStaff().ifPresent(config -> {
+		guildConfig.getTeamMessage().ifPresent(config -> {
 			if (config.getMessage() == event.getMessageIdLong()) {
 				config.disable(event.getGuild());
-				guildConfig.setStaff(null);
+				guildConfig.setTeamMessage(null);
 
 				guildConfig.save();
 			}
@@ -46,6 +46,6 @@ public class StaffMessage extends ListenerAdapter {
 	}
 
 	public void update(@NotNull Guild guild) {
-		bot.loadGuild(guild).getStaff().ifPresent(s -> s.update(guild));
+		bot.loadGuild(guild).getTeamMessage().ifPresent(s -> s.update(guild));
 	}
 }

@@ -114,8 +114,8 @@ public class GuildConfig {
 	private MeetingConfig meeting;
 
 	@Setter
-	@CategoryInfo(name = "Team-Nachricht", command = "staff", description = "Kanfigration für die Team-Nachricht")
-	private StaffConfig staff;
+	@CategoryInfo(name = "Team-Nachricht", command = "team-message", description = "Kanfigration für die Team-Nachricht")
+	private StaffConfig teamMessage;
 
 	@NotNull
 	private GuildConfig configure(@NotNull SlimeBot bot, @NotNull String path, long guild) {
@@ -126,7 +126,7 @@ public class GuildConfig {
 		if (spotify != null) spotify.bot = bot;
 		if (fdmds != null) fdmds.bot = bot;
 		if (level != null) level.bot = bot;
-		if (staff != null) staff.bot = bot;
+		if (teamMessage != null) teamMessage.bot = bot;
 		if (meeting != null) meeting.bot = bot;
 
 		return this;
@@ -168,8 +168,8 @@ public class GuildConfig {
 	}
 
 	@NotNull
-	public Optional<StaffConfig> getStaff() {
-		return Optional.ofNullable(staff);
+	public Optional<StaffConfig> getTeamMessage() {
+		return Optional.ofNullable(teamMessage);
 	}
 
 
