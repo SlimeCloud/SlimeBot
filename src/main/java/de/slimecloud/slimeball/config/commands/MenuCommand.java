@@ -169,7 +169,7 @@ public class MenuCommand {
 	private static void set(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Function<GuildConfig, Object> category, @NotNull Setter setter, @Nullable Object value) {
 		GuildConfig config = bot.loadGuild(state.event.getGuild());
 		setter.set(state, config, value);
-		if(category.apply(config) instanceof ConfigCategory c) c.update(state.event.getGuild());
+		if (category.apply(config) instanceof ConfigCategory c) c.update(state.event.getGuild());
 		config.save();
 	}
 
@@ -182,7 +182,7 @@ public class MenuCommand {
 	private static <T> void handle(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Function<GuildConfig, Object> category, @NotNull Getter getter, @NotNull Consumer<T> handler) {
 		GuildConfig config = bot.loadGuild(state.event.getGuild());
 		handler.accept((T) getter.get(state, config));
-		if(category.apply(config) instanceof ConfigCategory c) c.update(state.event.getGuild());
+		if (category.apply(config) instanceof ConfigCategory c) c.update(state.event.getGuild());
 		config.save();
 	}
 
@@ -333,7 +333,7 @@ public class MenuCommand {
 		CategoryInfo valueCategory = createCategory(category.name() + " → " + field.name(), category.command() + "." + field.command(), field.description());
 		ConfigField valueField = createField("?", "value", field.description(), field.type());
 
-		MessageMenu valueMenu = createFieldMenu(bot, manager, valueType,categoryInstance,
+		MessageMenu valueMenu = createFieldMenu(bot, manager, valueType, categoryInstance,
 				(s, c) -> ((Map) getter.get(s, c)).getOrDefault(s.getRawState("key", keyClass), Collection.class.isAssignableFrom(valueClass) ? createEmptyCollection(valueClass, valueType) : null),
 				(s, c, v) -> {
 					Map value = (Map) getter.get(s, c);

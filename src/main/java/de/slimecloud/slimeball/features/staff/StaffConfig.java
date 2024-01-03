@@ -76,7 +76,7 @@ public class StaffConfig extends ConfigCategory {
 			}
 		});
 
-		if(builder.isEmpty()) builder.append("*Keine Einträge*");
+		if (builder.isEmpty()) builder.append("*Keine Einträge*");
 
 		return MessageEditData.fromContent(builder.toString());
 	}
