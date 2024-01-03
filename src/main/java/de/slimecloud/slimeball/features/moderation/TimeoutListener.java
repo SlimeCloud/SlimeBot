@@ -18,7 +18,7 @@ public class TimeoutListener extends ListenerAdapter {
 
 	public TimeoutListener(@NotNull SlimeBot bot) {
 		this.bot = bot;
-		JEvent.getManager().registerListener(this);
+		JEvent.getDefaultManager().registerListener(this);
 	}
 
 	@Override
