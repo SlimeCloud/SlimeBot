@@ -3,6 +3,7 @@ package de.slimecloud.slimeball.config;
 import de.slimecloud.slimeball.config.engine.CategoryInfo;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
+import de.slimecloud.slimeball.config.engine.KeyType;
 import de.slimecloud.slimeball.features.alerts.SpotifyNotificationConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
@@ -90,8 +91,9 @@ public class GuildConfig {
 	@ConfigField(name = "Contributor-Rolle", command = "contributor", description = "Rolle, die Mitglieder erhalten, die am SlimeBall Bot mitgewirkt haben", type = ConfigFieldType.ROLE)
 	private Long contributorRole;
 
-	//TODO Make this configurable via command
 	@Setter
+	@ConfigField(name = "Automatisches Nachrichtenlöschen", command = "autodelete", description = "Kanäle, in denen Nachrichten automatisch gelöscht werden", type = ConfigFieldType.ENUM)
+	@KeyType(ConfigFieldType.MESSAGE_CHANNEL)
 	private Map<Long, EnumSet<AutodleteFlag>> autodelete;
 
 

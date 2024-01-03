@@ -6,6 +6,7 @@ import de.mineking.discordutils.ui.components.button.MenuComponent;
 import de.mineking.discordutils.ui.components.select.EntitySelectComponent;
 import de.mineking.discordutils.ui.components.select.StringSelectComponent;
 import de.mineking.discordutils.ui.components.types.Component;
+import de.mineking.discordutils.ui.modal.ModalMenu;
 import de.mineking.discordutils.ui.modal.TextComponent;
 import de.mineking.discordutils.ui.state.DataState;
 import de.slimecloud.slimeball.main.SlimeBot;
@@ -49,6 +50,12 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
+		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+			throw new UnsupportedOperationException();
+		}
+
+		@NotNull
+		@Override
 		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.CHANNEL)
 					.setPlaceholder(display)
@@ -82,7 +89,13 @@ public enum ConfigFieldType {
 		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
 			return new OptionData(OptionType.CHANNEL, info.command(), info.description())
-					.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS, ChannelType.FORUM);
+					.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS, ChannelType.FORUM, ChannelType.GUILD_NEWS_THREAD, ChannelType.GUILD_PRIVATE_THREAD, ChannelType.GUILD_PUBLIC_THREAD);
+		}
+
+		@NotNull
+		@Override
+		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+			throw new UnsupportedOperationException();
 		}
 
 		@NotNull
@@ -90,7 +103,7 @@ public enum ConfigFieldType {
 		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.CHANNEL)
 					.setPlaceholder(display)
-					.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS, ChannelType.FORUM)
+					.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS, ChannelType.FORUM, ChannelType.GUILD_NEWS_THREAD, ChannelType.GUILD_PRIVATE_THREAD, ChannelType.GUILD_PUBLIC_THREAD)
 					.appendHandler((s, v) -> {
 						handler.accept(s, v.getChannels().get(0).getIdLong());
 						s.update();
@@ -122,6 +135,12 @@ public enum ConfigFieldType {
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
 			return new OptionData(OptionType.CHANNEL, info.command(), info.description())
 					.setChannelTypes(ChannelType.VOICE, ChannelType.STAGE);
+		}
+
+		@NotNull
+		@Override
+		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+			throw new UnsupportedOperationException();
 		}
 
 		@NotNull
@@ -164,6 +183,12 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
+		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+			throw new UnsupportedOperationException();
+		}
+
+		@NotNull
+		@Override
 		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.ROLE)
 					.setPlaceholder(display)
@@ -192,6 +217,12 @@ public enum ConfigFieldType {
 		@Override
 		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
 			return SelectOption.of(value.toString(), ((Enum<?>) value).name());
+		}
+
+		@NotNull
+		@Override
+		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+			throw new UnsupportedOperationException();
 		}
 
 		@NotNull
@@ -335,24 +366,25 @@ public enum ConfigFieldType {
 	}
 
 	@NotNull
-	public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
-		return new MenuComponent<>(
-				manager.createModal(menu + "." + name,
-						s -> display,
-						List.of(new TextComponent("value", "Neuer Wert", TextInputStyle.SHORT)),
-						(s, m) -> {
-							if (validate(type, m.getString("value"))) {
-								handler.accept(s, parse(type, m.getString("value")));
-								manager.getMenu(menu).display(s.event);
-							} else {
-								manager.getMenu(menu).display(s.event);
-								s.event.getHook().sendMessage(":x: Ungültiger Wert").setEphemeral(true).queue();
-							}
-						}
-				),
-				ButtonColor.BLUE,
-				display
+	public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) throws UnsupportedOperationException {
+		return manager.createModal(menu + "." + name,
+				s -> display,
+				List.of(new TextComponent("value", "Neuer Wert", TextInputStyle.SHORT)),
+				(s, m) -> {
+					if (validate(type, m.getString("value"))) {
+						handler.accept(s, parse(type, m.getString("value")));
+						manager.getMenu(menu).display(s.event);
+					} else {
+						manager.getMenu(menu).display(s.event);
+						s.event.getHook().sendMessage(":x: Ungültiger Wert").setEphemeral(true).queue();
+					}
+				}
 		);
+	}
+
+	@NotNull
+	public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		return new MenuComponent<>(getModal(manager, type, menu, name, display, handler), ButtonColor.BLUE, display);
 	}
 
 	public boolean validate(@NotNull Class<?> type, @NotNull String value) {
