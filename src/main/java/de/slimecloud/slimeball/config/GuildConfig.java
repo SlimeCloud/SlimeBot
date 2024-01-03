@@ -94,7 +94,7 @@ public class GuildConfig {
 	@Setter
 	@ConfigField(name = "Automatisches Nachrichtenlöschen", command = "autodelete", description = "Kanäle, in denen Nachrichten automatisch gelöscht werden", type = ConfigFieldType.ENUM)
 	@Info(keyType = ConfigFieldType.MESSAGE_CHANNEL)
-	private Map<Long, EnumSet<AutodeleteFlag>> autodelete;
+	private Map<Long, EnumSet<AutodeleteFlag>> autodelete = new HashMap<>();
 
 
 	@Setter
