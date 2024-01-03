@@ -43,8 +43,6 @@ public class SpotifyAlert {
 
 		//CHeck for podcast episodes
 		bot.getConfig().getSpotify().flatMap(SpotifyConfig::getPodcastConfig).ifPresent(config -> {
-			logger.info("Checking for new podcast episodes...");
-
 			config.artistIds().stream()
 					.flatMap(id -> getLatestEntries(id, bot.getSpotify().getApi()::getShowEpisodes).stream())
 					.filter(e -> !known.contains(e.getId()))
@@ -56,8 +54,6 @@ public class SpotifyAlert {
 
 		//Check for music releases
 		bot.getConfig().getSpotify().flatMap(SpotifyConfig::getMusicConfig).ifPresent(config -> {
-			logger.info("Checking for music releases...");
-
 			config.artistIds().stream()
 					.flatMap(id -> getLatestEntries(id, bot.getSpotify().getApi()::getArtistsAlbums).stream())
 					.filter(e -> !known.contains(e.getId()))
@@ -68,6 +64,8 @@ public class SpotifyAlert {
 
 		});
 
+		logger.info("Found {} new entries", newIds.size());
+
 		//Mark newly published releases
 		bot.getDatabase().getDriver().useHandle(handle -> {
 			PreparedBatch update = handle.prepareBatch("insert into spotify_known values(:id)");
@@ -77,8 +75,6 @@ public class SpotifyAlert {
 	}
 
 	private <T, R extends AbstractDataPagingRequest.Builder<T, ?>> List<T> getLatestEntries(String id, Function<String, R> request) {
-		logger.info("Fetching entries for '{}'...", id);
-
 		try {
 			Paging<T> albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).build().execute();
 
@@ -86,7 +82,6 @@ public class SpotifyAlert {
 				albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).offset(albumSimplifiedPaging.getTotal() - 20).build().execute();
 
 			List<T> albums = Arrays.asList(albumSimplifiedPaging.getItems());
-			logger.info("Found {} entries", albums.size());
 
 			//Return older episodes first
 			Collections.reverse(albums);
