@@ -384,7 +384,7 @@ public enum ConfigFieldType {
 
 	@NotNull
 	public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
-		return new MenuComponent<>(getModal(manager, type, menu, name, display, handler), ButtonColor.BLUE, display);
+		return new MenuComponent<>(getModal(manager, type, menu, name, display, handler), ButtonColor.BLUE, display).setStateCreator(ModalMenu::createState);
 	}
 
 	public boolean validate(@NotNull Class<?> type, @NotNull String value) {
