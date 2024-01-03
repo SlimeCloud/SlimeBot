@@ -78,7 +78,7 @@ public class AutodeleteListener extends ListenerAdapter {
 						bot.loadGuild(event.getMessage().getGuild()).getAutodelete(event.getChannel())
 								.map(f -> "```" +
 										f.stream()
-												.map(AutodleteFlag::getName)
+												.map(AutodeleteFlag::getName)
 												.collect(Collectors.joining("\n")) +
 										"```"
 								)

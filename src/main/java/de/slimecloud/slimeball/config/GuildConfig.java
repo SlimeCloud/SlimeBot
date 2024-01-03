@@ -7,7 +7,7 @@ import de.slimecloud.slimeball.config.engine.KeyType;
 import de.slimecloud.slimeball.features.alerts.SpotifyNotificationConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
-import de.slimecloud.slimeball.features.moderation.AutodleteFlag;
+import de.slimecloud.slimeball.features.moderation.AutodeleteFlag;
 import de.slimecloud.slimeball.features.staff.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
 import de.slimecloud.slimeball.main.Main;
@@ -94,7 +94,7 @@ public class GuildConfig {
 	@Setter
 	@ConfigField(name = "Automatisches Nachrichtenlöschen", command = "autodelete", description = "Kanäle, in denen Nachrichten automatisch gelöscht werden", type = ConfigFieldType.ENUM)
 	@KeyType(ConfigFieldType.MESSAGE_CHANNEL)
-	private Map<Long, EnumSet<AutodleteFlag>> autodelete;
+	private Map<Long, EnumSet<AutodeleteFlag>> autodelete;
 
 
 	@Setter
@@ -204,7 +204,7 @@ public class GuildConfig {
 	}
 
 	@NotNull
-	public Optional<EnumSet<AutodleteFlag>> getAutodelete(@NotNull Channel channel) {
+	public Optional<EnumSet<AutodeleteFlag>> getAutodelete(@NotNull Channel channel) {
 		return Optional.ofNullable(autodelete).map(a -> a.get(channel.getIdLong()));
 	}
 
