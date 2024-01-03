@@ -357,12 +357,20 @@ public class MenuCommand {
 			s.update();
 		});
 
+		Component<?> edit = new StringSelectComponent("edit", s -> MenuCommand.<Map<?, ?>>get(bot, s, getter).keySet().stream()
+				.map(e -> keyType.createSelectOption(bot, e))
+				.toList()
+		).setPlaceholder("Wert bearbeiten").appendHandler((s, v) -> valueMenu.createState(s).setState("key", field.type().parse(valueClass, v.get(0).getValue())).display(s.event));
+
+
 		if (add instanceof EntitySelectComponent || add instanceof StringSelectComponent) {
 			components.add(0, add);
 			components.add(1, remove);
+			components.add(2, edit);
 		} else {
 			components.add(add);
 			components.add(remove);
+			components.add(edit);
 		}
 
 		return manager.createMenu(
