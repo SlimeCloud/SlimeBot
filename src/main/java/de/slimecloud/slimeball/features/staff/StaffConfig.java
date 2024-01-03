@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Getter
 public class StaffConfig extends ConfigCategory {
-	@ConfigField(name = "Einträge", command = "entries", description = "Einträge für die Nachricht", type = ConfigFieldType.STRING)
+	@ConfigField(name = "Einträge", command = "entries", description = "Einträge für die Nachricht (key: Rollen ID, value: Beschreibung)", type = ConfigFieldType.STRING)
 	@KeyType(ConfigFieldType.STRING)
 	private final LinkedHashMap<String, String> roles = new LinkedHashMap<>();
 
