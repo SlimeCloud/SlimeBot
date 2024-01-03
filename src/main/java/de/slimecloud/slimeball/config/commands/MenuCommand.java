@@ -282,7 +282,7 @@ public class MenuCommand {
 
 		components.add(new StringSelectComponent("value", s -> Arrays.stream(componentClass.getEnumConstants())
 				.map(e -> SelectOption.of(e.toString(), ((Enum<?>) e).name())
-						.withDefault(s.<EnumSet<?>>getCache("value").contains(e))
+						.withDefault(MenuCommand.<EnumSet<?>>get(bot, s, getter).contains(e))
 				)
 				.toList()
 		).setMinValues(0).setMaxValues(componentClass.getEnumConstants().length).appendHandler((s, v) -> {
@@ -297,7 +297,7 @@ public class MenuCommand {
 		return manager.createMenu(
 				"config." + category.command() + "." + field.command(),
 				MessageRenderer.embed(s -> {
-					EnumSet<?> value = s.getCache("value");
+					EnumSet<?> value = get(bot, s, getter);
 
 					return new EmbedBuilder()
 							.setDescription("## " + category.name() + " → " + display.apply(s) + "\n")
@@ -308,7 +308,7 @@ public class MenuCommand {
 							.build();
 				}),
 				ComponentRow.ofMany(components)
-		).cache(s -> s.setCache("value", get(bot, s, getter)));
+		);
 	}
 
 	@NotNull
@@ -334,12 +334,14 @@ public class MenuCommand {
 		ConfigField valueField = createField("?", "value", field.description(), field.type());
 
 		MessageMenu valueMenu = createFieldMenu(bot, manager, valueType, categoryInstance,
-				(s, c) -> ((Map) getter.get(s, c)).getOrDefault(s.getRawState("key", keyClass), Collection.class.isAssignableFrom(valueClass) ? createEmptyCollection(valueClass, valueType) : null),
+				(s, c) -> ((Map) getter.get(s, c)).computeIfAbsent(s.getRawState("key", keyClass), x -> Collection.class.isAssignableFrom(valueClass) ? createEmptyCollection(valueClass, valueType) : null),
 				(s, c, v) -> {
 					Map value = (Map) getter.get(s, c);
 
-					if (v != null) value.put(s.getRawState("key", keyClass), v);
-					else value.remove(s.getRawState("key", keyClass));
+					Object key = keyType.parse(keyClass, s.getRawState("key", keyClass));
+
+					if (v != null) value.put(key, v);
+					else value.remove(key);
 				},
 				s -> keyType.toString(s.getRawState("key", keyClass)), valueCategory, valueField, null
 		);
@@ -360,7 +362,7 @@ public class MenuCommand {
 		Component<?> edit = new StringSelectComponent("edit", s -> MenuCommand.<Map<?, ?>>get(bot, s, getter).keySet().stream()
 				.map(e -> keyType.createSelectOption(bot, e))
 				.toList()
-		).setPlaceholder("Wert bearbeiten").appendHandler((s, v) -> valueMenu.createState(s).setState("key", field.type().parse(valueClass, v.get(0).getValue())).display(s.event));
+		).setPlaceholder("Wert bearbeiten").appendHandler((s, v) -> valueMenu.createState(s).setState("key", v.get(0).getValue()).display(s.event));
 
 
 		if (add instanceof EntitySelectComponent || add instanceof StringSelectComponent) {
