@@ -29,7 +29,7 @@ public class StaffConfig extends ConfigCategory {
 	@Override
 	public void enable(@NotNull Guild guild) {
 		message = getChannel().map(channel -> channel
-				.sendMessage("*Noch nicht konfiguriert*")
+				.sendMessage("*Keine Einträge*")
 				.complete().getIdLong()
 		).orElseThrow();
 	}
@@ -75,6 +75,8 @@ public class StaffConfig extends ConfigCategory {
 				builder.append(description).append("\n\n");
 			}
 		});
+
+		if(builder.isEmpty()) builder.append("*Keine Einträge*");
 
 		return MessageEditData.fromContent(builder.toString());
 	}
