@@ -2,10 +2,13 @@ package de.slimecloud.slimeball.config.engine;
 
 import de.mineking.discordutils.ui.UIManager;
 import de.mineking.discordutils.ui.components.button.ButtonColor;
+import de.mineking.discordutils.ui.components.button.ButtonComponent;
 import de.mineking.discordutils.ui.components.button.MenuComponent;
+import de.mineking.discordutils.ui.components.button.label.TextLabel;
 import de.mineking.discordutils.ui.components.select.EntitySelectComponent;
 import de.mineking.discordutils.ui.components.select.StringSelectComponent;
 import de.mineking.discordutils.ui.components.types.Component;
+import de.mineking.discordutils.ui.components.types.ComponentRow;
 import de.mineking.discordutils.ui.modal.ModalMenu;
 import de.mineking.discordutils.ui.modal.TextComponent;
 import de.mineking.discordutils.ui.state.DataState;
@@ -35,7 +38,7 @@ import java.util.function.Function;
 @Getter
 @AllArgsConstructor
 public enum ConfigFieldType {
-	ALL_CHANNEL(OptionMapping::getAsLong) {
+	ALL_CHANNEL("Kanal (Alle)", OptionMapping::getAsLong) {
 		@NotNull
 		@Override
 		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
@@ -56,7 +59,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.CHANNEL)
 					.setPlaceholder(display)
 					.appendHandler((s, v) -> {
@@ -78,7 +81,7 @@ public enum ConfigFieldType {
 		}
 	},
 
-	MESSAGE_CHANNEL(OptionMapping::getAsLong) {
+	MESSAGE_CHANNEL("Kanal (Text)", OptionMapping::getAsLong) {
 		@NotNull
 		@Override
 		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
@@ -100,7 +103,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.CHANNEL)
 					.setPlaceholder(display)
 					.setChannelTypes(ChannelType.TEXT, ChannelType.NEWS, ChannelType.FORUM, ChannelType.GUILD_NEWS_THREAD, ChannelType.GUILD_PRIVATE_THREAD, ChannelType.GUILD_PUBLIC_THREAD)
@@ -123,7 +126,7 @@ public enum ConfigFieldType {
 		}
 	},
 
-	VOICE_CHANNEL(OptionMapping::getAsLong) {
+	VOICE_CHANNEL("Kanal (Voice)", OptionMapping::getAsLong) {
 		@NotNull
 		@Override
 		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
@@ -145,7 +148,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.CHANNEL)
 					.setPlaceholder(display)
 					.setChannelTypes(ChannelType.VOICE, ChannelType.STAGE)
@@ -168,7 +171,7 @@ public enum ConfigFieldType {
 		}
 	},
 
-	ROLE(OptionMapping::getAsLong) {
+	ROLE("Rolle", OptionMapping::getAsLong) {
 		@NotNull
 		@Override
 		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
@@ -189,7 +192,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			return new EntitySelectComponent(name, EntitySelectMenu.SelectTarget.ROLE)
 					.setPlaceholder(display)
 					.appendHandler((s, v) -> {
@@ -212,7 +215,7 @@ public enum ConfigFieldType {
 	},
 
 
-	ENUM(StringUtil::extractEnum) {
+	ENUM("Select", StringUtil::extractEnum) {
 		@NotNull
 		@Override
 		public SelectOption createSelectOption(@NotNull SlimeBot bot, @NotNull Object value) {
@@ -237,7 +240,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			return new StringSelectComponent(name, Arrays.stream(type.getEnumConstants())
 					.map(e -> SelectOption.of(e.toString(), ((Enum<?>) e).name()))
 					.toList()
@@ -262,7 +265,7 @@ public enum ConfigFieldType {
 	},
 
 
-	COLOR(ColorUtil::extract) {
+	COLOR("Farbe", ColorUtil::extract) {
 		@NotNull
 		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
@@ -283,7 +286,7 @@ public enum ConfigFieldType {
 	},
 
 
-	URL(StringUtil::extractUrl) {
+	URL("Link", StringUtil::extractUrl) {
 		@NotNull
 		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
@@ -303,7 +306,7 @@ public enum ConfigFieldType {
 	},
 
 
-	STRING(OptionMapping::getAsString) {
+	STRING("Text", OptionMapping::getAsString) {
 		@NotNull
 		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
@@ -317,7 +320,7 @@ public enum ConfigFieldType {
 		}
 	},
 
-	INTEGER(OptionMapping::getAsInt) {
+	INTEGER("Ganze Zahl", OptionMapping::getAsInt) {
 		@NotNull
 		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
@@ -336,7 +339,44 @@ public enum ConfigFieldType {
 		}
 	},
 
-	NUMBER(OptionMapping::getAsDouble) {
+	INTEGER_UI("Ganze Zahl", OptionMapping::getAsInt) {
+		@NotNull
+		@Override
+		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
+			return new OptionData(OptionType.INTEGER, info.command(), info.description());
+		}
+
+		@Override
+		public List<? extends ComponentRow> createAdvancedComponents(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
+			return List.of(
+					super.createComponent(manager, type, info, menu, name, display, value, handler),
+					ComponentRow.of(
+							new ButtonComponent(name + ".subtract", ButtonColor.BLUE, "-").asDisabled(s -> (Integer) value.apply(s) <= info.minValue()).appendHandler(s -> {
+								handler.accept(s, (Integer) value.apply(s) - 1);
+								s.update();
+							}),
+							new ButtonComponent(name + ".display", ButtonColor.GRAY, (TextLabel) s -> Objects.toString(value.apply(s))).asDisabled(true),
+							new ButtonComponent(name + ".add", ButtonColor.BLUE, "+").asDisabled(s -> (Integer) value.apply(s) >= info.maxValue()).appendHandler(s -> {
+								handler.accept(s, (Integer) value.apply(s) + 1);
+								s.update();
+							})
+					)
+			);
+		}
+
+		@Override
+		public boolean validate(@NotNull Class<?> type, @NotNull String value) {
+			return StringUtil.isInteger(value);
+		}
+
+		@NotNull
+		@Override
+		public Object parse(@NotNull Class<?> type, @NotNull String value) {
+			return Integer.parseInt(value);
+		}
+	},
+
+	NUMBER("Fließkomma Zahl", OptionMapping::getAsDouble) {
 		@NotNull
 		@Override
 		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
@@ -353,8 +393,46 @@ public enum ConfigFieldType {
 		public Object parse(@NotNull Class<?> type, @NotNull String value) {
 			return Double.parseDouble(value);
 		}
+	},
+
+	NUMBER_UI("Fließkomma Zahl", OptionMapping::getAsInt) {
+		@NotNull
+		@Override
+		public OptionData createOption(@NotNull Class<?> type, @NotNull ConfigField info) {
+			return new OptionData(OptionType.NUMBER, info.command(), info.description());
+		}
+
+		@Override
+		public List<? extends ComponentRow> createAdvancedComponents(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
+			return List.of(
+					super.createComponent(manager, type, info, menu, name, display, value, handler),
+					ComponentRow.of(
+							new ButtonComponent(name + ".subtract", ButtonColor.BLUE, "-").asDisabled(s -> (Double) value.apply(s) - 1 < info.minValue()).appendHandler(s -> {
+								handler.accept(s, (Double) value.apply(s) - 1);
+								s.update();
+							}),
+							new ButtonComponent(name + ".display", ButtonColor.GRAY, (TextLabel) s -> Objects.toString(value.apply(s))).asDisabled(true),
+							new ButtonComponent(name + ".add", ButtonColor.BLUE, "+").asDisabled(s -> (Double) value.apply(s) + 1 > info.maxValue()).appendHandler(s -> {
+								handler.accept(s, (Double) value.apply(s) + 1);
+								s.update();
+							})
+					)
+			);
+		}
+
+		@Override
+		public boolean validate(@NotNull Class<?> type, @NotNull String value) {
+			return StringUtil.isNumeric(value);
+		}
+
+		@NotNull
+		@Override
+		public Object parse(@NotNull Class<?> type, @NotNull String value) {
+			return Double.parseDouble(value);
+		}
 	};
 
+	private final String name;
 	private final BiFunction<Class<?>, OptionMapping, Object> extractor;
 
 	@NotNull
@@ -369,7 +447,7 @@ public enum ConfigFieldType {
 	public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) throws UnsupportedOperationException {
 		return manager.createModal(menu + "." + name,
 				s -> display,
-				List.of(new TextComponent("value", "Neuer Wert", TextInputStyle.SHORT)),
+				List.of(new TextComponent("value", "Neuer Wert", TextInputStyle.SHORT).setPlaceholder(this.name)),
 				(s, m) -> {
 					if (validate(type, m.getString("value"))) {
 						handler.accept(s, parse(type, m.getString("value")));
@@ -382,8 +460,12 @@ public enum ConfigFieldType {
 		);
 	}
 
+	public List<? extends ComponentRow> createAdvancedComponents(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		return List.of(createComponent(manager, type, info, menu, name, display, value, handler));
+	}
+
 	@NotNull
-	public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+	public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 		return new MenuComponent<>(getModal(manager, type, menu, name, display, handler), ButtonColor.BLUE, display).setStateCreator(ModalMenu::createState);
 	}
 
@@ -399,7 +481,7 @@ public enum ConfigFieldType {
 		return Objects.toString(value);
 	}
 
-	ConfigFieldType(@NotNull Function<OptionMapping, Object> extractor) {
-		this((t, o) -> extractor.apply(o));
+	ConfigFieldType(@NotNull String name, @NotNull Function<OptionMapping, Object> extractor) {
+		this(name, (t, o) -> extractor.apply(o));
 	}
 }

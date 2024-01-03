@@ -7,7 +7,7 @@ import de.mineking.javautils.database.Column;
 import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Table;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
-import de.slimecloud.slimeball.config.engine.KeyType;
+import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.config.engine.ValidationException;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
@@ -63,64 +63,64 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 	private boolean isPublic = false;
 
 	@Column
-	@KeyType(ConfigFieldType.COLOR)
+	@Info(keyType = ConfigFieldType.COLOR)
 	private Color progressbarColor = new Color(105, 227, 73, 240);
 	@Column
-	@KeyType(ConfigFieldType.COLOR)
+	@Info(keyType = ConfigFieldType.COLOR)
 	private Color progressbarBGColor = new Color(150, 150, 150, 50);
 	@Column
-	@KeyType(ConfigFieldType.ENUM)
+	@Info(keyType = ConfigFieldType.ENUM)
 	private Style progressbarStyle = Style.ROUND_SQUARE;
 
 	@Column
-	@KeyType(ConfigFieldType.COLOR)
+	@Info(keyType = ConfigFieldType.COLOR)
 	private Color progressbarBorderColor = new Color(68, 140, 41, 255);
 	@Column
-	@KeyType(ConfigFieldType.INTEGER)
+	@Info(keyType = ConfigFieldType.INTEGER)
 	private int progressbarBorderWidth = 5;
 
 	@Column
-	@KeyType(ConfigFieldType.ENUM)
+	@Info(keyType = ConfigFieldType.ENUM)
 	private Style avatarStyle = Style.ROUND_SQUARE;
 	@Column
-	@KeyType(ConfigFieldType.COLOR)
+	@Info(keyType = ConfigFieldType.COLOR)
 	private Color avatarBorderColor = TRANSPARENT;
 	@Column
-	@KeyType(ConfigFieldType.INTEGER)
+	@Info(keyType = ConfigFieldType.INTEGER)
 	private int avatarBorderWidth = 10;
 
 	@Column
-	@KeyType(ConfigFieldType.ENUM)
+	@Info(keyType = ConfigFieldType.ENUM)
 	private Style decorationStyle = Style.ROUND_SQUARE;
 	@Column
-	@KeyType(ConfigFieldType.COLOR)
+	@Info(keyType = ConfigFieldType.COLOR)
 	private Color decorationBorderColor = new Color(68, 140, 41, 255);
 	@Column
-	@KeyType(ConfigFieldType.INTEGER)
+	@Info(keyType = ConfigFieldType.INTEGER)
 	private int decorationBorderWidth = 5;
 
 
 	@Column
-	@KeyType(ConfigFieldType.COLOR)
+	@Info(keyType = ConfigFieldType.COLOR)
 	private Color backgroundColor = new Color(30, 30, 30, 200);
 	@Column
-	@KeyType(ConfigFieldType.URL)
+	@Info(keyType = ConfigFieldType.URL)
 	private String backgroundImageURL = "";
 	@Column
-	@KeyType(ConfigFieldType.COLOR)
+	@Info(keyType = ConfigFieldType.COLOR)
 	private Color backgroundBorderColor = new Color(68, 140, 41, 255);
 	@Column
-	@KeyType(ConfigFieldType.INTEGER)
+	@Info(keyType = ConfigFieldType.INTEGER)
 	private int backgroundBorderWidth = 10;
 
 	@Column
-	@KeyType(ConfigFieldType.COLOR)
+	@Info(keyType = ConfigFieldType.COLOR)
 	private Color fontColor = Color.WHITE;
 	@Column
-	@KeyType(ConfigFieldType.COLOR)
+	@Info(keyType = ConfigFieldType.COLOR)
 	private Color fontSecondaryColor = Color.GRAY;
 	@Column
-	@KeyType(ConfigFieldType.COLOR)
+	@Info(keyType = ConfigFieldType.COLOR)
 	private Color fontLevelColor = new Color(97, 180, 237);
 
 
@@ -171,7 +171,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 
 			if (value.isEmpty()) field.set(this, field.get(DEFAULT));
 			else {
-				ConfigFieldType type = field.getAnnotation(KeyType.class).value();
+				ConfigFieldType type = field.getAnnotation(Info.class).keyType();
 
 				if (!type.validate(field.getType(), value)) throw new ValidationException(null);
 				field.set(this, type.parse(field.getType(), value));
@@ -191,7 +191,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 
 			Object value = field.get(this);
 
-			if (field.isAnnotationPresent(KeyType.class)) return field.getAnnotation(KeyType.class).value().toString(value);
+			if (field.isAnnotationPresent(Info.class)) return field.getAnnotation(Info.class).keyType().toString(value);
 			else return Objects.toString(value);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new RuntimeException(e);
