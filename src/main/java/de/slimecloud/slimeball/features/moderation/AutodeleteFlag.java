@@ -19,4 +19,9 @@ public enum AutodeleteFlag {
 
 	private final String name;
 	private final Predicate<Message> filter;
+
+	@Override
+	public String toString() {
+		return name;
+	}
 }
