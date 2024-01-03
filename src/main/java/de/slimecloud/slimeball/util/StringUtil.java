@@ -1,5 +1,7 @@
 package de.slimecloud.slimeball.util;
 
+import de.slimecloud.slimeball.config.engine.ValidationException;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -63,6 +65,24 @@ public class StringUtil {
 		} catch (MalformedURLException | URISyntaxException e) {
 			return false;
 		}
+	}
+
+	@NotNull
+	public static String extractUrl(@NotNull OptionMapping value) {
+		try {
+			if (isValidURL(value.getAsString())) value.getAsString();
+			throw new ValidationException(null);
+		} catch (Exception e) {
+			throw new ValidationException(e);
+		}
+	}
+
+	@NotNull
+	public static Enum<?> extractEnum(@NotNull Class<?> type, @NotNull OptionMapping value) {
+		return Arrays.stream(type.getEnumConstants())
+				.map(e -> (Enum<?>) e)
+				.filter(e -> e.name().equals(value.getAsString()))
+				.findFirst().orElseThrow(() -> new ValidationException(null));
 	}
 
 	@NotNull

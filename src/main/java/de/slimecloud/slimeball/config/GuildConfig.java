@@ -3,6 +3,7 @@ package de.slimecloud.slimeball.config;
 import de.slimecloud.slimeball.config.engine.CategoryInfo;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
+import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.features.alerts.SpotifyNotificationConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
@@ -90,10 +91,10 @@ public class GuildConfig {
 	@ConfigField(name = "Contributor-Rolle", command = "contributor", description = "Rolle, die Mitglieder erhalten, die am SlimeBall Bot mitgewirkt haben", type = ConfigFieldType.ROLE)
 	private Long contributorRole;
 
-	//TODO Make this configurable via command
 	@Setter
-	private Map<Long, EnumSet<AutodeleteFlag>> autodelete;
-
+	@ConfigField(name = "Automatisches Nachrichtenlöschen", command = "autodelete", description = "Kanäle, in denen Nachrichten automatisch gelöscht werden", type = ConfigFieldType.ENUM)
+	@Info(keyType = ConfigFieldType.MESSAGE_CHANNEL)
+	private Map<Long, EnumSet<AutodeleteFlag>> autodelete = new HashMap<>();
 
 	@Setter
 	@CategoryInfo(name = "Spotify", command = "spotify", description = "Konfiguration für Spotify-Alerts")
@@ -112,8 +113,8 @@ public class GuildConfig {
 	private MeetingConfig meeting;
 
 	@Setter
-	@CategoryInfo(name = "Team-Nachricht", command = "staff", description = "Kanfigration für die Team-Nachricht")
-	private StaffConfig staff;
+	@CategoryInfo(name = "Team-Nachricht", command = "team-message", description = "Kanfigration für die Team-Nachricht")
+	private StaffConfig teamMessage;
 
 	@NotNull
 	private GuildConfig configure(@NotNull SlimeBot bot, @NotNull String path, long guild) {
@@ -124,7 +125,7 @@ public class GuildConfig {
 		if (spotify != null) spotify.bot = bot;
 		if (fdmds != null) fdmds.bot = bot;
 		if (level != null) level.bot = bot;
-		if (staff != null) staff.bot = bot;
+		if (teamMessage != null) teamMessage.bot = bot;
 		if (meeting != null) meeting.bot = bot;
 
 		return this;
@@ -166,8 +167,8 @@ public class GuildConfig {
 	}
 
 	@NotNull
-	public Optional<StaffConfig> getStaff() {
-		return Optional.ofNullable(staff);
+	public Optional<StaffConfig> getTeamMessage() {
+		return Optional.ofNullable(teamMessage);
 	}
 
 

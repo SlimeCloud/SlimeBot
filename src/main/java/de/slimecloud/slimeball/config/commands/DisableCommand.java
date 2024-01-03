@@ -31,7 +31,7 @@ public class DisableCommand extends Command<ICommandContext> {
 
 		//Get current to call disable method
 		Object current = field.get(config);
-		if (current instanceof ConfigCategory c) c.disable();
+		if (current instanceof ConfigCategory c) c.disable(context.getEvent().getGuild());
 
 		field.set(config, null);
 		config.save();
@@ -39,6 +39,6 @@ public class DisableCommand extends Command<ICommandContext> {
 		//Update commands to remove commands that might be affected by this
 		bot.updateGuildCommands(context.getEvent().getGuild());
 
-		context.getEvent().reply("Feature **" + category.name() + "** deaktiviert").setEphemeral(true).queue();
+		context.getEvent().reply("✅ Feature **" + category.name() + "** deaktiviert").setEphemeral(true).queue();
 	}
 }

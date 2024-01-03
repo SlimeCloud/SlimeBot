@@ -3,7 +3,6 @@ package de.slimecloud.slimeball.config.commands;
 import de.mineking.discordutils.commands.Command;
 import de.mineking.discordutils.commands.CommandManager;
 import de.mineking.discordutils.commands.context.ICommandContext;
-import de.mineking.discordutils.ui.MessageMenu;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.engine.CategoryInfo;
 import de.slimecloud.slimeball.config.engine.ConfigField;
@@ -13,11 +12,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 public class CategoryCommand extends Command<ICommandContext> {
-	public CategoryCommand(@NotNull SlimeBot bot, @NotNull CommandManager<ICommandContext, ?> manager, @Nullable Field field, @NotNull Function<GuildConfig, Object> instance, @NotNull CategoryInfo category, @NotNull Field[] fields, @NotNull MessageMenu menu) {
+	public CategoryCommand(@NotNull SlimeBot bot, @NotNull CommandManager<ICommandContext, ?> manager, @Nullable Field field, @NotNull Function<GuildConfig, Object> instance, @NotNull CategoryInfo category, @NotNull Field[] fields) {
 		super(manager, category.command(), category.description());
 
 		Map<String, Field> fieldMap = new HashMap<>();
@@ -35,15 +37,6 @@ public class CategoryCommand extends Command<ICommandContext> {
 
 			if (info.required()) required.add(f);
 			else optional.add(f);
-
-			if (info.required()) continue;
-
-			//Add subcommand for collections
-			if (Collection.class.isAssignableFrom(f.getType())) addSubcommand(new ConfigCollectionCommand(bot, manager, instance, f, category, info, menu));
-			else if (Map.class.isAssignableFrom(f.getType())) addSubcommand(new ConfigMapCommand(bot, manager, instance, f, category, info, menu));
-
-				//Add subcommand for normal fields
-			else addSubcommand(new ConfigFieldCommand(bot, manager, instance, f, category, info, menu));
 		}
 
 		//Add enable / disable
@@ -54,7 +47,7 @@ public class CategoryCommand extends Command<ICommandContext> {
 	}
 
 	@NotNull
-	public static CategoryCommand getCommand(@NotNull SlimeBot bot, @NotNull CommandManager<ICommandContext, ?> manager, @NotNull Field field, @NotNull MessageMenu menu) {
+	public static CategoryCommand getCommand(@NotNull SlimeBot bot, @NotNull CommandManager<ICommandContext, ?> manager, @NotNull Field field) {
 		CategoryInfo info = field.getAnnotation(CategoryInfo.class);
 		if (info == null) throw new IllegalArgumentException("Category is missing annotation!");
 
@@ -75,7 +68,7 @@ public class CategoryCommand extends Command<ICommandContext> {
 			} catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
-		}, info, field.getType().getDeclaredFields(), menu);
+		}, info, field.getType().getDeclaredFields());
 	}
 
 	@Override
