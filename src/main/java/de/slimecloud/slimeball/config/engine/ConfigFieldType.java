@@ -355,7 +355,7 @@ public enum ConfigFieldType {
 								handler.accept(s, (Integer) value.apply(s) - 1);
 								s.update();
 							}),
-							new ButtonComponent(name + ".display", ButtonColor.GRAY, (TextLabel) s -> Objects.toString(value.apply(s))).asDisabled(true),
+							new MenuComponent<>(getModal(manager, type, menu, name + ".display", display, handler), ButtonColor.GRAY, (TextLabel) s -> "\uD83D\uDCDD " + value.apply(s)).setStateCreator(ModalMenu::createState),
 							new ButtonComponent(name + ".add", ButtonColor.BLUE, "+").asDisabled(s -> (Integer) value.apply(s) >= info.maxValue()).appendHandler(s -> {
 								handler.accept(s, (Integer) value.apply(s) + 1);
 								s.update();
@@ -404,20 +404,17 @@ public enum ConfigFieldType {
 
 		@Override
 		public List<? extends ComponentRow> createAdvancedComponents(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
-			return List.of(
-					super.createComponent(manager, type, info, menu, name, display, value, handler),
-					ComponentRow.of(
-							new ButtonComponent(name + ".subtract", ButtonColor.BLUE, "-").asDisabled(s -> (Double) value.apply(s) - 1 < info.minValue()).appendHandler(s -> {
-								handler.accept(s, (Double) value.apply(s) - 1);
-								s.update();
-							}),
-							new ButtonComponent(name + ".display", ButtonColor.GRAY, (TextLabel) s -> Objects.toString(value.apply(s))).asDisabled(true),
-							new ButtonComponent(name + ".add", ButtonColor.BLUE, "+").asDisabled(s -> (Double) value.apply(s) + 1 > info.maxValue()).appendHandler(s -> {
-								handler.accept(s, (Double) value.apply(s) + 1);
-								s.update();
-							})
-					)
-			);
+			return List.of(ComponentRow.of(
+					new ButtonComponent(name + ".subtract", ButtonColor.BLUE, "-").asDisabled(s -> (Double) value.apply(s) - 1 < info.minValue()).appendHandler(s -> {
+						handler.accept(s, (Double) value.apply(s) - 1);
+						s.update();
+					}),
+					new MenuComponent<>(getModal(manager, type, menu, name + ".display", display, handler), ButtonColor.GRAY, (TextLabel) s -> "\uD83D\uDCDD " + value.apply(s)).setStateCreator(ModalMenu::createState),
+					new ButtonComponent(name + ".add", ButtonColor.BLUE, "+").asDisabled(s -> (Double) value.apply(s) + 1 > info.maxValue()).appendHandler(s -> {
+						handler.accept(s, (Double) value.apply(s) + 1);
+						s.update();
+					})
+			));
 		}
 
 		@Override
