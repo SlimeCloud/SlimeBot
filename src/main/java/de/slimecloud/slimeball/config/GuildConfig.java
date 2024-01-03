@@ -96,7 +96,6 @@ public class GuildConfig {
 	@Info(keyType = ConfigFieldType.MESSAGE_CHANNEL)
 	private Map<Long, EnumSet<AutodeleteFlag>> autodelete = new HashMap<>();
 
-
 	@Setter
 	@CategoryInfo(name = "Spotify", command = "spotify", description = "Konfiguration für Spotify-Alerts")
 	private SpotifyNotificationConfig spotify;
