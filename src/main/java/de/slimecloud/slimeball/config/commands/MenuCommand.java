@@ -14,6 +14,7 @@ import de.mineking.discordutils.ui.components.select.StringSelectComponent;
 import de.mineking.discordutils.ui.components.types.Component;
 import de.mineking.discordutils.ui.components.types.ComponentRow;
 import de.mineking.discordutils.ui.state.DataState;
+import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.engine.CategoryInfo;
 import de.slimecloud.slimeball.config.engine.ConfigField;
@@ -90,7 +91,7 @@ public class MenuCommand {
 					ConfigField info = f.getAnnotation(ConfigField.class);
 
 					return new MenuComponent<>(
-							createFieldMenu(bot, manager, f.getGenericType(), (s, c) -> {
+							createFieldMenu(bot, manager, f.getGenericType(), instance, (s, c) -> {
 								try {
 									return f.get(instance.apply(c));
 								} catch (IllegalAccessException e) {
@@ -156,18 +157,19 @@ public class MenuCommand {
 	}
 
 	@NotNull
-	private static MessageMenu createFieldMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Type generic, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field, @Nullable ConfigFieldType keyType) {
+	private static MessageMenu createFieldMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Type generic, @NotNull Function<GuildConfig, Object> categoryInstance, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field, @Nullable ConfigFieldType keyType) {
 		Class<?> type = getClass(generic);
 
-		if (EnumSet.class.isAssignableFrom(type)) return createEnumSetValueMenu(bot, manager, generic, getter, setter, display, category, field);
-		if (Collection.class.isAssignableFrom(type)) return createListValueMenu(bot, manager, type, generic, getter, setter, display, category, field);
-		if (Map.class.isAssignableFrom(type)) return createMapValueMenu(bot, manager, type, generic, getter, setter, display, category, field, keyType);
-		return createValueMenu(bot, manager, type, getter, setter, display, category, field);
+		if (EnumSet.class.isAssignableFrom(type)) return createEnumSetValueMenu(bot, manager, generic, categoryInstance, getter, setter, display, category, field);
+		if (Collection.class.isAssignableFrom(type)) return createListValueMenu(bot, manager, type, generic, categoryInstance, getter, setter, display, category, field);
+		if (Map.class.isAssignableFrom(type)) return createMapValueMenu(bot, manager, type, generic, categoryInstance, getter, setter, display, category, field, keyType);
+		return createValueMenu(bot, manager, type, categoryInstance, getter, setter, display, category, field);
 	}
 
-	private static void set(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Setter setter, @Nullable Object value) {
+	private static void set(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Function<GuildConfig, Object> category, @NotNull Setter setter, @Nullable Object value) {
 		GuildConfig config = bot.loadGuild(state.event.getGuild());
 		setter.set(state, config, value);
+		if(category.apply(config) instanceof ConfigCategory c) c.update(state.event.getGuild());
 		config.save();
 	}
 
@@ -177,23 +179,24 @@ public class MenuCommand {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> void handle(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Getter getter, @NotNull Consumer<T> handler) {
+	private static <T> void handle(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Function<GuildConfig, Object> category, @NotNull Getter getter, @NotNull Consumer<T> handler) {
 		GuildConfig config = bot.loadGuild(state.event.getGuild());
 		handler.accept((T) getter.get(state, config));
+		if(category.apply(config) instanceof ConfigCategory c) c.update(state.event.getGuild());
 		config.save();
 	}
 
 	@NotNull
-	private static MessageMenu createValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Class<?> type, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field) {
+	private static MessageMenu createValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Class<?> type, @NotNull Function<GuildConfig, Object> categoryInstance, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field) {
 		List<Component<?>> components = new ArrayList<>();
 
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
-			set(bot, s, setter, null);
+			set(bot, s, categoryInstance, setter, null);
 			s.update();
 		}));
 
-		Component<?> component = field.type().createComponent(manager, type, "config." + category.command() + "." + field.command(), "value", "Wert festlegen", (s, v) -> set(bot, s, setter, v));
+		Component<?> component = field.type().createComponent(manager, type, "config." + category.command() + "." + field.command(), "value", "Wert festlegen", (s, v) -> set(bot, s, categoryInstance, setter, v));
 
 		if (component instanceof EntitySelectComponent || component instanceof StringSelectComponent) components.add(0, component);
 		else components.add(component);
@@ -217,7 +220,7 @@ public class MenuCommand {
 
 	@NotNull
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	private static MessageMenu createListValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Class<?> type, @NotNull Type generic, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field) {
+	private static MessageMenu createListValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Class<?> type, @NotNull Type generic, @NotNull Function<GuildConfig, Object> categoryInstance, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field) {
 		Type componentType = getGenericType(generic, 0);
 		Class<?> componentClass = getClass(componentType);
 
@@ -225,17 +228,17 @@ public class MenuCommand {
 
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
-			set(bot, s, setter, createEmptyCollection(type, generic));
+			set(bot, s, categoryInstance, setter, createEmptyCollection(type, generic));
 			s.update();
 		}));
 
-		Component<?> add = field.type().createComponent(manager, componentClass, "config." + category.command() + "." + field.command(), "add", "Wert hinzufügen", (s, v) -> MenuCommand.<Collection>handle(bot, s, getter, c -> c.add(v)));
+		Component<?> add = field.type().createComponent(manager, componentClass, "config." + category.command() + "." + field.command(), "add", "Wert hinzufügen", (s, v) -> MenuCommand.<Collection>handle(bot, s, categoryInstance, getter, c -> c.add(v)));
 
 		Component<?> remove = new StringSelectComponent("remove", s -> MenuCommand.<Collection<?>>get(bot, s, getter).stream()
 				.map(e -> field.type().createSelectOption(bot, e))
 				.toList()
 		).setPlaceholder("Wert entfernen").appendHandler((s, v) -> {
-			MenuCommand.<Collection<?>>handle(bot, s, getter, c -> c.remove(field.type().parse(componentClass, v.get(0).getValue())));
+			MenuCommand.<Collection<?>>handle(bot, s, categoryInstance, getter, c -> c.remove(field.type().parse(componentClass, v.get(0).getValue())));
 			s.update();
 		});
 
@@ -266,14 +269,14 @@ public class MenuCommand {
 
 	@NotNull
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	private static MessageMenu createEnumSetValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Type generic, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field) {
+	private static MessageMenu createEnumSetValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Type generic, @NotNull Function<GuildConfig, Object> categoryInstance, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field) {
 		Class<?> componentClass = getClass(getGenericType(generic, 0));
 
 		List<Component<?>> components = new ArrayList<>();
 
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
-			set(bot, s, setter, emptyEnumSet(componentClass));
+			set(bot, s, categoryInstance, setter, emptyEnumSet(componentClass));
 			s.update();
 		}));
 
@@ -283,7 +286,7 @@ public class MenuCommand {
 				)
 				.toList()
 		).setMinValues(0).setMaxValues(componentClass.getEnumConstants().length).appendHandler((s, v) -> {
-			MenuCommand.<EnumSet>handle(bot, s, getter, c -> {
+			MenuCommand.<EnumSet>handle(bot, s, categoryInstance, getter, c -> {
 				c.clear();
 				c.addAll(v.stream().map(x -> Arrays.stream(componentClass.getEnumConstants()).map(e -> (Enum<?>) e).filter(e -> e.name().equals(x.getValue())).findFirst().orElseThrow()).toList());
 			});
@@ -310,7 +313,7 @@ public class MenuCommand {
 
 	@NotNull
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private static MessageMenu createMapValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Class<?> type, @NotNull Type generic, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field, @Nullable ConfigFieldType keyType) {
+	private static MessageMenu createMapValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Class<?> type, @NotNull Type generic, @NotNull Function<GuildConfig, Object> categoryInstance, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field, @Nullable ConfigFieldType keyType) {
 		Class<?> keyClass = getClass(getGenericType(generic, 0));
 
 		Type valueType = getGenericType(generic, 1);
@@ -323,14 +326,14 @@ public class MenuCommand {
 
 		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
-			set(bot, s, setter, type.isAssignableFrom(HashMap.class) ? new HashMap<>() : new LinkedHashMap<>());
+			set(bot, s, categoryInstance, setter, type.isAssignableFrom(HashMap.class) ? new HashMap<>() : new LinkedHashMap<>());
 			s.update();
 		}));
 
 		CategoryInfo valueCategory = createCategory(category.name() + " → " + field.name(), category.command() + "." + field.command(), field.description());
 		ConfigField valueField = createField("?", "value", field.description(), field.type());
 
-		MessageMenu valueMenu = createFieldMenu(bot, manager, valueType,
+		MessageMenu valueMenu = createFieldMenu(bot, manager, valueType,categoryInstance,
 				(s, c) -> ((Map) getter.get(s, c)).getOrDefault(s.getRawState("key", keyClass), Collection.class.isAssignableFrom(valueClass) ? createEmptyCollection(valueClass, valueType) : null),
 				(s, c, v) -> {
 					Map value = (Map) getter.get(s, c);
@@ -350,7 +353,7 @@ public class MenuCommand {
 				.map(e -> keyType.createSelectOption(bot, e))
 				.toList()
 		).setPlaceholder("Wert entfernen").appendHandler((s, v) -> {
-			MenuCommand.<Map<?, ?>>handle(bot, s, getter, c -> c.remove(keyType.parse(keyClass, v.get(0).getValue())));
+			MenuCommand.<Map<?, ?>>handle(bot, s, categoryInstance, getter, c -> c.remove(keyType.parse(keyClass, v.get(0).getValue())));
 			s.update();
 		});
 
