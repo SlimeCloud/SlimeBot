@@ -1,5 +1,5 @@
 /**
- * In this package you find everything witch need the GitHub-API
+ * In this package you find everything witch needs the GitHub-API
  * <p>e.g. Bug-Reports
  */
 
