@@ -17,7 +17,7 @@ public class StaffMessage extends ListenerAdapter {
 
 	@Override
 	public void onMessageDelete(@NotNull MessageDeleteEvent event) {
-		if(!event.isFromGuild()) return;
+		if (!event.isFromGuild()) return;
 
 		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
 		guildConfig.getStaff().ifPresent(config -> {

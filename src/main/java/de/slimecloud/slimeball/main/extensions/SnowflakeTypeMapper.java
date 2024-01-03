@@ -66,15 +66,15 @@ public class SnowflakeTypeMapper implements TypeMapper<Long, ISnowflake> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public ISnowflake parse(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field field, @Nullable Long value) {
-		if(value == null) return null;
+		if (value == null) return null;
 
 		JDA jda = manager.<SlimeBot>getData("bot").getJda();
 
-		if(type.isAssignableFrom(UserSnowflake.class)) return UserSnowflake.fromId(value);
-		else if(type.isAssignableFrom(Guild.class)) return jda.getGuildById(value);
-		else if(type.isAssignableFrom(Role.class)) return jda.getRoleById(value);
+		if (type.isAssignableFrom(UserSnowflake.class)) return UserSnowflake.fromId(value);
+		else if (type.isAssignableFrom(Guild.class)) return jda.getGuildById(value);
+		else if (type.isAssignableFrom(Role.class)) return jda.getRoleById(value);
 
-		else if(Channel.class.isAssignableFrom(type)) return jda.getChannelById((Class<? extends Channel>) type, value);
+		else if (Channel.class.isAssignableFrom(type)) return jda.getChannelById((Class<? extends Channel>) type, value);
 
 		throw new RuntimeException();
 	}

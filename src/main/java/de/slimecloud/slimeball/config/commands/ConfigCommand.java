@@ -6,29 +6,17 @@ import de.mineking.discordutils.commands.CommandManager;
 import de.mineking.discordutils.commands.Setup;
 import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.context.ICommandContext;
-import de.mineking.discordutils.ui.MessageMenu;
-import de.mineking.discordutils.ui.MessageRenderer;
-import de.mineking.discordutils.ui.RenderTermination;
 import de.mineking.discordutils.ui.UIManager;
-import de.mineking.discordutils.ui.components.button.ButtonColor;
-import de.mineking.discordutils.ui.components.button.ButtonComponent;
-import de.mineking.discordutils.ui.components.types.ComponentRow;
-import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.engine.CategoryInfo;
 import de.slimecloud.slimeball.config.engine.ConfigField;
-import de.slimecloud.slimeball.config.engine.ConfigFieldType;
-import de.slimecloud.slimeball.config.engine.KeyType;
 import de.slimecloud.slimeball.main.CommandPermission;
 import de.slimecloud.slimeball.main.SlimeBot;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 
 @ApplicationCommand(name = "config", description = "Verwaltet die konfiguration des Servers", scope = Scope.GUILD_GLOBAL)
 public class ConfigCommand {

@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.text.html.Option;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -71,7 +70,7 @@ public class StringUtil {
 	@NotNull
 	public static String extractUrl(@NotNull OptionMapping value) {
 		try {
-			if(isValidURL(value.getAsString())) value.getAsString();
+			if (isValidURL(value.getAsString())) value.getAsString();
 			throw new ValidationException(null);
 		} catch (Exception e) {
 			throw new ValidationException(e);
