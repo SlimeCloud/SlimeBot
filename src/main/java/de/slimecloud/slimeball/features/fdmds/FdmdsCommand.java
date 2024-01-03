@@ -127,7 +127,7 @@ public class FdmdsCommand {
 	@Listener(type = ButtonHandler.class, filter = "fdmds.edit")
 	public void editFdmds(ButtonInteractionEvent event) {
 		MessageEmbed embed = event.getMessage().getEmbeds().get(0);
-		sendModal(event, embed.getFields().get(0).getValue(), embed.getFields().get(1).getValue().lines()
+		sendModal(event, embed.getDescription(), embed.getFields().get(0).getValue().lines()
 				.map(s -> s.split(" -> ", 2)[1])
 				.collect(Collectors.joining("\n"))
 		);
@@ -139,10 +139,10 @@ public class FdmdsCommand {
 			//Load information from embed
 			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 
-			String question = embed.getFields().get(0).getValue();
-			String choices = embed.getFields().get(1).getValue();
-
 			if (embed.getAuthor() != null) {
+				String question = embed.getDescription();
+				String choices = embed.getFields().get(0).getValue();
+
 				//Call event
 				new FdmdsCreateEvent(ContributorCommand.getUser(embed), event.getMember(), question).callEvent();
 
@@ -169,6 +169,9 @@ public class FdmdsCommand {
 
 			//TODO: Backward compatibility. This should be removed as soon as enough questions with the new system have been submitted
 			else {
+				String question = embed.getFields().get(0).getValue();
+				String choices = embed.getFields().get(1).getValue();
+
 				String footerText = embed.getFooter().getText();
 				Member requester = event.getGuild().getMemberById(footerText.substring(footerText.lastIndexOf(' ') + 2, footerText.length() - 1));
 
