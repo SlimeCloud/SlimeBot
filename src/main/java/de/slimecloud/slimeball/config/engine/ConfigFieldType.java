@@ -71,7 +71,7 @@ public enum ConfigFieldType {
 		@NotNull
 		@Override
 		public Object parse(@NotNull Class<?> type, @NotNull String value) {
-			return Long.parseLong(value);
+			return Long.parseLong(value.replaceAll("[<#>]", ""));
 		}
 
 		@NotNull
@@ -116,7 +116,7 @@ public enum ConfigFieldType {
 		@NotNull
 		@Override
 		public Object parse(@NotNull Class<?> type, @NotNull String value) {
-			return Long.parseLong(value);
+			return Long.parseLong(value.replaceAll("[<#>]", ""));
 		}
 
 		@NotNull
@@ -161,7 +161,7 @@ public enum ConfigFieldType {
 		@NotNull
 		@Override
 		public Object parse(@NotNull Class<?> type, @NotNull String value) {
-			return Long.parseLong(value);
+			return Long.parseLong(value.replaceAll("[<#>]", ""));
 		}
 
 		@NotNull
@@ -204,7 +204,7 @@ public enum ConfigFieldType {
 		@NotNull
 		@Override
 		public Object parse(@NotNull Class<?> type, @NotNull String value) {
-			return Long.parseLong(value);
+			return Long.parseLong(value.replaceAll("[<@&>]", ""));
 		}
 
 		@NotNull
