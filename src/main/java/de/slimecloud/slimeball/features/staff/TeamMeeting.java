@@ -50,7 +50,7 @@ public class TeamMeeting extends ListenerAdapter {
 		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
 		guildConfig.getMeeting().ifPresent(config -> {
 			if (config.getMessage() == event.getMessageIdLong()) {
-				config.disable();
+				config.disable(event.getGuild());
 				guildConfig.setMeeting(null);
 
 				guildConfig.save();

@@ -52,7 +52,7 @@ public class MeetingConfig extends ConfigCategory {
 	private final transient Set<Future<?>> futures = new HashSet<>();
 
 	@Override
-	public void enable() {
+	public void enable(@NotNull Guild guild) {
 		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(offset));
 	}
 
@@ -92,7 +92,7 @@ public class MeetingConfig extends ConfigCategory {
 	}
 
 	@Override
-	public void disable() {
+	public void disable(@NotNull Guild guild) {
 		if (message == null) return;
 		getChannel().ifPresent(channel -> {
 			channel.deleteMessageById(message).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));

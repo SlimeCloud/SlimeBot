@@ -23,7 +23,7 @@ import de.mineking.discordutils.ui.state.UpdateState;
 import de.mineking.javautils.ID;
 import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.config.GuildConfig;
-import de.slimecloud.slimeball.config.engine.KeyType;
+import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.config.engine.ValidationException;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
@@ -76,7 +76,7 @@ public class CardCommand {
 					.setImage("attachment://image.png");
 
 			for (Field f : CardProfileData.class.getDeclaredFields()) {
-				if (!f.isAnnotationPresent(KeyType.class)) continue;
+				if (!f.isAnnotationPresent(Info.class)) continue;
 
 				f.setAccessible(true);
 
@@ -105,15 +105,15 @@ public class CardCommand {
 			//Modal input menu
 			ModalMenu input = manager.createModal(
 					"card.edit.modal",
-					state -> StringUtil.prettifyCamelCase(state.getState("field")),
+					state -> StringUtil.prettifyCamelCase(state.getState("field", String.class)),
 					List.of(new TextComponent("value", "Der neue Wert für diese Eigenschaft", TextInputStyle.SHORT)
-							.setValue(s -> bot.getCardProfiles().getProfile(s.event.getMember()).getData().get(s.getState("field")))
-							.setPlaceholder(s -> (s.<String>getState("field").contains("Color") ? "Hex-Code, z.B. #00ff00. " : "") + "Leer lassen um zurück zusetzten")
+							.setValue(s -> bot.getCardProfiles().getProfile(s.event.getMember()).getData().get(s.getState("field", String.class)))
+							.setPlaceholder(s -> (s.getState("field", String.class).contains("Color") ? "Hex-Code, z.B. #00ff00. " : "") + "Leer lassen um zurück zusetzten")
 							.setRequired(s -> false)
 					),
 					(state, response) -> {
 						try {
-							bot.getCardProfiles().getProfile(state.event.getMember()).getData().set(state.getState("field"), response.getString("value")).update();
+							bot.getCardProfiles().getProfile(state.event.getMember()).getData().set(state.getState("field", String.class), response.getString("value")).update();
 							manager.getMenu("card.edit").display(state.event);
 						} catch (ValidationException e) {
 							manager.getMenu("card.edit").display(state.event);
@@ -129,7 +129,7 @@ public class CardCommand {
 			String last = null;
 
 			for (Field field : CardProfileData.class.getDeclaredFields()) {
-				if (!field.isAnnotationPresent(KeyType.class)) continue;
+				if (!field.isAnnotationPresent(Info.class)) continue;
 				field.setAccessible(true);
 
 				String category = StringUtil.parseCamelCase(field.getName())[0];

@@ -3,6 +3,7 @@ package de.slimecloud.slimeball.features.staff;
 import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
+import de.slimecloud.slimeball.config.engine.Info;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -17,6 +18,8 @@ import java.util.Optional;
 
 @Getter
 public class StaffConfig extends ConfigCategory {
+	@ConfigField(name = "Einträge", command = "entries", description = "Einträge für die Nachricht (key: Rollen ID, value: Beschreibung)", type = ConfigFieldType.STRING)
+	@Info(keyType = ConfigFieldType.STRING)
 	private final LinkedHashMap<String, String> roles = new LinkedHashMap<>();
 
 	@ConfigField(name = "Kanal", command = "channel", description = "Kanal, in dem die Team-Rollen erklärt werden", type = ConfigFieldType.MESSAGE_CHANNEL, required = true)
@@ -24,22 +27,22 @@ public class StaffConfig extends ConfigCategory {
 	private Long message;
 
 	@Override
-	public void enable() {
+	public void enable(@NotNull Guild guild) {
 		message = getChannel().map(channel -> channel
-				.sendMessage("*Noch nicht konfiguriert*")
+				.sendMessage("*Keine Einträge*")
 				.complete().getIdLong()
 		).orElseThrow();
 	}
 
 	@Override
-	public void disable() {
+	public void disable(@NotNull Guild guild) {
 		if (message == null) return;
 		getChannel().ifPresent(channel -> channel.deleteMessageById(message).queue());
 	}
 
 	@Override
-	public void update() {
-		if (message == null) enable();
+	public void update(@NotNull Guild guild) {
+		if (message == null) enable(guild);
 		getChannel().ifPresent(channel -> channel.editMessageById(message, buildMessage(channel.getGuild())).queue());
 	}
 
@@ -72,6 +75,8 @@ public class StaffConfig extends ConfigCategory {
 				builder.append(description).append("\n\n");
 			}
 		});
+
+		if (builder.isEmpty()) builder.append("*Keine Einträge*");
 
 		return MessageEditData.fromContent(builder.toString());
 	}
