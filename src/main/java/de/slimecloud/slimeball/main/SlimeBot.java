@@ -34,6 +34,10 @@ import de.slimecloud.slimeball.features.poll.PollCommand;
 import de.slimecloud.slimeball.features.poll.PollTable;
 import de.slimecloud.slimeball.features.quote.QuoteCommand;
 import de.slimecloud.slimeball.features.quote.QuoteMessageCommand;
+import de.slimecloud.slimeball.features.reminder.RemindManager;
+import de.slimecloud.slimeball.features.reminder.RemindMeCommand;
+import de.slimecloud.slimeball.features.reminder.Reminder;
+import de.slimecloud.slimeball.features.reminder.ReminderTable;
 import de.slimecloud.slimeball.features.report.Report;
 import de.slimecloud.slimeball.features.report.ReportBlock;
 import de.slimecloud.slimeball.features.report.ReportBlockTable;
@@ -103,6 +107,9 @@ public class SlimeBot extends ListenerAdapter {
 
 	private final PollTable polls;
 
+	private final ReminderTable reminder;
+	private final RemindManager remindManager;
+
 	private final LevelTable level;
 	private final CardDataTable profileData;
 	private final GuildCardTable cardProfiles;
@@ -137,6 +144,8 @@ public class SlimeBot extends ListenerAdapter {
 
 			polls = (PollTable) database.getTable(PollTable.class, Poll.class, () -> new Poll(this), "polls").createTable();
 
+			reminder = (ReminderTable) database.getTable(ReminderTable.class, Reminder.class, () -> new Reminder(this), "reminders").createTable();
+
 			level = (LevelTable) database.getTable(LevelTable.class, Level.class, () -> new Level(this), "levels").createTable();
 			profileData = (CardDataTable) database.getTable(CardDataTable.class, CardProfileData.class, () -> new CardProfileData(this), "card_data").createTable();
 			cardProfiles = (GuildCardTable) database.getTable(GuildCardTable.class, GuildCardProfile.class, () -> new GuildCardProfile(this), "guild_card_profiles").createTable();
@@ -150,12 +159,16 @@ public class SlimeBot extends ListenerAdapter {
 			reports = null;
 			reportBlocks = null;
 			polls = null;
+			reminder = null;
 			level = null;
 			profileData = null;
 			cardProfiles = null;
 			cardDecorations = null;
 			wrappedData = null;
 		}
+
+		// Initialize RemindMe manger
+		remindManager = new RemindManager(this);
 
 		//Initialize GitHub API
 		if (credentials.get("GITHUB_TOKEN") != null && config.getGithubRepository() != null) github = new GitHubAPI(credentials.get("GITHUB_TOKEN"));
@@ -218,6 +231,10 @@ public class SlimeBot extends ListenerAdapter {
 
 					manager.registerCommand(FdmdsCommand.class);
 
+					//Register remind commands
+					if(reminder != null) {
+						manager.registerCommand(RemindMeCommand.class);
+					}
 					//Register report commands
 					if (reports != null) {
 						manager.registerCommand(ReportCommand.class);
