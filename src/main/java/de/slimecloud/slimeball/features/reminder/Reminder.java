@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
+
 @Getter
 @AllArgsConstructor
 public class Reminder implements DataClass<Reminder> {
@@ -17,25 +19,27 @@ public class Reminder implements DataClass<Reminder> {
 
 	@Column(autoincrement = true, key = true)
 	private final int id;
-	@Column()
+
+	@Column
 	private final Guild guild;
-	@Column()
+	@Column
 	private final UserSnowflake user;
 
-	@Column()
-	private final long time;
+	@Column
+	private final Instant time;
 
 	@Column
 	private final String message;
 
 	public Reminder(@NotNull SlimeBot bot) {
-		this(bot, 0, null, null, 0, null);
+		this(bot, 0, null, null, null, null);
 	}
 
 	public void execute() {
 		bot.getJda().openPrivateChannelById(user.getIdLong())
 				.flatMap(channel -> channel.sendMessage(message))
 				.queue();
+
 		delete();
 		bot.getRemindManager().scheduleNextReminder();
 	}
@@ -44,17 +48,5 @@ public class Reminder implements DataClass<Reminder> {
 	@Override
 	public Table<Reminder> getTable() {
 		return bot.getReminder();
-	}
-
-	@NotNull
-	@Override
-	public DataClass<Reminder> update() {
-		return DataClass.super.update();
-	}
-
-	@NotNull
-	@Override
-	public DataClass<Reminder> delete() {
-		return DataClass.super.delete();
 	}
 }

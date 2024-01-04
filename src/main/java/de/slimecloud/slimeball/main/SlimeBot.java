@@ -231,7 +231,8 @@ public class SlimeBot extends ListenerAdapter {
 					//Register remind commands
 					if(reminder != null) {
 						manager.registerCommand(RemindMeCommand.class);
-					}
+					} else logger.warn("Reminders disabled due to missing database");
+
 					//Register report commands
 					if (reports != null) {
 						manager.registerCommand(ReportCommand.class);
@@ -298,8 +299,9 @@ public class SlimeBot extends ListenerAdapter {
 				else logger.warn("Spotify alerts disabled deu to missing database");
 			} else logger.warn("Spotify alerts disabled due to missing configuration");
 		}
+
 		// Initialize RemindMe manger
-		remindManager = new RemindManager(this);
+		if(reminder != null) remindManager = new RemindManager(this);
 
 		new HolidayAlert(this);
 	}

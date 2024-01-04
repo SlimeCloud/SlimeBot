@@ -3,11 +3,12 @@ package de.slimecloud.slimeball.features.reminder;
 import de.mineking.javautils.database.Order;
 import de.mineking.javautils.database.Table;
 import de.mineking.javautils.database.Where;
+import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,18 +18,24 @@ public interface ReminderTable extends Table<Reminder> {
 		return selectAll(Order.ascendingBy("time").limit(1)).stream().findFirst();
 	}
 
-	default void createReminder(Guild guild, UserSnowflake user, long time, String message) {
-		new Reminder(getManager().getData("bot"), 0, guild, user, time, message).update();
+	default Reminder createReminder(@NotNull Member member, @NotNull Instant time, @NotNull String message) {
+		SlimeBot bot = getManager().getData("bot");
+
+		Reminder result = insert(new Reminder(bot, 0, member.getGuild(), member, time, message));
+		bot.getRemindManager().scheduleNextReminder();
+		return result;
 	}
 
-	default List<Reminder> getByMember(Member member) {
+	@NotNull
+	default List<Reminder> getByMember(@NotNull Member member) {
 		return selectMany(Where.allOf(
 				Where.equals("user", member.getUser().getIdLong()),
 				Where.equals("guild", member.getGuild().getIdLong())
 		));
 	}
 
-	default List<Reminder> getByGuild(Guild guild) {
+	@NotNull
+	default List<Reminder> getByGuild(@NotNull Guild guild) {
 		return selectMany(Where.equals("guild", guild.getIdLong()));
 	}
 }
