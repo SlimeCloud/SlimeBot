@@ -108,7 +108,7 @@ public class SlimeBot extends ListenerAdapter {
 	private final PollTable polls;
 
 	private final ReminderTable reminder;
-	private final RemindManager remindManager;
+	private RemindManager remindManager;
 
 	private final LevelTable level;
 	private final CardDataTable profileData;
@@ -166,9 +166,6 @@ public class SlimeBot extends ListenerAdapter {
 			cardDecorations = null;
 			wrappedData = null;
 		}
-
-		// Initialize RemindMe manger
-		remindManager = new RemindManager(this);
 
 		//Initialize GitHub API
 		if (credentials.get("GITHUB_TOKEN") != null && config.getGithubRepository() != null) github = new GitHubAPI(credentials.get("GITHUB_TOKEN"));
@@ -301,6 +298,8 @@ public class SlimeBot extends ListenerAdapter {
 				else logger.warn("Spotify alerts disabled deu to missing database");
 			} else logger.warn("Spotify alerts disabled due to missing configuration");
 		}
+		// Initialize RemindMe manger
+		remindManager = new RemindManager(this);
 
 		new HolidayAlert(this);
 	}

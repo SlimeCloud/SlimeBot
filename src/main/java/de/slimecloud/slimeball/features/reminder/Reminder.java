@@ -9,27 +9,37 @@ import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.PropertyKey;
 
 @Getter
 @AllArgsConstructor
 public class Reminder implements DataClass<Reminder> {
 	private final SlimeBot bot;
 
+	@Column(autoincrement = true, key = true)
+	private final int id;
 	@Column()
 	private final Guild guild;
 	@Column()
 	private final UserSnowflake user;
 
-	@Column(key = true)
+	@Column()
 	private final long time;
 
 	@Column
 	private final String message;
 
 	public Reminder(@NotNull SlimeBot bot) {
-		this(bot, null, null, 0, null);
+		this(bot, 0, null, null, 0, null);
 	}
+
+	public void execute() {
+		bot.getJda().openPrivateChannelById(user.getIdLong())
+				.flatMap(channel -> channel.sendMessage(message))
+				.queue();
+		delete();
+		bot.getRemindManager().scheduleNextReminder();
+	}
+
 	@NotNull
 	@Override
 	public Table<Reminder> getTable() {

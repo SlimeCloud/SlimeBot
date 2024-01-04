@@ -54,6 +54,7 @@ public class RemindMeCommand {
 		}
 
 		bot.getReminder().createReminder(event.getGuild(), event.getUser(), unixTime, message);
+		// Schedule the next reminder
 		bot.getRemindManager().scheduleNextReminder();
 
 		event.reply(String.valueOf(unixTime)).queue();

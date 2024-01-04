@@ -8,13 +8,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.channels.SelectableChannel;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 public interface ReminderTable extends Table<Reminder> {
 	@NotNull
@@ -23,7 +18,7 @@ public interface ReminderTable extends Table<Reminder> {
 	}
 
 	default void createReminder(Guild guild, UserSnowflake user, long time, String message) {
-		new Reminder(getManager().getData("bot"),guild, user, time, message).update();
+		new Reminder(getManager().getData("bot"), 0, guild, user, time, message).update();
 	}
 
 	default List<Reminder> getByMember(Member member) {
@@ -36,6 +31,4 @@ public interface ReminderTable extends Table<Reminder> {
 	default List<Reminder> getByGuild(Guild guild) {
 		return selectMany(Where.equals("guild", guild.getIdLong()));
 	}
-
-
 }
