@@ -40,7 +40,7 @@ public class SnowflakeTypeMapper implements TypeMapper<Long, ISnowflake> {
 		return new Argument() {
 			@Override
 			public void apply(int position, PreparedStatement statement, StatementContext ctx) throws SQLException {
-				statement.setLong(position, value);
+				statement.setLong(position, value == null ? 0 : value);
 			}
 
 			@Override
@@ -66,7 +66,7 @@ public class SnowflakeTypeMapper implements TypeMapper<Long, ISnowflake> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public ISnowflake parse(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field field, @Nullable Long value) {
-		if (value == null) return null;
+		if (value == null ||value == 0) return null;
 
 		JDA jda = manager.<SlimeBot>getData("bot").getJda();
 
