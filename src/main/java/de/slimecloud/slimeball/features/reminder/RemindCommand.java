@@ -43,7 +43,7 @@ public class RemindCommand {
 					return;
 				}
 
-				bot.getReminder().createReminder(event.getMember(), 0, timestamp, message);
+				bot.getReminder().createReminder(event.getMember(), null, timestamp, message);
 
 				event.reply("Reminder wurde gesetzt! Löst aus " + TimeFormat.RELATIVE.format(timestamp)).setEphemeral(true).queue();
 			} catch (DateTimeParseException e) {
@@ -74,7 +74,7 @@ public class RemindCommand {
 					return;
 				}
 
-				bot.getReminder().createReminder(event.getMember(), role.getIdLong(), timestamp, message);
+				bot.getReminder().createReminder(event.getMember(), role, timestamp, message);
 
 				event.reply("Reminder wurde gesetzt! Löst aus " + TimeFormat.RELATIVE.format(timestamp)).setEphemeral(true).queue();
 			} catch (DateTimeParseException e) {
@@ -83,6 +83,7 @@ public class RemindCommand {
 			}
 		}
 	}
+
 	@ApplicationCommand(name = "list", description = "Zeige und deine aktiven Reminder")
 	public static class ListCommand {
 		@ApplicationCommandMethod
@@ -107,14 +108,6 @@ public class RemindCommand {
 
 	@ApplicationCommand(name = "delete", description = "Lösche einen aktiven Reminder")
 	public static class DeleteCommand {
-		/*
-		TODO: Number wird nicht in discord angezeigt
-		 */
-		@Setup
-		public static void setup(Command<?> cmd) {
-			System.out.println(cmd.getOptions());
-		}
-
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
 		                           @Option(description = "Nummer des Reminders") int number
@@ -137,7 +130,6 @@ public class RemindCommand {
 			}
 		}
 	}
-
 
 	public static Instant convertTime(String time) throws DateTimeParseException {
 		LocalDateTime now = LocalDateTime.now(Main.timezone);

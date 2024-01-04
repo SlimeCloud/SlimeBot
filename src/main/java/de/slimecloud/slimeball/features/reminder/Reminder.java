@@ -9,6 +9,7 @@ import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,7 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder> {
 	private final UserSnowflake user;
 	@Column
 	@Nullable
-	private final long roleId;
+	private final Role role;
 
 	@Column
 	private final Instant time;
@@ -38,11 +39,11 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder> {
 	private final String message;
 
 	public Reminder(@NotNull SlimeBot bot) {
-		this(bot, 0, null, null, 0, null, null);
+		this(bot, 0, null, null, null, null, null);
 	}
 
 	public void execute() {
-		if(roleId == 0) {
+		if(role == null) {
 			// Send Private Reminder
 			EmbedBuilder embedBuilder = new EmbedBuilder()
 					.setTitle("Reminder!")
@@ -63,7 +64,7 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder> {
 						.setFooter("Reminder von: " + name);
 
 				bot.loadGuild(guild.getIdLong()).getTeamChannel().ifPresent(channel -> {
-					channel.sendMessage(bot.getJda().getRoleById(roleId).getAsMention()).setEmbeds(embedBuilder.build()).queue();
+					channel.sendMessage(role.getAsMention()).setEmbeds(embedBuilder.build()).queue();
 				});
 			});
 		}

@@ -7,7 +7,6 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.internal.entities.RoleImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
@@ -20,10 +19,10 @@ public interface ReminderTable extends Table<Reminder> {
 		return selectAll(Order.ascendingBy("time").limit(1)).stream().findFirst();
 	}
 
-	default Reminder createReminder(@NotNull Member member, long roleId, @NotNull Instant time, @NotNull String message) {
+	default Reminder createReminder(@NotNull Member member, Role role, @NotNull Instant time, @NotNull String message) {
 		SlimeBot bot = getManager().getData("bot");
 
-		Reminder result = insert(new Reminder(bot, 0, member.getGuild(), member, roleId, time, message));
+		Reminder result = insert(new Reminder(bot, 0, member.getGuild(), member, role, time, message));
 		bot.getRemindManager().scheduleNextReminder();
 		return result;
 	}
@@ -33,7 +32,7 @@ public interface ReminderTable extends Table<Reminder> {
 		return selectMany(Where.allOf(
 				Where.equals("user", member.getUser().getIdLong()),
 				Where.equals("guild", member.getGuild().getIdLong()),
-				Where.equals("roleid", 0)
+				Where.equals("role", 0)
 		), Order.ascendingBy("time"));
 	}
 
