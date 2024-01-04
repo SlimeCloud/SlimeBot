@@ -34,8 +34,8 @@ import de.slimecloud.slimeball.features.poll.PollCommand;
 import de.slimecloud.slimeball.features.poll.PollTable;
 import de.slimecloud.slimeball.features.quote.QuoteCommand;
 import de.slimecloud.slimeball.features.quote.QuoteMessageCommand;
+import de.slimecloud.slimeball.features.reminder.RemindCommand;
 import de.slimecloud.slimeball.features.reminder.RemindManager;
-import de.slimecloud.slimeball.features.reminder.RemindMeCommand;
 import de.slimecloud.slimeball.features.reminder.Reminder;
 import de.slimecloud.slimeball.features.reminder.ReminderTable;
 import de.slimecloud.slimeball.features.report.Report;
@@ -230,7 +230,7 @@ public class SlimeBot extends ListenerAdapter {
 
 					//Register remind commands
 					if(reminder != null) {
-						manager.registerCommand(RemindMeCommand.class);
+						manager.registerCommand(RemindCommand.class);
 					} else logger.warn("Reminders disabled due to missing database");
 
 					//Register report commands
