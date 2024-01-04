@@ -36,7 +36,7 @@ public interface CardDataTable extends Table<CardProfileData>, Listable<CardProf
 	@NotNull
 	@Override
 	default EmbedBuilder createEmbed(@NotNull DataState<MessageMenu> state, @NotNull ListContext<CardProfileData> context) {
-		Filter filter = Filter.valueOf(state.getState("filter"));
+		Filter filter = state.getState("filter", Filter.class);
 
 		EmbedBuilder builder = new EmbedBuilder()
 				.setTitle("Profile mit Filter '**" + filter.getName() + "**'")
@@ -53,7 +53,7 @@ public interface CardDataTable extends Table<CardProfileData>, Listable<CardProf
 	@Override
 	default List<CardProfileData> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<CardProfileData> context) {
 		return selectMany(Where.allOf(
-				Filter.valueOf(state.getState("filter")).getFilter().apply(context.event().getUser()),
+				state.getState("filter", Filter.class).getFilter().apply(context.event().getUser()),
 				Where.equals("owner", context.event().getUser().getIdLong()).or(Where.equals("public", true))
 		));
 	}
