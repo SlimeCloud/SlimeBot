@@ -54,7 +54,7 @@ public class MeetingConfig extends ConfigCategory {
 	private final transient Set<Future<?>> futures = new HashSet<>();
 
 	@Override
-	public void enable() {
+	public void enable(@NotNull Guild guild) {
 		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(SlimeBot.timezone));
 	}
 
