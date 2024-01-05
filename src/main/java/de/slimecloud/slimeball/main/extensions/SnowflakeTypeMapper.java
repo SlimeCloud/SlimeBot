@@ -2,6 +2,8 @@ package de.slimecloud.slimeball.main.extensions;
 
 import de.mineking.javautils.database.DatabaseManager;
 import de.mineking.javautils.database.TypeMapper;
+import de.mineking.javautils.database.type.DataType;
+import de.mineking.javautils.database.type.PostgresType;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -28,8 +30,8 @@ public class SnowflakeTypeMapper implements TypeMapper<Long, ISnowflake> {
 
 	@NotNull
 	@Override
-	public String getType(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field field) {
-		return "bigint";
+	public DataType getType(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field field) {
+		return PostgresType.BIG_INT;
 	}
 
 	@NotNull

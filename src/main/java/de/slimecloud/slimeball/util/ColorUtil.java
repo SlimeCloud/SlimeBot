@@ -1,5 +1,7 @@
 package de.slimecloud.slimeball.util;
 
+import de.slimecloud.slimeball.config.engine.ValidationException;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -7,6 +9,16 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 
 public class ColorUtil {
+	@NotNull
+	public static String extract(@NotNull OptionMapping value) {
+		try {
+			if (parseColor(value.getAsString()) != null) value.getAsString();
+			throw new ValidationException(null);
+		} catch (Exception e) {
+			throw new ValidationException(e);
+		}
+	}
+
 	@NotNull
 	public static String toString(@Nullable Color color) {
 		if (color == null) return "*null*";

@@ -94,7 +94,7 @@ public class MeetingConfig extends ConfigCategory {
 	}
 
 	@Override
-	public void disable() {
+	public void disable(@NotNull Guild guild) {
 		if (message == null) return;
 		getChannel().ifPresent(channel -> {
 			channel.deleteMessageById(message).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));

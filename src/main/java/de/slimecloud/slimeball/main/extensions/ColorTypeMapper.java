@@ -2,6 +2,8 @@ package de.slimecloud.slimeball.main.extensions;
 
 import de.mineking.javautils.database.DatabaseManager;
 import de.mineking.javautils.database.TypeMapper;
+import de.mineking.javautils.database.type.DataType;
+import de.mineking.javautils.database.type.PostgresType;
 import de.slimecloud.slimeball.util.ColorUtil;
 import org.jdbi.v3.core.argument.Argument;
 import org.jetbrains.annotations.NotNull;
@@ -20,8 +22,8 @@ public class ColorTypeMapper implements TypeMapper<Integer, Color> {
 
 	@NotNull
 	@Override
-	public String getType(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f) {
-		return "int";
+	public DataType getType(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f) {
+		return PostgresType.INTEGER;
 	}
 
 	@NotNull
@@ -30,7 +32,7 @@ public class ColorTypeMapper implements TypeMapper<Integer, Color> {
 		return (pos, stmt, ctx) -> stmt.setObject(pos, value);
 	}
 
-	@NotNull
+	@Nullable
 	@Override
 	public Integer string(@NotNull DatabaseManager manager, @NotNull Class<?> type, @NotNull Field f, @Nullable Color value) {
 		return value == null ? null : value.getRGB();
