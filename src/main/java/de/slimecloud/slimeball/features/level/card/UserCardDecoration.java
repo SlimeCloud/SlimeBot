@@ -4,6 +4,7 @@ import de.mineking.javautils.database.Column;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,7 @@ public class UserCardDecoration {
 	private final SlimeBot bot;
 
 	@Column(key = true)
-	private final long guild;
+	private final Guild guild;
 
 	@Column(key = true)
 	private final UserSnowflake user;
@@ -26,11 +27,11 @@ public class UserCardDecoration {
 	private final Set<String> decorations = new HashSet<>();
 
 	public UserCardDecoration(@NotNull SlimeBot bot) {
-		this(bot, 0, null);
+		this(bot, null, null);
 	}
 
 	@NotNull
 	public static UserCardDecoration empty(@NotNull SlimeBot bot, @NotNull Member member) {
-		return new UserCardDecoration(bot, member.getGuild().getIdLong(), member);
+		return new UserCardDecoration(bot, member.getGuild(), member);
 	}
 }
