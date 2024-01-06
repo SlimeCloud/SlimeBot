@@ -13,6 +13,8 @@ import de.slimecloud.slimeball.features.alerts.HolidayAlert;
 import de.slimecloud.slimeball.features.alerts.Spotify;
 import de.slimecloud.slimeball.features.alerts.SpotifyAlert;
 import de.slimecloud.slimeball.features.birthday.Birthday;
+import de.slimecloud.slimeball.features.birthday.BirthdayAlert;
+import de.slimecloud.slimeball.features.birthday.BirthdayListener;
 import de.slimecloud.slimeball.features.birthday.BirthdayTable;
 import de.slimecloud.slimeball.features.birthday.commands.BirthdayCommand;
 import de.slimecloud.slimeball.features.fdmds.FdmdsCommand;
@@ -299,6 +301,8 @@ public class SlimeBot extends ListenerAdapter {
 		}
 
 		new HolidayAlert(this);
+		new BirthdayAlert(this);
+		new BirthdayListener(this);
 	}
 
 	private void startActivity() {
