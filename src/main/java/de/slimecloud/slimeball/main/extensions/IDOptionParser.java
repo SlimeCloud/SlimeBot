@@ -15,19 +15,19 @@ import java.nio.BufferUnderflowException;
 
 public class IDOptionParser implements IOptionParser {
 	@Override
-	public boolean accepts(@NotNull Class<?> type, @NotNull Parameter param) {
-		return type.isAssignableFrom(ID.class);
+	public boolean accepts(@NotNull Type type, @NotNull Parameter param) {
+		return type.equals(ID.class);
 	}
 
 	@NotNull
 	@Override
-	public OptionType getType(@NotNull CommandManager<?, ?> manager, @NotNull Class<?> type, @NotNull Type generic, @NotNull Parameter param) {
+	public OptionType getType(@NotNull CommandManager<?, ?> manager, @NotNull Type type, @NotNull Parameter param) {
 		return OptionType.STRING;
 	}
 
 	@Nullable
 	@Override
-	public Object parse(@NotNull CommandManager<?, ?> manager, @NotNull GenericCommandInteractionEvent event, @NotNull String name, @NotNull Parameter param, @NotNull Class<?> type, @NotNull Type generic) {
+	public Object parse(@NotNull CommandManager<?, ?> manager, @NotNull GenericCommandInteractionEvent event, @NotNull String name, @NotNull Parameter param, @NotNull Type type) {
 		try {
 			return event.getOption(name, o -> {
 				ID id = ID.decode(o.getAsString());

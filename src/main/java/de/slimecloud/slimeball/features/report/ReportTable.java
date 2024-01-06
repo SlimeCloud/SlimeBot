@@ -82,7 +82,7 @@ public interface ReportTable extends Table<Report>, Listable<Report> {
 	@Override
 	default List<Report> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Report> context) {
 		return selectMany(Where.allOf(
-				Where.equals("guild", context.event().getGuild().getIdLong()),
+				Where.equals("guild", context.event().getGuild()),
 				state.getState("filter", Filter.class).getFilter()
 		));
 	}

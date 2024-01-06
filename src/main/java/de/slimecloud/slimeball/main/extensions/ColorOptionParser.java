@@ -22,7 +22,7 @@ public class ColorOptionParser extends OptionParser {
 
 	@Nullable
 	@Override
-	public Object parse(@NotNull CommandManager<?, ?> manager, @NotNull GenericCommandInteractionEvent event, @NotNull String name, @NotNull Parameter param, @NotNull Class<?> type, @NotNull Type generic) {
+	public Object parse(@NotNull CommandManager<?, ?> manager, @NotNull GenericCommandInteractionEvent event, @NotNull String name, @NotNull Parameter param, @NotNull Type type) {
 		return event.getOption(name, o -> {
 			Color color = ColorUtil.parseColor(o.getAsString()); //Try to parse color
 			if (color == null) {
@@ -34,7 +34,7 @@ public class ColorOptionParser extends OptionParser {
 	}
 
 	@Override
-	public OptionData configure(@NotNull Command<?> command, @NotNull OptionData option, @NotNull Parameter param, @NotNull Class<?> type, @NotNull Type generic) {
+	public OptionData configure(@NotNull Command<?> command, @NotNull OptionData option, @NotNull Parameter param, @NotNull Type type) {
 		//#fff, 255,255,255,255
 		return option.setRequiredLength(4, 4 * 3 + 3);
 	}

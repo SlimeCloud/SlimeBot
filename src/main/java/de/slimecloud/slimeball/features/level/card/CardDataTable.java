@@ -21,12 +21,12 @@ public interface CardDataTable extends Table<CardProfileData>, Listable<CardProf
 	@NotNull
 	default Optional<CardProfileData> getData(@Nullable ID id, @NotNull UserSnowflake owner) {
 		if (id == null) return Optional.of(new CardProfileData(getManager().getData("bot"), owner));
-		return selectOne(Where.equals("id", id.asString()));
+		return selectOne(Where.equals("id", id));
 	}
 
 	@NotNull
 	default List<CardProfileData> getAll(@NotNull UserSnowflake user) {
-		return selectMany(Where.equals("owner", user.getIdLong()));
+		return selectMany(Where.equals("owner", user));
 	}
 
 	/*
@@ -54,7 +54,7 @@ public interface CardDataTable extends Table<CardProfileData>, Listable<CardProf
 	default List<CardProfileData> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<CardProfileData> context) {
 		return selectMany(Where.allOf(
 				state.getState("filter", Filter.class).getFilter().apply(context.event().getUser()),
-				Where.equals("owner", context.event().getUser().getIdLong()).or(Where.equals("public", true))
+				Where.equals("owner", context.event().getUser()).or(Where.equals("public", true))
 		));
 	}
 }
