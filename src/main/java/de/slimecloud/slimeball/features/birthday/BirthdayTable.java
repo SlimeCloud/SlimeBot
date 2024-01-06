@@ -6,7 +6,7 @@ import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
 import de.mineking.javautils.database.Table;
 import de.mineking.javautils.database.Where;
-import de.slimecloud.slimeball.features.birthday.event.BirthdayRemovedEvent;
+import de.slimecloud.slimeball.features.birthday.event.BirthdayRemoveEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdaySetEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	default void delete(@NotNull Member member) {
-		if (new BirthdayRemovedEvent(member).callEvent()) return;
+		if (new BirthdayRemoveEvent(member).callEvent()) return;
 		delete(Where.allOf(
 				Where.equals("guild", member.getGuild().getIdLong()),
 				Where.equals("user", member.getIdLong())

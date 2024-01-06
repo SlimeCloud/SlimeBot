@@ -3,7 +3,7 @@ package de.slimecloud.slimeball.features.birthday;
 import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.JEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayEndEvent;
-import de.slimecloud.slimeball.features.birthday.event.BirthdayRemovedEvent;
+import de.slimecloud.slimeball.features.birthday.event.BirthdayRemoveEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdaySetEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayStartEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
@@ -42,7 +42,7 @@ public class BirthdayListener {
 	}
 
 	@EventHandler
-	public void onBirthdayRemove(@NotNull BirthdayRemovedEvent event) {
+	public void onBirthdayRemove(@NotNull BirthdayRemoveEvent event) {
 		//Call the method instead of the event, as it will be called in any case, even if the user does not have a birthday and has just removed their birthday. But in the onBirthdayEnd method it does not matter, as it only tries to remove the birthday role.
 		onBirthdayEnd(new BirthdayEndEvent(event.getMember()));
 	}

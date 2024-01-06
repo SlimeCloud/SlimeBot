@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class BirthdayRemovedEvent extends CancellableEvent {
+public class BirthdayRemoveEvent extends CancellableEvent {
 
 	@NotNull
 	private final Member member;
