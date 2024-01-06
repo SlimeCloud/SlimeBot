@@ -16,6 +16,8 @@ public class Config {
 	@Required
 	private String defaultColor;
 
+	private Long developerRole;
+
 	@Required
 	private String guildStorage;
 

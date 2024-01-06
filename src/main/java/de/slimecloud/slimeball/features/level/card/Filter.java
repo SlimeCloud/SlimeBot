@@ -11,7 +11,7 @@ import java.util.function.Function;
 @AllArgsConstructor
 public enum Filter {
 	ALL(x -> Where.empty(), "Alle"),
-	OWN(user -> Where.equals("owner", user.getIdLong()), "Eigene");
+	OWN(user -> Where.equals("owner", user), "Eigene");
 
 	private final Function<UserSnowflake, Where> filter;
 	private final String name;
