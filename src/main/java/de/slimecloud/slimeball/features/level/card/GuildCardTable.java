@@ -9,15 +9,15 @@ public interface GuildCardTable extends Table<GuildCardProfile> {
 	@NotNull
 	default GuildCardProfile getProfile(@NotNull Member member) {
 		return selectOne(Where.allOf(
-				Where.equals("guild", member.getGuild().getIdLong()),
-				Where.equals("user", member.getIdLong())
+				Where.equals("guild", member.getGuild()),
+				Where.equals("user", member)
 		)).orElseGet(() -> new GuildCardProfile(getManager().getData("bot"), member));
 	}
 
 	default void reset(@NotNull Member member) {
 		delete(Where.allOf(
-				Where.equals("guild", member.getGuild().getIdLong()),
-				Where.equals("user", member.getIdLong())
+				Where.equals("guild", member.getGuild()),
+				Where.equals("user", member)
 		));
 	}
 }

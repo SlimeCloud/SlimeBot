@@ -12,8 +12,8 @@ import java.util.Set;
 public interface CardDecorationTable extends Table<UserCardDecoration> {
 	default Optional<UserCardDecoration> get(@NotNull Member member) {
 		return selectOne(Where.allOf(
-				Where.equals("guild", member.getGuild().getIdLong()),
-				Where.equals("user", member.getUser().getIdLong())
+				Where.equals("guild", member.getGuild()),
+				Where.equals("user", member.getUser())
 		));
 	}
 
