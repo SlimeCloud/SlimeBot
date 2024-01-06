@@ -92,9 +92,8 @@ public class FdmdsCommand {
 
 		//Build embed
 		EmbedBuilder embed = new EmbedBuilder()
-				.setTitle("Vorschlag für \"Frag doch mal den Schleim\"")
 				.setColor(bot.getColor(event.getGuild()))
-				.addField("Frage", question, false)
+				.setDescription(question)
 				.addField("Auswahlmöglichkeiten", choices.toString(), false);
 
 		if (event.getModalId().contains("send")) embed.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl());
@@ -117,7 +116,10 @@ public class FdmdsCommand {
 			event.getMessage().editMessage(message.build()).queue();
 			event.reply("Frage wurde bearbeitet.").setEphemeral(true).queue();
 		} else bot.loadGuild(event.getGuild()).getFdmds().map(FdmdsConfig::getLogChannel).ifPresent(channel -> {
-			channel.sendMessage(MessageCreateData.fromEditData(message.build())).queue();
+			channel.sendMessage(MessageCreateData.fromEditData(message.build())).queue(mes -> {
+				mes.addReaction(SlimeEmoji.UP.getEmoji(mes.getGuild())).queue();
+				mes.addReaction(SlimeEmoji.DOWN.getEmoji(mes.getGuild())).queue();
+			});
 			event.reply("Frage erfolgreich eingereicht! Das Team wird die Frage kontrollieren und anschließend veröffentlicht.").setEphemeral(true).queue();
 		});
 	}
@@ -125,7 +127,7 @@ public class FdmdsCommand {
 	@Listener(type = ButtonHandler.class, filter = "fdmds.edit")
 	public void editFdmds(ButtonInteractionEvent event) {
 		MessageEmbed embed = event.getMessage().getEmbeds().get(0);
-		sendModal(event, embed.getFields().get(0).getValue(), embed.getFields().get(1).getValue().lines()
+		sendModal(event, embed.getDescription(), embed.getFields().get(0).getValue().lines()
 				.map(s -> s.split(" -> ", 2)[1])
 				.collect(Collectors.joining("\n"))
 		);
@@ -137,10 +139,10 @@ public class FdmdsCommand {
 			//Load information from embed
 			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 
-			String question = embed.getFields().get(0).getValue();
-			String choices = embed.getFields().get(1).getValue();
-
 			if (embed.getAuthor() != null) {
+				String question = embed.getDescription();
+				String choices = embed.getFields().get(0).getValue();
+
 				//Call event
 				new FdmdsCreateEvent(ContributorCommand.getUser(embed), event.getMember(), question).callEvent();
 
@@ -167,6 +169,9 @@ public class FdmdsCommand {
 
 			//TODO: Backward compatibility. This should be removed as soon as enough questions with the new system have been submitted
 			else {
+				String question = embed.getFields().get(0).getValue();
+				String choices = embed.getFields().get(1).getValue();
+
 				String footerText = embed.getFooter().getText();
 				Member requester = event.getGuild().getMemberById(footerText.substring(footerText.lastIndexOf(' ') + 2, footerText.length() - 1));
 

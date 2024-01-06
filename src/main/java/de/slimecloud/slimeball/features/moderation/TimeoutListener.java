@@ -18,11 +18,13 @@ public class TimeoutListener extends ListenerAdapter {
 
 	public TimeoutListener(@NotNull SlimeBot bot) {
 		this.bot = bot;
-		JEvent.getManager().registerListener(this);
+		JEvent.getDefaultManager().registerListener(this);
 	}
 
 	@Override
 	public void onGuildMemberUpdateTimeOut(@NotNull GuildMemberUpdateTimeOutEvent event) {
+		if (event.getNewTimeOutEnd() == null) return;
+
 		//Discord doesn't provide the team member to use, so we fetch it from the audit logs
 		event.getGuild().retrieveAuditLogs().type(ActionType.MEMBER_UPDATE).forEachAsync(entry -> {
 			if (entry.getTargetIdLong() != event.getUser().getIdLong()) return true; //Continue non-matches

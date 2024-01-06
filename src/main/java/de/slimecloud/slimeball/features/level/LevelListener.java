@@ -48,7 +48,7 @@ public class LevelListener extends ListenerAdapter {
 
 	@Override
 	public void onGuildBan(@NotNull GuildBanEvent event) {
-		bot.getLevel().reset(event.getGuild().getIdLong(), event.getUser());
+		bot.getLevel().reset(event.getGuild(), event.getUser());
 	}
 
 	@Override

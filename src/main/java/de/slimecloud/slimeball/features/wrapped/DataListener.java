@@ -34,7 +34,7 @@ public class DataListener extends ListenerAdapter {
 
 	public DataListener(@NotNull SlimeBot bot) {
 		this.bot = bot;
-		JEvent.getManager().registerListener(this);
+		JEvent.getDefaultManager().registerListener(this);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class DataListener extends ListenerAdapter {
 		//Start schedule
 		bot.getExecutor().scheduleAtFixedRate(() -> voiceUsers.forEach((user, channel) -> {
 			//Read current data
-			WrappedData data = bot.getWrappedData().getData(bot.getJda().getVoiceChannelById(channel).getGuild().getIdLong(), UserSnowflake.fromId(user));
+			WrappedData data = bot.getWrappedData().getData(bot.getJda().getVoiceChannelById(channel).getGuild(), UserSnowflake.fromId(user));
 
 			data.getVoice().compute(String.valueOf(channel), (k, v) -> v == null ? 1 : v + 1);
 
@@ -134,7 +134,7 @@ public class DataListener extends ListenerAdapter {
 	@EventHandler
 	public void handleFdmdsCreated(@NotNull FdmdsCreateEvent event) {
 		//Load current data
-		WrappedData data = bot.getWrappedData().getData(event.getTeam().getGuild().getIdLong(), event.getUser());
+		WrappedData data = bot.getWrappedData().getData(event.getTeam().getGuild(), event.getUser());
 
 		//Update data
 		data.setFdmdsAccepted(data.getFdmdsAccepted() + 1);
@@ -146,7 +146,7 @@ public class DataListener extends ListenerAdapter {
 	@EventHandler
 	public void onXp(@NotNull UserGainXPEvent event) {
 		//Load current data
-		WrappedData data = bot.getWrappedData().getData(event.getUser().getGuild().getIdLong(), event.getUser());
+		WrappedData data = bot.getWrappedData().getData(event.getUser().getGuild(), event.getUser());
 
 		int delta = event.getNewXp() - event.getOldXp();
 

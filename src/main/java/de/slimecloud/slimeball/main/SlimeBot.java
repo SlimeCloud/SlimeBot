@@ -23,10 +23,7 @@ import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.features.github.GitHubAPI;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
-import de.slimecloud.slimeball.features.level.card.CardCommand;
-import de.slimecloud.slimeball.features.level.card.CardProfile;
-import de.slimecloud.slimeball.features.level.card.RankCardTable;
-import de.slimecloud.slimeball.features.level.card.RankCommand;
+import de.slimecloud.slimeball.features.level.card.*;
 import de.slimecloud.slimeball.features.level.commands.LeaderboardCommand;
 import de.slimecloud.slimeball.features.level.commands.LevelCommand;
 import de.slimecloud.slimeball.features.moderation.AutodeleteListener;
@@ -54,7 +51,8 @@ import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
 import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
 import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
-import de.slimecloud.slimeball.main.extensions.UserSnowflakeTypeMapper;
+import de.slimecloud.slimeball.main.extensions.IDOptionParser;
+import de.slimecloud.slimeball.main.extensions.SnowflakeTypeMapper;
 import de.slimecloud.slimeball.util.ColorUtil;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
@@ -108,7 +106,9 @@ public class SlimeBot extends ListenerAdapter {
 	private final PollTable polls;
 
 	private final LevelTable level;
-	private final RankCardTable levelProfiles;
+	private final CardDataTable profileData;
+	private final GuildCardTable cardProfiles;
+	private final CardDecorationTable cardDecorations;
 
 	private final WrappedDataTable wrappedData;
 
@@ -130,7 +130,7 @@ public class SlimeBot extends ListenerAdapter {
 			database.getDriver().installPlugin(new PostgresPlugin());
 
 			database.putData("bot", this);
-			database.addMapper(new UserSnowflakeTypeMapper());
+			database.addMapper(new SnowflakeTypeMapper());
 			database.addMapper(new ColorTypeMapper());
 
 			//Initialize tables
@@ -140,7 +140,9 @@ public class SlimeBot extends ListenerAdapter {
 			polls = (PollTable) database.getTable(PollTable.class, Poll.class, () -> new Poll(this), "polls").createTable();
 
 			level = (LevelTable) database.getTable(LevelTable.class, Level.class, () -> new Level(this), "levels").createTable();
-			levelProfiles = (RankCardTable) database.getTable(RankCardTable.class, CardProfile.class, () -> new CardProfile(this), "card_profiles").createTable();
+			profileData = (CardDataTable) database.getTable(CardDataTable.class, CardProfileData.class, () -> new CardProfileData(this), "card_data").createTable();
+			cardProfiles = (GuildCardTable) database.getTable(GuildCardTable.class, GuildCardProfile.class, () -> new GuildCardProfile(this), "guild_card_profiles").createTable();
+			cardDecorations = (CardDecorationTable) database.getTable(CardDecorationTable.class, UserCardDecoration.class, () -> new UserCardDecoration(this), "guild_card_decorations").createTable();
 
 			wrappedData = (WrappedDataTable) database.getTable(WrappedDataTable.class, WrappedData.class, () -> new WrappedData(this), "wrapped_data").createTable();
 		} else {
@@ -151,7 +153,9 @@ public class SlimeBot extends ListenerAdapter {
 			reportBlocks = null;
 			polls = null;
 			level = null;
-			levelProfiles = null;
+			profileData = null;
+			cardProfiles = null;
+			cardDecorations = null;
 			wrappedData = null;
 		}
 
@@ -204,6 +208,7 @@ public class SlimeBot extends ListenerAdapter {
 				.useUIManager(null)
 				.useCommandManager(e -> () -> e, e -> () -> e, manager -> {
 					manager.registerOptionParser(new ColorOptionParser());
+					manager.registerOptionParser(new IDOptionParser());
 
 					manager.registerCommand(ConfigCommand.class);
 
@@ -242,6 +247,7 @@ public class SlimeBot extends ListenerAdapter {
 					if (database != null && config.getLevel().isPresent()) {
 						manager.registerCommand(RankCommand.class);
 						manager.registerCommand(CardCommand.class);
+						manager.registerCommand(DecorationCommand.class);
 
 						manager.registerCommand(LeaderboardCommand.class);
 						manager.registerCommand(LevelCommand.class);

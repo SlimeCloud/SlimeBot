@@ -63,7 +63,7 @@ public interface ReportTable extends Table<Report>, Listable<Report> {
 	@NotNull
 	@Override
 	default EmbedBuilder createEmbed(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Report> context) {
-		Filter filter = Filter.valueOf(state.getState("filter"));
+		Filter filter = state.getState("filter", Filter.class);
 
 		EmbedBuilder builder = new EmbedBuilder()
 				.setTitle("Reports mit Filter '**" + filter.getName() + "**'")
@@ -83,7 +83,7 @@ public interface ReportTable extends Table<Report>, Listable<Report> {
 	default List<Report> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Report> context) {
 		return selectMany(Where.allOf(
 				Where.equals("guild", context.event().getGuild().getIdLong()),
-				Filter.valueOf(state.getState("filter")).getFilter()
+				state.getState("filter", Filter.class).getFilter()
 		));
 	}
 }

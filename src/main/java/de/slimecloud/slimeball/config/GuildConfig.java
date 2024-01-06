@@ -3,10 +3,11 @@ package de.slimecloud.slimeball.config;
 import de.slimecloud.slimeball.config.engine.CategoryInfo;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
+import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.features.alerts.SpotifyNotificationConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
-import de.slimecloud.slimeball.features.moderation.AutodleteFlag;
+import de.slimecloud.slimeball.features.moderation.AutodeleteFlag;
 import de.slimecloud.slimeball.features.staff.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
 import de.slimecloud.slimeball.features.statistic.StatisticConfig;
@@ -16,7 +17,6 @@ import de.slimecloud.slimeball.util.ColorUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.*;
 
 @Slf4j
-@Accessors(chain = true)
 @CategoryInfo(name = "Standard", command = "general", description = "Generelle Konfiguration des Servers")
 @ToString
 public class GuildConfig {
@@ -93,10 +92,10 @@ public class GuildConfig {
 	@ConfigField(name = "Contributor-Rolle", command = "contributor", description = "Rolle, die Mitglieder erhalten, die am SlimeBall Bot mitgewirkt haben", type = ConfigFieldType.ROLE)
 	private Long contributorRole;
 
-	//TODO Make this configurable via command
 	@Setter
-	private Map<Long, EnumSet<AutodleteFlag>> autodelete;
-
+	@ConfigField(name = "Automatisches Nachrichtenlöschen", command = "autodelete", description = "Kanäle, in denen Nachrichten automatisch gelöscht werden", type = ConfigFieldType.ENUM)
+	@Info(keyType = ConfigFieldType.MESSAGE_CHANNEL)
+	private Map<Long, EnumSet<AutodeleteFlag>> autodelete = new HashMap<>();
 
 	@Setter
 	@CategoryInfo(name = "Spotify", command = "spotify", description = "Konfiguration für Spotify-Alerts")
@@ -115,8 +114,8 @@ public class GuildConfig {
 	private MeetingConfig meeting;
 
 	@Setter
-	@CategoryInfo(name = "Team-Nachricht", command = "staff", description = "Konfiguration für die Team-Nachricht")
-	private StaffConfig staff;
+	@CategoryInfo(name = "Team-Nachricht", command = "team-message", description = "Konfiguration für die Team-Nachricht")
+	private StaffConfig teamMessage;
 
 	@Setter
 	@CategoryInfo(name = "Statistic", command = "statistic", description = "Konfiguration für die Statistic Channels")
@@ -131,7 +130,7 @@ public class GuildConfig {
 		if (spotify != null) spotify.bot = bot;
 		if (fdmds != null) fdmds.bot = bot;
 		if (level != null) level.bot = bot;
-		if (staff != null) staff.bot = bot;
+		if (teamMessage != null) teamMessage.bot = bot;
 		if (meeting != null) meeting.bot = bot;
 		if (statistic != null) statistic.bot = bot;
 
@@ -174,8 +173,8 @@ public class GuildConfig {
 	}
 
 	@NotNull
-	public Optional<StaffConfig> getStaff() {
-		return Optional.ofNullable(staff);
+	public Optional<StaffConfig> getTeamMessage() {
+		return Optional.ofNullable(teamMessage);
 	}
 
 	@NotNull
@@ -215,7 +214,7 @@ public class GuildConfig {
 	}
 
 	@NotNull
-	public Optional<EnumSet<AutodleteFlag>> getAutodelete(@NotNull Channel channel) {
+	public Optional<EnumSet<AutodeleteFlag>> getAutodelete(@NotNull Channel channel) {
 		return Optional.ofNullable(autodelete).map(a -> a.get(channel.getIdLong()));
 	}
 

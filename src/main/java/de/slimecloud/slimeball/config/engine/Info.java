@@ -7,6 +7,10 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface KeyType {
-	ConfigFieldType value();
+public @interface Info {
+	ConfigFieldType keyType() default ConfigFieldType.STRING;
+
+	double minValue() default Double.MIN_VALUE;
+
+	double maxValue() default Double.MAX_VALUE;
 }
