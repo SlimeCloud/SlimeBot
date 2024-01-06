@@ -6,6 +6,8 @@ import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
 import de.mineking.javautils.database.Table;
 import de.mineking.javautils.database.Where;
+import de.slimecloud.slimeball.features.birthday.event.BirthdayRemovedEvent;
+import de.slimecloud.slimeball.features.birthday.event.BirthdaySetEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -17,6 +19,7 @@ import java.util.Optional;
 
 public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	default void delete(@NotNull Member member) {
+		if (new BirthdayRemovedEvent(member).callEvent()) return;
 		delete(Where.allOf(
 				Where.equals("guild", member.getGuild().getIdLong()),
 				Where.equals("user", member.getIdLong())
@@ -25,7 +28,9 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 
 	@NotNull
 	default Birthday save(@NotNull Member member, @NotNull Instant date) {
-		return insert(new Birthday(getManager().getData("bot"), member.getGuild(), member, date));
+		BirthdaySetEvent event = new BirthdaySetEvent(member, new Birthday(getManager().getData("bot"), member.getGuild(), member, date));
+		if (event.callEvent()) return event.getNewBirthday();
+		return insert(event.getNewBirthday());
 	}
 
 	@NotNull
@@ -34,6 +39,11 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 				Where.equals("guild", user.getGuild().getIdLong()),
 				Where.equals("user", user.getIdLong())
 		));
+	}
+
+	@NotNull
+	default List<Birthday> getAll() {
+		return selectAll();
 	}
 
 	/*
