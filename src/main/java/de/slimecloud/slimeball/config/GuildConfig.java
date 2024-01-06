@@ -5,6 +5,7 @@ import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.features.alerts.SpotifyNotificationConfig;
+import de.slimecloud.slimeball.features.birthday.BirthdayConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
 import de.slimecloud.slimeball.features.moderation.AutodeleteFlag;
@@ -116,6 +117,10 @@ public class GuildConfig {
 	@CategoryInfo(name = "Team-Nachricht", command = "team-message", description = "Kanfigration für die Team-Nachricht")
 	private StaffConfig teamMessage;
 
+	@Setter
+	@CategoryInfo(name = "Birthday", command = "birthday", description = "Konfiguration für das Birthday System")
+	private BirthdayConfig birthday;
+
 	@NotNull
 	private GuildConfig configure(@NotNull SlimeBot bot, @NotNull String path, long guild) {
 		this.bot = bot;
@@ -127,6 +132,7 @@ public class GuildConfig {
 		if (level != null) level.bot = bot;
 		if (teamMessage != null) teamMessage.bot = bot;
 		if (meeting != null) meeting.bot = bot;
+		if (birthday != null) birthday.bot = bot;
 
 		return this;
 	}
@@ -169,6 +175,11 @@ public class GuildConfig {
 	@NotNull
 	public Optional<StaffConfig> getTeamMessage() {
 		return Optional.ofNullable(teamMessage);
+	}
+
+	@NotNull
+	public Optional<BirthdayConfig> getBirthday() {
+		return Optional.ofNullable(birthday);
 	}
 
 
