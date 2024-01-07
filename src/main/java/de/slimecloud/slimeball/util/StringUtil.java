@@ -35,7 +35,7 @@ public class StringUtil {
 
 	@NotNull
 	public static String format(@NotNull String s, @NotNull Map<String, Object> args) {
-		if(s.isEmpty()) return args.values().toString();
+		if (s.isEmpty()) return args.values().toString();
 
 		AtomicString format = new AtomicString(s);
 		args.forEach((k, v) -> format.set(format.get().replace("%" + k + "%", String.valueOf(v))));

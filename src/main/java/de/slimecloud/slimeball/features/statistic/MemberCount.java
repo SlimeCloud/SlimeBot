@@ -7,14 +7,12 @@ import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
-import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -58,7 +56,7 @@ public class MemberCount extends ListenerAdapter {
 
 	public void update(@NotNull StatisticConfig config, @NotNull Guild guild) {
 		VoiceChannel channel = Optional.ofNullable(config.getMemberCountChannel()).map(bot.getJda()::getVoiceChannelById).orElse(null);
-		if(channel == null) return;
+		if (channel == null) return;
 
 		channel.getManager().setName(StringUtil.format(config.getMemberCountFormat(), Map.of("members", guild
 				.getMembers()
