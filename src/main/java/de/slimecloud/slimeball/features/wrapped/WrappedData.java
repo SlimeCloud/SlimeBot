@@ -62,6 +62,8 @@ public class WrappedData implements DataClass<WrappedData> {
 	private int messageXp;
 	@Column
 	private int voiceXp;
+	@Column
+	private int specialXp;
 
 	public WrappedData(@NotNull SlimeBot bot) {
 		this(bot, null, null);

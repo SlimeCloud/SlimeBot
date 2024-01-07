@@ -156,6 +156,7 @@ public class DataListener extends ListenerAdapter {
 		//Save type
 		if(event.getType() == UserGainXPEvent.Type.MESSAGE) data.setMessageXp(data.getMessageXp() + delta);
 		else if(event.getType() == UserGainXPEvent.Type.VOICE) data.setVoiceXp(data.getVoiceXp() + delta);
+		else if(event.getType() == UserGainXPEvent.Type.MANUAL) data.setSpecialXp(data.getSpecialXp() + delta);
 
 		//Save changes
 		data.update();
