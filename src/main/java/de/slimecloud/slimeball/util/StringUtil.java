@@ -1,6 +1,7 @@
 package de.slimecloud.slimeball.util;
 
 import de.slimecloud.slimeball.config.engine.ValidationException;
+import de.slimecloud.slimeball.util.types.AtomicString;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Contract;
@@ -11,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,16 @@ public class StringUtil {
 		return Arrays.stream(parseCamelCase(s))
 				.map(StringUtils::capitalize)
 				.collect(Collectors.joining(" "));
+	}
+
+	@NotNull
+	public static String format(@NotNull String s, @NotNull Map<String, Object> args) {
+		if(s.isEmpty()) return args.values().toString();
+
+		AtomicString format = new AtomicString(s);
+		args.forEach((k, v) -> format.set(format.get().replace("%" + k + "%", String.valueOf(v))));
+
+		return format.get();
 	}
 
 	@Contract("null -> false")
