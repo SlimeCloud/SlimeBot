@@ -3,6 +3,7 @@ package de.slimecloud.slimeball.features.birthday.commands;
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
 import de.mineking.discordutils.commands.option.Option;
+import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.TimeFormat;
@@ -25,7 +26,7 @@ public class RememberBirthdayCommand {
 	                           @Option(name = "year", description = "das jahr in dem du geburtstag hast", minValue = 1900, maxValue = 2024, required = false) Integer year
 	) {
 		try {
-			ZonedDateTime date = LocalDateTime.of(year == null ? 0 : year, month, day, 0, 0).atZone(SlimeBot.timezone);
+			ZonedDateTime date = LocalDateTime.of(year == null ? 0 : year, month, day, 0, 0).atZone(Main.timezone);
 			bot.getBirthdays().save(event.getMember(), date.toInstant());
 
 			String dateString = year == null

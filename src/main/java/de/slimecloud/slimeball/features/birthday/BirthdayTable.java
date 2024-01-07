@@ -20,6 +20,7 @@ import java.util.Optional;
 public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	default void delete(@NotNull Member member) {
 		if (new BirthdayRemoveEvent(member).callEvent()) return;
+
 		delete(Where.allOf(
 				Where.equals("guild", member.getGuild().getIdLong()),
 				Where.equals("user", member.getIdLong())
@@ -28,9 +29,10 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 
 	@NotNull
 	default Birthday save(@NotNull Member member, @NotNull Instant date) {
-		BirthdaySetEvent event = new BirthdaySetEvent(member, new Birthday(getManager().getData("bot"), member.getGuild(), member, date));
-		if (event.callEvent()) return event.getNewBirthday();
-		return insert(event.getNewBirthday());
+		Birthday birthday = new Birthday(getManager().getData("bot"), member.getGuild(), member, date);
+		if (new BirthdaySetEvent(member, birthday).callEvent()) return birthday;
+
+		return insert(birthday);
 	}
 
 	@NotNull
@@ -64,6 +66,7 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 
 		if (context.entries().isEmpty()) builder.setDescription("*Keine Einträge*");
 		else builder.setFooter("Insgesamt " + context.entries().size() + " eingetragene Geburtstage");
+
 		return builder;
 	}
 

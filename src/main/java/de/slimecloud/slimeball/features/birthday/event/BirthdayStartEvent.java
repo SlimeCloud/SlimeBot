@@ -4,9 +4,10 @@ import de.slimecloud.slimeball.features.birthday.Birthday;
 import lombok.Getter;
 
 @Getter
-public class BirthdayStartEvent extends BirthdayEvent  {
+public class BirthdayStartEvent extends BirthdayEvent {
 
 	private final Birthday birthday;
+
 	public BirthdayStartEvent(Birthday birthday) {
 		super(birthday);
 		this.birthday = birthday;

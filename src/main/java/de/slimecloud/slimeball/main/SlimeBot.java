@@ -94,8 +94,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Getter
 public class SlimeBot extends ListenerAdapter {
-	public final static ZoneOffset timezone = ZoneOffset.ofHours(1);
-
 	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
 
 	private final Config config;

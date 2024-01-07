@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.util;
 
+import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 
 import java.time.Instant;
@@ -16,7 +17,7 @@ public class TimeUtil {
 	}
 
 	public static boolean isSameDay(Instant instant, Instant other, boolean ignoreYear) {
-		return isSameDay(ZonedDateTime.ofInstant(instant, SlimeBot.timezone), ZonedDateTime.ofInstant(other, SlimeBot.timezone), ignoreYear);
+		return isSameDay(instant.atZone(Main.timezone), other.atZone(Main.timezone), ignoreYear);
 	}
 
 	public static boolean isSameDay(ZonedDateTime zdt, ZonedDateTime other, boolean ignoreYear) {

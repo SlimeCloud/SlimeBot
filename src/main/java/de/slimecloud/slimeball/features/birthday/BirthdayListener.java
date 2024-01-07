@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class BirthdayListener {
-
 	private final SlimeBot bot;
 
 	public BirthdayListener(@NotNull SlimeBot bot) {
@@ -30,14 +29,19 @@ public class BirthdayListener {
 	@EventHandler
 	public void onBirthdaySet(@NotNull BirthdaySetEvent event) {
 		int age = event.getNewBirthday().getAge();
+
 		if (age != -1 && age < 16) {
 			Member member = event.getMember();
 			Guild guild = member.getGuild();
+
 			BirthdayConfig config = bot.loadGuild(guild).getBirthday().orElse(null);
 			if (config == null) return;
+
 			TextChannel channel = guild.getTextChannelById(config.reportChat);
-			if (channel != null) channel.sendMessage(String.format("%s (%s) hat gerade sein geburtstag gerade auf den %s gesetzt, und ist somit erst %s Jahre alt", member.getAsMention(), member.getEffectiveName(), event.getNewBirthday(), age)).queue();
+			if (channel != null)
+				channel.sendMessage(String.format("%s (%s) hat gerade sein geburtstag gerade auf den %s gesetzt, und ist somit erst %s Jahre alt", member.getAsMention(), member.getEffectiveName(), event.getNewBirthday(), age)).queue();
 		}
+
 		if (TimeUtil.isSameDay(event.getNewBirthday().getTime(), Instant.now(), true)) new BirthdayStartEvent(event.getNewBirthday()).callEvent();
 	}
 
@@ -48,14 +52,14 @@ public class BirthdayListener {
 	}
 
 
-
-
 	@EventHandler
 	public void onBirthdayEnd(@NotNull BirthdayEndEvent event) {
 		BirthdayConfig config = bot.loadGuild(event.getGuild()).getBirthday().orElse(null);
 		if (config == null) return;
+
 		Role role = event.getGuild().getRoleById(config.birthdayRole);
 		if (role == null) return;
+
 		event.getGuild().modifyMemberRoles(event.getMember(), Collections.emptyList(), List.of(role)).queue();
 	}
 
@@ -63,12 +67,14 @@ public class BirthdayListener {
 	public void onBirthdayStart(@NotNull BirthdayStartEvent event) {
 		BirthdayConfig config = bot.loadGuild(event.getGuild()).getBirthday().orElse(null);
 		if (config == null) return;
+
 		Role role = event.getGuild().getRoleById(config.birthdayRole);
 		if (role != null) event.getGuild().modifyMemberRoles(event.getMember(), List.of(role), Collections.emptyList()).queue();
+
 		TextChannel channel = event.getGuild().getTextChannelById(config.announceChat);
 		if (channel != null) {
 			int age = event.getBirthday().getAge();
-			channel.sendMessage(String.format("%s hat heute Geburtstag%s :birthday: :partying_face:", event.getMember().getAsMention(), age!=-1 ? String.format(" , und wird %s Jahre alt", age) : "")).queue();
+			channel.sendMessage(String.format("%s hat heute Geburtstag%s :birthday: :partying_face:", event.getMember().getAsMention(), age != -1 ? String.format(" , und wird %s Jahre alt", age) : "")).queue();
 		}
 	}
 }

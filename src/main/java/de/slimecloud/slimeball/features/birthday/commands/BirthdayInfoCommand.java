@@ -20,7 +20,7 @@ public class BirthdayInfoCommand {
 		bot.getBirthdays().get(member).ifPresentOrElse(
 				birthday -> {
 					int age = birthday.getAge();
-					event.getHook().editOriginal(":birthday: " + member.getAsMention() + " hat " + birthday.getFormat() + " Geburtstag" + (age==-1 ? "!" : String.format(", und wird %s Jahre alt!", ++age))).queue();
+					event.getHook().editOriginal(":birthday: " + member.getAsMention() + " hat " + birthday.getFormat() + " Geburtstag" + (age == -1 ? "!" : String.format(", und wird %s Jahre alt!", ++age))).queue();
 				},
 				() -> event.getHook().editOriginal(":x: Ich kenne " + member.getAsMention() + "'s Geburtstag noch nicht.").queue()
 		);
