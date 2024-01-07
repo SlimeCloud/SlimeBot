@@ -22,8 +22,8 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 		if (new BirthdayRemoveEvent(member).callEvent()) return;
 
 		delete(Where.allOf(
-				Where.equals("guild", member.getGuild().getIdLong()),
-				Where.equals("user", member.getIdLong())
+				Where.equals("guild", member.getGuild()),
+				Where.equals("user", member)
 		));
 	}
 
@@ -38,8 +38,8 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	@NotNull
 	default Optional<Birthday> get(@NotNull Member user) {
 		return selectOne(Where.allOf(
-				Where.equals("guild", user.getGuild().getIdLong()),
-				Where.equals("user", user.getIdLong())
+				Where.equals("guild", user.getGuild()),
+				Where.equals("user", user)
 		));
 	}
 
