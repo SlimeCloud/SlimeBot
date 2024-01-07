@@ -115,6 +115,9 @@ public class SlimeBot extends ListenerAdapter {
 	private final GitHubAPI github;
 	private final Spotify spotify;
 
+	private final MemberCount memberCount;
+	private final RoleMemberCount roleMemberCount;
+
 	public SlimeBot(@NotNull Config config, @NotNull Dotenv credentials) throws IOException {
 		this.config = config;
 		this.credentials = credentials;
@@ -196,8 +199,8 @@ public class SlimeBot extends ListenerAdapter {
 
 				.addEventListeners(new DataListener(this))
 
-				.addEventListeners(new MemberCount(this))
-				.addEventListeners(new RoleMemberCount(this))
+				.addEventListeners(memberCount = new MemberCount(this))
+				.addEventListeners(roleMemberCount = new RoleMemberCount(this))
 
 				.build();
 
