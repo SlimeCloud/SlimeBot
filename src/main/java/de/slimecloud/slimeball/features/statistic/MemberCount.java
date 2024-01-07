@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.features.statistic;
 
+import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.StringUtil;
 import lombok.AllArgsConstructor;
@@ -39,12 +40,16 @@ public class MemberCount extends ListenerAdapter {
 
 	@Override
 	public void onChannelDelete(@NotNull ChannelDeleteEvent event) {
-		bot.loadGuild(event.getGuild()).getStatistic().ifPresent(c -> c.setMemberCountChannel(null));
+		GuildConfig config = bot.loadGuild(event.getGuild());
+		config.getStatistic().ifPresent(c -> c.setMemberCountChannel(null));
+		config.save();
 	}
 
 	@Override
 	public void onRoleDelete(@NotNull RoleDeleteEvent event) {
-		bot.loadGuild(event.getGuild()).getStatistic().ifPresent(c -> c.setMemberCountChannel(null));
+		GuildConfig config = bot.loadGuild(event.getGuild());
+		config.getStatistic().ifPresent(c -> c.setMemberCountChannel(null));
+		config.save();
 	}
 
 	public void update(@NotNull Guild guild) {
