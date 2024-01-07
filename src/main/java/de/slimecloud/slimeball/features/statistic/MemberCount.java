@@ -22,34 +22,32 @@ public class MemberCount extends ListenerAdapter {
 
 	@Override
 	public void onGuildReady(@NotNull GuildReadyEvent event) {
-		update(event);
+		update(event.getGuild());
 	}
 
 	@Override
 	public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
-		update(event);
+		update(event.getGuild());
 	}
 
 	@Override
 	public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
-		update(event);
-	}
-
-	private void update(@NotNull GenericGuildEvent event) {
 		update(event.getGuild());
 	}
 
 	public void update(@NotNull Guild guild) {
-		bot.loadGuild(guild).getStatistic().ifPresent(config -> {
-			VoiceChannel channel = Optional.ofNullable(config.getMemberCountChannel()).map(bot.getJda()::getVoiceChannelById).orElse(null);
-			if(channel == null) return;
+		bot.loadGuild(guild).getStatistic().ifPresent(c -> update(c, guild));
+	}
 
-			channel.getManager().setName(StringUtil.format(config.getMemberCountFormat(), Map.of("members", guild
-					.getMembers()
-					.stream()
-					.filter(m -> !m.getUser().isBot())
-					.count()
-			))).queue();
-		});
+	public void update(@NotNull StatisticConfig config, @NotNull Guild guild) {
+		VoiceChannel channel = Optional.ofNullable(config.getMemberCountChannel()).map(bot.getJda()::getVoiceChannelById).orElse(null);
+		if(channel == null) return;
+
+		channel.getManager().setName(StringUtil.format(config.getMemberCountFormat(), Map.of("members", guild
+				.getMembers()
+				.stream()
+				.filter(m -> !m.getUser().isBot())
+				.count()
+		))).queue();
 	}
 }
