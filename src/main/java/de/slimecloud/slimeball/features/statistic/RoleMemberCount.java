@@ -64,10 +64,12 @@ public class RoleMemberCount extends ListenerAdapter {
 		update(event);
 	}
 
-	@SuppressWarnings("ConstantConditions")
 	private void update(@NotNull GenericGuildEvent event) {
-		Guild guild = event.getGuild();
+		update(event.getGuild());
+	}
 
+	@SuppressWarnings("ConstantConditions")
+	public void update(@NotNull Guild guild) {
 		StatisticConfig config = bot.loadGuild(guild.getIdLong()).getStatistic().orElse(null);
 		if (config == null) return;
 

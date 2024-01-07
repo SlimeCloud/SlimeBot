@@ -64,8 +64,10 @@ public class MemberCount extends ListenerAdapter {
 	}
 
 	private void update(@NotNull GenericGuildEvent event) {
-		Guild guild = event.getGuild();
+		update(event.getGuild());
+	}
 
+	public void update(@NotNull Guild guild) {
 		VoiceChannel channel = getChannel(guild.getIdLong());
 		if (channel == null) return;
 
