@@ -5,6 +5,7 @@ import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import de.slimecloud.slimeball.config.engine.Info;
 import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 
 @Getter
 public class StatisticConfig extends ConfigCategory {
+	@Setter
 	@ConfigField(name = "MemberCount Kanal", command = "member_channel", description = "Kanal, der die aktuelle Anzahl an Server-Mitgliedern anzeigt", type = ConfigFieldType.VOICE_CHANNEL)
 	private Long memberCountChannel;
 

@@ -5,10 +5,12 @@ import de.slimecloud.slimeball.util.StringUtil;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
+import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +35,16 @@ public class MemberCount extends ListenerAdapter {
 	@Override
 	public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
 		update(event.getGuild());
+	}
+
+	@Override
+	public void onChannelDelete(@NotNull ChannelDeleteEvent event) {
+		bot.loadGuild(event.getGuild()).getStatistic().ifPresent(c -> c.setMemberCountChannel(null));
+	}
+
+	@Override
+	public void onRoleDelete(@NotNull RoleDeleteEvent event) {
+		bot.loadGuild(event.getGuild()).getStatistic().ifPresent(c -> c.setMemberCountChannel(null));
 	}
 
 	public void update(@NotNull Guild guild) {
