@@ -36,6 +36,6 @@ public class StatisticConfig extends ConfigCategory {
 	@Override
 	public void update(@NotNull Guild guild) {
 		bot.getMemberCount().update(this, guild);
-		bot.getRoleMemberCount().update(guild);
+		bot.getRoleMemberCount().update(this, guild);
 	}
 }
