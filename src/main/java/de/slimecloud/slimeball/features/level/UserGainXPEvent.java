@@ -20,4 +20,5 @@ public class UserGainXPEvent extends CancellableEvent {
 	private final int level;
 	private final int oldXp;
 	private final int newXp;
+	private final int deltaXp;
 }

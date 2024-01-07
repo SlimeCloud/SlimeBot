@@ -67,7 +67,7 @@ public interface LevelTable extends Table<Level> {
 		Level current = getLevel(user);
 
 		//Call event and save if not canceled
-		CancellableEvent event = new UserLevelUpEvent(user, UserGainXPEvent.Type.MANUAL, current.getXp(), current.getXp(), current.getLevel(), level);
+		CancellableEvent event = new UserLevelUpEvent(user, UserGainXPEvent.Type.MANUAL, current.getXp(), current.getXp(), 0, current.getLevel(), level);
 
 		//Update state
 		current = current.withLevel(level);
@@ -79,7 +79,7 @@ public interface LevelTable extends Table<Level> {
 	}
 
 	@NotNull
-	default Level addXp(@NotNull Member user, int xp, @NotNull UserGainXPEvent.Type type) {
+	default Level addXp(@NotNull Member user, double addXp, @NotNull UserGainXPEvent.Type type) {
 		//Retrieve current level
 		Level current = getLevel(user);
 
@@ -87,8 +87,8 @@ public interface LevelTable extends Table<Level> {
 		Optional<GuildLevelConfig> config = getManager().<SlimeBot>getData("bot").loadGuild(user.getGuild()).getLevel();
 		if (config.isEmpty()) return current;
 
-		xp *= config.get().getMultiplier();
-		xp += current.getXp();
+		addXp *= config.get().getMultiplier();
+		int xp = (int) addXp + current.getXp();
 
 		//Check for level up
 		int level = current.getLevel();
@@ -103,8 +103,8 @@ public interface LevelTable extends Table<Level> {
 
 		//Create event
 		CancellableEvent event = level == current.getLevel()
-				? new UserGainXPEvent(user, type, level, current.getXp(), xp)
-				: new UserLevelUpEvent(user, type, current.getXp(), xp, current.getLevel(), level);
+				? new UserGainXPEvent(user, type, level, current.getXp(), xp, (int) addXp)
+				: new UserLevelUpEvent(user, type, current.getXp(), xp, (int) addXp, current.getLevel(), level);
 
 		//Update state
 		current = current
@@ -145,6 +145,6 @@ public interface LevelTable extends Table<Level> {
 		if (config.isEmpty()) return;
 
 		//Add xp
-		addXp(user, (int) MathUtil.randomDouble(config.get().getMinVoiceXP(), config.get().getMaxVoiceXP()), UserGainXPEvent.Type.VOICE);
+		addXp(user, MathUtil.randomDouble(config.get().getMinVoiceXP(), config.get().getMaxVoiceXP()), UserGainXPEvent.Type.VOICE);
 	}
 }
