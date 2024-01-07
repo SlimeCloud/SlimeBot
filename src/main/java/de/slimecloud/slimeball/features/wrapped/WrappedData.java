@@ -58,6 +58,11 @@ public class WrappedData implements DataClass<WrappedData> {
 	@Json
 	private Map<String, Double> xpPerDay = new HashMap<>();
 
+	@Column
+	private int messageXp;
+	@Column
+	private int voiceXp;
+
 	public WrappedData(@NotNull SlimeBot bot) {
 		this(bot, null, null);
 	}
