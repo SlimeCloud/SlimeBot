@@ -40,14 +40,14 @@ public interface LevelTable extends Table<Level> {
 
 	@NotNull
 	default List<Level> getLevels(@NotNull Guild guild) {
-		return selectMany(Where.equals("guild", guild.getIdLong()), Order.descendingBy("level"));
+		return selectMany(Where.equals("guild", guild), Order.descendingBy("level"));
 	}
 
 	@NotNull
 	default Level getLevel(@NotNull Guild guild, @NotNull UserSnowflake user) {
 		return selectOne(Where.allOf(
-				Where.equals("user", user.getIdLong()),
-				Where.equals("guild", guild.getIdLong())
+				Where.equals("user", user),
+				Where.equals("guild", guild)
 		)).orElseGet(() -> Level.empty(getManager().getData("bot"), guild, user));
 	}
 

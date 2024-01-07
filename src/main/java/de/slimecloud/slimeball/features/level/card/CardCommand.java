@@ -252,7 +252,7 @@ public class CardCommand {
 						if (data.getPermission(event.getMember()).canWrite()) {
 							data.delete();
 
-							bot.getCardProfiles().delete(Where.equals("id", data.getId().asString()));
+							bot.getCardProfiles().delete(Where.equals("id", data.getId()));
 
 							event.reply("Profil mit ID **" + id + "** gelöscht").setEphemeral(true).queue();
 						} else event.reply(":no_entry_sign: Du hast keinen Zugriff auf dieses Profil").setEphemeral(true).queue();
@@ -343,7 +343,7 @@ public class CardCommand {
 
 								bot.getCardProfiles().delete(Where.allOf(
 										Where.equals("id", data.getId()),
-										Where.not(Where.equals("user", data.getOwner().getIdLong()))
+										Where.not(Where.equals("user", data.getOwner()))
 								));
 							}
 						} else event.reply(":no_entry_sign: Du hast keinen Zugriff auf dieses Profil").setEphemeral(true).queue();
