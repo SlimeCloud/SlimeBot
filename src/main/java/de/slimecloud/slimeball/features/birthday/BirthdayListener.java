@@ -39,7 +39,7 @@ public class BirthdayListener {
 
 			TextChannel channel = guild.getTextChannelById(config.reportChat);
 			if (channel != null)
-				channel.sendMessage(String.format("%s (%s) hat gerade sein geburtstag gerade auf den %s gesetzt, und ist somit erst %s Jahre alt", member.getAsMention(), member.getEffectiveName(), event.getNewBirthday(), age)).queue();
+				channel.sendMessage(String.format("%s (%s) hat gerade seinen/ihren Geburtstag auf den %s gesetzt und ist somit erst **%s** Jahre alt!", member.getAsMention(), member.getEffectiveName(), event.getNewBirthday(), age)).queue();
 		}
 
 		if (TimeUtil.isSameDay(event.getNewBirthday().getTime(), Instant.now(), true)) new BirthdayStartEvent(event.getNewBirthday()).callEvent();
@@ -47,7 +47,8 @@ public class BirthdayListener {
 
 	@EventHandler
 	public void onBirthdayRemove(@NotNull BirthdayRemoveEvent event) {
-		//Call the method instead of the event, as it will be called in any case, even if the user does not have a birthday and has just removed their birthday. But in the onBirthdayEnd method it does not matter, as it only tries to remove the birthday role.
+		//Call the method instead of the event, as it will be called in any case, even if the user does not have a birthday and has just removed their birthday.
+		//But in the onBirthdayEnd method it does not matter, as it only tries to remove the birthday role.
 		onBirthdayEnd(new BirthdayEndEvent(event.getMember()));
 	}
 
@@ -74,7 +75,7 @@ public class BirthdayListener {
 		TextChannel channel = event.getGuild().getTextChannelById(config.announceChat);
 		if (channel != null) {
 			int age = event.getBirthday().getAge();
-			channel.sendMessage(String.format("%s hat heute Geburtstag%s :birthday: :partying_face:", event.getMember().getAsMention(), age != -1 ? String.format(" , und wird %s Jahre alt", age) : "")).queue();
+			channel.sendMessage(String.format("%s hat heute Geburtstag%s :birthday: :partying_face:", event.getMember().getAsMention(), age != -1 ? String.format(" und wird %s Jahre alt", age) : "")).queue();
 		}
 	}
 }

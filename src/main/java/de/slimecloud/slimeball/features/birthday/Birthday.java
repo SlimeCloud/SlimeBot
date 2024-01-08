@@ -82,6 +82,6 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 	@Override
 	public String toString() {
 		ZonedDateTime date = time.atZone(Main.timezone);
-		return TimeFormat.DATE_TIME_SHORT.format(date);
+		return TimeFormat.DATE_LONG.format(date);
 	}
 }
