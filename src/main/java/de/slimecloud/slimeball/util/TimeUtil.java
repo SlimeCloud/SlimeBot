@@ -1,7 +1,6 @@
 package de.slimecloud.slimeball.util;
 
 import de.slimecloud.slimeball.main.Main;
-import de.slimecloud.slimeball.main.SlimeBot;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -21,7 +20,7 @@ public class TimeUtil {
 	}
 
 	public static boolean isSameDay(ZonedDateTime zdt, ZonedDateTime other, boolean ignoreYear) {
-		return (ignoreYear || zdt.getYear()==other.getYear()) && zdt.getMonth().equals(other.getMonth()) && zdt.getDayOfMonth()==other.getDayOfMonth();
+		return (ignoreYear || zdt.getYear() == other.getYear()) && zdt.getMonth().equals(other.getMonth()) && zdt.getDayOfMonth() == other.getDayOfMonth();
 	}
 
 }
