@@ -49,6 +49,8 @@ import de.slimecloud.slimeball.features.report.commands.UserReportCommand;
 import de.slimecloud.slimeball.features.report.commands.UserReportSlashCommand;
 import de.slimecloud.slimeball.features.staff.StaffMessage;
 import de.slimecloud.slimeball.features.staff.TeamMeeting;
+import de.slimecloud.slimeball.features.statistic.MemberCount;
+import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
@@ -120,6 +122,9 @@ public class SlimeBot extends ListenerAdapter {
 
 	private final GitHubAPI github;
 	private final Spotify spotify;
+
+	private final MemberCount memberCount;
+	private final RoleMemberCount roleMemberCount;
 
 	public SlimeBot(@NotNull Config config, @NotNull Dotenv credentials) throws IOException {
 		this.config = config;
@@ -204,6 +209,9 @@ public class SlimeBot extends ListenerAdapter {
 				.addEventListeners(new TeamMeeting(this))
 
 				.addEventListeners(new DataListener(this))
+
+				.addEventListeners(memberCount = new MemberCount(this))
+				.addEventListeners(roleMemberCount = new RoleMemberCount(this))
 
 				.build();
 
