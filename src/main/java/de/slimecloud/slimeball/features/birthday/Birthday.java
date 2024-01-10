@@ -54,10 +54,13 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 
 	public int getAge() {
 		ZonedDateTime date = time.atZone(Main.timezone);
-		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
 		if (date.getYear() == 0) return -1;
+
+		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
+
 		int age = now.getYear() - date.getYear();
 		if (!now.isAfter(date.withYear(now.getYear()))) age--;
+
 		return age;
 	}
 

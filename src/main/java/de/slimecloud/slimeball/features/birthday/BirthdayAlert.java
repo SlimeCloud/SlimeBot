@@ -22,6 +22,7 @@ public class BirthdayAlert {
 
 	private void check() {
 		List<Birthday> all = bot.getBirthdays().getAll();
+
 		getYesterday(all).forEach(b -> new BirthdayEndEvent(b).callEvent());
 		getToday(all).forEach(b -> new BirthdayStartEvent(b).callEvent());
 	}

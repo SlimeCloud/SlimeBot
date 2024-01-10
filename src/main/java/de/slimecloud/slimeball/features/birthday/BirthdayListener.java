@@ -2,6 +2,7 @@ package de.slimecloud.slimeball.features.birthday;
 
 import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.JEvent;
+import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayEndEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayRemoveEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdaySetEvent;
@@ -10,13 +11,10 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.TimeUtil;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
 
 public class BirthdayListener {
 	private final SlimeBot bot;
@@ -55,27 +53,18 @@ public class BirthdayListener {
 
 	@EventHandler
 	public void onBirthdayEnd(@NotNull BirthdayEndEvent event) {
-		BirthdayConfig config = bot.loadGuild(event.getGuild()).getBirthday().orElse(null);
-		if (config == null) return;
-
-		Role role = event.getGuild().getRoleById(config.birthdayRole);
-		if (role == null) return;
-
-		event.getGuild().modifyMemberRoles(event.getMember(), Collections.emptyList(), List.of(role)).queue();
+		bot.loadGuild(event.getGuild()).getBirthday().flatMap(BirthdayConfig::getBirthdayRole).ifPresent(role -> event.getGuild().removeRoleFromMember(event.getMember(), role).queue());
 	}
 
 	@EventHandler
 	public void onBirthdayStart(@NotNull BirthdayStartEvent event) {
-		BirthdayConfig config = bot.loadGuild(event.getGuild()).getBirthday().orElse(null);
-		if (config == null) return;
+		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
 
-		Role role = event.getGuild().getRoleById(config.birthdayRole);
-		if (role != null) event.getGuild().modifyMemberRoles(event.getMember(), List.of(role), Collections.emptyList()).queue();
+		guildConfig.getBirthday().flatMap(BirthdayConfig::getBirthdayRole).ifPresent(role -> event.getGuild().addRoleToMember(event.getMember(), role).queue());
 
-		TextChannel channel = event.getGuild().getTextChannelById(config.announceChat);
-		if (channel != null) {
+		guildConfig.getGreetingsChannel().ifPresent(channel -> {
 			int age = event.getBirthday().getAge();
-			channel.sendMessage(String.format("%s hat heute Geburtstag%s :birthday: :partying_face:", event.getMember().getAsMention(), age != -1 ? String.format(" und wird %s Jahre alt", age) : "")).queue();
-		}
+			channel.sendMessage(event.getMember().getAsMention() + " hat heute Geburtstag" + (age != -1 ? String.format(" und wird %s Jahre alt", age) : "") + " :birthday: :partying_face:").queue();
+		});
 	}
 }
