@@ -30,14 +30,14 @@ public interface ReminderTable extends Table<Reminder> {
 	@NotNull
 	default List<Reminder> getByMember(@NotNull Member member) {
 		return selectMany(Where.allOf(
-				Where.equals("user", member.getUser().getIdLong()),
-				Where.equals("guild", member.getGuild().getIdLong()),
+				Where.equals("user", member.getUser()),
+				Where.equals("guild", member.getGuild()),
 				Where.equals("role", 0)
 		), Order.ascendingBy("time"));
 	}
 
 	@NotNull
 	default List<Reminder> getByGuild(@NotNull Guild guild) {
-		return selectMany(Where.equals("guild", guild.getIdLong()));
+		return selectMany(Where.equals("guild", guild));
 	}
 }

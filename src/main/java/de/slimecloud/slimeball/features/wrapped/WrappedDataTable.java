@@ -13,8 +13,8 @@ public interface WrappedDataTable extends Table<WrappedData> {
 	@NotNull
 	default WrappedData getData(@NotNull Guild guild, @NotNull UserSnowflake user) {
 		return selectOne(Where.allOf(
-				Where.equals("guild", guild.getIdLong()),
-				Where.equals("user", user.getIdLong())
+				Where.equals("guild", guild),
+				Where.equals("user", user)
 		)).orElseGet(() -> WrappedData.empty(getManager().getData("bot"), guild, user));
 	}
 
@@ -25,6 +25,6 @@ public interface WrappedDataTable extends Table<WrappedData> {
 
 	@NotNull
 	default List<WrappedData> getAll(@NotNull Guild guild) {
-		return selectMany(Where.equals("guild", guild.getIdLong()));
+		return selectMany(Where.equals("guild", guild));
 	}
 }

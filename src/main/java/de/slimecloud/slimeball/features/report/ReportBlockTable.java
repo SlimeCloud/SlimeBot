@@ -21,7 +21,7 @@ public interface ReportBlockTable extends Table<ReportBlock>, Listable<ReportBlo
 	@NotNull
 	@Override
 	default List<ReportBlock> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<ReportBlock> context) {
-		return selectMany(Where.equals("guild", context.event().getGuild().getIdLong()));
+		return selectMany(Where.equals("guild", context.event().getGuild()));
 	}
 
 	default boolean blockUser(@NotNull UserSnowflake team, @NotNull Member member, @NotNull String reason) {
@@ -34,16 +34,16 @@ public interface ReportBlockTable extends Table<ReportBlock>, Listable<ReportBlo
 
 	default void unblock(@NotNull Member member) {
 		delete(Where.allOf(
-				Where.equals("user", member.getIdLong()),
-				Where.equals("guild", member.getGuild().getIdLong())
+				Where.equals("user", member),
+				Where.equals("guild", member.getGuild())
 		));
 	}
 
 	@NotNull
 	default Optional<ReportBlock> isBlocked(@NotNull Guild guild, @NotNull UserSnowflake user) {
 		return selectOne(Where.allOf(
-				Where.equals("user", user.getIdLong()),
-				Where.equals("guild", guild.getIdLong())
+				Where.equals("user", user),
+				Where.equals("guild", guild)
 		));
 	}
 
