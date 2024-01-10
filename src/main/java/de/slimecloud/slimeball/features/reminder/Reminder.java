@@ -58,7 +58,7 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runn
 
 	@Override
 	public void run() {
-		if(role == null) {
+		if (role == null) {
 			// Send Private Reminder
 			EmbedBuilder embedBuilder = new EmbedBuilder()
 					.setAuthor(guild.getName(), null, guild.getIconUrl())
@@ -91,7 +91,7 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runn
 
 	public Optional<ScheduledFuture<?>> schedule() {
 		long delay = time.toEpochMilli() - System.currentTimeMillis();
-		if(delay <= 0) {
+		if (delay <= 0) {
 			run();
 			return Optional.empty();
 		}

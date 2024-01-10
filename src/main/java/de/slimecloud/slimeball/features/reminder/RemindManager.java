@@ -14,7 +14,7 @@ public class RemindManager {
 	}
 
 	public void scheduleNextReminder() {
-		if (scheduledFuture != null)scheduledFuture.cancel(true);
+		if (scheduledFuture != null) scheduledFuture.cancel(true);
 		table.getNext().flatMap(Reminder::schedule).ifPresent(f -> scheduledFuture = f);
 	}
 }
