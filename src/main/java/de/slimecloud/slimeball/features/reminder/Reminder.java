@@ -4,21 +4,24 @@ import de.mineking.javautils.database.Column;
 import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Table;
 import de.slimecloud.slimeball.main.SlimeBot;
+import de.slimecloud.slimeball.main.SlimeEmoji;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
+import java.util.Optional;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @AllArgsConstructor
-public class Reminder implements DataClass<Reminder>, Comparable<Reminder> {
+public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runnable {
 	private final SlimeBot bot;
 
 	@Column(autoincrement = true, key = true)
@@ -42,26 +45,39 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder> {
 		this(bot, 0, null, null, null, null, null);
 	}
 
-	public void execute() {
+	@NotNull
+	@Override
+	public Table<Reminder> getTable() {
+		return bot.getReminder();
+	}
+
+	@Override
+	public int compareTo(@NotNull Reminder o) {
+		return this.getTime().compareTo(o.getTime());
+	}
+
+	@Override
+	public void run() {
 		if(role == null) {
 			// Send Private Reminder
 			EmbedBuilder embedBuilder = new EmbedBuilder()
-					.setTitle("Reminder!")
+					.setAuthor(guild.getName(), null, guild.getIconUrl())
+					.setTitle(SlimeEmoji.EXCLAMATION.toString(guild) + " Reminder!")
 					.setColor(bot.getColor(guild))
-					.addField("Nachricht:", message, false)
-					.setFooter("Reminder auf: " + guild.getName());
+					.setDescription(message);
 
 			bot.getJda().openPrivateChannelById(user.getIdLong())
 					.flatMap(channel -> channel.sendMessageEmbeds(embedBuilder.build()))
 					.queue();
-		}else {
+		} else {
 			// Send Role Reminder
-			guild.retrieveMember(user).map(Member::getEffectiveName).queue(name -> {
+			guild.retrieveMember(user).queue(member -> {
 				EmbedBuilder embedBuilder = new EmbedBuilder()
-						.setTitle("Reminder!")
+						.setAuthor(member.getEffectiveName(), null, member.getEffectiveAvatarUrl())
+						.setTitle(SlimeEmoji.EXCLAMATION.toString(guild) + " Reminder!")
 						.setColor(bot.getColor(guild))
-						.addField("Nachricht:", message, false)
-						.setFooter("Reminder von: " + name);
+						.setDescription(message);
+
 
 				bot.loadGuild(guild.getIdLong()).getTeamChannel().ifPresent(channel -> {
 					channel.sendMessage(role.getAsMention()).setEmbeds(embedBuilder.build()).queue();
@@ -73,14 +89,12 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder> {
 		bot.getRemindManager().scheduleNextReminder();
 	}
 
-	@NotNull
-	@Override
-	public Table<Reminder> getTable() {
-		return bot.getReminder();
-	}
-
-	@Override
-	public int compareTo(@NotNull Reminder o) {
-		return this.getTime().compareTo(o.getTime());
+	public Optional<ScheduledFuture<?>> schedule() {
+		long delay = time.toEpochMilli() - System.currentTimeMillis();
+		if(delay <= 0) {
+			run();
+			return Optional.empty();
+		}
+		return Optional.of(bot.getExecutor().schedule(this, delay / 1000, TimeUnit.SECONDS));
 	}
 }

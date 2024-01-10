@@ -301,7 +301,10 @@ public class SlimeBot extends ListenerAdapter {
 		}
 
 		// Initialize RemindMe manger
-		if(reminder != null) remindManager = new RemindManager(this);
+		if(reminder != null) {
+			remindManager = new RemindManager(this);
+			remindManager.scheduleNextReminder();
+		}
 
 		new HolidayAlert(this);
 	}
