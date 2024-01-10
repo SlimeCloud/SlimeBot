@@ -10,6 +10,7 @@ import de.slimecloud.slimeball.features.level.GuildLevelConfig;
 import de.slimecloud.slimeball.features.moderation.AutodeleteFlag;
 import de.slimecloud.slimeball.features.staff.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
+import de.slimecloud.slimeball.features.statistic.StatisticConfig;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
@@ -113,8 +114,12 @@ public class GuildConfig {
 	private MeetingConfig meeting;
 
 	@Setter
-	@CategoryInfo(name = "Team-Nachricht", command = "team-message", description = "Kanfigration für die Team-Nachricht")
+	@CategoryInfo(name = "Team-Nachricht", command = "team-message", description = "Konfiguration für die Team-Nachricht")
 	private StaffConfig teamMessage;
+
+	@Setter
+	@CategoryInfo(name = "Statistic", command = "statistic", description = "Konfiguration für die Statistic Channels")
+	private StatisticConfig statistic;
 
 	@NotNull
 	private GuildConfig configure(@NotNull SlimeBot bot, @NotNull String path, long guild) {
@@ -127,6 +132,7 @@ public class GuildConfig {
 		if (level != null) level.bot = bot;
 		if (teamMessage != null) teamMessage.bot = bot;
 		if (meeting != null) meeting.bot = bot;
+		if (statistic != null) statistic.bot = bot;
 
 		return this;
 	}
@@ -169,6 +175,11 @@ public class GuildConfig {
 	@NotNull
 	public Optional<StaffConfig> getTeamMessage() {
 		return Optional.ofNullable(teamMessage);
+	}
+
+	@NotNull
+	public Optional<StatisticConfig> getStatistic() {
+		return Optional.ofNullable(statistic);
 	}
 
 
