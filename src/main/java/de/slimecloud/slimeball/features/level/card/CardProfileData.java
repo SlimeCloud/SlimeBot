@@ -387,9 +387,9 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 
 				x += width + height / 2;
 			} catch (FileNotFoundException e) {
-				logger.warn("Decoration {} not found", d);
+				logger.warn("Decoration {} not found for member {}", d, member);
 			} catch (IOException e) {
-				logger.error("Failed to read decoration", e);
+				logger.error("Failed to read decoration {} for member {}", d, member, e);
 			}
 		}
 	}
