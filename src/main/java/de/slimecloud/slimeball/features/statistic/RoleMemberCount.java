@@ -73,8 +73,8 @@ public class RoleMemberCount extends ListenerAdapter {
 
 	public void update(@NotNull StatisticConfig config, @NotNull Guild guild) {
 		config.getRoleMemberCountChannel().forEach((channel, roleId) -> {
-			String format = config.getRoleMemberCountFormat().containsKey(roleId)
-					? config.getRoleMemberCountFormat().get(roleId)
+			String format = config.getRoleMemberCountFormat().containsKey(channel)
+					? config.getRoleMemberCountFormat().get(channel)
 					: config.getDefaultRoleFormat();
 
 			Role role = bot.getJda().getRoleById(roleId);
