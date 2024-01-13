@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -281,7 +282,14 @@ public enum ConfigFieldType {
 		@NotNull
 		@Override
 		public Object parse(@NotNull Class<?> type, @NotNull String value) {
-			return value;
+			return type.equals(Color.class) ? ColorUtil.parseColor(value) : value;
+		}
+
+		@NotNull
+		@Override
+		public String toString(@NotNull Object value) {
+			if(value instanceof Color c) return ColorUtil.toString(c);
+			else return super.toString(value);
 		}
 	},
 
