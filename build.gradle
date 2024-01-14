@@ -11,7 +11,7 @@ plugins {
 mainClassName = "de.slimecloud.slimeball.main.Main"
 
 group 'com.slimebot'
-version '3.2.1'
+version '3.3.1'
 
 repositories {
     mavenCentral()
