@@ -54,7 +54,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -98,7 +98,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -143,7 +143,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -187,7 +187,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -225,7 +225,7 @@ public enum ConfigFieldType {
 
 		@NotNull
 		@Override
-		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) {
+		public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -363,7 +363,7 @@ public enum ConfigFieldType {
 								handler.accept(s, (Integer) value.apply(s) - 1);
 								s.update();
 							}),
-							new MenuComponent<>(getModal(manager, type, menu, name + ".display", display, handler), ButtonColor.GRAY, (TextLabel) s -> "\uD83D\uDCDD " + value.apply(s)).setStateCreator(ModalMenu::createState),
+							new MenuComponent<>(getModal(manager, type, menu, name + ".display", display, value, handler), ButtonColor.GRAY, (TextLabel) s -> "\uD83D\uDCDD " + value.apply(s)).setStateCreator(ModalMenu::createState),
 							new ButtonComponent(name + ".add", ButtonColor.BLUE, "+").asDisabled(s -> (Integer) value.apply(s) >= info.maxValue()).appendHandler(s -> {
 								handler.accept(s, (Integer) value.apply(s) + 1);
 								s.update();
@@ -417,7 +417,7 @@ public enum ConfigFieldType {
 						handler.accept(s, (Double) value.apply(s) - 1);
 						s.update();
 					}),
-					new MenuComponent<>(getModal(manager, type, menu, name + ".display", display, handler), ButtonColor.GRAY, (TextLabel) s -> "\uD83D\uDCDD " + value.apply(s)).setStateCreator(ModalMenu::createState),
+					new MenuComponent<>(getModal(manager, type, menu, name + ".display", display, value, handler), ButtonColor.GRAY, (TextLabel) s -> "\uD83D\uDCDD " + value.apply(s)).setStateCreator(ModalMenu::createState),
 					new ButtonComponent(name + ".add", ButtonColor.BLUE, "+").asDisabled(s -> (Double) value.apply(s) + 1 > info.maxValue()).appendHandler(s -> {
 						handler.accept(s, (Double) value.apply(s) + 1);
 						s.update();
@@ -449,10 +449,18 @@ public enum ConfigFieldType {
 	}
 
 	@NotNull
-	public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull BiConsumer<DataState<?>, Object> handler) throws UnsupportedOperationException {
+	public ModalMenu getModal(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) throws UnsupportedOperationException {
 		return manager.createModal(menu + "." + name,
 				s -> display,
-				List.of(new TextComponent("value", "Neuer Wert", TextInputStyle.SHORT).setPlaceholder(this.name)),
+				List.of(new TextComponent("value", "Neuer Wert", TextInputStyle.SHORT)
+						.setPlaceholder(this.name)
+						.setValue(s -> {
+							Object v = value.apply(s);
+							String temp = toString(v);
+
+							return (v == null && temp.equals("null")) || temp.isEmpty() ? null : temp;
+						})
+				),
 				(s, m) -> {
 					if (validate(type, m.getString("value"))) {
 						handler.accept(s, parse(type, m.getString("value")));
@@ -471,7 +479,7 @@ public enum ConfigFieldType {
 
 	@NotNull
 	public Component<?> createComponent(@NotNull UIManager manager, @NotNull Class<?> type, @NotNull Info info, @NotNull String menu, @NotNull String name, @NotNull String display, @NotNull Function<DataState<?>, Object> value, @NotNull BiConsumer<DataState<?>, Object> handler) {
-		return new MenuComponent<>(getModal(manager, type, menu, name, display, handler), ButtonColor.BLUE, display).setStateCreator(ModalMenu::createState);
+		return new MenuComponent<>(getModal(manager, type, menu, name, display, value, handler), ButtonColor.BLUE, display).setStateCreator(ModalMenu::createState);
 	}
 
 	public boolean validate(@NotNull Class<?> type, @NotNull String value) {
