@@ -116,14 +116,14 @@ public class TeamMeeting extends ListenerAdapter {
 									.setDescription("Team-Besprechung erfolgreich beendet")
 									.appendDescription("\n\nFehler beim erstellen der ToDo's")
 									.build()
-							)).queue(x -> {
-								//Delete event
-								event.getGuild().retrieveScheduledEventById(config.getEvent()).flatMap(ScheduledEvent::delete).queue();
+							)).complete(); //We have to use complete to ensure the order of messages. We can not use the queue callback because of the complete usage in createNewMeeting
 
-								//This will send a new message
-								config.createNewMeeting(current.getTimestamp().toInstant().plus(Duration.ofDays(14)));
-								guildConfig.save();
-							});
+					//Delete event
+					event.getGuild().retrieveScheduledEventById(config.getEvent()).flatMap(ScheduledEvent::delete).queue();
+
+					//This will send a new message
+					config.createNewMeeting(current.getTimestamp().toInstant().plus(Duration.ofDays(14)));
+					guildConfig.save();
 				}
 			}
 		});
