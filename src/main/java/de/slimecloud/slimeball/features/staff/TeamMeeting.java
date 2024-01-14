@@ -116,14 +116,14 @@ public class TeamMeeting extends ListenerAdapter {
 									.setDescription("Team-Besprechung erfolgreich beendet")
 									.appendDescription("\n\nFehler beim erstellen der ToDo's")
 									.build()
-							)).queue();
+							)).queue(x -> {
+								//Delete event
+								event.getGuild().retrieveScheduledEventById(config.getEvent()).flatMap(ScheduledEvent::delete).queue();
 
-					//Delete event
-					event.getGuild().retrieveScheduledEventById(config.getEvent()).flatMap(ScheduledEvent::delete).queue();
-
-					//This will send a new message
-					config.createNewMeeting(current.getTimestamp().toInstant().plus(Duration.ofDays(14)));
-					guildConfig.save();
+								//This will send a new message
+								config.createNewMeeting(current.getTimestamp().toInstant().plus(Duration.ofDays(14)));
+								guildConfig.save();
+							});
 				}
 			}
 		});
