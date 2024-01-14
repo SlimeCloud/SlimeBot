@@ -44,7 +44,7 @@ public class TeamMeeting extends ListenerAdapter {
 	}
 
 	@Override
-	public void onMessageDelete(@NotNull MessageDeleteEvent event) {
+	public synchronized void onMessageDelete(@NotNull MessageDeleteEvent event) {
 		if (!event.isFromGuild()) return;
 
 		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
@@ -59,12 +59,14 @@ public class TeamMeeting extends ListenerAdapter {
 	}
 
 	@Override
-	public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+	public synchronized void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
 		String[] id = event.getComponentId().split(":");
 		if (!id[0].equals("meeting")) return;
 
 		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
 		guildConfig.getMeeting().ifPresent(config -> {
+			if(event.getMessage().getIdLong() != config.getMessage()) return;
+
 			MessageEmbed current = event.getMessage().getEmbeds().get(0);
 
 			switch (id[1]) {
@@ -128,12 +130,14 @@ public class TeamMeeting extends ListenerAdapter {
 	}
 
 	@Override
-	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+	public synchronized void onStringSelectInteraction(StringSelectInteractionEvent event) {
 		String[] id = event.getComponentId().split(":");
 		if (!id[0].equals("meeting")) return;
 
 		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
 		guildConfig.getMeeting().ifPresent(config -> {
+			if(event.getMessage().getIdLong() != config.getMessage()) return;
+
 			MessageEmbed current = event.getMessage().getEmbeds().get(0);
 			int i = Integer.valueOf(event.getSelectedOptions().get(0).getValue());
 
@@ -157,12 +161,14 @@ public class TeamMeeting extends ListenerAdapter {
 	}
 
 	@Override
-	public void onModalInteraction(ModalInteractionEvent event) {
+	public synchronized void onModalInteraction(ModalInteractionEvent event) {
 		String[] id = event.getModalId().split(":");
 		if (!id[0].equals("meeting")) return;
 
 		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
 		guildConfig.getMeeting().ifPresent(config -> {
+			if(event.getMessage().getIdLong() != config.getMessage()) return;
+
 			MessageEmbed current = event.getMessage().getEmbeds().get(0);
 
 			switch (id[1]) {
