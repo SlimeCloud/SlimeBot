@@ -148,10 +148,8 @@ public class DataListener extends ListenerAdapter {
 		//Load current data
 		WrappedData data = bot.getWrappedData().getData(event.getUser().getGuild(), event.getUser());
 
-		int delta = event.getNewXp() - event.getOldXp();
-
 		//Update data
-		data.getXpPerDay().compute(HolidayAlert.formatter.format(LocalDateTime.now()), (k, v) -> v == null ? delta : v + delta);
+		data.getXpPerDay().compute(HolidayAlert.formatter.format(LocalDateTime.now()), (k, v) -> v == null ? event.getDeltaXp() : v + event.getDeltaXp());
 
 		//Save type
 		if(event.getType() == UserGainXPEvent.Type.MESSAGE) data.setMessageXp(data.getMessageXp() + delta);
