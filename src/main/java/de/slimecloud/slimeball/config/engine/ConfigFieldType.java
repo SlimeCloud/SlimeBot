@@ -288,7 +288,7 @@ public enum ConfigFieldType {
 		@NotNull
 		@Override
 		public String toString(@NotNull Object value) {
-			if (value instanceof Color c) return ColorUtil.toString(c);
+			if(value instanceof Color c) return ColorUtil.toString(c);
 			else return super.toString(value);
 		}
 	},

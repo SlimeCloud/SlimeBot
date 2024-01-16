@@ -65,7 +65,7 @@ public class TeamMeeting extends ListenerAdapter {
 
 		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
 		guildConfig.getMeeting().ifPresent(config -> {
-			if (event.getMessage().getIdLong() != config.getMessage()) return;
+			if(event.getMessage().getIdLong() != config.getMessage()) return;
 
 			MessageEmbed current = event.getMessage().getEmbeds().get(0);
 
@@ -136,7 +136,7 @@ public class TeamMeeting extends ListenerAdapter {
 
 		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
 		guildConfig.getMeeting().ifPresent(config -> {
-			if (event.getMessage().getIdLong() != config.getMessage()) return;
+			if(event.getMessage().getIdLong() != config.getMessage()) return;
 
 			MessageEmbed current = event.getMessage().getEmbeds().get(0);
 			int i = Integer.valueOf(event.getSelectedOptions().get(0).getValue());
@@ -167,7 +167,7 @@ public class TeamMeeting extends ListenerAdapter {
 
 		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
 		guildConfig.getMeeting().ifPresent(config -> {
-			if (event.getMessage().getIdLong() != config.getMessage()) return;
+			if(event.getMessage().getIdLong() != config.getMessage()) return;
 
 			MessageEmbed current = event.getMessage().getEmbeds().get(0);
 

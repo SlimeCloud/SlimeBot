@@ -152,9 +152,9 @@ public class DataListener extends ListenerAdapter {
 		data.getXpPerDay().compute(HolidayAlert.formatter.format(LocalDateTime.now()), (k, v) -> v == null ? event.getDeltaXp() : v + event.getDeltaXp());
 
 		//Save type
-		if (event.getType() == UserGainXPEvent.Type.MESSAGE) data.setMessageXp(data.getMessageXp() + delta);
-		else if (event.getType() == UserGainXPEvent.Type.VOICE) data.setVoiceXp(data.getVoiceXp() + delta);
-		else if (event.getType() == UserGainXPEvent.Type.MANUAL) data.setSpecialXp(data.getSpecialXp() + delta);
+		if(event.getType() == UserGainXPEvent.Type.MESSAGE) data.setMessageXp(data.getMessageXp() + delta);
+		else if(event.getType() == UserGainXPEvent.Type.VOICE) data.setVoiceXp(data.getVoiceXp() + delta);
+		else if(event.getType() == UserGainXPEvent.Type.MANUAL) data.setSpecialXp(data.getSpecialXp() + delta);
 
 		//Save changes
 		data.update();
