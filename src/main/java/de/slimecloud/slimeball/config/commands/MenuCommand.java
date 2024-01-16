@@ -397,7 +397,7 @@ public class MenuCommand {
 		);
 
 		//Add components that opens the value menu to add a new entry
-		Component<?> add = keyType.createComponent(manager, keyClass, info, "config." + category.command() + "." + field.command(), "add", "Wert hinzufügen", s -> get(bot, s, getter), (s, k) -> {
+		Component<?> add = keyType.createComponent(manager, keyClass, info, "config." + category.command() + "." + field.command(), "add", "Wert hinzufügen", s -> "", (s, k) -> {
 			valueMenu.createState(s).setState("key", keyType.toString(k)).display(s.event);
 			throw new RenderTermination();
 		});

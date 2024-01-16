@@ -15,6 +15,8 @@ public class Main {
 
 	public final static Random random = new Random();
 
+	public final static ZoneOffset timezone = ZoneOffset.ofHours(1);
+
 	public final static Gson json = new Gson();
 	public final static Gson formattedJson = new GsonBuilder()
 			.setPrettyPrinting()

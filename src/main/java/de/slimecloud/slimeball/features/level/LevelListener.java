@@ -86,7 +86,10 @@ public class LevelListener extends ListenerAdapter {
 
 		//If channel has 2 valid members and the channel is not blacklisted -> mark channel for leveling
 		if (validMembers.size() >= 2 && !isBlacklisted(channel)) validMembers.forEach(m -> voiceUsers.put(m.getIdLong(), channel.getGuild().getIdLong()));
-		else channel.getMembers().forEach(m -> voiceUsers.remove(m.getIdLong()));
+
+		channel.getMembers().forEach(m -> {
+			if (!validMembers.contains(m)) voiceUsers.remove(m.getIdLong());
+		});
 	}
 
 	private boolean isBlacklisted(@NotNull GuildChannel channel) {
