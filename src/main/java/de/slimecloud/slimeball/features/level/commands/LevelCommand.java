@@ -27,5 +27,6 @@ public class LevelCommand {
 		command.addSubcommand(AddCommand.class);
 		command.addSubcommand(RemoveCommand.class);
 		command.addSubcommand(SetCommand.class);
+		command.addSubcommand(CalculateCommand.class);
 	}
 }
