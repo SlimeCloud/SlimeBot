@@ -3,6 +3,7 @@ package de.slimecloud.slimeball.features.staff;
 import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
+import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeEmoji;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -22,7 +23,10 @@ import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -30,8 +34,6 @@ import java.util.concurrent.TimeUnit;
 
 @Getter
 public class MeetingConfig extends ConfigCategory {
-	public final static ZoneOffset offset = ZoneOffset.ofHours(1);
-
 	@ConfigField(name = "Kanal", command = "channel", description = "Kanal, in dem Team-Meetings organisiert werden", type = ConfigFieldType.MESSAGE_CHANNEL, required = true)
 	private Long channel;
 
@@ -53,7 +55,7 @@ public class MeetingConfig extends ConfigCategory {
 
 	@Override
 	public void enable(@NotNull Guild guild) {
-		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(offset));
+		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(Main.timezone));
 	}
 
 	public void setupNotification() {
@@ -83,7 +85,7 @@ public class MeetingConfig extends ConfigCategory {
 			this.message = message.getIdLong();
 
 			//Create event
-			this.event = channel.getGuild().createScheduledEvent("Teamsitzung", getVoiceChannel().orElseThrow(), timestamp.atOffset(offset))
+			this.event = channel.getGuild().createScheduledEvent("Teamsitzung", getVoiceChannel().orElseThrow(), timestamp.atOffset(Main.timezone))
 					.setDescription("Weitere Informationen: " + message.getJumpUrl())
 					.complete().getIdLong();
 		});
