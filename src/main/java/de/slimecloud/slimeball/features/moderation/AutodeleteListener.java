@@ -38,7 +38,7 @@ public class AutodeleteListener extends ListenerAdapter {
 
 		thread.retrieveStartMessage().queue(
 				message -> check(message, thread.getParentChannel(), true),
-				new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
+				new ErrorHandler(System.out::println).ignore(ErrorResponse.UNKNOWN_MESSAGE)
 		);
 	}
 
