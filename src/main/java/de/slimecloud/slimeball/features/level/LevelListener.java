@@ -88,7 +88,7 @@ public class LevelListener extends ListenerAdapter {
 		if (validMembers.size() >= 2 && !isBlacklisted(channel)) validMembers.forEach(m -> voiceUsers.put(m.getIdLong(), channel.getGuild().getIdLong()));
 
 		channel.getMembers().forEach(m -> {
-			if(!validMembers.contains(m)) voiceUsers.remove(m.getIdLong());
+			if (!validMembers.contains(m)) voiceUsers.remove(m.getIdLong());
 		});
 	}
 
