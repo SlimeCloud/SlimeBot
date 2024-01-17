@@ -48,20 +48,7 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 	@NotNull
 	@Override
 	public String build(int index, @NotNull ListContext<? extends ListEntry> context) {
-		int age = getAge();
-		return String.format("%s %s%s", getFormat(), user.getAsMention(), age == -1 ? "" : String.format(" wird %s Jahre alt!", ++age));
-	}
-
-	public int getAge() {
-		ZonedDateTime date = time.atZone(Main.timezone);
-		if (date.getYear() == 0) return -1;
-
-		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
-
-		int age = now.getYear() - date.getYear();
-		if (!now.isAfter(date.withYear(now.getYear()))) age--;
-
-		return age;
+		return String.format("%s %s", getFormat(), user.getAsMention());
 	}
 
 
