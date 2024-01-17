@@ -13,16 +13,8 @@ import java.util.Optional;
 @Getter
 public class BirthdayConfig extends ConfigCategory {
 
-	@ConfigField(name = "Report Kanal", command = "report-channel", description = "Der chat in den eine warnung gesendet wird wenn ein nutzer unter 16 ist", type = ConfigFieldType.MESSAGE_CHANNEL)
-	public Long reportChat;
-
 	@ConfigField(name = "Geburtstags-Rolle", command = "role", description = "Die rolle die an nutzer vergeben wird wenn sie geburtstag haben", type = ConfigFieldType.ROLE)
 	public Long birthdayRole;
-
-	@NotNull
-	public Optional<MessageChannel> getReportChat() {
-		return Optional.ofNullable(reportChat).map(id -> bot.getJda().getChannelById(MessageChannel.class, id));
-	}
 
 	@NotNull
 	public Optional<Role> getBirthdayRole() {

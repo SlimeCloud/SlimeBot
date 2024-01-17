@@ -26,20 +26,6 @@ public class BirthdayListener {
 
 	@EventHandler
 	public void onBirthdaySet(@NotNull BirthdaySetEvent event) {
-		int age = event.getNewBirthday().getAge();
-
-		if (age != -1 && age < 16) {
-			Member member = event.getMember();
-			Guild guild = member.getGuild();
-
-			BirthdayConfig config = bot.loadGuild(guild).getBirthday().orElse(null);
-			if (config == null) return;
-
-			TextChannel channel = guild.getTextChannelById(config.reportChat);
-			if (channel != null)
-				channel.sendMessage(String.format("%s (%s) hat gerade seinen/ihren Geburtstag auf den %s gesetzt und ist somit erst **%s** Jahre alt!", member.getAsMention(), member.getEffectiveName(), event.getNewBirthday(), age)).queue();
-		}
-
 		if (TimeUtil.isSameDay(event.getNewBirthday().getTime(), Instant.now(), true)) new BirthdayStartEvent(event.getNewBirthday()).callEvent();
 	}
 
@@ -63,8 +49,7 @@ public class BirthdayListener {
 		guildConfig.getBirthday().flatMap(BirthdayConfig::getBirthdayRole).ifPresent(role -> event.getGuild().addRoleToMember(event.getMember(), role).queue());
 
 		guildConfig.getGreetingsChannel().ifPresent(channel -> {
-			int age = event.getBirthday().getAge();
-			channel.sendMessage(event.getMember().getAsMention() + " hat heute Geburtstag" + (age != -1 ? String.format(" und wird %s Jahre alt", age) : "") + " :birthday: :partying_face:").queue();
+			channel.sendMessage(event.getMember().getAsMention() + " hat heute Geburtstag! :birthday: :partying_face:").queue();
 		});
 	}
 }
