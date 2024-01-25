@@ -19,10 +19,10 @@ public interface ReminderTable extends Table<Reminder> {
 		return selectAll(Order.ascendingBy("time").limit(1)).stream().findFirst();
 	}
 
-	default Reminder createReminder(@NotNull Member member, Role role, @NotNull Instant time, @NotNull String message) {
+	default Reminder createReminder(@NotNull Member member, Role role, @NotNull Instant time, @NotNull Instant timeSet, @NotNull String message) {
 		SlimeBot bot = getManager().getData("bot");
 
-		Reminder result = insert(new Reminder(bot, 0, member.getGuild(), member, role, time, message));
+		Reminder result = insert(new Reminder(bot, 0, member.getGuild(), member, role, time, timeSet, message));
 		bot.getRemindManager().scheduleNextReminder();
 		return result;
 	}
@@ -32,7 +32,7 @@ public interface ReminderTable extends Table<Reminder> {
 		return selectMany(Where.allOf(
 				Where.equals("user", member.getUser()),
 				Where.equals("guild", member.getGuild()),
-				Where.equals("role", 0)
+				Where.equals("role", null)
 		), Order.ascendingBy("time"));
 	}
 

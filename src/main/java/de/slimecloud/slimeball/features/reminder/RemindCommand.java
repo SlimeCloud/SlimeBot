@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
@@ -37,7 +38,7 @@ public class RemindCommand {
 			return event.reply("Deine angegebene Zeit ist schon vergangen!");
 		}
 
-		bot.getReminder().createReminder(event.getMember(), role, timestamp, message);
+		bot.getReminder().createReminder(event.getMember(), role, timestamp, LocalDateTime.now(Main.timezone).toInstant(ZoneOffset.UTC), message);
 
 		return event.reply("Reminder wurde gesetzt! Löst aus " + TimeFormat.RELATIVE.format(timestamp));
 	}

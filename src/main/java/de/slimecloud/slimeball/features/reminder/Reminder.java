@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,15 +35,15 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runn
 	@Column
 	@Nullable
 	private final Role role;
-
 	@Column
 	private final Instant time;
-
+	@Column
+	private final Instant timeSet;
 	@Column
 	private final String message;
 
 	public Reminder(@NotNull SlimeBot bot) {
-		this(bot, 0, null, null, null, null, null);
+		this(bot, 0, null, null, null, null, null, null);
 	}
 
 	@NotNull
@@ -64,7 +65,7 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runn
 					.setAuthor(guild.getName(), null, guild.getIconUrl())
 					.setTitle(SlimeEmoji.EXCLAMATION.toString(guild) + " Reminder!")
 					.setColor(bot.getColor(guild))
-					.setDescription(message);
+					.setDescription(message + " \n \n" + "(Reminder von " + TimeFormat.RELATIVE.format(timeSet) + ")");
 
 			bot.getJda().openPrivateChannelById(user.getIdLong())
 					.flatMap(channel -> channel.sendMessageEmbeds(embedBuilder.build()))
@@ -76,7 +77,7 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runn
 						.setAuthor(member.getEffectiveName(), null, member.getEffectiveAvatarUrl())
 						.setTitle(SlimeEmoji.EXCLAMATION.toString(guild) + " Reminder!")
 						.setColor(bot.getColor(guild))
-						.setDescription(message);
+						.setDescription(message + " \n \n" + "(Reminder von " + TimeFormat.RELATIVE.format(timeSet) + ")");
 
 
 				bot.loadGuild(guild.getIdLong()).getTeamChannel().ifPresent(channel -> {
