@@ -107,17 +107,17 @@ public class CardCommand {
 					"card.edit.modal",
 					state -> StringUtil.prettifyCamelCase(state.getState("field", String.class)),
 					List.of(new TextComponent("value", "Der neue Wert für diese Eigenschaft", TextInputStyle.SHORT)
-							.setValue(s -> bot.getCardProfiles().getProfile(s.event.getMember()).getData().get(s.getState("field", String.class)))
+							.setValue(s -> bot.getCardProfiles().getProfile(s.getEvent().getMember()).getData().get(s.getState("field", String.class)))
 							.setPlaceholder(s -> (s.getState("field", String.class).contains("Color") ? "Hex-Code, z.B. #00ff00. " : "") + "Leer lassen um zurück zusetzten")
 							.setRequired(s -> false)
 					),
 					(state, response) -> {
 						try {
-							bot.getCardProfiles().getProfile(state.event.getMember()).getData().set(state.getState("field", String.class), response.getString("value")).update();
-							manager.getMenu("card.edit").display(state.event);
+							bot.getCardProfiles().getProfile(state.getEvent().getMember()).getData().set(state.getState("field", String.class), response.getString("value")).update();
+							manager.getMenu("card.edit").display(state.getEvent());
 						} catch (ValidationException e) {
-							manager.getMenu("card.edit").display(state.event);
-							state.event.getHook().sendMessage(":x: Ungültige Eingabe!").setEphemeral(true).queue();
+							manager.getMenu("card.edit").display(state.getEvent());
+							state.getEvent().getHook().sendMessage(":x: Ungültige Eingabe!").setEphemeral(true).queue();
 						}
 					}
 			);
@@ -144,7 +144,7 @@ public class CardCommand {
 				else temp.add(0, new ButtonComponent(field.getName(), ButtonColor.GRAY, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s ->
 						input.createState()
 								.setState("field", field.getName())
-								.display((IModalCallback) s.event)
+								.display((IModalCallback) s.getEvent())
 				));
 			}
 
@@ -155,26 +155,26 @@ public class CardCommand {
 					"card.edit",
 					MessageRenderer.embed(s -> new EmbedBuilder()
 							.setTitle("Aktuelle RankCard (ID: **" + s.<CardProfileData>getCache("profile").getId() + "**)")
-							.setColor(bot.getColor(s.event.getGuild()))
+							.setColor(bot.getColor(s.getEvent().getGuild()))
 							.setImage("attachment://image.png")
 							.build()
-					).withFile(s -> s.<CardProfileData>getCache("profile").render(s.event.getMember()).getFile()),
+					).withFile(s -> s.<CardProfileData>getCache("profile").render(s.getEvent().getMember()).getFile()),
 					components
-			).cache(state -> state.setCache("profile", bot.getCardProfiles().getProfile(state.event.getMember()).getData()));
+			).cache(state -> state.setCache("profile", bot.getCardProfiles().getProfile(state.getEvent().getMember()).getData()));
 
 			//Build confirmation
 			this.confirmation = manager.createMenu(
 					"card.confirm",
 					MessageRenderer.embed(s -> new EmbedBuilder()
 							.setTitle("Keine Rechte zum Bearbeiten")
-							.setColor(bot.getColor(s.event.getGuild()))
+							.setColor(bot.getColor(s.getEvent().getGuild()))
 							.setDescription("Du bist nicht der eigentümer des Profiles, das du aktuell verwendest. Um es zu bearbeiten, musst du eine Kopie des Profils erstellen")
 							.build()
 					),
 					ComponentRow.of(
 							new ButtonComponent("confirm", ButtonColor.GREEN, "Profil kopieren").appendHandler(s -> {
-								bot.getCardProfiles().getProfile(s.event.getMember()).getData().createCopy(s.event.getMember()).update();
-								menu.display(s.event);
+								bot.getCardProfiles().getProfile(s.getEvent().getMember()).getData().createCopy(s.getEvent().getMember()).update();
+								menu.display(s.getEvent());
 							}),
 							new ButtonComponent("cancel", ButtonColor.RED, "Abbrechen").appendHandler(UpdateState::close)
 					)

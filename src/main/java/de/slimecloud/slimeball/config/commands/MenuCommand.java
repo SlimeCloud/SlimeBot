@@ -60,7 +60,7 @@ public class MenuCommand {
 					}, info, f.getType().getDeclaredFields()), ButtonColor.GRAY, info.name()).asDisabled(s -> {
 						try {
 							//Disable if category is null -> use has to use config enable command first
-							return f.get(bot.loadGuild(s.event.getGuild())) == null;
+							return f.get(bot.loadGuild(s.getEvent().getGuild())) == null;
 						} catch (IllegalAccessException e) {
 							throw new RuntimeException(e);
 						}
@@ -76,9 +76,9 @@ public class MenuCommand {
 		menu = manager.createMenu(
 				"config",
 				MessageRenderer.embed(s -> new EmbedBuilder()
-						.setDescription("## Konfiguration für **" + s.event.getGuild().getName() + "**\n")
-						.setColor(bot.getColor(s.event.getGuild()))
-						.setThumbnail(s.event.getGuild().getIconUrl())
+						.setDescription("## Konfiguration für **" + s.getEvent().getGuild().getName() + "**\n")
+						.setColor(bot.getColor(s.getEvent().getGuild()))
+						.setThumbnail(s.getEvent().getGuild().getIconUrl())
 						.appendDescription("Verwende die Buttons unter dieser Nachricht, um einzelne Kategorien zu konfigurieren\n")
 						.appendDescription("Bevor die Konfiguration hier angepasst werden kann, muss eine Kategorie mit `/config <category> enable` aktiviert werden")
 						.build()
@@ -121,17 +121,17 @@ public class MenuCommand {
 		);
 
 		//Add button to go back to main menu. We have to get the menu by name here because the menu doesn't exist yet
-		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config").display(s.event)));
+		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config").display(s.getEvent())));
 
 		//Create menu
 		return manager.createMenu(
 				"config." + category.command(),
 				MessageRenderer.embed(s -> new EmbedBuilder()
 						.setDescription("## " + category.name() + "\n")
-						.setColor(bot.getColor(s.event.getGuild()))
+						.setColor(bot.getColor(s.getEvent().getGuild()))
 						.appendDescription(category.description())
 						.appendDescription("\n### Aktuelle Konfiguration\n")
-						.appendDescription("```json\n" + Main.formattedJson.toJson(instance.apply(bot.loadGuild(s.event.getGuild()))) + "```")
+						.appendDescription("```json\n" + Main.formattedJson.toJson(instance.apply(bot.loadGuild(s.getEvent().getGuild()))) + "```")
 						.build()
 				),
 				components
@@ -177,11 +177,11 @@ public class MenuCommand {
 	}
 
 	private static void set(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Function<GuildConfig, Object> category, @NotNull Setter setter, @Nullable Object value) {
-		GuildConfig config = bot.loadGuild(state.event.getGuild());
+		GuildConfig config = bot.loadGuild(state.getEvent().getGuild());
 		setter.set(state, config, value);
 
 		//Call update method on category
-		if (category.apply(config) instanceof ConfigCategory c) c.update(state.event.getGuild());
+		if (category.apply(config) instanceof ConfigCategory c) c.update(state.getEvent().getGuild());
 
 		//Save changes
 		config.save();
@@ -189,16 +189,16 @@ public class MenuCommand {
 
 	@SuppressWarnings("unchecked")
 	private static <T> T get(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Getter getter) {
-		return (T) getter.get(state, bot.loadGuild(state.event.getGuild()));
+		return (T) getter.get(state, bot.loadGuild(state.getEvent().getGuild()));
 	}
 
 	@SuppressWarnings("unchecked")
 	private static <T> void handle(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Function<GuildConfig, Object> category, @NotNull Getter getter, @NotNull Consumer<T> handler) {
-		GuildConfig config = bot.loadGuild(state.event.getGuild());
+		GuildConfig config = bot.loadGuild(state.getEvent().getGuild());
 		handler.accept((T) getter.get(state, config));
 
 		//Call update method on category
-		if (category.apply(config) instanceof ConfigCategory c) c.update(state.event.getGuild());
+		if (category.apply(config) instanceof ConfigCategory c) c.update(state.getEvent().getGuild());
 
 		//Save changes
 		config.save();
@@ -210,7 +210,7 @@ public class MenuCommand {
 		List<ComponentRow> components = new ArrayList<>();
 
 		//Add base components
-		base.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
+		base.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.getEvent())));
 		base.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
 			//For normal fields the default value is 'null'
 			set(bot, s, categoryInstance, setter, null);
@@ -238,7 +238,7 @@ public class MenuCommand {
 
 					return new EmbedBuilder()
 							.setDescription("## " + category.name() + " → " + display.apply(s) + "\n")
-							.setColor(bot.getColor(s.event.getGuild()))
+							.setColor(bot.getColor(s.getEvent().getGuild()))
 							.appendDescription(field.description())
 							.appendDescription("\n### Aktueller Wert\n")
 							.appendDescription(value == null ? "*nicht gesetzt*" : field.type().toString(value))
@@ -258,7 +258,7 @@ public class MenuCommand {
 		List<ComponentRow> components = new ArrayList<>();
 
 		//Add base components
-		base.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
+		base.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.getEvent())));
 		base.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
 			//We use empty collections as default here so that we don't have to handle the 'null' case
 			set(bot, s, categoryInstance, setter, createEmptyCollection(type, generic));
@@ -296,7 +296,7 @@ public class MenuCommand {
 
 					return new EmbedBuilder()
 							.setDescription("## " + category.name() + " → " + display.apply(s) + "\n")
-							.setColor(bot.getColor(s.event.getGuild()))
+							.setColor(bot.getColor(s.getEvent().getGuild()))
 							.appendDescription(field.description())
 							.appendDescription("\n### Aktuelle Einträge\n")
 							.appendDescription(value.isEmpty() ? "*Keine Einträge*" : value.stream().map(e -> "- " + field.type().toString(e)).collect(Collectors.joining("\n")))
@@ -314,7 +314,7 @@ public class MenuCommand {
 		List<Component<?>> components = new ArrayList<>();
 
 		//Add base components
-		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
+		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.getEvent())));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
 			set(bot, s, categoryInstance, setter, emptyEnumSet(componentClass));
 			s.update();
@@ -344,7 +344,7 @@ public class MenuCommand {
 
 					return new EmbedBuilder()
 							.setDescription("## " + category.name() + " → " + display.apply(s) + "\n")
-							.setColor(bot.getColor(s.event.getGuild()))
+							.setColor(bot.getColor(s.getEvent().getGuild()))
 							.appendDescription(field.description())
 							.appendDescription("\n### Aktuelle Einträge\n")
 							.appendDescription(value.isEmpty() ? "*Keine Einträge*" : value.stream().map(e -> "- " + field.type().toString(e)).collect(Collectors.joining("\n")))
@@ -369,7 +369,7 @@ public class MenuCommand {
 		List<Component<?>> components = new ArrayList<>();
 
 		//Add base components
-		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.event)));
+		components.add(new ButtonComponent("back", ButtonColor.GRAY, "Zurück").appendHandler(s -> manager.getMenu("config." + category.command()).display(s.getEvent())));
 		components.add(new ButtonComponent("reset", ButtonColor.RED, "Zurücksetzten").appendHandler(s -> {
 			set(bot, s, categoryInstance, setter, type.isAssignableFrom(HashMap.class) ? new HashMap<>() : new LinkedHashMap<>());
 			s.update();
@@ -398,7 +398,7 @@ public class MenuCommand {
 
 		//Add components that opens the value menu to add a new entry
 		Component<?> add = keyType.createComponent(manager, keyClass, info, "config." + category.command() + "." + field.command(), "add", "Wert hinzufügen", s -> "", (s, k) -> {
-			valueMenu.createState(s).setState("key", keyType.toString(k)).display(s.event);
+			valueMenu.createState(s).setState("key", keyType.toString(k)).display(s.getEvent());
 			throw new RenderTermination();
 		});
 
@@ -415,7 +415,7 @@ public class MenuCommand {
 		Component<?> edit = new StringSelectComponent("edit", s -> MenuCommand.<Map<?, ?>>get(bot, s, getter).keySet().stream()
 				.map(e -> keyType.createSelectOption(bot, e))
 				.toList()
-		).setPlaceholder("Wert bearbeiten").appendHandler((s, v) -> valueMenu.createState(s).setState("key", v.get(0).getValue()).display(s.event));
+		).setPlaceholder("Wert bearbeiten").appendHandler((s, v) -> valueMenu.createState(s).setState("key", v.get(0).getValue()).display(s.getEvent()));
 
 		//Add component to the very top if it is as select menu
 		if (add instanceof EntitySelectComponent || add instanceof StringSelectComponent) {
@@ -435,7 +435,7 @@ public class MenuCommand {
 
 					return new EmbedBuilder()
 							.setDescription("## " + category.name() + " → " + display.apply(s) + "\n")
-							.setColor(bot.getColor(s.event.getGuild()))
+							.setColor(bot.getColor(s.getEvent().getGuild()))
 							.appendDescription(field.description())
 							.appendDescription("\n### Aktuelle Einträge\n")
 							.appendDescription(value.isEmpty() ? "*Keine Einträge*" : value.entrySet().stream().map(e -> "- " + keyType.toString(e.getKey()) + " = " + field.type().toString(e.getValue())).collect(Collectors.joining("\n")))

@@ -40,7 +40,7 @@ public interface CardDataTable extends Table<CardProfileData>, Listable<CardProf
 
 		EmbedBuilder builder = new EmbedBuilder()
 				.setTitle("Profile mit Filter '**" + filter.getName() + "**'")
-				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.event.getGuild()))
+				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.getEvent().getGuild()))
 				.setTimestamp(Instant.now());
 
 		if (context.entries().isEmpty()) builder.setDescription("*Keine Einträge*");

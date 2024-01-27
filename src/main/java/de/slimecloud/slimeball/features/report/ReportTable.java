@@ -67,7 +67,7 @@ public interface ReportTable extends Table<Report>, Listable<Report> {
 
 		EmbedBuilder builder = new EmbedBuilder()
 				.setTitle("Reports mit Filter '**" + filter.getName() + "**'")
-				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.event.getGuild()))
+				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.getEvent().getGuild()))
 				.setTimestamp(Instant.now());
 
 		if (context.entries().isEmpty()) builder.setDescription("*Keine Einträge*");
