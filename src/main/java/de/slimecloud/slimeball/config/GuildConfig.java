@@ -208,6 +208,7 @@ public class GuildConfig {
 	public Optional<MessageChannel> getTeamChannel() {
 		return Optional.ofNullable(teamChannel).map(channel -> getGuild().getChannelById(MessageChannel.class, channel));
 	}
+
 	@NotNull
 	public Optional<GuildMessageChannel> getGreetingsChannel() {
 		return Optional.ofNullable(greetingsChannel).map(id -> bot.getJda().getChannelById(GuildMessageChannel.class, id));

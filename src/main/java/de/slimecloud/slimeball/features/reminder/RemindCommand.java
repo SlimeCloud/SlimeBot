@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -25,18 +26,14 @@ import java.util.List;
 public class RemindCommand {
 
 	public static ReplyCallbackAction createReminder(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-	                                                 Role role,
+	                                                 @Nullable Role role,
 	                                                 @NotNull String time,
 	                                                 @NotNull String message
 	) throws DateTimeParseException {
-		if (message.length() > 1024) {
-			return event.reply("Deine Message darf maximal nur 1024 Zeichen lang sein!");
-		}
+		if (message.length() > 1024) return event.reply("Deine Nachricht darf maximal nur 1024 Zeichen lang sein!");
 		Instant timestamp = convertTime(time);
 
-		if (timestamp.isBefore(Instant.now())) {
-			return event.reply("Deine angegebene Zeit ist schon vergangen!");
-		}
+		if (timestamp.isBefore(Instant.now())) return event.reply("Deine angegebene Zeit ist schon vergangen!");
 
 		bot.getReminder().createReminder(event.getMember(), role, timestamp, LocalDateTime.now(Main.timezone).toInstant(ZoneOffset.UTC), message);
 
@@ -64,7 +61,6 @@ public class RemindCommand {
 			try {
 				createReminder(bot, event, null, time, message).setEphemeral(true).queue();
 			} catch (DateTimeParseException e) {
-				e.printStackTrace();
 				event.reply("Falsches Zeitformat! Versuche etwas wie \"14:45\" oder \"09:04 04.05.2024\"").setEphemeral(true).queue();
 			}
 		}
@@ -122,10 +118,12 @@ public class RemindCommand {
 				event.reply("Du hast keine aktiven Reminder auf diesem Server!").setEphemeral(true).queue();
 				return;
 			}
+
 			if (number > reminders.size()) {
 				event.reply("Diesen Reminder gibt es nicht!").setEphemeral(true).queue();
 				return;
 			}
+
 			Reminder reminder = reminders.get(number - 1);
 			if (reminder != null) {
 				reminder.delete();

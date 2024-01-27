@@ -79,7 +79,6 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runn
 						.setColor(bot.getColor(guild))
 						.setDescription(message + " \n \n" + "(Reminder von " + TimeFormat.RELATIVE.format(timeSet) + ")");
 
-
 				bot.loadGuild(guild.getIdLong()).getTeamChannel().ifPresent(channel -> {
 					channel.sendMessage(role.getAsMention()).setEmbeds(embedBuilder.build()).queue();
 				});

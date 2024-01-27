@@ -255,7 +255,7 @@ public class SlimeBot extends ListenerAdapter {
 					manager.registerCommand(FdmdsCommand.class);
 
 					//Register remind commands
-					if(reminder != null) {
+					if (reminder != null) {
 						manager.registerCommand(RemindCommand.class);
 					} else logger.warn("Reminders disabled due to missing database");
 
@@ -330,7 +330,7 @@ public class SlimeBot extends ListenerAdapter {
 		}
 
 		// Initialize RemindMe manger
-		if(reminder != null) {
+		if (reminder != null) {
 			remindManager = new RemindManager(this);
 			remindManager.scheduleNextReminder();
 		}
