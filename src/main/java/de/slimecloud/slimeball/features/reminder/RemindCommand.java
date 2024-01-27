@@ -119,18 +119,15 @@ public class RemindCommand {
 				return;
 			}
 
-			if (number > reminders.size()) {
+			if (number < 1 || number > reminders.size()) {
 				event.reply("Diesen Reminder gibt es nicht!").setEphemeral(true).queue();
 				return;
 			}
 
-			Reminder reminder = reminders.get(number - 1);
-			if (reminder != null) {
-				reminder.delete();
-				bot.getRemindManager().scheduleNextReminder();
+			reminders.get(number - 1).delete();
+			bot.getRemindManager().scheduleNextReminder();
 
-				event.reply("Reminder gelöscht!").setEphemeral(true).queue();
-			}
+			event.reply("Reminder gelöscht!").setEphemeral(true).queue();
 		}
 	}
 }
