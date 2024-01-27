@@ -1,5 +1,7 @@
 package de.slimecloud.slimeball.features.reminder;
 
+import de.mineking.discordutils.list.ListContext;
+import de.mineking.discordutils.list.ListEntry;
 import de.mineking.javautils.database.Column;
 import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Table;
@@ -22,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 @Getter
 @AllArgsConstructor
-public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runnable {
+public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runnable, ListEntry {
 	private final SlimeBot bot;
 
 	@Column(autoincrement = true, key = true)
@@ -32,13 +34,16 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runn
 	private final Guild guild;
 	@Column
 	private final UserSnowflake user;
+
 	@Column
 	@Nullable
 	private final Role role;
+
 	@Column
 	private final Instant time;
 	@Column
 	private final Instant timeSet;
+
 	@Column
 	private final String message;
 
@@ -96,5 +101,11 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runn
 			return Optional.empty();
 		}
 		return Optional.of(bot.getExecutor().schedule(this, delay / 1000, TimeUnit.SECONDS));
+	}
+
+	@NotNull
+	@Override
+	public String build(int index, @NotNull ListContext<? extends ListEntry> context) {
+		return (index + 1) + ". " + TimeFormat.RELATIVE.format(time) + ": " + message;
 	}
 }

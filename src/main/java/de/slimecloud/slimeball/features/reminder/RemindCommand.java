@@ -2,11 +2,14 @@ package de.slimecloud.slimeball.features.reminder;
 
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
+import de.mineking.discordutils.commands.Command;
+import de.mineking.discordutils.commands.Setup;
+import de.mineking.discordutils.commands.context.ICommandContext;
 import de.mineking.discordutils.commands.option.Option;
+import de.mineking.discordutils.list.ListManager;
 import de.slimecloud.slimeball.main.CommandPermission;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.TimeFormat;
@@ -22,6 +25,10 @@ import java.util.List;
 
 @ApplicationCommand(name = "remind", description = "Setzt einen Reminder")
 public class RemindCommand {
+	@Setup
+	public static void setup(@NotNull SlimeBot bot, @NotNull ListManager<ICommandContext> manager, @NotNull Command<ICommandContext> command) {
+		command.addSubcommand(manager.createCommand(s -> bot.getReminder()).withDescription("Zeigt alle deine Reminder an"));
+	}
 
 	public static void createReminder(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
 	                                  @Nullable Role role,
@@ -74,28 +81,6 @@ public class RemindCommand {
 		                           @Option(description = "Die Sache an die du erinnern möchtest") String message
 		) {
 			createReminder(bot, event, role, time, message);
-		}
-	}
-
-	@ApplicationCommand(name = "list", description = "Zeige und deine aktiven Reminder")
-	public static class ListCommand {
-		@ApplicationCommandMethod
-		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
-			List<Reminder> reminders = bot.getReminder().getByMember(event.getMember());
-			if (reminders.isEmpty()) {
-				event.reply("Du hast keine aktiven Reminder auf diesem Server!").setEphemeral(true).queue();
-				return;
-			}
-			EmbedBuilder builder = new EmbedBuilder()
-					.setTitle("Reminder")
-					.setColor(bot.getColor(event.getGuild()))
-					.setFooter("Lösche einen Reminder mit /remind delete [Nummer]");
-
-			for (int i = 0; i < reminders.size(); i++) {
-				Reminder reminder = reminders.get(i);
-				builder.addField((i + 1) + ": " + TimeFormat.RELATIVE.format(reminder.getTime()), reminder.getMessage(), false);
-			}
-			event.replyEmbeds(builder.build()).queue();
 		}
 	}
 
