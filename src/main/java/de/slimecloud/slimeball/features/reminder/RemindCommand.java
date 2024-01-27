@@ -9,14 +9,12 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
@@ -25,19 +23,22 @@ import java.util.List;
 @ApplicationCommand(name = "remind", description = "Setzt einen Reminder")
 public class RemindCommand {
 
-	public static ReplyCallbackAction createReminder(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-	                                                 @Nullable Role role,
-	                                                 @NotNull String time,
-	                                                 @NotNull String message
+	public static void createReminder(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
+	                                  @Nullable Role role,
+	                                  @NotNull String time,
+	                                  @NotNull String message
 	) throws DateTimeParseException {
-		if (message.length() > 1024) return event.reply("Deine Nachricht darf maximal nur 1024 Zeichen lang sein!");
+		if (message.length() > 1024) event.reply("Deine Nachricht darf maximal nur 1024 Zeichen lang sein!").setEphemeral(true).queue();
 		Instant timestamp = convertTime(time);
 
-		if (timestamp.isBefore(Instant.now())) return event.reply("Deine angegebene Zeit ist schon vergangen!");
+		if (timestamp.isBefore(Instant.now())) event.reply("Deine angegebene Zeit ist schon vergangen!").setEphemeral(true).queue();
 
-		bot.getReminder().createReminder(event.getMember(), role, timestamp, LocalDateTime.now(Main.timezone).toInstant(ZoneOffset.UTC), message);
-
-		return event.reply("Reminder wurde gesetzt! Löst aus " + TimeFormat.RELATIVE.format(timestamp));
+		try {
+			bot.getReminder().createReminder(event.getMember(), role, timestamp, Instant.now(), message);
+			event.reply("Reminder wurde gesetzt! Löst aus " + TimeFormat.RELATIVE.format(timestamp)).setEphemeral(true).queue();
+		} catch (DateTimeParseException e) {
+			event.reply("Falsches Zeitformat! Versuche etwas wie \"14:45\" oder \"09:04 04.05.2024\"").setEphemeral(true).queue();
+		}
 	}
 
 	public static Instant convertTime(String time) throws DateTimeParseException {
@@ -58,11 +59,7 @@ public class RemindCommand {
 		                           @Option(description = "Die Zeit an welcher du erinnert werden möchtest, beispielsweise 13:30") String time,
 		                           @Option(description = "Die Sache an die du erinnert werden möchtest") String message
 		) {
-			try {
-				createReminder(bot, event, null, time, message).setEphemeral(true).queue();
-			} catch (DateTimeParseException e) {
-				event.reply("Falsches Zeitformat! Versuche etwas wie \"14:45\" oder \"09:04 04.05.2024\"").setEphemeral(true).queue();
-			}
+			createReminder(bot, event, null, time, message);
 		}
 	}
 
@@ -76,12 +73,7 @@ public class RemindCommand {
 		                           @Option(description = "Die Zeit an welcher du erinnern möchtest, beispielsweise 13:30") String time,
 		                           @Option(description = "Die Sache an die du erinnern möchtest") String message
 		) {
-			try {
-				createReminder(bot, event, role, time, message).setEphemeral(true).queue();
-			} catch (DateTimeParseException e) {
-				e.printStackTrace();
-				event.reply("Falsches Zeitformat! Versuche etwas wie \"14:45\" oder \"09:04 04.05.2024\"").setEphemeral(true).queue();
-			}
+			createReminder(bot, event, role, time, message);
 		}
 	}
 
