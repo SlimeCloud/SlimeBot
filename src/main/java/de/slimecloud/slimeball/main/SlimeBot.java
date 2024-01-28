@@ -189,7 +189,7 @@ public class SlimeBot extends ListenerAdapter {
 
 
 		//Setup JDA
-		jda = JDABuilder.createDefault(credentials.get("DISCORD_TOKEN"))
+		JDABuilder builder = JDABuilder.createDefault(credentials.get("DISCORD_TOKEN"))
 				//Show startup activity, see #startActivity
 				.setStatus(OnlineStatus.IDLE)
 				.setActivity(Activity.customStatus("Bot startet..."))
@@ -211,12 +211,10 @@ public class SlimeBot extends ListenerAdapter {
 				.addEventListeners(new DataListener(this))
 
 				.addEventListeners(memberCount = new MemberCount(this))
-				.addEventListeners(roleMemberCount = new RoleMemberCount(this))
-
-				.build();
+				.addEventListeners(roleMemberCount = new RoleMemberCount(this));
 
 		//Configure DiscordUtils
-		discordUtils = DiscordUtils.create(jda, this)
+		discordUtils = DiscordUtils.create(builder, this)
 				.mirrorConsole(config.getLogForwarding().stream().map(LogForwarding::build).toList())
 				.useEventManager(null)
 				.useUIManager(null)
@@ -291,6 +289,8 @@ public class SlimeBot extends ListenerAdapter {
 					if (github != null) github.init(manager);
 				})
 				.build();
+
+		jda = discordUtils.getJDA();
 	}
 
 	@NotNull
