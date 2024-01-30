@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.features.poll;
 
+import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
 import de.mineking.discordutils.commands.option.Option;
@@ -27,8 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PollCommand {
 	public final CommandPermission permission = CommandPermission.TEAM;
 
-	public PollCommand(@NotNull SlimeBot bot) {
-		bot.getJda().addEventListener(new PollListener(bot));
+	public PollCommand(@NotNull SlimeBot bot, @NotNull DiscordUtils<?> discordUtils) {
+		discordUtils.getJDA().addEventListener(new PollListener(bot));
 	}
 
 	@ApplicationCommandMethod

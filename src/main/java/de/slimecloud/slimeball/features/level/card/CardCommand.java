@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.features.level.card;
 
+import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
 import de.mineking.discordutils.commands.Command;
@@ -51,8 +52,8 @@ public class CardCommand {
 	public final IRegistrationCondition<ICommandContext> condition = (manager, guild, cache) -> cache.<GuildConfig>getState("config").getLevel().isPresent();
 
 	@Setup
-	public static void setup(@NotNull SlimeBot bot, @NotNull Command<ICommandContext> command, @NotNull ListManager<ICommandContext> manager) {
-		bot.getJda().addEventListener(new CardDecorationListener(bot));
+	public static void setup(@NotNull SlimeBot bot, @NotNull DiscordUtils<?> discordUtils, @NotNull Command<ICommandContext> command, @NotNull ListManager<ICommandContext> manager) {
+		discordUtils.getJDA().addEventListener(new CardDecorationListener(bot));
 
 		command.addSubcommand(manager.createCommand(
 				(ctx, state) -> state.setState("filter", ctx.getEvent().getOption("filter").getAsString()),
