@@ -60,7 +60,7 @@ public interface ReportBlockTable extends Table<ReportBlock>, Listable<ReportBlo
 	@Override
 	default EmbedBuilder createEmbed(@NotNull DataState<MessageMenu> state, @NotNull ListContext<ReportBlock> context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.event.getGuild()))
+				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.getEvent().getGuild()))
 				.setTimestamp(Instant.now())
 				.setTitle("Vom Report-System ausgeschlossene Nutzer");
 

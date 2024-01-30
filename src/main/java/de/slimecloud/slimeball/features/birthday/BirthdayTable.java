@@ -61,7 +61,7 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	default EmbedBuilder createEmbed(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Birthday> context) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.setTitle("Geburtstage")
-				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.event.getGuild()))
+				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.getEvent().getGuild()))
 				.setTimestamp(Instant.now());
 
 		if (context.entries().isEmpty()) builder.setDescription("*Keine Einträge*");
