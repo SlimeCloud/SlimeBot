@@ -34,7 +34,7 @@ public class GitHubAPI {
 
 	public void init(@NotNull CustomRestActionManager manager) {
 		host = manager.createHost("https://api.github.com/");
-		host.defaultHeaders.put("Authorization", "Bearer " + token);
+		host.getDefaultHeaders().put("Authorization", "Bearer " + token);
 
 	}
 

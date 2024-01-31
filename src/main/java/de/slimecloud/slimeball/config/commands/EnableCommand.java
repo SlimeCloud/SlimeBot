@@ -73,7 +73,7 @@ public class EnableCommand extends Command<ICommandContext> {
 		Object instance = this.instance.apply(config);
 
 		//Basic enable
-		if (!options.isEmpty()) {
+		if (!getOptions().isEmpty()) {
 			//Extract values from options
 			Map<Field, Object> values = new HashMap<>();
 			try {
