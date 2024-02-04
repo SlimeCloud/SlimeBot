@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.main;
 
+import de.cyklon.jevent.JEvent;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.Cache;
 import de.mineking.discordutils.commands.Command;
@@ -133,6 +134,9 @@ public class SlimeBot extends ListenerAdapter {
 		//Verify token
 		String token = credentials.get("DISCORD_TOKEN");
 		if (token == null) throw new IllegalArgumentException("No token specified");
+
+		//register bot as ParameterInstance
+		JEvent.getDefaultManager().registerParameterInstance(this);
 
 		//Initialize database if configured
 		String databaseHost = credentials.get("DATABASE_HOST");
@@ -317,6 +321,8 @@ public class SlimeBot extends ListenerAdapter {
 		new HolidayAlert(this);
 		new BirthdayAlert(this);
 		new BirthdayListener(this);
+
+		JEvent.getDefaultManager().registerListenerPackage("de.slimecloud.slimeball");
 	}
 
 	private void startActivity() {
