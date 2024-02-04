@@ -1,6 +1,5 @@
 package de.slimecloud.slimeball.features.level.commands;
 
-import de.cyklon.jevent.JEvent;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.Command;
@@ -23,7 +22,7 @@ public class LevelCommand {
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull DiscordUtils<?> discordUtils, @NotNull Command<?> command) {
 		discordUtils.getJDA().addEventListener(new LevelListener(bot));
-		JEvent.getDefaultManager().registerListener(new LevelUpListener(bot));
+		new LevelUpListener(bot);
 
 		command.addSubcommand(AddCommand.class);
 		command.addSubcommand(RemoveCommand.class);

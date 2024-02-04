@@ -1,8 +1,9 @@
 package de.slimecloud.slimeball.features.moderation;
 
 import de.cyklon.jevent.EventHandler;
-import de.cyklon.jevent.JEvent;
+import de.cyklon.jevent.Listener;
 import de.slimecloud.slimeball.main.SlimeBot;
+import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.Channel;
@@ -17,13 +18,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Collectors;
 
+@Listener
+@RequiredArgsConstructor
 public class AutodeleteListener extends ListenerAdapter {
 	private final SlimeBot bot;
-
-	public AutodeleteListener(@NotNull SlimeBot bot) {
-		this.bot = bot;
-		JEvent.getDefaultManager().registerListener(this);
-	}
 
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
