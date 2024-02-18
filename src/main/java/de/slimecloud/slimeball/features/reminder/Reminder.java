@@ -70,7 +70,7 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runn
 					.setAuthor(guild.getName(), null, guild.getIconUrl())
 					.setTitle(SlimeEmoji.EXCLAMATION.toString(guild) + " Reminder!")
 					.setColor(bot.getColor(guild))
-					.setDescription(message + " \n \n" + "(Reminder von " + TimeFormat.RELATIVE.format(timeSet) + ")");
+					.setDescription(message + " \n \n" + "(Reminder vor " + TimeFormat.RELATIVE.format(timeSet) + ")");
 
 			bot.getJda().openPrivateChannelById(user.getIdLong())
 					.flatMap(channel -> channel.sendMessageEmbeds(embedBuilder.build()))
@@ -82,7 +82,7 @@ public class Reminder implements DataClass<Reminder>, Comparable<Reminder>, Runn
 						.setAuthor(member.getEffectiveName(), null, member.getEffectiveAvatarUrl())
 						.setTitle(SlimeEmoji.EXCLAMATION.toString(guild) + " Reminder!")
 						.setColor(bot.getColor(guild))
-						.setDescription(message + " \n \n" + "(Reminder von " + TimeFormat.RELATIVE.format(timeSet) + ")");
+						.setDescription(message + " \n \n" + "(Reminder vor " + TimeFormat.RELATIVE.format(timeSet) + ")");
 
 				bot.loadGuild(guild.getIdLong()).getTeamChannel().ifPresent(channel -> {
 					channel.sendMessage(role.getAsMention()).setEmbeds(embedBuilder.build()).queue();
