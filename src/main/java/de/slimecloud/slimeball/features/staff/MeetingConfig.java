@@ -117,9 +117,9 @@ public class MeetingConfig extends ConfigCategory {
 
 	@NotNull
 	public MessageEditData buildMessage(@NotNull Guild guild, @NotNull Instant timestamp, @Nullable MessageEmbed current, @Nullable MeetingHandler handler) {
-		List<String> y = new ArrayList<>();
-		List<String> m = new ArrayList<>();
-		List<String> n = new ArrayList<>();
+		Set<String> y = new HashSet<>();
+		Set<String> m = new HashSet<>();
+		Set<String> n = new HashSet<>();
 
 		List<String> a = new ArrayList<>();
 
@@ -195,6 +195,6 @@ public class MeetingConfig extends ConfigCategory {
 	}
 
 	public interface MeetingHandler {
-		void handle(@NotNull List<String> y, @NotNull List<String> m, @NotNull List<String> n, @NotNull List<String> a);
+		void handle(@NotNull Set<String> y, @NotNull Set<String> m, @NotNull Set<String> n, @NotNull List<String> a);
 	}
 }
