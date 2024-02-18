@@ -97,7 +97,7 @@ public class RemindCommand {
 			}
 
 			if (number < 1 || number > reminders.size()) {
-				event.reply("Diesen Reminder gibt es nicht!").setEphemeral(true).queue();
+				event.reply("Diesen Reminder gibt es nicht oder ist bereits ausgelaufen!").setEphemeral(true).queue();
 				return;
 			}
 
