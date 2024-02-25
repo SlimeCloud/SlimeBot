@@ -144,7 +144,7 @@ public class FdmdsCommand {
 				String choices = embed.getFields().get(0).getValue();
 
 				//Call event
-				new FdmdsCreateEvent(ContributorCommand.getUser(embed), event.getMember(), question).callEvent();
+				new FdmdsCreateEvent(SlimeBot.getUser(embed), event.getMember(), question).callEvent();
 
 				//Create and send embed
 				EmbedBuilder builder = new EmbedBuilder()

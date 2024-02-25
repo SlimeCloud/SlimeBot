@@ -3,6 +3,7 @@ package de.slimecloud.slimeball.features.quote;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
+import de.mineking.discordutils.commands.Setup;
 import de.mineking.discordutils.commands.condition.IRegistrationCondition;
 import de.mineking.discordutils.commands.condition.cooldown.Cooldown;
 import de.mineking.discordutils.commands.context.ICommandContext;
@@ -30,6 +31,11 @@ import java.util.stream.Collectors;
 @ApplicationCommand(name = "quote", description = "Zitiere jemanden", defer = true)
 public class QuoteCommand {
 	public final IRegistrationCondition<ICommandContext> condition = (manager, guild, cache) -> cache.<GuildConfig>getState("config").getQuoteChannel().isPresent();
+
+	@Setup
+	public static void setup(@NotNull DiscordUtils<?> manager, @NotNull SlimeBot bot) {
+		manager.getJDA().addEventListener(new QuoteDeleteListener(bot));
+	}
 
 	@Cooldown(interval = 1, unit = TimeUnit.DAYS, uses = 2, identifier = "quote")
 	public void handleCooldown(@NotNull ICommandContext context) {
@@ -92,6 +98,9 @@ public class QuoteCommand {
 				1. Bitte zitiere nur Aussagen von diesem Server
 				2. Zitiere nur besondere Nachrichten. Ein "*Hi*" ist nicht unbedingt zitat würdig
 				3. Stelle sicher, dass du nur Mitglieder zitierst, wenn die zitierte Person nichts dagegen hat. Respektiere bitte das Urheber recht und die Privatsphäre!
+				                
+				## Zitat löschen
+				Wenn du zitiert wurdest, aber dieses Zitat gerne entfernen möchtest, kannst du die `❌`-Reaktion zur Nachricht in diesem Kanal hinzufügen, um diese zu löschen.
 				                
 				## Selbst Jemanden zitieren
 				Es gibt zwei Möglichkeiten, um ein Zitat zu senden. Bitte beachte dabei die oben genannten Regeln!
