@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.features.level.commands;
 
+import de.cyklon.jevent.JEvent;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.Command;
@@ -9,6 +10,7 @@ import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.context.ICommandContext;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.features.level.LevelListener;
+import de.slimecloud.slimeball.features.level.LevelUpListener;
 import de.slimecloud.slimeball.main.CommandPermission;
 import de.slimecloud.slimeball.main.SlimeBot;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +23,7 @@ public class LevelCommand {
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull DiscordUtils<?> discordUtils, @NotNull Command<?> command) {
 		discordUtils.getJDA().addEventListener(new LevelListener(bot));
+		JEvent.getDefaultManager().registerListener(new LevelUpListener(bot));
 
 		command.addSubcommand(AddCommand.class);
 		command.addSubcommand(RemoveCommand.class);

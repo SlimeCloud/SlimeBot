@@ -1,18 +1,18 @@
 package de.slimecloud.slimeball.features.report;
 
 import de.cyklon.jevent.EventHandler;
-import de.cyklon.jevent.Listener;
 import de.slimecloud.slimeball.main.SlimeBot;
-import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 
-@Listener
-@RequiredArgsConstructor
 public class ReportListener {
 	private final SlimeBot bot;
+
+	public ReportListener(@NotNull SlimeBot bot) {
+		this.bot = bot;
+	}
 
 	@EventHandler
 	public void handleReport(@NotNull UserReportedEvent event) {
