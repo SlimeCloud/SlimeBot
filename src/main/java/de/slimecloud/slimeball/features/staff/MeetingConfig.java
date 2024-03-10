@@ -69,7 +69,7 @@ public class MeetingConfig extends ConfigCategory {
 	private void scheduleNotification(long delta) {
 		long time = nextMeeting - delta - System.currentTimeMillis();
 		if (time > 0) futures.add(bot.getExecutor().schedule(() -> getChannel().ifPresent(channel ->
-				channel.sendMessage(bot.loadGuild(channel.getGuild()).getTeamRole().map(Role::getAsMention).orElse("@Team") + ", " + TimeFormat.RELATIVE.format(nextMeeting) + " (" + TimeFormat.TIME_LONG.format(nextMeeting) + ") " + " geht das Team-Meeting los!")
+				channel.sendMessage(bot.loadGuild(channel.getGuild()).getTeamRole().map(Role::getAsMention).orElse("@Team") + ", " + TimeFormat.RELATIVE.format(nextMeeting) + " (" + TimeFormat.DATE_TIME_LONG.format(nextMeeting) + ") " + " geht das Team-Meeting los!")
 						.setMessageReference(message)
 						.queue()
 		), time, TimeUnit.MILLISECONDS));
@@ -190,7 +190,7 @@ public class MeetingConfig extends ConfigCategory {
 								Button.danger("meeting:end", "Meeting beenden")
 						)
 				)
-				.setContent(bot.loadGuild(guild).getTeamRole().map(IMentionable::getAsMention).orElse("") + "\nBeginnt " + TimeFormat.RELATIVE.format(nextMeeting) + " (" + TimeFormat.TIME_LONG.format(nextMeeting) + ")")
+				.setContent(bot.loadGuild(guild).getTeamRole().map(IMentionable::getAsMention).orElse("") + "\nBeginnt " + TimeFormat.RELATIVE.format(nextMeeting) + " (" + TimeFormat.DATE_TIME_LONG.format(nextMeeting) + ")")
 				.build();
 	}
 
