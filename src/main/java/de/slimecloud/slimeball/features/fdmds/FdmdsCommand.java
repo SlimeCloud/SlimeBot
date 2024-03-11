@@ -10,7 +10,6 @@ import de.mineking.discordutils.events.Listener;
 import de.mineking.discordutils.events.handlers.ButtonHandler;
 import de.mineking.discordutils.events.handlers.ModalHandler;
 import de.slimecloud.slimeball.config.GuildConfig;
-import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.main.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
