@@ -1,18 +1,20 @@
 package de.slimecloud.slimeball.features.level.card;
 
 import de.cyklon.jevent.EventHandler;
-import de.cyklon.jevent.Listener;
+import de.cyklon.jevent.JEvent;
 import de.slimecloud.slimeball.features.github.ContributorAcceptedEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
-import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateBoostTimeEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
-@Listener
-@RequiredArgsConstructor
 public class CardDecorationListener extends ListenerAdapter {
 	private final SlimeBot bot;
+
+	public CardDecorationListener(@NotNull SlimeBot bot) {
+		this.bot = bot;
+		JEvent.getDefaultManager().registerListener(this);
+	}
 
 	@Override
 	public void onGuildMemberUpdateBoostTime(@NotNull GuildMemberUpdateBoostTimeEvent event) {

@@ -1,7 +1,6 @@
 package de.slimecloud.slimeball.features.level;
 
 import de.cyklon.jevent.EventHandler;
-import de.cyklon.jevent.Listener;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-@Listener
 @RequiredArgsConstructor
 public class LevelUpListener {
 	private final SlimeBot bot;
