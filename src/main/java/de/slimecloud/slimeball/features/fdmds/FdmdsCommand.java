@@ -14,7 +14,6 @@ import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.main.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -38,8 +37,16 @@ public class FdmdsCommand {
 	@ApplicationCommandMethod
 	@Listener(type = ButtonHandler.class, filter = "fdmds:create")
 	//Parameters without @Option (or special meaning) will have a null value when called by the CommandManager
-	public void sendModal(@NotNull IModalCallback event, @Nullable String question, @Nullable String choices) {
-		event.replyModal(Modal.create("fdmds:" + (question == null ? "send" : "edit"), "Schlage eine fdmds Frage vor")
+	public void sendModal(@NotNull IModalCallback event, @Nullable String title, @Nullable String question, @Nullable String choices) {
+		event.replyModal(Modal.create("fdmds:" + (question == null ? "send" : "edit"), "Schlage eine FdmdS Frage vor")
+				.addActionRow(TextInput.create("title", "Titel", TextInputStyle.SHORT)
+						.setPlaceholder("Eissorten")
+						.setValue(title)
+						.setMinLength(10)
+						.setMaxLength(150)
+						.setRequired(true)
+						.build()
+				)
 				.addActionRow(TextInput.create("question", "Deine Frage", TextInputStyle.SHORT)
 						.setPlaceholder("Welche Eissorte mögt ihr am liebsten?")
 						.setValue(question)
@@ -60,8 +67,9 @@ public class FdmdsCommand {
 		).queue();
 	}
 
-	@Listener(type = ModalHandler.class, filter = "fdmds:(.*)")
+	@Listener(type = ModalHandler.class, filter = "fdmds:(send|edit)")
 	public void handleFdmdsModal(@NotNull SlimeBot bot, @NotNull ModalInteractionEvent event) {
+		String title = event.getValue("title").getAsString();
 		String question = event.getValue("question").getAsString();
 		String[] temp = event.getValue("choices").getAsString().split("\n");
 
@@ -92,6 +100,7 @@ public class FdmdsCommand {
 
 		//Build embed
 		EmbedBuilder embed = new EmbedBuilder()
+				.setTitle(title)
 				.setColor(bot.getColor(event.getGuild()))
 				.setDescription(question)
 				.addField("Auswahlmöglichkeiten", choices.toString(), false);
@@ -107,8 +116,8 @@ public class FdmdsCommand {
 		MessageEditBuilder message = new MessageEditBuilder()
 				.setEmbeds(embed.build())
 				.setActionRow(
-						Button.secondary("fdmds.edit", "Bearbeiten"),
-						Button.danger("fdmds.send", "Senden")
+						Button.secondary("fdmds:edit", "Bearbeiten"),
+						Button.primary("fdmds:send", "Senden")
 				);
 
 		//Edit or send
@@ -124,77 +133,48 @@ public class FdmdsCommand {
 		});
 	}
 
-	@Listener(type = ButtonHandler.class, filter = "fdmds.edit")
+	@Listener(type = ButtonHandler.class, filter = "fdmds:edit")
 	public void editFdmds(ButtonInteractionEvent event) {
 		MessageEmbed embed = event.getMessage().getEmbeds().get(0);
-		sendModal(event, embed.getDescription(), embed.getFields().get(0).getValue().lines()
+		sendModal(event, embed.getTitle(), embed.getDescription(), embed.getFields().get(0).getValue().lines()
 				.map(s -> s.split(" -> ", 2)[1])
 				.collect(Collectors.joining("\n"))
 		);
 	}
 
-	@Listener(type = ButtonHandler.class, filter = "fdmds.send")
+	@Listener(type = ButtonHandler.class, filter = "fdmds:send")
 	public void sendFdmds(@NotNull SlimeBot bot, @NotNull CommandManager<?, ?> manager, @NotNull ButtonInteractionEvent event) {
 		bot.loadGuild(event.getGuild()).getFdmds().ifPresent(fdmds -> {
 			//Load information from embed
 			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 
-			if (embed.getAuthor() != null) {
-				String question = embed.getDescription();
-				String choices = embed.getFields().get(0).getValue();
+			String question = embed.getDescription();
+			String title = embed.getTitle() == null ? "Umfrage" : embed.getTitle(); //TODO Backward compatibility, remove the fallback as soon as all old submissions are gone
+			String choices = embed.getFields().get(0).getValue();
 
-				//Call event
-				new FdmdsCreateEvent(ContributorCommand.getUser(embed), event.getMember(), question).callEvent();
+			//Call event
+			new FdmdsCreateEvent(ContributorCommand.getUser(embed), event.getMember(), question).callEvent();
 
-				//Create and send embed
-				EmbedBuilder builder = new EmbedBuilder()
-						.setColor(bot.getColor(event.getGuild()))
-						.setAuthor(embed.getAuthor().getName(), embed.getAuthor().getUrl(), embed.getAuthor().getIconUrl())
-						.setDescription(question)
-						.addField("Auswahlmöglichkeiten", choices, false);
+			//Create and send embed
+			EmbedBuilder builder = new EmbedBuilder()
+					.setTitle(title)
+					.setColor(bot.getColor(event.getGuild()))
+					.setAuthor(embed.getAuthor().getName(), embed.getAuthor().getUrl(), embed.getAuthor().getIconUrl())
+					.setDescription(question)
+					.addField("Auswahlmöglichkeiten", choices, false);
 
-				fdmds.getChannel().sendMessageEmbeds(builder.build())
-						.setContent(fdmds.getRole().map(Role::getAsMention).orElse(null))
-						.addActionRow(Button.secondary("fdmds:create", "Frage einreichen"))
-						.queue(m -> {
-							//Add reactions
-							for (int i = 0; i < choices.lines().count(); i++) m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
+			fdmds.getChannel().sendMessageEmbeds(builder.build())
+					.setContent(fdmds.getRole().map(Role::getAsMention).orElse(null))
+					.addActionRow(Button.secondary("fdmds:create", "Selbst eine Frage einreichen"))
+					.queue(m -> {
+						//Add reactions
+						for (int i = 0; i < choices.lines().count(); i++) m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
 
-							//Create thread
-							m.createThreadChannel("Unterhaltet euch über diese Frage!").queue();
+						//Create thread
+						m.createThreadChannel(title).queue();
 
-							event.reply("Frage verschickt!").setEphemeral(true).queue();
-						});
-			}
-
-			//TODO: Backward compatibility. This should be removed as soon as enough questions with the new system have been submitted
-			else {
-				String question = embed.getFields().get(0).getValue();
-				String choices = embed.getFields().get(1).getValue();
-
-				String footerText = embed.getFooter().getText();
-				Member requester = event.getGuild().getMemberById(footerText.substring(footerText.lastIndexOf(' ') + 2, footerText.length() - 1));
-
-				StringBuilder text = new StringBuilder()
-						.append(fdmds.getRole().map(Role::getAsMention).orElse("")).append("\n")
-						.append("Einen Wunderschönen hier ist ").append(requester.getAsMention()).append(" ,\n\n")
-						.append(question).append("\n\n")
-						.append(choices).append("\n\n")
-						.append("Du möchtest selbst eine Umfrage Einreichen? Verwende ")
-						.append(manager.getCommand(FdmdsCommand.class).getAsMention(event.getGuild().getIdLong()))
-						.append(" oder den Knopf unter dieser Nachricht!");
-
-				//Send, create thread and add reactions
-				fdmds.getChannel().sendMessage(text)
-						.addActionRow(Button.secondary("fdmds:create", "Frage einreichen"))
-						.queue(m -> {
-							for (int i = 0; i < choices.lines().count(); i++) m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
-
-							m.createThreadChannel("Unterhaltet euch über diese Frage!").queue();
-
-							event.reply("Frage verschickt!").setEphemeral(true).queue();
-						});
-			}
+						event.reply("Frage verschickt!").setEphemeral(true).queue();
+					});
 
 			event.getMessage().delete().queue();
 		});
