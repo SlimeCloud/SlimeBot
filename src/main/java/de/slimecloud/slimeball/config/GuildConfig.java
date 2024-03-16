@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,6 +69,10 @@ public class GuildConfig {
 	@Setter
 	@ConfigField(name = "Team", command = "team", description = "Die Team-Rolle", type = ConfigFieldType.ROLE)
 	private Long teamRole;
+
+	@Setter
+	@ConfigField(name = "TeamChannel", command = "teamChannel", description = "Der Team-Channel", type = ConfigFieldType.MESSAGE_CHANNEL)
+	private Long teamChannel;
 
 	@Getter
 	@ConfigField(name = "Beitritts Rollen", command = "autorole", description = "Rollen, die Mitgliedern beim Beitreten gegeben werden", type = ConfigFieldType.ROLE)
@@ -197,6 +202,11 @@ public class GuildConfig {
 	@NotNull
 	public Optional<Role> getTeamRole() {
 		return Optional.ofNullable(teamRole).map(bot.getJda()::getRoleById);
+	}
+
+	@NotNull
+	public Optional<MessageChannel> getTeamChannel() {
+		return Optional.ofNullable(teamChannel).map(channel -> getGuild().getChannelById(MessageChannel.class, channel));
 	}
 
 	@NotNull
