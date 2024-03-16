@@ -53,7 +53,7 @@ public class DataListener extends ListenerAdapter {
 			data.getVoice().compute(String.valueOf(channel), (k, v) -> v == null ? 1 : v + 1);
 
 			//Save changes
-			data.update();
+			data.upsert();
 		}), 0, 1, TimeUnit.MINUTES);
 	}
 
@@ -93,7 +93,7 @@ public class DataListener extends ListenerAdapter {
 		data.getWordCount().add(words);
 
 		//Save changes
-		data.update();
+		data.upsert();
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class DataListener extends ListenerAdapter {
 		}
 
 		//Save changes
-		data.update();
+		data.upsert();
 	}
 
 	@EventHandler
@@ -128,7 +128,7 @@ public class DataListener extends ListenerAdapter {
 		data.setFdmdsSubmitted(data.getFdmdsSubmitted() + 1);
 
 		//Save changes
-		data.update();
+		data.upsert();
 	}
 
 	@EventHandler
@@ -140,7 +140,7 @@ public class DataListener extends ListenerAdapter {
 		data.setFdmdsAccepted(data.getFdmdsAccepted() + 1);
 
 		//Save changes
-		data.update();
+		data.upsert();
 	}
 
 	@EventHandler
@@ -157,7 +157,7 @@ public class DataListener extends ListenerAdapter {
 		else if (event.getType() == UserGainXPEvent.Type.MANUAL) data.setSpecialXp(data.getSpecialXp() + event.getDeltaXp());
 
 		//Save changes
-		data.update();
+		data.upsert();
 	}
 
 	@Override
@@ -170,7 +170,7 @@ public class DataListener extends ListenerAdapter {
 			if (minutes != null) data.setTempVoice(data.getTempVoice() + (int) (double) minutes);
 
 			//Save changes
-			data.update();
+			data.upsert();
 		});
 	}
 

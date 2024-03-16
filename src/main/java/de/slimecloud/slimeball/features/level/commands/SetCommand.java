@@ -21,7 +21,7 @@ public class SetCommand {
 			//Load and update level
 			Level level = bot.getLevel().getLevel(target)
 					.withLevel(amount)
-					.update();
+					.upsert();
 
 			//Send message
 			event.reply(target.getAsMention() + " hat jetzt **" + level.getLevel() + " Level** und **" + level.getXp() + " Xp**").setEphemeral(true).queue();
@@ -38,7 +38,7 @@ public class SetCommand {
 			//Load and update xp
 			Level level = bot.getLevel().getLevel(target)
 					.withXp(amount)
-					.update();
+					.upsert();
 
 			//Send message
 			event.reply(target.getAsMention() + " hat jetzt **" + level.getLevel() + " Level** und **" + level.getXp() + " Xp**").setEphemeral(true).queue();

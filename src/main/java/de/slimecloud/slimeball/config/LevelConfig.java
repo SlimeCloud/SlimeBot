@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class LevelConfig {
 	@Required
-	private String decorationFolder;
+	private String badgeFolder;
 
 	@Required
 	private String levelUpMessage;
