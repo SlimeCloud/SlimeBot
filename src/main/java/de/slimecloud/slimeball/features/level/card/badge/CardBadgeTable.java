@@ -37,10 +37,8 @@ public interface CardBadgeTable extends Table<CardBadgeData>, Listable<StringEnt
 
 	@NotNull
 	default Collection<String> getEffectiveBadges(@NotNull Member member) {
-		return Stream.concat(
-				Stream.of(member),
-				member.getRoles().stream()
-		).map(this::get)
+		return Stream.concat(Stream.of(member), member.getRoles().stream())
+				.map(this::get)
 				.flatMap(Optional::stream)
 				.flatMap(d -> d.getBadges().stream())
 				.toList();
@@ -72,9 +70,9 @@ public interface CardBadgeTable extends Table<CardBadgeData>, Listable<StringEnt
 				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.getEvent().getGuild()))
 				.setTimestamp(Instant.now());
 
-		if(state.asMap().containsKey("badge")) builder.setTitle("Besitzer des Badges **" + state.getState("badge", String.class) + "**");
-		else if(state.asMap().containsKey("user")) builder.setTitle("Badges für Nutzer **" + bot.getJda().getUserById(state.getState("user", long.class)).getName() + "**");
-		else if(state.asMap().containsKey("role")) builder.setTitle("Badges für Rolle **" + bot.getJda().getRoleById(state.getState("role", long.class)).getName() + "**");
+		if (state.asMap().containsKey("badge")) builder.setTitle("Besitzer des Badges **" + state.getState("badge", String.class) + "**");
+		else if (state.asMap().containsKey("user")) builder.setTitle("Badges für Nutzer **" + bot.getJda().getUserById(state.getState("user", long.class)).getName() + "**");
+		else if (state.asMap().containsKey("role")) builder.setTitle("Badges für Rolle **" + bot.getJda().getRoleById(state.getState("role", long.class)).getName() + "**");
 		else builder.setTitle("Alle Badges");
 
 		if (context.entries().isEmpty()) builder.setDescription("*Keine Einträge*");
@@ -88,16 +86,16 @@ public interface CardBadgeTable extends Table<CardBadgeData>, Listable<StringEnt
 	default List<StringEntry> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<StringEntry> context) {
 		SlimeBot bot = getManager().getData("bot");
 
-		if(state.asMap().containsKey("badge")) return selectMany(Where.contains("badges", state.getState("badge", String.class))).stream()
+		if (state.asMap().containsKey("badge")) return selectMany(Where.contains("badges", state.getState("badge", String.class))).stream()
 				.map(d -> d.getTarget().getAsMention())
 				.map(StringEntry::new)
 				.toList();
 
-		if(state.asMap().containsKey("user")) return getEffectiveBadges(context.event().getGuild().getMemberById(state.getState("user", long.class))).stream()
+		if (state.asMap().containsKey("user")) return getEffectiveBadges(context.event().getGuild().getMemberById(state.getState("user", long.class))).stream()
 				.map(StringEntry::new)
 				.toList();
 
-		if(state.asMap().containsKey("role")) return getOrDefault(bot.getJda().getRoleById(state.getState("role", long.class))).getBadges().stream()
+		if (state.asMap().containsKey("role")) return getOrDefault(bot.getJda().getRoleById(state.getState("role", long.class))).getBadges().stream()
 				.map(StringEntry::new)
 				.toList();
 

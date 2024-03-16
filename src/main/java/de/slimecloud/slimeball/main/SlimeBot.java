@@ -30,9 +30,9 @@ import de.slimecloud.slimeball.features.github.GitHubAPI;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
 import de.slimecloud.slimeball.features.level.card.*;
+import de.slimecloud.slimeball.features.level.card.badge.BadgeCommand;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeTable;
-import de.slimecloud.slimeball.features.level.card.badge.BadgeCommand;
 import de.slimecloud.slimeball.features.level.commands.LeaderboardCommand;
 import de.slimecloud.slimeball.features.level.commands.LevelCommand;
 import de.slimecloud.slimeball.features.moderation.AutodeleteListener;
@@ -418,8 +418,8 @@ public class SlimeBot extends ListenerAdapter {
 
 	@NotNull
 	public static Guild getGuild(@NotNull ISnowflake obj) {
-		if(obj instanceof Role r) return r.getGuild();
-		else if(obj instanceof Member m) return m.getGuild();
+		if (obj instanceof Role r) return r.getGuild();
+		else if (obj instanceof Member m) return m.getGuild();
 
 		throw new RuntimeException();
 	}
