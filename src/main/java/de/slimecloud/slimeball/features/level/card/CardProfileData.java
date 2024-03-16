@@ -11,6 +11,7 @@ import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.config.engine.ValidationException;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
+import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
 import de.slimecloud.slimeball.util.graphic.CustomFont;
@@ -24,10 +25,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -375,7 +374,8 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 
 		for (String d : badges) {
 			try {
-				BufferedImage img = ImageIO.read(new File(bot.getConfig().getLevel().get().getBadgeFolder(), d));
+				BufferedImage img = CardBadgeData.readBadge(bot, d);
+				if(img == null) continue;
 
 				int width = (int) (img.getWidth() * ((double) height / img.getHeight()));
 

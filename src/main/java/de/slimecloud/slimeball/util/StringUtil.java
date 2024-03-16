@@ -48,7 +48,7 @@ public class StringUtil {
 		if (s == null || s.isBlank()) return false;
 
 		try {
-			Integer.parseInt(s);
+			Long.parseLong(s);
 			return true;
 		} catch (NumberFormatException | NullPointerException e) {
 			return false;

@@ -34,7 +34,7 @@ public class BadgeCommand {
 
 	public static void handleAutocomplete(@NotNull SlimeBot bot, @NotNull CommandAutoCompleteInteractionEvent event) {
 		event.replyChoices(
-				Arrays.stream(new File(bot.getConfig().getLevel().get().getBadgeFolder()).list())
+				CardBadgeData.getBadges(bot).stream()
 						.filter(d -> d.contains(event.getFocusedOption().getValue()))
 						.map(d -> new Command.Choice(d, d))
 						.toList()
@@ -77,13 +77,24 @@ public class BadgeCommand {
 		                           @Option(description = "Das Badge, die dem Mitglied / der Rolle gegeben wird") String badge
 		) {
 			//Check if badge exists
-			if (!new File(bot.getConfig().getLevel().get().getBadgeFolder(), badge).exists()) {
+			if (!CardBadgeData.getBadge(bot, badge).exists()) {
 				event.reply(":x: Badge nicht gefunden!").setEphemeral(true).queue();
 				return;
 			}
 
 			bot.getCardBadges().grant(target, badge);
 
+			event.reply("Badge vergeben!").setEphemeral(true).queue();
+		}
+	}
+
+	@ApplicationCommand(name = "grant_default", description = "Einer Rolle ihr icon als Badge")
+	public static class GrantDefaultCommand {
+		@ApplicationCommandMethod
+		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
+		                           @Option(description = "Die Rolle, dem das Badge gegeben wird") Role target
+		) {
+			bot.getCardBadges().grant(target, target.getId());
 			event.reply("Badge vergeben!").setEphemeral(true).queue();
 		}
 	}
@@ -101,13 +112,24 @@ public class BadgeCommand {
 		                           @Option(description = "Das BAdge, die dem Mitglied / der Rolle entzogen wird") String badge
 		) {
 			//Check if badge exists
-			if (!new File(bot.getConfig().getLevel().get().getBadgeFolder(), badge).exists()) {
+			if (!CardBadgeData.getBadge(bot, badge).exists()) {
 				event.reply(":x: Badge nicht gefunden!").setEphemeral(true).queue();
 				return;
 			}
 
 			bot.getCardBadges().revoke(target, badge);
 
+			event.reply("Badge entzogen!").setEphemeral(true).queue();
+		}
+	}
+
+	@ApplicationCommand(name = "revoke_default", description = "Einer Rolle ihr icon als Badge")
+	public static class RevokeDefaultCommand {
+		@ApplicationCommandMethod
+		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
+		                           @Option(description = "Die Rolle, dem das Badge gegeben wird") Role target
+		) {
+			bot.getCardBadges().revoke(target, target.getId());
 			event.reply("Badge entzogen!").setEphemeral(true).queue();
 		}
 	}

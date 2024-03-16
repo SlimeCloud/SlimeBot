@@ -8,6 +8,7 @@ import de.mineking.discordutils.ui.state.DataState;
 import de.mineking.javautils.database.Table;
 import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.main.SlimeBot;
+import de.slimecloud.slimeball.util.StringUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.entities.Member;
@@ -48,17 +49,17 @@ public interface CardBadgeTable extends Table<CardBadgeData>, Listable<StringEnt
 		CardBadgeData badge = getOrDefault(target);
 
 		badge.getBadges().add(name);
-		insert(badge);
+		upsert(badge);
 	}
 
 	default void revoke(@NotNull IMentionable target, @NotNull String name) {
 		CardBadgeData badge = getOrDefault(target);
 
 		badge.getBadges().remove(name);
-		insert(badge);
+		upsert(badge);
 	}
 
-		/*
+	/*
 	Listable implementation
 	 */
 
@@ -92,14 +93,16 @@ public interface CardBadgeTable extends Table<CardBadgeData>, Listable<StringEnt
 				.toList();
 
 		if (state.asMap().containsKey("user")) return getEffectiveBadges(context.event().getGuild().getMemberById(state.getState("user", long.class))).stream()
+				.map(s -> StringUtil.isInteger(s) ? "*Icon <@&" + s + ">*" : s)
 				.map(StringEntry::new)
 				.toList();
 
 		if (state.asMap().containsKey("role")) return getOrDefault(bot.getJda().getRoleById(state.getState("role", long.class))).getBadges().stream()
+				.map(s -> StringUtil.isInteger(s) ? "*Icon <@&" + s + ">*" : s)
 				.map(StringEntry::new)
 				.toList();
 
-		return Arrays.stream(new File(bot.getConfig().getLevel().get().getBadgeFolder()).list())
+		return CardBadgeData.getBadges(bot).stream()
 				.map(StringEntry::new)
 				.toList();
 	}
