@@ -1,7 +1,7 @@
 package de.slimecloud.slimeball.features.birthday;
 
 import de.cyklon.jevent.EventHandler;
-import de.cyklon.jevent.JEvent;
+import de.cyklon.jevent.Listener;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayEndEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayRemoveEvent;
@@ -9,17 +9,15 @@ import de.slimecloud.slimeball.features.birthday.event.BirthdaySetEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayStartEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.TimeUtil;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 
+@Listener
+@RequiredArgsConstructor
 public class BirthdayListener {
 	private final SlimeBot bot;
-
-	public BirthdayListener(@NotNull SlimeBot bot) {
-		this.bot = bot;
-		JEvent.getDefaultManager().registerListener(this);
-	}
 
 	@EventHandler
 	public void onBirthdaySet(@NotNull BirthdaySetEvent event) {
