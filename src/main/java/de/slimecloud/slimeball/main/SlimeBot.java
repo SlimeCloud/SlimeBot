@@ -332,14 +332,7 @@ public class SlimeBot extends ListenerAdapter {
 		new BirthdayAlert(this);
 		new BirthdayListener(this);
 
-		//botPackage
-		loadSubPackages(botPackage);
 		JEvent.getDefaultManager().registerListenerPackage(botPackage);
-	}
-
-	private void loadSubPackages(OfflinePackage pkg) {
-		if (!pkg.getDirectClasses().isEmpty()) pkg.load();
-		pkg.getPackages().forEach(this::loadSubPackages);
 	}
 
 	private void startActivity() {
