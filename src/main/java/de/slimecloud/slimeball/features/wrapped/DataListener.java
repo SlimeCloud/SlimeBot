@@ -2,7 +2,7 @@ package de.slimecloud.slimeball.features.wrapped;
 
 import com.vdurmont.emoji.EmojiParser;
 import de.cyklon.jevent.EventHandler;
-import de.cyklon.jevent.Listener;
+import de.cyklon.jevent.JEvent;
 import de.slimecloud.slimeball.features.alerts.HolidayAlert;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsCreateEvent;
@@ -10,7 +10,6 @@ import de.slimecloud.slimeball.features.fdmds.FdmdsSubmitedEvent;
 import de.slimecloud.slimeball.features.level.UserGainXPEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.StringUtil;
-import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -29,11 +28,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@Listener
-@RequiredArgsConstructor
 public class DataListener extends ListenerAdapter {
 	private final SlimeBot bot;
 	private final Map<Long, Long> voiceUsers = new HashMap<>();
+
+	public DataListener(@NotNull SlimeBot bot) {
+		this.bot = bot;
+		JEvent.getDefaultManager().registerListener(this);
+	}
 
 	@Override
 	public void onReady(@NotNull ReadyEvent event) {

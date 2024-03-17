@@ -69,7 +69,7 @@ public class MeetingConfig extends ConfigCategory {
 	private void scheduleNotification(long delta) {
 		long time = nextMeeting - delta - System.currentTimeMillis();
 		if (time > 0) futures.add(bot.getExecutor().schedule(() -> getChannel().ifPresent(channel ->
-				channel.sendMessage(bot.loadGuild(channel.getGuild()).getTeamRole().map(Role::getAsMention).orElse("@Team") + ", " + TimeFormat.RELATIVE.format(nextMeeting) + " geht das Team-Meeting los!")
+				channel.sendMessage(bot.loadGuild(channel.getGuild()).getTeamRole().map(Role::getAsMention).orElse("@Team") + ", " + TimeFormat.RELATIVE.format(nextMeeting) + " (" + TimeFormat.DATE_TIME_LONG.format(nextMeeting) + ") " + " geht das Team-Meeting los!")
 						.setMessageReference(message)
 						.queue()
 		), time, TimeUnit.MILLISECONDS));
@@ -117,9 +117,9 @@ public class MeetingConfig extends ConfigCategory {
 
 	@NotNull
 	public MessageEditData buildMessage(@NotNull Guild guild, @NotNull Instant timestamp, @Nullable MessageEmbed current, @Nullable MeetingHandler handler) {
-		List<String> y = new ArrayList<>();
-		List<String> m = new ArrayList<>();
-		List<String> n = new ArrayList<>();
+		Set<String> y = new HashSet<>();
+		Set<String> m = new HashSet<>();
+		Set<String> n = new HashSet<>();
 
 		List<String> a = new ArrayList<>();
 
@@ -190,11 +190,11 @@ public class MeetingConfig extends ConfigCategory {
 								Button.danger("meeting:end", "Meeting beenden")
 						)
 				)
-				.setContent(bot.loadGuild(guild).getTeamRole().map(IMentionable::getAsMention).orElse("") + "\nBeginnt " + TimeFormat.RELATIVE.format(nextMeeting))
+				.setContent(bot.loadGuild(guild).getTeamRole().map(IMentionable::getAsMention).orElse("") + "\nBeginnt " + TimeFormat.RELATIVE.format(nextMeeting) + " (" + TimeFormat.DATE_TIME_LONG.format(nextMeeting) + ")")
 				.build();
 	}
 
 	public interface MeetingHandler {
-		void handle(@NotNull List<String> y, @NotNull List<String> m, @NotNull List<String> n, @NotNull List<String> a);
+		void handle(@NotNull Set<String> y, @NotNull Set<String> m, @NotNull Set<String> n, @NotNull List<String> a);
 	}
 }

@@ -41,14 +41,14 @@ public class SpotifyAlert {
 		List<String> known = bot.getDatabase().getDriver().withHandle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list());
 		List<String> newIds = new ArrayList<>();
 
-		//CHeck for podcast episodes
+		//Check for podcast episodes
 		bot.getConfig().getSpotify().flatMap(SpotifyConfig::getPodcastConfig).ifPresent(config -> {
 			config.artistIds().stream()
 					.flatMap(id -> getLatestEntries(id, bot.getSpotify().getApi()::getShowEpisodes).stream())
 					.filter(e -> !known.contains(e.getId()))
 					.forEach(e -> {
 						newIds.add(e.getId());
-						broadcast(config.message(), SpotifyNotificationConfig::getPodcastChannel, e.getName(), e.getExternalUrls().get("spotify"));
+						broadcast(config.message(), SpotifyNotificationConfig::getPodcastChannel, SpotifyNotificationConfig::getPodcastRole, e.getName(), e.getExternalUrls().get("spotify"));
 					});
 		});
 
@@ -59,7 +59,7 @@ public class SpotifyAlert {
 					.filter(e -> !known.contains(e.getId()))
 					.forEach(e -> {
 						newIds.add(e.getId());
-						broadcast(config.message(), SpotifyNotificationConfig::getMusicChannel, e.getName(), e.getExternalUrls().get("spotify"));
+						broadcast(config.message(), SpotifyNotificationConfig::getMusicChannel, SpotifyNotificationConfig::getMusicRole, e.getName(), e.getExternalUrls().get("spotify"));
 					});
 
 		});
@@ -92,11 +92,11 @@ public class SpotifyAlert {
 		}
 	}
 
-	private void broadcast(String format, Function<SpotifyNotificationConfig, Optional<GuildMessageChannel>> channel, String name, String url) {
+	private void broadcast(String format, Function<SpotifyNotificationConfig, Optional<GuildMessageChannel>> channel, Function<SpotifyNotificationConfig, Optional<Role>> role, String name, String url) {
 		for (Guild guild : bot.getJda().getGuilds()) {
 			bot.loadGuild(guild).getSpotify().ifPresent(spotify ->
 					channel.apply(spotify).ifPresent(ch -> {
-						String notification = spotify.getRole()
+						String notification = role.apply(spotify)
 								.map(Role::getAsMention)
 								.orElse("");
 

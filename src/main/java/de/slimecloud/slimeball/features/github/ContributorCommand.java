@@ -47,7 +47,7 @@ public class ContributorCommand {
 
 	@Listener(type = ButtonHandler.class, filter = "contributor:accept")
 	public void handleAccept(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
-		UserSnowflake user = getUser(event.getMessage().getEmbeds().get(0));
+		UserSnowflake user = SlimeBot.getUser(event.getMessage().getEmbeds().get(0));
 
 		bot.loadGuild(event.getGuild()).getContributorRole().ifPresent(role -> {
 			//Call event
@@ -66,7 +66,7 @@ public class ContributorCommand {
 
 	@Listener(type = ButtonHandler.class, filter = "contributor:reject")
 	public void handleDeny(@NotNull ButtonInteractionEvent event) {
-		UserSnowflake user = getUser(event.getMessage().getEmbeds().get(0));
+		UserSnowflake user = SlimeBot.getUser(event.getMessage().getEmbeds().get(0));
 
 		event.getMessage().delete().queue();
 		event.getJDA().openPrivateChannelById(user.getIdLong())
@@ -74,10 +74,5 @@ public class ContributorCommand {
 				.queue();
 
 		event.reply(user.getAsMention() + " wurde die Contributor Rolle nicht gegeben.").queue();
-	}
-
-	@NotNull
-	public static UserSnowflake getUser(@NotNull MessageEmbed embed) {
-		return UserSnowflake.fromId(embed.getAuthor().getIconUrl().split("/")[4]); //Avatar Pattern: "https://cdn.discordapp.com/avatars/%s/%s.%s"
 	}
 }

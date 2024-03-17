@@ -71,6 +71,8 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -428,5 +430,10 @@ public class SlimeBot extends ListenerAdapter {
 			logger.error("Regular shutdown failed, forcing shutdown...", e);
 			System.exit(1);
 		}
+	}
+
+	@NotNull
+	public static UserSnowflake getUser(@NotNull MessageEmbed embed) {
+		return UserSnowflake.fromId(embed.getAuthor().getIconUrl().split("/")[4]); //Avatar Pattern: "https://cdn.discordapp.com/avatars/%s/%s.%s"
 	}
 }
