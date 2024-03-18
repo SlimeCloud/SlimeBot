@@ -242,10 +242,7 @@ public class SlimeBot extends ListenerAdapter {
 					manager.registerCommand(FdmdsCommand.class);
 
 					//old mee6 custom commands
-					manager.registerCommand(CheckCommand.class);
-					manager.registerCommand(CornhubCommand.class);
-					manager.registerCommand(MailCommand.class);
-					manager.registerCommand(MaisCommand.class);
+					manager.registerCommand(SocialsCommand.class);
 
 					//Register report commands
 					if (reports != null) {
