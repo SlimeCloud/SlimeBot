@@ -19,10 +19,7 @@ import de.slimecloud.slimeball.features.birthday.BirthdayListener;
 import de.slimecloud.slimeball.features.birthday.BirthdayTable;
 import de.slimecloud.slimeball.features.birthday.commands.BirthdayCommand;
 import de.slimecloud.slimeball.features.fdmds.FdmdsCommand;
-import de.slimecloud.slimeball.features.general.BonkCommand;
-import de.slimecloud.slimeball.features.general.BulkAddRoleCommand;
-import de.slimecloud.slimeball.features.general.InfoCommand;
-import de.slimecloud.slimeball.features.general.PingCommand;
+import de.slimecloud.slimeball.features.general.*;
 import de.slimecloud.slimeball.features.github.BugCommand;
 import de.slimecloud.slimeball.features.github.BugContextCommand;
 import de.slimecloud.slimeball.features.github.ContributorCommand;
@@ -243,6 +240,9 @@ public class SlimeBot extends ListenerAdapter {
 					manager.registerCommand(QuoteMessageCommand.class);
 
 					manager.registerCommand(FdmdsCommand.class);
+
+					//old mee6 custom commands
+					manager.registerCommand(SocialsCommand.class);
 
 					//Register report commands
 					if (reports != null) {
