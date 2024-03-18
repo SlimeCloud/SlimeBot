@@ -24,9 +24,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.util.Arrays;
-
 @ApplicationCommand(name = "badge", description = "Verwaltet RankCard-Badges", scope = Scope.GUILD)
 public class BadgeCommand {
 	public final CommandPermission permission = CommandPermission.TEAM;

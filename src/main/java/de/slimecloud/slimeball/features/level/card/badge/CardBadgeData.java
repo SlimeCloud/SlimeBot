@@ -56,9 +56,9 @@ public class CardBadgeData {
 	public static BufferedImage readBadge(@NotNull SlimeBot bot, @NotNull String badge) throws IOException {
 		var role = StringUtil.isInteger(badge) ? bot.getJda().getRoleById(badge) : null;
 
-		if(role != null) {
-			if(role.getIcon() == null) return null;
-			if(role.getIcon().getIcon() == null) return null;
+		if (role != null) {
+			if (role.getIcon() == null) return null;
+			if (role.getIcon().getIcon() == null) return null;
 			return ImageIO.read(role.getIcon().getIcon().download().join());
 		}
 
