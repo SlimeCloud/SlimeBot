@@ -375,7 +375,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		for (String d : badges) {
 			try {
 				BufferedImage img = CardBadgeData.readBadge(bot, d);
-				if(img == null) continue;
+				if (img == null) continue;
 
 				int width = (int) (img.getWidth() * ((double) height / img.getHeight()));
 
