@@ -7,15 +7,17 @@ import de.mineking.javautils.database.Table;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.StringUtil;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Getter
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Poll implements DataClass<Poll> {
@@ -28,6 +30,9 @@ public class Poll implements DataClass<Poll> {
 	private int max;
 
 	@Column
+	private boolean names;
+
+	@Column
 	@Json
 	private LinkedHashMap<String, List<String>> values;
 
@@ -38,7 +43,7 @@ public class Poll implements DataClass<Poll> {
 	}
 
 	@NotNull
-	public Poll updateSelection(String user, @NotNull List<Integer> selected) {
+	public Poll updateSelection(@NotNull String user, @NotNull List<Integer> selected) {
 		AtomicInteger i = new AtomicInteger();
 
 		values.forEach((name, values) -> {
@@ -49,7 +54,8 @@ public class Poll implements DataClass<Poll> {
 		return this;
 	}
 
-	public String buildChoices() {
+	@NotNull
+	public String buildChoices(@NotNull Guild guild) {
 		StringBuilder result = new StringBuilder();
 
 		AtomicInteger maxLength = new AtomicInteger();
@@ -66,14 +72,21 @@ public class Poll implements DataClass<Poll> {
 
 			result.append("\033[1m").append(StringUtil.padRight(name, maxLength.get())).append("\033[0m").append(maxLength.get() > 8 ? "\n" : ": ")
 					//Bar
-					.append("[").append(StringUtil.createProgressBar(percentage, 30)).append("]")
+					.append("[").append(StringUtil.createProgressBar(percentage, 20)).append("]")
 					//Display percentage
 					.append(" \033[34;1m(").append((int) (percentage * 100)).append("%, ").append(values.size()).append(" Stimmen)\033[0m")
 					.append("\n");
 
+			if (names) {
+				StringBuilder names = new StringBuilder();
+				values.forEach(n -> names.append("- ").append(Optional.ofNullable(guild.getMemberById(n)).map(Member::getEffectiveName).orElse("Unbekannt")).append("\n"));
+
+				result.append(StringUtils.abbreviate(names.toString(), 500)).append("\n");
+			}
+
 			if (maxLength.get() > 8) result.append("\n");
 		});
 
-		return "```ansi\n" + result + "```\n" + new HashSet<>(participants).size() + " Teilnehmer" + (max > 1 ? ", " + participants.size() + " Stimmen" : "");
+		return "```ansi\n" + StringUtils.abbreviate(result.toString(), 4000) + "```\n" + new HashSet<>(participants).size() + " Teilnehmer" + (max > 1 ? ", " + participants.size() + " Stimmen, Maximal **" + max + "** Stimmen pro Nutzer" : "");
 	}
 }

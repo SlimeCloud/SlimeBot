@@ -47,7 +47,7 @@ public class PollListener extends ListenerAdapter {
 					.clearFields()
 					.addField(
 							"Auswahlmöglichkeiten",
-							poll.buildChoices(),
+							poll.buildChoices(event.getGuild()),
 							false
 					)
 					.build()
