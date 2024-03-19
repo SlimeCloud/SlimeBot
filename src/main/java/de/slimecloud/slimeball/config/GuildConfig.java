@@ -8,7 +8,7 @@ import de.slimecloud.slimeball.features.alerts.SpotifyNotificationConfig;
 import de.slimecloud.slimeball.features.birthday.BirthdayConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
-import de.slimecloud.slimeball.features.moderation.AutodeleteFlag;
+import de.slimecloud.slimeball.features.moderation.AutoDeleteFlag;
 import de.slimecloud.slimeball.features.staff.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
 import de.slimecloud.slimeball.features.statistic.StatisticConfig;
@@ -94,9 +94,13 @@ public class GuildConfig {
 	private Long contributorRole;
 
 	@Setter
-	@ConfigField(name = "Automatisches Nachrichtenlöschen", command = "autodelete", description = "Kanäle, in denen Nachrichten automatisch gelöscht werden", type = ConfigFieldType.ENUM)
+	@ConfigField(name = "Automatisches Nachrichtenlöschen", command = "autodelete", description = "Kanäle, in denen Nachrichten automatisch gelöscht werden. Nachrichten, mit den angegebenen Filtern werden **nicht** gelöscht!", type = ConfigFieldType.ENUM)
 	@Info(keyType = ConfigFieldType.MESSAGE_CHANNEL)
-	private Map<Long, EnumSet<AutodeleteFlag>> autodelete = new HashMap<>();
+	private Map<Long, EnumSet<AutoDeleteFlag>> autodelete = new HashMap<>();
+
+	@ConfigField(name = "Automatische Threads", command = "autothread", description = "Kanäle, in denen automatisch Threads erstellt werden", type = ConfigFieldType.MESSAGE_CHANNEL)
+	private List<Long> autoThread = new ArrayList<>();
+
 
 	@Setter
 	@CategoryInfo(name = "Spotify", command = "spotify", description = "Konfiguration für Spotify-Alerts")
@@ -194,6 +198,7 @@ public class GuildConfig {
 	}
 
 
+
 	@NotNull
 	public Optional<Role> getTeamRole() {
 		return Optional.ofNullable(teamRole).map(bot.getJda()::getRoleById);
@@ -225,8 +230,12 @@ public class GuildConfig {
 	}
 
 	@NotNull
-	public Optional<EnumSet<AutodeleteFlag>> getAutodelete(@NotNull Channel channel) {
+	public Optional<EnumSet<AutoDeleteFlag>> getAutodelete(@NotNull Channel channel) {
 		return Optional.ofNullable(autodelete).map(a -> a.get(channel.getIdLong()));
+	}
+
+	public boolean isAutoThread(long id) {
+		return autoThread.contains(id);
 	}
 
 	@NotNull

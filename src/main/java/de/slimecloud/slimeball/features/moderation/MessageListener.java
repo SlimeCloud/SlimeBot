@@ -13,14 +13,17 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class AutodeleteListener extends ListenerAdapter {
+public class MessageListener extends ListenerAdapter {
+	public static final Pattern URL_PATTERN = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", Pattern.CASE_INSENSITIVE);
 	private final SlimeBot bot;
 
-	public AutodeleteListener(@NotNull SlimeBot bot) {
+	public MessageListener(@NotNull SlimeBot bot) {
 		this.bot = bot;
 		JEvent.getDefaultManager().registerListener(this);
 	}
@@ -47,13 +50,20 @@ public class AutodeleteListener extends ListenerAdapter {
 		if (message.isWebhookMessage()) return;
 
 		bot.loadGuild(message.getGuild()).getAutodelete(channel).ifPresent(filters -> {
-			if (filters.stream().anyMatch(f -> f.getFilter().test(message))) return;
-			new AutodeleteFlagedEvent(thread, channel, message).callEvent();
+			if (filters.stream().anyMatch(f -> f.getFilter().test(message)) || new AutoDeleteFlagedEvent(thread, channel, message).callEvent()) {
+				if(!message.isFromGuild() || !bot.loadGuild(message.getGuild()).isAutoThread(message.getChannel().getIdLong())) return;
+				message.createThreadChannel(
+						StringUtils.abbreviate(
+								"(" + message.getAuthor().getEffectiveName() + ") " + getThreadName(message),
+								ThreadChannel.MAX_NAME_LENGTH
+						)
+				).queue();
+			}
 		});
 	}
 
 	@EventHandler(priority = -1)
-	public void delete(@NotNull AutodeleteFlagedEvent event) {
+	public void delete(@NotNull AutoDeleteFlagedEvent event) {
 		//Ignore bots
 		if (event.getMessage().getAuthor().isBot()) return;
 
@@ -68,7 +78,7 @@ public class AutodeleteListener extends ListenerAdapter {
 	}
 
 	@EventHandler(priority = -2)
-	public void inform(@NotNull AutodeleteFlagedEvent event) {
+	public void inform(@NotNull AutoDeleteFlagedEvent event) {
 		event.getMessage().getAuthor().openPrivateChannel().flatMap(ch -> ch.sendMessageEmbeds(new EmbedBuilder()
 				.setTitle("Nachricht gelöscht")
 				.setColor(bot.getColor(event.getMessage().getGuild()))
@@ -79,7 +89,7 @@ public class AutodeleteListener extends ListenerAdapter {
 								.filter(f -> !f.isEmpty())
 								.map(f -> "```" +
 										f.stream()
-												.map(AutodeleteFlag::getName)
+												.map(AutoDeleteFlag::getName)
 												.collect(Collectors.joining("\n")) +
 										"```"
 								)
@@ -88,5 +98,25 @@ public class AutodeleteListener extends ListenerAdapter {
 				)
 				.build()
 		)).queue();
+	}
+
+	@NotNull
+	private String getThreadName(@NotNull Message message) {
+		String content = message.getContentRaw()
+				.replaceAll(URL_PATTERN.pattern(), "")
+				.replaceAll("<a?:\\w+:(\\d+)>", "")
+				.replaceAll("<@.?:\\d+>", "")
+				.trim();
+
+		if(content.isEmpty()) {
+			if(!message.getEmbeds().isEmpty()) {
+				String title = message.getEmbeds().get(0).getTitle();
+				if (title != null) return title;
+			}
+
+			return "";
+		}
+
+		return content;
 	}
 }
