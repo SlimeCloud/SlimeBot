@@ -1,8 +1,9 @@
 package de.slimecloud.slimeball.features.moderation;
 
 import de.cyklon.jevent.EventHandler;
-import de.cyklon.jevent.JEvent;
+import de.cyklon.jevent.Listener;
 import de.slimecloud.slimeball.main.SlimeBot;
+import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -24,14 +25,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Listener
+@RequiredArgsConstructor
 public class MessageListener extends ListenerAdapter {
 	public static final Pattern URL_PATTERN = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", Pattern.CASE_INSENSITIVE);
 	private final SlimeBot bot;
-
-	public MessageListener(@NotNull SlimeBot bot) {
-		this.bot = bot;
-		JEvent.getDefaultManager().registerListener(this);
-	}
 
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {

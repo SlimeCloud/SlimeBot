@@ -1,5 +1,7 @@
 package de.slimecloud.slimeball.main;
 
+import de.cyklon.jevent.JEvent;
+import de.cyklon.reflection.entities.OfflinePackage;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.Cache;
 import de.mineking.discordutils.commands.Command;
@@ -79,6 +81,7 @@ import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
@@ -95,6 +98,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Getter
 public class SlimeBot extends ListenerAdapter {
+
+	public static final OfflinePackage botPackage = OfflinePackage.get("de.slimecloud.slimeball");
+
 	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
 
 	private final Config config;
@@ -132,6 +138,12 @@ public class SlimeBot extends ListenerAdapter {
 		//Verify token
 		String token = credentials.get("DISCORD_TOKEN");
 		if (token == null) throw new IllegalArgumentException("No token specified");
+
+		Logger jeventLogger = LoggerFactory.getLogger("JEvent");
+		JEvent.getDefaultManager().setDebugLogger(jeventLogger::debug);
+
+		//register bot as ParameterInstance
+		JEvent.getDefaultManager().registerParameterInstance(this);
 
 		//Initialize database if configured
 		String databaseHost = credentials.get("DATABASE_HOST");
@@ -319,6 +331,8 @@ public class SlimeBot extends ListenerAdapter {
 		new HolidayAlert(this);
 		new BirthdayAlert(this);
 		new BirthdayListener(this);
+
+		JEvent.getDefaultManager().registerListenerPackage(botPackage);
 	}
 
 	private void startActivity() {

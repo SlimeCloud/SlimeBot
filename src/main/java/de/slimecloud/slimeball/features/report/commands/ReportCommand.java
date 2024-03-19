@@ -1,6 +1,5 @@
 package de.slimecloud.slimeball.features.report.commands;
 
-import de.cyklon.jevent.JEvent;
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.Command;
 import de.mineking.discordutils.commands.Setup;
@@ -14,7 +13,6 @@ import de.mineking.discordutils.list.ListManager;
 import de.mineking.discordutils.ui.components.select.StringSelectComponent;
 import de.slimecloud.slimeball.features.report.Filter;
 import de.slimecloud.slimeball.features.report.Report;
-import de.slimecloud.slimeball.features.report.ReportListener;
 import de.slimecloud.slimeball.main.CommandPermission;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -41,7 +39,6 @@ public class ReportCommand {
 
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull Command<ICommandContext> command, @NotNull ListManager<ICommandContext> list) {
-		JEvent.getDefaultManager().registerListener(new ReportListener(bot));
 
 		//Add subcommands
 		command.addSubcommand(BlockCommand.class);
