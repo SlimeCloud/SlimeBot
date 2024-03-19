@@ -4,7 +4,9 @@ import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.JEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.attribute.IPostContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -16,6 +18,9 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -105,8 +110,11 @@ public class MessageListener extends ListenerAdapter {
 		String content = message.getContentRaw()
 				.replaceAll(URL_PATTERN.pattern(), "")
 				.replaceAll("<a?:\\w+:(\\d+)>", "")
-				.replaceAll("<@.?:\\d+>", "")
 				.trim();
+
+		content = replace(content, "<@(\\d+)>", g -> "@" + Optional.ofNullable(message.getGuild().getMemberById(g)).map(Member::getEffectiveName).orElse("Unbekannt"));
+		content = replace(content, "<@&(\\d+)>", g -> "@" + Optional.ofNullable(bot.getJda().getRoleById(g)).map(Role::getName).orElse("Unbekannt"));
+		content = replace(content, "<#(\\d+)>", g -> "#" + Optional.ofNullable(bot.getJda().getChannelById(Channel.class, g)).map(Channel::getName).orElse("Unbekannt"));
 
 		if(content.isEmpty()) {
 			if(!message.getEmbeds().isEmpty()) {
@@ -118,5 +126,18 @@ public class MessageListener extends ListenerAdapter {
 		}
 
 		return content;
+	}
+
+	@NotNull
+	private String replace(@NotNull String str, @NotNull String pattern, @NotNull Function<String, String> handler) {
+		StringBuilder result = new StringBuilder();
+		Matcher matcher = Pattern.compile(pattern).matcher(str);
+
+		while(matcher.find()) {
+			matcher.appendReplacement(result, handler.apply(matcher.group(1)));
+		}
+
+		matcher.appendTail(result);
+		return result.toString();
 	}
 }
