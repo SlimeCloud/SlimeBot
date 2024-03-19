@@ -32,8 +32,8 @@ import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeTable;
 import de.slimecloud.slimeball.features.level.commands.LeaderboardCommand;
 import de.slimecloud.slimeball.features.level.commands.LevelCommand;
-import de.slimecloud.slimeball.features.moderation.AutodeleteListener;
 import de.slimecloud.slimeball.features.moderation.MemberJoinListener;
+import de.slimecloud.slimeball.features.moderation.MessageListener;
 import de.slimecloud.slimeball.features.moderation.TimeoutListener;
 import de.slimecloud.slimeball.features.poll.Poll;
 import de.slimecloud.slimeball.features.poll.PollCommand;
@@ -202,7 +202,7 @@ public class SlimeBot extends ListenerAdapter {
 
 				.addEventListeners(new MemberJoinListener(this))
 				.addEventListeners(new TimeoutListener(this))
-				.addEventListeners(new AutodeleteListener(this))
+				.addEventListeners(new MessageListener(this))
 
 				.addEventListeners(new StaffMessage(this))
 				.addEventListeners(new TeamMeeting(this))

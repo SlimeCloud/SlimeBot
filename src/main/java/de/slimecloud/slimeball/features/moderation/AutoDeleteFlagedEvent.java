@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.channel.Channel;
 
 @Getter
 @AllArgsConstructor
-public class AutodeleteFlagedEvent extends CancellableEvent {
+public class AutoDeleteFlagedEvent extends CancellableEvent {
 	private final boolean thread;
 	private final Channel channel;
 	private final Message message;
