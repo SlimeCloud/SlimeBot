@@ -33,7 +33,7 @@
   },
 
   "level": {
-    "decorationFolder": "decorations",
+    "badgeFolder": "badges",
 
     "levelUpMessage": "Herzlichen Glückwunsch %user%! Du bist jetzt level %level%!",
 

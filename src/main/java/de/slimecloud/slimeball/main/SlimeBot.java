@@ -27,6 +27,9 @@ import de.slimecloud.slimeball.features.github.GitHubAPI;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
 import de.slimecloud.slimeball.features.level.card.*;
+import de.slimecloud.slimeball.features.level.card.badge.BadgeCommand;
+import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
+import de.slimecloud.slimeball.features.level.card.badge.CardBadgeTable;
 import de.slimecloud.slimeball.features.level.commands.LeaderboardCommand;
 import de.slimecloud.slimeball.features.level.commands.LevelCommand;
 import de.slimecloud.slimeball.features.moderation.AutodeleteListener;
@@ -64,10 +67,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -113,7 +113,7 @@ public class SlimeBot extends ListenerAdapter {
 	private final LevelTable level;
 	private final CardDataTable profileData;
 	private final GuildCardTable cardProfiles;
-	private final CardDecorationTable cardDecorations;
+	private final CardBadgeTable cardBadges;
 
 	private final WrappedDataTable wrappedData;
 
@@ -152,7 +152,7 @@ public class SlimeBot extends ListenerAdapter {
 			level = (LevelTable) database.getTable(LevelTable.class, Level.class, () -> new Level(this), "levels").createTable();
 			profileData = (CardDataTable) database.getTable(CardDataTable.class, CardProfileData.class, () -> new CardProfileData(this), "card_data").createTable();
 			cardProfiles = (GuildCardTable) database.getTable(GuildCardTable.class, GuildCardProfile.class, () -> new GuildCardProfile(this), "guild_card_profiles").createTable();
-			cardDecorations = (CardDecorationTable) database.getTable(CardDecorationTable.class, UserCardDecoration.class, () -> new UserCardDecoration(this), "guild_card_decorations").createTable();
+			cardBadges = (CardBadgeTable) database.getTable(CardBadgeTable.class, CardBadgeData.class, () -> new CardBadgeData(this), "guild_card_badges").createTable();
 
 			wrappedData = (WrappedDataTable) database.getTable(WrappedDataTable.class, WrappedData.class, () -> new WrappedData(this), "wrapped_data").createTable();
 
@@ -167,7 +167,7 @@ public class SlimeBot extends ListenerAdapter {
 			level = null;
 			profileData = null;
 			cardProfiles = null;
-			cardDecorations = null;
+			cardBadges = null;
 			wrappedData = null;
 			birthdays = null;
 		}
@@ -268,7 +268,7 @@ public class SlimeBot extends ListenerAdapter {
 					if (database != null && config.getLevel().isPresent()) {
 						manager.registerCommand(RankCommand.class);
 						manager.registerCommand(CardCommand.class);
-						manager.registerCommand(DecorationCommand.class);
+						manager.registerCommand(BadgeCommand.class);
 
 						manager.registerCommand(LeaderboardCommand.class);
 						manager.registerCommand(LevelCommand.class);
@@ -414,5 +414,13 @@ public class SlimeBot extends ListenerAdapter {
 	@NotNull
 	public static UserSnowflake getUser(@NotNull MessageEmbed embed) {
 		return UserSnowflake.fromId(embed.getAuthor().getIconUrl().split("/")[4]); //Avatar Pattern: "https://cdn.discordapp.com/avatars/%s/%s.%s"
+	}
+
+	@NotNull
+	public static Guild getGuild(@NotNull ISnowflake obj) {
+		if (obj instanceof Role r) return r.getGuild();
+		else if (obj instanceof Member m) return m.getGuild();
+
+		throw new RuntimeException();
 	}
 }

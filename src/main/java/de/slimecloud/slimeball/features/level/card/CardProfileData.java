@@ -11,6 +11,7 @@ import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.config.engine.ValidationException;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
+import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
 import de.slimecloud.slimeball.util.graphic.CustomFont;
@@ -24,15 +25,13 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Objects;
-import java.util.Set;
 
 @Slf4j
 @Getter
@@ -91,13 +90,13 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 
 	@Column
 	@Info(keyType = ConfigFieldType.ENUM)
-	private Style decorationStyle = Style.ROUND_SQUARE;
+	private Style badgeStyle = Style.ROUND_SQUARE;
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color decorationBorderColor = new Color(68, 140, 41, 255);
+	private Color badgeBorderColor = new Color(68, 140, 41, 255);
 	@Column
 	@Info(keyType = ConfigFieldType.INTEGER)
-	private int decorationBorderWidth = 5;
+	private int badgeBorderWidth = 5;
 
 
 	@Column
@@ -218,7 +217,7 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		applyProgressBar(graphics, level);
 
 		applyText(graphics, level, member);
-		applyDecorations(graphics, member);
+		applyBadges(graphics, member);
 	}
 
 	private void applyBackground(@NotNull Graphics2D graphics) {
@@ -361,8 +360,8 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		graphics.drawString(rankName, width - offset - rankWidth - rankNameWidth - 2 * offset - levelWidth - levelNameWidth, offset + levelHeight);
 	}
 
-	private void applyDecorations(@NotNull Graphics2D graphics, @NotNull Member member) {
-		Set<String> decorations = bot.getCardDecorations().getDecorations(member);
+	private void applyBadges(@NotNull Graphics2D graphics, @NotNull Member member) {
+		Collection<String> badges = bot.getCardBadges().getEffectiveBadges(member);
 
 		int offset = (int) (height * 0.1);
 		int height = (int) getFontSize(50);
@@ -370,26 +369,27 @@ public class CardProfileData extends Graphic implements DataClass<CardProfileDat
 		//Offset + avatar + offset (Could be simplified to height, but it is easier to understand this way)
 		int x = offset + (this.height - 2 * offset) + offset;
 
-		graphics.setColor(decorationBorderColor);
-		graphics.setStroke(new BasicStroke(adjustBorderWith(decorationBorderWidth)));
+		graphics.setColor(badgeBorderColor);
+		graphics.setStroke(new BasicStroke(adjustBorderWith(badgeBorderWidth)));
 
-		for (String d : decorations) {
+		for (String d : badges) {
 			try {
-				BufferedImage decoration = ImageIO.read(new File(bot.getConfig().getLevel().get().getDecorationFolder(), d));
+				BufferedImage img = CardBadgeData.readBadge(bot, d);
+				if(img == null) continue;
 
-				int width = (int) (decoration.getWidth() * ((double) height / decoration.getHeight()));
+				int width = (int) (img.getWidth() * ((double) height / img.getHeight()));
 
 				graphics.setClip(null);
-				graphics.drawRoundRect(x, offset, width, height, decorationStyle.getArc(height), decorationStyle.getArc(height));
+				graphics.drawRoundRect(x, offset, width, height, badgeStyle.getArc(height), badgeStyle.getArc(height));
 
-				graphics.setClip(decorationStyle.getShape(x, offset, width, height));
-				graphics.drawImage(decoration, x, offset, width, height, null);
+				graphics.setClip(badgeStyle.getShape(x, offset, width, height));
+				graphics.drawImage(img, x, offset, width, height, null);
 
 				x += width + height / 2;
 			} catch (FileNotFoundException e) {
-				logger.warn("Decoration {} not found for member {}", d, member);
+				logger.warn("Badge {} not found for member {}", d, member);
 			} catch (IOException e) {
-				logger.error("Failed to read decoration {} for member {}", d, member, e);
+				logger.error("Failed to read badge {} for member {}", d, member, e);
 			}
 		}
 	}

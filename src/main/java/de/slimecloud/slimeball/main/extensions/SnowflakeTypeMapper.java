@@ -7,10 +7,7 @@ import de.mineking.javautils.database.type.PostgresType;
 import de.mineking.javautils.reflection.ReflectionUtils;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.ISnowflake;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import org.jdbi.v3.core.argument.Argument;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -73,7 +70,18 @@ public class SnowflakeTypeMapper implements TypeMapper<Long, ISnowflake> {
 		Class<?> clazz = ReflectionUtils.getClass(type);
 		JDA jda = manager.<SlimeBot>getData("bot").getJda();
 
-		if (clazz.isAssignableFrom(UserSnowflake.class)) return UserSnowflake.fromId(value);
+		if (clazz.equals(ISnowflake.class) || clazz.equals(IMentionable.class)) {
+			ISnowflake temp = jda.getGuildById(value);
+			if (temp != null) return temp;
+
+			temp = jda.getRoleById(value);
+			if (temp != null) return temp;
+
+			temp = jda.getChannelById(Channel.class, value);
+			if (temp != null) return temp;
+
+			return UserSnowflake.fromId(value);
+		} else if (clazz.isAssignableFrom(UserSnowflake.class)) return UserSnowflake.fromId(value);
 		else if (clazz.isAssignableFrom(Guild.class)) return jda.getGuildById(value);
 		else if (clazz.isAssignableFrom(Role.class)) return jda.getRoleById(value);
 
