@@ -56,7 +56,7 @@ public class MessageListener extends ListenerAdapter {
 
 		bot.loadGuild(message.getGuild()).getAutodelete(channel).ifPresent(filters -> {
 			if (filters.stream().anyMatch(f -> f.getFilter().test(message)) || new AutoDeleteFlagedEvent(thread, channel, message).callEvent()) {
-				if(!message.isFromGuild() || !bot.loadGuild(message.getGuild()).isAutoThread(message.getChannel().getIdLong())) return;
+				if (!message.isFromGuild() || !bot.loadGuild(message.getGuild()).isAutoThread(message.getChannel().getIdLong())) return;
 				message.createThreadChannel(
 						StringUtils.abbreviate(
 								"(" + message.getAuthor().getEffectiveName() + ") " + getThreadName(message),
@@ -116,8 +116,8 @@ public class MessageListener extends ListenerAdapter {
 		content = replace(content, "<@&(\\d+)>", g -> "@" + Optional.ofNullable(bot.getJda().getRoleById(g)).map(Role::getName).orElse("Unbekannt"));
 		content = replace(content, "<#(\\d+)>", g -> "#" + Optional.ofNullable(bot.getJda().getChannelById(Channel.class, g)).map(Channel::getName).orElse("Unbekannt"));
 
-		if(content.isEmpty()) {
-			if(!message.getEmbeds().isEmpty()) {
+		if (content.isEmpty()) {
+			if (!message.getEmbeds().isEmpty()) {
 				String title = message.getEmbeds().get(0).getTitle();
 				if (title != null) return title;
 			}
@@ -133,7 +133,7 @@ public class MessageListener extends ListenerAdapter {
 		StringBuilder result = new StringBuilder();
 		Matcher matcher = Pattern.compile(pattern).matcher(str);
 
-		while(matcher.find()) {
+		while (matcher.find()) {
 			matcher.appendReplacement(result, handler.apply(matcher.group(1)));
 		}
 

@@ -198,7 +198,6 @@ public class GuildConfig {
 	}
 
 
-
 	@NotNull
 	public Optional<Role> getTeamRole() {
 		return Optional.ofNullable(teamRole).map(bot.getJda()::getRoleById);

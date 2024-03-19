@@ -13,12 +13,12 @@ public class QuoteDeleteListener extends ListenerAdapter {
 	@Override
 	public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
 		bot.loadGuild(event.getGuild()).getQuoteChannel().ifPresent(channel -> {
-			if(event.getChannel().getIdLong() != channel.getIdLong()) return;
-			if(!event.getEmoji().getAsReactionCode().equals("❌")) return;
+			if (event.getChannel().getIdLong() != channel.getIdLong()) return;
+			if (!event.getEmoji().getAsReactionCode().equals("❌")) return;
 
 			event.getChannel().retrieveMessageById(event.getMessageIdLong()).queue(message -> {
-				if(event.getUserIdLong() != message.getMentions().getUsers().get(0).getIdLong()) return;
-				if(!new QuoteDeleteEvent(event.getMember()).callEvent()) message.delete().queue();
+				if (event.getUserIdLong() != message.getMentions().getUsers().get(0).getIdLong()) return;
+				if (!new QuoteDeleteEvent(event.getMember()).callEvent()) message.delete().queue();
 			});
 
 			event.getReaction().removeReaction(event.getUser()).queue();

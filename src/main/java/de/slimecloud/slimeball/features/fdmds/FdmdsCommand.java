@@ -151,8 +151,8 @@ public class FdmdsCommand {
 			String title = embed.getTitle() == null ? "Umfrage" : embed.getTitle(); //TODO Backward compatibility, remove the fallback as soon as all old submissions are gone
 			String choices = embed.getFields().get(0).getValue();
 
-				//Call event
-				new FdmdsCreateEvent(SlimeBot.getUser(embed), event.getMember(), question).callEvent();
+			//Call event
+			new FdmdsCreateEvent(SlimeBot.getUser(embed), event.getMember(), question).callEvent();
 
 			//Create and send embed
 			EmbedBuilder builder = new EmbedBuilder()
