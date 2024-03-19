@@ -73,7 +73,7 @@ public interface LevelTable extends Table<Level> {
 		current = current.withLevel(level);
 
 		//Call event and save if not canceled
-		if (!event.callEvent()) current.update();
+		if (!event.callEvent()) current.upsert();
 
 		return current;
 	}
@@ -114,7 +114,7 @@ public interface LevelTable extends Table<Level> {
 		if (type == UserGainXPEvent.Type.MESSAGE) current = current.withMessages(current.getMessages() + 1);
 
 		//Call event and save if not canceled
-		if (!event.callEvent()) current.update();
+		if (!event.callEvent()) current.upsert();
 
 		return current;
 	}

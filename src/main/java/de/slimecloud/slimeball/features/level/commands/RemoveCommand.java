@@ -28,7 +28,7 @@ public class RemoveCommand {
 			}
 
 			//Update level
-			level.withLevel(level.getLevel() - amount).update();
+			level.withLevel(level.getLevel() - amount).upsert();
 			event.reply(target.getAsMention() + " hat jetzt **" + level.getLevel() + " Level** und **" + level.getXp() + " Xp**").setEphemeral(true).queue();
 		}
 	}
@@ -50,7 +50,7 @@ public class RemoveCommand {
 			}
 
 			//Update xp
-			level.withXp(level.getXp() - amount).update();
+			level.withXp(level.getXp() - amount).upsert();
 			event.reply(target.getAsMention() + " hat jetzt **" + level.getLevel() + " Level** und **" + level.getXp() + " Xp**").setEphemeral(true).queue();
 		}
 	}

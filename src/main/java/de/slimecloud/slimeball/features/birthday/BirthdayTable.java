@@ -32,7 +32,7 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 		Birthday birthday = new Birthday(getManager().getData("bot"), member.getGuild(), member, date);
 		if (new BirthdaySetEvent(member, birthday).callEvent()) return birthday;
 
-		return insert(birthday);
+		return upsert(birthday);
 	}
 
 	@NotNull

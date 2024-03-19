@@ -47,7 +47,7 @@ public class Level implements DataClass<Level>, Comparable<Level> {
 	@NotNull
 	@Override
 	public Level update() {
-		return (Level) DataClass.super.update();
+		return DataClass.super.update();
 	}
 
 	@NotNull

@@ -9,11 +9,11 @@ import java.util.function.Predicate;
 
 @Getter
 @AllArgsConstructor
-public enum AutodeleteFlag {
+public enum AutoDeleteFlag {
 	IMAGE("Bilder", m -> m.getContentRaw().isEmpty() && !m.getAttachments().isEmpty() && m.getAttachments().stream().allMatch(Message.Attachment::isImage)),
 	IMAGE_WITH_TEXT("Beschriftete Bilder", m -> !m.getContentRaw().isEmpty() && !m.getAttachments().isEmpty() && m.getAttachments().stream().allMatch(Message.Attachment::isImage)),
 	VIDEO("Video", m -> m.getContentRaw().isEmpty() && !m.getAttachments().isEmpty() && m.getAttachments().stream().allMatch(Message.Attachment::isVideo)),
-	VIDEO_WITH_TEXT("Beschriftetes Video", m -> !m.getContentRaw().isEmpty() && !m.getAttachments().isEmpty() && m.getAttachments().stream().allMatch(Message.Attachment::isVideo)),
+	VIDEO_WITH_TEXT("Beschriftete Videos", m -> !m.getContentRaw().isEmpty() && !m.getAttachments().isEmpty() && m.getAttachments().stream().allMatch(Message.Attachment::isVideo)),
 	LINK("Links", m -> m.getAttachments().isEmpty() && StringUtil.isValidURL(m.getContentRaw())),
 	INTEGER("Zahlen", m -> m.getAttachments().isEmpty() && StringUtil.isInteger(m.getContentRaw()));
 

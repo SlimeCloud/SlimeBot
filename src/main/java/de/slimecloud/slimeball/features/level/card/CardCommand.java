@@ -53,8 +53,6 @@ public class CardCommand {
 
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull DiscordUtils<?> discordUtils, @NotNull Command<ICommandContext> command, @NotNull ListManager<ICommandContext> manager) {
-		discordUtils.getJDA().addEventListener(new CardDecorationListener(bot));
-
 		command.addSubcommand(manager.createCommand(
 				(ctx, state) -> state.setState("filter", ctx.getEvent().getOption("filter").getAsString()),
 				state -> bot.getProfileData()
@@ -114,7 +112,7 @@ public class CardCommand {
 					),
 					(state, response) -> {
 						try {
-							bot.getCardProfiles().getProfile(state.getEvent().getMember()).getData().set(state.getState("field", String.class), response.getString("value")).update();
+							bot.getCardProfiles().getProfile(state.getEvent().getMember()).getData().set(state.getState("field", String.class), response.getString("value")).upsert();
 							manager.getMenu("card.edit").display(state.getEvent());
 						} catch (ValidationException e) {
 							manager.getMenu("card.edit").display(state.getEvent());
@@ -174,7 +172,7 @@ public class CardCommand {
 					),
 					ComponentRow.of(
 							new ButtonComponent("confirm", ButtonColor.GREEN, "Profil kopieren").appendHandler(s -> {
-								bot.getCardProfiles().getProfile(s.getEvent().getMember()).getData().createCopy(s.getEvent().getMember()).update();
+								bot.getCardProfiles().getProfile(s.getEvent().getMember()).getData().createCopy(s.getEvent().getMember()).upsert();
 								menu.display(s.getEvent());
 							}),
 							new ButtonComponent("cancel", ButtonColor.RED, "Abbrechen").appendHandler(UpdateState::close)
@@ -195,8 +193,8 @@ public class CardCommand {
 					return;
 				}
 
-				data.update(); //Create new storage, will generate id
-				profile.setId(data.getId()).update(); //Set newly generated data as current profile
+				data.upsert(); //Create new storage, will generate id
+				profile.setId(data.getId()).upsert(); //Set newly generated data as current profile
 			}
 
 			//Check if member is owner
@@ -291,7 +289,7 @@ public class CardCommand {
 						//Check permission
 						if (data.getPermission(event.getMember()).canRead()) {
 							//Reference profile in guild table
-							bot.getCardProfiles().getProfile(event.getMember()).setId(data.getId()).update();
+							bot.getCardProfiles().getProfile(event.getMember()).setId(data.getId()).upsert();
 
 							event.reply("Profil mit ID **" + id + "** geladen")
 									.setFiles(data.render(event.getMember()).getFile())
