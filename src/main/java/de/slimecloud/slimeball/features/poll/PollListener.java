@@ -43,13 +43,10 @@ public class PollListener extends ListenerAdapter {
 
 			//Update message
 			MessageEmbed old = event.getMessage().getEmbeds().get(0);
+			String[] temp = old.getDescription().split("## Ergebnisse\n\n", 2);
 			event.getHook().editOriginalEmbeds(new EmbedBuilder(old)
-					.clearFields()
-					.addField(
-							"Auswahlmöglichkeiten",
-							poll.buildChoices(event.getGuild()),
-							false
-					)
+					.clearFields() //To keep old polls intact
+					.setDescription((old.getFields().isEmpty() ? temp[0] : old.getDescription()) + "## Ergebnisse\n\n" + poll.buildChoices(event.getGuild()))
 					.build()
 			).setActionRow(poll.buildMenu(event.getGuild())).queue();
 		});

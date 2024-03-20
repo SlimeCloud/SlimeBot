@@ -44,11 +44,10 @@ public class PollCommand {
 							.setTitle("\uD83D\uDCCA  Abstimmung")
 							.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl())
 							.setColor(bot.getColor(event.getGuild()))
-							.setDescription(question)
-							.addField(
-									"Ergebnisse",
-									poll.buildChoices(event.getGuild()),
-									false
+							.setDescription(question + "\n")
+							.appendDescription(
+									"## Ergebnisse\n\n" +
+									poll.buildChoices(event.getGuild())
 							)
 							.setFooter(max == 1 ? null : "Maximale Stimmzahl: " + max)
 							.build()

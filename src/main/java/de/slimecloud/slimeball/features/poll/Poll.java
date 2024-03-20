@@ -94,7 +94,7 @@ public class Poll implements DataClass<Poll> {
 			if (maxLength.get() > 8) result.append("\n");
 		});
 
-		return "```ansi\n" + StringUtils.abbreviate(result.toString(), 4000) + "```\n" + new HashSet<>(participants).size() + " Teilnehmer" + (max > 1 ? ", " + participants.size() + " Stimmen, Maximal **" + max + "** Stimmen pro Nutzer" : "");
+		return "```ansi\n" + StringUtils.abbreviate(result.toString(), 3500) + "```\n" + new HashSet<>(participants).size() + " Teilnehmer" + (max > 1 ? ", " + participants.size() + " Stimmen, Maximal **" + max + "** Stimmen pro Nutzer" : "");
 	}
 
 	@NotNull
