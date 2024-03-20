@@ -16,6 +16,7 @@ import de.slimecloud.slimeball.main.CommandPermission;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
@@ -30,10 +31,9 @@ public class PollEditCommand {
 	public final CommandPermission permission = CommandPermission.ROLE_MANAGE; //This makes this command only visible for team members
 
 	private MessageMenu menu;
-	private final ModalMenu addModal;
 
 	public PollEditCommand(@NotNull SlimeBot bot, @NotNull UIManager manager) {
-		addModal = manager.createModal(
+		ModalMenu addModal = manager.createModal(
 				"poll.options.add",
 				s -> "Option hinzufügen",
 				List.of(
@@ -45,6 +45,28 @@ public class PollEditCommand {
 					long id = state.getState("id", long.class);
 					bot.getPolls().getPoll(id).ifPresent(poll -> {
 						poll.getValues().put(response.getString("name"), Collections.emptyList());
+						poll.update();
+					});
+
+					menu.createState(state).display(state.getEvent());
+				}
+		);
+
+		ModalMenu renameModal = manager.createModal(
+				"poll.options.rename",
+				s -> "Option bearbeiten",
+				List.of(
+						new TextComponent("name", "Option", TextInputStyle.SHORT)
+								.setPlaceholder("Ja / Nein")
+								.setValue(s -> s.getState("current", String.class))
+								.setMaxLength(90)
+				),
+				(state, response) -> {
+					long id = state.getState("id", long.class);
+					bot.getPolls().getPoll(id).ifPresent(poll -> {
+						List<String> temp = poll.getValues().get(state.getState("current", String.class));
+						poll.getValues().put(response.getString("name"), temp);
+						poll.getValues().remove(state.getState("current", String.class));
 						poll.update();
 					});
 
@@ -83,6 +105,13 @@ public class PollEditCommand {
 					});
 					state.update();
 				}),
+				new StringSelectComponent("options.rename", s -> s.<Optional<Poll>>getCache("poll").map(p -> p.getValues().keySet()).orElse(Collections.emptySet()).stream()
+						.map(o -> SelectOption.of(o, o))
+						.toList()
+				).setPlaceholder("Option bearbeiten").appendHandler((state, values) -> renameModal.createState(state)
+						.setState("current", values.get(0).getValue())
+						.display((GenericComponentInteractionCreateEvent) state.getEvent())
+				),
 				ComponentRow.of(
 						new MenuComponent<>(addModal, ButtonColor.GRAY, "Option hinzufügen").transfereState(),
 						new ButtonComponent("names", s -> s.<Optional<Poll>>getCache("poll").filter(Poll::isNames).map(p -> ButtonColor.GREEN).orElse(ButtonColor.GRAY), "Namen anzeigen").appendHandler(s -> {
