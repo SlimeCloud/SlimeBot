@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import org.apache.commons.lang3.StringUtils;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.jetbrains.annotations.NotNull;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
@@ -107,7 +109,7 @@ public class SpotifyAlert {
 									.replace("%name%", name)
 									.replace("%url%", url)
 							).queue(msg -> {
-								msg.createThreadChannel("Unterhaltet euch über diese Folge!").queue();
+								msg.createThreadChannel(StringUtils.abbreviate(name, ThreadChannel.MAX_NAME_LENGTH)).queue();
 								if (msg.getChannelType().equals(ChannelType.NEWS)) msg.crosspost().queue();
 							});
 						} catch (Exception e) {
