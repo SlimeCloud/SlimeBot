@@ -46,7 +46,7 @@ public class PollCommand {
 							.setColor(bot.getColor(event.getGuild()))
 							.setDescription(question + "\n")
 							.appendDescription(
-									"## Ergebnisse\n\n" +
+									"### Ergebnisse\n\n" +
 									poll.buildChoices(event.getGuild())
 							)
 							.setFooter(max == 1 ? null : "Maximale Stimmzahl: " + max)
