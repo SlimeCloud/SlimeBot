@@ -40,7 +40,9 @@ public class PollEditCommand {
 				"poll.options.add",
 				s -> "Option hinzufügen",
 				List.of(
-						new TextComponent("name", "Option", TextInputStyle.SHORT).setPlaceholder("Ja / Nein")
+						new TextComponent("name", "Option", TextInputStyle.SHORT)
+								.setPlaceholder("Ja / Nein")
+								.setMaxLength(90)
 				),
 				(state, response) -> {
 					Map<String, List<String>> options = state.<Map<String, List<String>>>getState("values", LinkedHashMap.class);
