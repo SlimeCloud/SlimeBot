@@ -28,7 +28,7 @@ public class PollCommand {
 	public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
 	                           @Option(description = "Die Frage") String question,
 	                           @OptionArray(minCount = 2, maxCount = 5) @Option(name = "choice", description = "Die Auswahlmöglichkeiten", maxLength = 90) String[] options,
-	                           @IntegerDefault(1) @Option(description = "Die maximale Anzahl pro Nutzer", required = false, minValue = 1) int max,
+	                           @IntegerDefault(1) @Option(description = "Die maximale Anzahl pro Nutzer", required = false, minValue = 1, maxValue = 25) int max,
 	                           @Option(description = "Rolle, die erwähnt wird", required = false) Role role,
                                @BooleanDefault(false) @Option(description = "Namen der Nutzer anzeigen? (Nur bei internen Abstimmungen!)", required = false) boolean names
 	) {

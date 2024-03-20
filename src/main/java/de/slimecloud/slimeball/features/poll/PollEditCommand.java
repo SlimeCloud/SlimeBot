@@ -90,7 +90,7 @@ public class PollEditCommand {
 							s.<Optional<Poll>>getCache("poll").ifPresent(poll -> poll.setMax(poll.getMax() - 1).update());
 							s.update();
 						}),
-						new ButtonComponent("max.add", ButtonColor.BLUE, "+").appendHandler(s -> {
+						new ButtonComponent("max.add", ButtonColor.BLUE, "+").asDisabled(s -> s.<Optional<Poll>>getCache("poll").map(Poll::getMax).map(m -> m >= 25).orElse(true)).appendHandler(s -> {
 							s.<Optional<Poll>>getCache("poll").ifPresent(poll -> poll.setMax(poll.getMax() + 1).update());
 							s.update();
 						})
