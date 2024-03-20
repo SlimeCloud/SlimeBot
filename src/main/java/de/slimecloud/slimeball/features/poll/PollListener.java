@@ -46,7 +46,7 @@ public class PollListener extends ListenerAdapter {
 			String[] temp = old.getDescription().split("## Ergebnisse\n\n", 2);
 			event.getHook().editOriginalEmbeds(new EmbedBuilder(old)
 					.clearFields() //To keep old polls intact
-					.setDescription((old.getFields().isEmpty() ? temp[0] : old.getDescription()) + "## Ergebnisse\n\n" + poll.buildChoices(event.getGuild()))
+					.setDescription((old.getFields().isEmpty() ? temp[0] : old.getDescription() + "\n") + "## Ergebnisse\n\n" + poll.buildChoices(event.getGuild()))
 					.build()
 			).setActionRow(poll.buildMenu(event.getGuild())).queue();
 		});
