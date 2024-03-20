@@ -10,6 +10,7 @@ import de.slimecloud.slimeball.util.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -30,9 +31,11 @@ public class Poll implements DataClass<Poll> {
 	@Column(key = true)
 	private long id;
 
+	@Setter
 	@Column
 	private int max;
 
+	@Setter
 	@Column
 	private boolean names;
 
