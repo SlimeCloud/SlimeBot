@@ -51,7 +51,7 @@ public class PollListener extends ListenerAdapter {
 							false
 					)
 					.build()
-			).queue();
+			).setActionRow(poll.buildMenu(event.getGuild())).queue();
 		});
 	}
 }

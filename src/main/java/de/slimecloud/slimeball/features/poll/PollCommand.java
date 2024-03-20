@@ -7,37 +7,14 @@ import de.mineking.discordutils.commands.option.Option;
 import de.mineking.discordutils.commands.option.OptionArray;
 import de.mineking.discordutils.commands.option.defaultValue.BooleanDefault;
 import de.mineking.discordutils.commands.option.defaultValue.IntegerDefault;
-import de.mineking.discordutils.ui.MessageMenu;
-import de.mineking.discordutils.ui.MessageRenderer;
-import de.mineking.discordutils.ui.UIManager;
-import de.mineking.discordutils.ui.components.button.ButtonColor;
-import de.mineking.discordutils.ui.components.button.ButtonComponent;
-import de.mineking.discordutils.ui.components.button.MenuComponent;
-import de.mineking.discordutils.ui.components.button.ToggleComponent;
-import de.mineking.discordutils.ui.components.button.label.TextLabel;
-import de.mineking.discordutils.ui.components.types.ComponentRow;
-import de.mineking.discordutils.ui.modal.ModalMenu;
-import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.main.CommandPermission;
 import de.slimecloud.slimeball.main.SlimeBot;
-import de.slimecloud.slimeball.main.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
-import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
-import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @ApplicationCommand(name = "poll", description = "Erstellt eine Abstimmung")
 public class PollCommand {
@@ -63,7 +40,7 @@ public class PollCommand {
 					//Create poll
 					Poll poll = bot.getPolls().createPoll(mes.getIdLong(), max, names, options);
 
-					MessageEditAction temp = mes.editMessageEmbeds(new EmbedBuilder()
+					return mes.editMessageEmbeds(new EmbedBuilder()
 							.setTitle("\uD83D\uDCCA  Abstimmung")
 							.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl())
 							.setColor(bot.getColor(event.getGuild()))
@@ -75,23 +52,7 @@ public class PollCommand {
 							)
 							.setFooter(max == 1 ? null : "Maximale Stimmzahl: " + max)
 							.build()
-					);
-
-					AtomicInteger i = new AtomicInteger();
-					return temp.setActionRow(
-							StringSelectMenu.create("poll:select")
-									.setPlaceholder("Wähle weise")
-									.addOptions(Arrays.stream(options)
-											.map(s -> SelectOption.of(StringUtils.abbreviate(s, SelectOption.LABEL_MAX_LENGTH), String.valueOf(i.get()))
-													//Number keycap emoji
-													.withEmoji(SlimeEmoji.number(i.incrementAndGet()).getEmoji(event.getGuild()))
-											)
-											.toList()
-									)
-									.addOptions(SelectOption.of("Auswahl aufheben", "-1").withEmoji(Emoji.fromFormatted("❌")))
-									.setMaxValues(max)
-									.build()
-					);
+					).setActionRow(poll.buildMenu(event.getGuild()));
 				})
 				.queue();
 	}

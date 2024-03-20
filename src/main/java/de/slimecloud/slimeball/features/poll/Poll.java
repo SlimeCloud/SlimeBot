@@ -5,12 +5,16 @@ import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Json;
 import de.mineking.javautils.database.Table;
 import de.slimecloud.slimeball.main.SlimeBot;
+import de.slimecloud.slimeball.main.SlimeEmoji;
 import de.slimecloud.slimeball.util.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -88,5 +92,22 @@ public class Poll implements DataClass<Poll> {
 		});
 
 		return "```ansi\n" + StringUtils.abbreviate(result.toString(), 4000) + "```\n" + new HashSet<>(participants).size() + " Teilnehmer" + (max > 1 ? ", " + participants.size() + " Stimmen, Maximal **" + max + "** Stimmen pro Nutzer" : "");
+	}
+
+	@NotNull
+	public StringSelectMenu buildMenu(@NotNull Guild guild) {
+		AtomicInteger i = new AtomicInteger();
+		return StringSelectMenu.create("poll:select")
+				.setPlaceholder("Wähle weise")
+				.addOptions(values.keySet().stream()
+						.map(s -> SelectOption.of(StringUtils.abbreviate(s, SelectOption.LABEL_MAX_LENGTH), String.valueOf(i.get()))
+								//Number keycap emoji
+								.withEmoji(SlimeEmoji.number(i.incrementAndGet()).getEmoji(guild))
+						)
+						.toList()
+				)
+				.addOptions(SelectOption.of("Auswahl aufheben", "-1").withEmoji(Emoji.fromFormatted("❌")))
+				.setMaxValues(max)
+				.build();
 	}
 }

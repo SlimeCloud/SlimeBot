@@ -9,7 +9,7 @@ import de.mineking.discordutils.ui.components.button.ButtonColor;
 import de.mineking.discordutils.ui.components.button.ButtonComponent;
 import de.mineking.discordutils.ui.components.button.MenuComponent;
 import de.mineking.discordutils.ui.components.button.ToggleComponent;
-import de.mineking.discordutils.ui.components.button.label.TextLabel;
+import de.mineking.discordutils.ui.components.select.StringSelectComponent;
 import de.mineking.discordutils.ui.components.types.ComponentRow;
 import de.mineking.discordutils.ui.modal.ModalMenu;
 import de.mineking.discordutils.ui.modal.TextComponent;
@@ -19,17 +19,41 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @ApplicationCommand(name = "Abstimmung bearbeiten", type = Command.Type.MESSAGE)
 public class PollEditCommand {
 	public final CommandPermission permission = CommandPermission.ROLE_MANAGE; //This makes this command only visible for team members
 
-	private final MessageMenu menu;
+	private MessageMenu menu;
+	private final ModalMenu addModal;
 
 	public PollEditCommand(@NotNull SlimeBot bot, @NotNull UIManager manager) {
+		addModal = manager.createModal(
+				"poll.options.add",
+				s -> "Option hinzufügen",
+				List.of(
+						new TextComponent("name", "Option", TextInputStyle.SHORT).setPlaceholder("Ja / Nein")
+				),
+				(state, response) -> {
+					Map<String, List<String>> options = state.<Map<String, List<String>>>getState("values", LinkedHashMap.class);
+					options.put(response.getString("name"), Collections.emptyList());
+					state.setState("values", options);
+
+					long id = state.getState("id", long.class);
+					bot.getPolls().updateField(Where.equals("id", id), "values", options);
+
+					menu.createState(state).display(state.getEvent());
+				}
+		);
+
 		menu = manager.createMenu(
 				"poll.edit",
 				MessageRenderer.embed(s -> new EmbedBuilder()
@@ -51,12 +75,25 @@ public class PollEditCommand {
 							s.update();
 						})
 				),
+				new StringSelectComponent("options.remove", s -> s.<Map<String, List<String>>>getState("values", LinkedHashMap.class).keySet().stream()
+						.map(o -> SelectOption.of(o, o))
+						.toList()
+				).asDisabled(s -> s.getState("values", Map.class).size() <= 2).setPlaceholder("Option entfernen").appendHandler((state, values) -> {
+					Map<String, List<String>> options = state.<Map<String, List<String>>>getState("values", LinkedHashMap.class);
+					options.remove(values.get(0).getValue());
+					state.setState("values", options);
+
+					state.update();
+				}),
 				ComponentRow.of(
+						new MenuComponent<>(addModal, ButtonColor.GRAY, "Option hinzufügen").transfereState(),
 						new ToggleComponent("names", e -> e ? ButtonColor.GREEN : ButtonColor.GRAY, "Namen anzeigen")
 				)
 		).effect((state, name, oldValue, newValue) -> {
+			long id = state.getState("id", long.class);
+
 			if (!bot.getPolls().getColumns().containsKey(name)) return;
-			bot.getPolls().updateField(Where.equals("id", state.getState("id", long.class)), name, newValue);
+			bot.getPolls().updateField(Where.equals("id", id), name, newValue);
 		});
 	}
 
@@ -67,6 +104,7 @@ public class PollEditCommand {
 						.setState("id", poll.getId())
 						.setState("names", poll.isNames())
 						.setState("max", poll.getMax())
+						.setState("values", poll.getValues())
 						.display(event),
 				() -> event.reply(":x: Abstimmung nicht gefunden!").setEphemeral(true).queue()
 		);
