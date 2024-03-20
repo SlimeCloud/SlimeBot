@@ -57,6 +57,7 @@ import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
+import de.slimecloud.slimeball.features.youtube.Youtube;
 import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
 import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
 import de.slimecloud.slimeball.main.extensions.IDOptionParser;
@@ -127,6 +128,7 @@ public class SlimeBot extends ListenerAdapter {
 
 	private final GitHubAPI github;
 	private final Spotify spotify;
+	private final Youtube youtube;
 
 	private final MemberCount memberCount;
 	private final RoleMemberCount roleMemberCount;
@@ -196,6 +198,14 @@ public class SlimeBot extends ListenerAdapter {
 		else {
 			logger.warn("Spotify api disabled due to missing credentials");
 			spotify = null;
+		}
+
+
+		//Initalize Youtube API
+		if (credentials.get("YOUTUBE_API_KEY") != null) youtube = new Youtube(credentials.get("YOUTUBE_API_KEY"), this);
+		else {
+			logger.warn("Youtube api disabled due to missing credentials");
+			youtube = null;
 		}
 
 
