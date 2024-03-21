@@ -11,7 +11,7 @@ plugins {
 mainClassName = "de.slimecloud.slimeball.main.Main"
 
 group 'com.slimebot'
-version '3.5.0'
+version '3.5.1'
 
 repositories {
     mavenCentral()
@@ -28,8 +28,8 @@ dependencies {
 
     implementation('de.mineking:DiscordUtils:f577623')
     implementation 'de.mineking:JavaUtils:3ffa11e'
-    implementation 'de.cyklon:ReflectionUtils:57d42d8'
-    implementation 'de.cyklon:JEvent:62448c4'
+    implementation 'de.cyklon:ReflectionUtils:fa134db'
+    implementation 'de.cyklon:JEvent:879a575'
 
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.3.4'
     implementation 'com.github.minndevelopment:emoji-java:master-SNAPSHOT'
