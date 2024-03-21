@@ -79,8 +79,7 @@ public class PollEditCommand {
 				MessageRenderer.embed(s -> new EmbedBuilder()
 						.setColor(bot.getColor(s.getEvent().getGuild()))
 						.setTitle("Umfrage bearbeiten")
-						.setDescription("https://discord.com/channels/" + s.getEvent().getGuild().getId() + "/" + s.getEvent().getChannel().getId() + "/" + s.getState("id", String.class) + " ")
-						.appendDescription("Umfrage wird aktualisiert sobald der nächste Nutzer eine Auswahl tritt")
+						.setDescription("https://discord.com/channels/" + s.getEvent().getGuild().getId() + "/" + s.getEvent().getChannel().getId() + "/" + s.getState("id", String.class))
 						.appendDescription(s.<Optional<Poll>>getCache("poll").map(p -> p.buildChoices(s.getEvent().getGuild())).orElse("*Nicht gefunden*"))
 						.build()
 				),
@@ -117,6 +116,19 @@ public class PollEditCommand {
 						new ButtonComponent("names", s -> s.<Optional<Poll>>getCache("poll").filter(Poll::isNames).map(p -> ButtonColor.GREEN).orElse(ButtonColor.GRAY), "Namen anzeigen").appendHandler(s -> {
 							s.<Optional<Poll>>getCache("poll").ifPresent(poll -> poll.setNames(!poll.isNames()).update());
 							s.update();
+						}),
+						new ButtonComponent("update", ButtonColor.BLUE, "Nachricht aktualisieren").appendHandler(state -> {
+							bot.getPolls().getPoll(state.getState("id", long.class)).ifPresent(poll ->
+									state.getEvent().getMessageChannel().retrieveMessageById(poll.getId()).map(mes -> mes.getEmbeds().get(0)).queue(old -> {
+										String[] temp = old.getDescription().split("### Ergebnisse\n\n", 2);
+										state.getEvent().getMessageChannel().editMessageEmbedsById(poll.getId(), new EmbedBuilder(old)
+												.clearFields()
+												.setDescription((old.getFields().isEmpty() ? temp[0] : old.getDescription() + "\n") + "### Ergebnisse\n\n" + poll.buildChoices(state.getEvent().getGuild()))
+												.build()
+										).setActionRow(poll.buildMenu(state.getEvent().getGuild())).queue();
+									})
+							);
+							state.update();
 						})
 				)
 		).cache(state -> {
