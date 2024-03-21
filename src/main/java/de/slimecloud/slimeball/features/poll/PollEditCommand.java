@@ -112,7 +112,7 @@ public class PollEditCommand {
 						.display((GenericComponentInteractionCreateEvent) state.getEvent())
 				),
 				ComponentRow.of(
-						new MenuComponent<>(addModal, ButtonColor.GRAY, "Option hinzufügen").transfereState().asDisabled(s -> s.<Optional<Poll>>getCache("poll").map(p -> p.getValues().size()).map(m -> m >= 25).orElse(true)),
+						new MenuComponent<>(addModal, ButtonColor.GRAY, "Option hinzufügen").transfereState().asDisabled(s -> s.<Optional<Poll>>getCache("poll").map(p -> p.getValues().size()).map(m -> m >= 9).orElse(true)),
 						new ButtonComponent("names", s -> s.<Optional<Poll>>getCache("poll").filter(Poll::isNames).map(p -> ButtonColor.GREEN).orElse(ButtonColor.GRAY), "Namen anzeigen").appendHandler(s -> {
 							s.<Optional<Poll>>getCache("poll").ifPresent(poll -> poll.setNames(!poll.isNames()).update());
 							s.update();

@@ -30,7 +30,7 @@ public class PollCommand {
 	                           @OptionArray(minCount = 2, maxCount = 5) @Option(name = "choice", description = "Die Auswahlmöglichkeiten", maxLength = 90) String[] options,
 	                           @IntegerDefault(1) @Option(description = "Die maximale Anzahl pro Nutzer", required = false, minValue = 1, maxValue = 25) int max,
 	                           @Option(description = "Rolle, die erwähnt wird", required = false) Role role,
-                               @BooleanDefault(false) @Option(description = "Namen der Nutzer anzeigen? (Nur bei internen Abstimmungen!)", required = false) boolean names
+	                           @BooleanDefault(false) @Option(description = "Namen der Nutzer anzeigen? (Nur bei internen Abstimmungen!)", required = false) boolean names
 	) {
 		ReplyCallbackAction action = role == null ? event.deferReply() : event.reply(role.getAsMention());
 
@@ -47,7 +47,7 @@ public class PollCommand {
 							.setDescription(question + "\n")
 							.appendDescription(
 									"### Ergebnisse\n\n" +
-									poll.buildChoices(event.getGuild())
+											poll.buildChoices(event.getGuild())
 							)
 							.setFooter(max == 1 ? null : "Maximale Stimmzahl: " + max)
 							.build()
