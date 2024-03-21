@@ -12,8 +12,14 @@ import java.util.stream.Collectors;
 
 public interface PollTable extends Table<Poll> {
 	@NotNull
-	default Poll createPoll(long message, int max, String[] choices) {
-		return insert(new Poll(getManager().getData("bot"), message, max, Arrays.stream(choices).collect(Collectors.toMap(c -> c, x -> new ArrayList<>(), (x, y) -> y, LinkedHashMap::new))));
+	default Poll createPoll(long message, int max, boolean names, @NotNull String[] choices) {
+		return insert(new Poll(
+				getManager().getData("bot"),
+				message,
+				max,
+				names,
+				Arrays.stream(choices).collect(Collectors.toMap(c -> c, x -> new ArrayList<>(), (x, y) -> y, LinkedHashMap::new))
+		));
 	}
 
 	default void delete(long message) {
