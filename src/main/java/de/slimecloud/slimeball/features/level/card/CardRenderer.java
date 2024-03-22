@@ -156,7 +156,7 @@ public class CardRenderer extends Graphic {
 
 		graphics.drawString(levelString, width - offset- levelWidth, offset + nameSize);
 
-		graphics.setFont(CustomFont.getFont(font, nameSize * 0.8F));
+		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
 		int levelNameWidth = graphics.getFontMetrics().stringWidth(levelName);
 		graphics.drawString(levelName, width - offset - levelWidth - levelNameWidth, offset + nameSize);
 
