@@ -283,10 +283,6 @@ public class SlimeBot extends ListenerAdapter {
 						manager.registerCommand(CardCommand.class);
 						manager.registerCommand(BadgeCommand.class);
 
-						manager.registerCommand(manager.getManager().getListManager().createCommand(s -> level)
-								.withName("leaderboard")
-								.withDescription("Zeigt das aktuelle Level-Leaderboard")
-						);
 						manager.registerCommand(LevelCommand.class);
 					} else logger.warn("Level system disabled due to missing database or level config");
 
