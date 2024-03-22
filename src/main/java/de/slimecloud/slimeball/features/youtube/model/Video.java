@@ -1,16 +1,17 @@
 package de.slimecloud.slimeball.features.youtube.model;
 
-import lombok.Data;
+public record Video(String id, VideoSnippet snippet) {
 
-@Data
-public class Video {
-
-	private String id;
-
-	private VideoSnippet snippet;
+	public String getUrl() {
+		return "https://www.youtube.com/watch?v=" + id;
+	}
 
 	public boolean isLive() {
-		return snippet.getLiveBroadcastContent().equals("live");
+		return snippet.liveBroadcastContent().equals("live");
+	}
+
+	public Channel getChannel() {
+		return new Channel(snippet.channelId(), new ChannelSnippet(snippet.channelTitle()));
 	}
 
 }

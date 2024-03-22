@@ -1,14 +1,3 @@
 package de.slimecloud.slimeball.features.youtube.model;
 
-import lombok.Data;
-
-@Data
-public class VideoSnippet {
-
-	private String description;
-
-	private String title;
-
-	private String liveBroadcastContent;
-
-}
+public record VideoSnippet(String description, String title, String channelId, String channelTitle, String liveBroadcastContent) {}

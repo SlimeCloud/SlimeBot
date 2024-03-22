@@ -1,15 +1,8 @@
 package de.slimecloud.slimeball.features.youtube.model;
 
-import lombok.Data;
-
-@Data
-public class Channel {
-
-	private String id;
-
-	private ChannelSnippet snippet;
+public record Channel(String id, ChannelSnippet snippet) {
 
 	public String getTitle() {
-		return getSnippet().getTitle();
+		return snippet.title();
 	}
 }
