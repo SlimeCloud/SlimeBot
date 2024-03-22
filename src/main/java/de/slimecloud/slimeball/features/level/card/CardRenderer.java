@@ -58,7 +58,7 @@ public class CardRenderer extends Graphic {
 		applyProgressBar(graphics, maxLevel == null ? (double) level.getXp() / LevelTable.calculateRequiredXP(level.getLevel() + 1) : (double) level.getLevel() / maxLevel);
 
 		applyText(graphics, level, member);
-		if(maxLevel == null) applyBadges(graphics, member);
+		if (maxLevel == null) applyBadges(graphics, member);
 	}
 
 	private void applyBackground(@NotNull Graphics2D graphics) {
@@ -154,7 +154,7 @@ public class CardRenderer extends Graphic {
 		graphics.setFont(CustomFont.getFont(font, nameSize));
 		int levelWidth = graphics.getFontMetrics().stringWidth(levelString);
 
-		graphics.drawString(levelString, width - offset- levelWidth, offset + nameSize);
+		graphics.drawString(levelString, width - offset - levelWidth, offset + nameSize);
 
 		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
 		int levelNameWidth = graphics.getFontMetrics().stringWidth(levelName);
@@ -178,7 +178,7 @@ public class CardRenderer extends Graphic {
 		int rankNameWidth = graphics.getFontMetrics().stringWidth(levelName);
 		graphics.drawString(rankName, width - offset - rankWidth - rankNameWidth - width / 25 - levelWidth - levelNameWidth, offset + nameSize);
 
-		if(maxLevel != null) return;
+		if (maxLevel != null) return;
 
 		//Required XP
 		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
@@ -244,7 +244,7 @@ public class CardRenderer extends Graphic {
 	private Color getColor(int rank) {
 		return switch (rank) {
 			case 1 -> new Color(232, 187, 65);
-			case 2 -> new Color(192,192,192);
+			case 2 -> new Color(192, 192, 192);
 			case 3 -> new Color(205, 115, 50);
 			default -> data.getFontColor();
 		};

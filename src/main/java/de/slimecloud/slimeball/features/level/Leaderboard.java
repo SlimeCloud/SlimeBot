@@ -36,7 +36,7 @@ public class Leaderboard extends Graphic {
 		Guild guild = state.getEvent().getGuild();
 		int maxLevel = data.stream().mapToInt(Level::getLevel).max().orElse(0);
 
-		for(int i = 0; i < data.size(); i++) {
+		for (int i = 0; i < data.size(); i++) {
 			Level level = data.get(i);
 			Member member = guild.getMember(level.getUser());
 
