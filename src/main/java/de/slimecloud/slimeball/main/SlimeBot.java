@@ -32,7 +32,6 @@ import de.slimecloud.slimeball.features.level.card.*;
 import de.slimecloud.slimeball.features.level.card.badge.BadgeCommand;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeTable;
-import de.slimecloud.slimeball.features.level.commands.LeaderboardCommand;
 import de.slimecloud.slimeball.features.level.commands.LevelCommand;
 import de.slimecloud.slimeball.features.moderation.MemberJoinListener;
 import de.slimecloud.slimeball.features.moderation.MessageListener;
@@ -284,7 +283,10 @@ public class SlimeBot extends ListenerAdapter {
 						manager.registerCommand(CardCommand.class);
 						manager.registerCommand(BadgeCommand.class);
 
-						manager.registerCommand(LeaderboardCommand.class);
+						manager.registerCommand(manager.getManager().getListManager().createCommand(s -> level)
+								.withName("leaderboard")
+								.withDescription("Zeigt das aktuelle Level-Leaderboard")
+						);
 						manager.registerCommand(LevelCommand.class);
 					} else logger.warn("Level system disabled due to missing database or level config");
 
