@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.IMentionable;
+import net.dv8tion.jda.api.entities.Role;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +55,7 @@ public class CardBadgeData {
 
 	@Nullable
 	public static BufferedImage readBadge(@NotNull SlimeBot bot, @NotNull String badge) throws IOException {
-		var role = StringUtil.isInteger(badge) ? bot.getJda().getRoleById(badge) : null;
+		Role role = StringUtil.isInteger(badge) ? bot.getJda().getRoleById(badge) : null;
 
 		if (role != null) {
 			if (role.getIcon() == null) return null;
