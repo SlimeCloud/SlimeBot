@@ -24,7 +24,7 @@ public class CardRenderer extends Graphic {
 
 	static {
 		try {
-			font = CustomFont.getFont("Ubuntu.ttf", Font.BOLD);
+			font = CustomFont.getFont("DejaVuSans.ttf", Font.BOLD);
 		} catch (IOException | FontFormatException e) {
 			throw new RuntimeException(e);
 		}
