@@ -76,7 +76,7 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 	private Color badgeBorderColor = new Color(68, 140, 41, 255);
 	@Column
 	@Info(keyType = ConfigFieldType.INTEGER)
-	private int badgeBorderWidth = 5;
+	private int badgeBorderWidth = 0;
 
 
 	@Column
