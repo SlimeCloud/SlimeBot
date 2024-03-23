@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.slimecloud.slimeball.main.SlimeBot;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,13 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@RequiredArgsConstructor
 public class Youtube {
 
 	private final String API_KEY;
+	private final SlimeBot bot;
 	private final List<GuildYoutube> guildInstances = new ArrayList<>();
 
-	public Youtube(String apiKey, SlimeBot bot) {
-		this.API_KEY = apiKey;
+
+	public void init() {
 		bot.getJda().getGuilds().forEach(g -> bot.loadGuild(g).getYoutube().ifPresent(c -> guildInstances.add(new GuildYoutube(this, c))));
 		bot.getExecutor().scheduleAtFixedRate(() -> guildInstances.forEach(GuildYoutube::schedule), 2, 2, TimeUnit.SECONDS);
 	}
