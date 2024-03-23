@@ -173,7 +173,7 @@ public interface LevelTable extends Table<Level>, Listable<Level> {
 				.setTitle("Leaderboard")
 				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.getEvent().getGuild()))
 				.setImage("attachment://leaderboard.png")
-				.setFooter("Plätze " + ((state.getState("page", int.class) - 1) * entriesPerPage() + 1) + " bis " + Math.min(state.getState("page", int.class) * entriesPerPage(), context.entries().size()))
+				.setFooter("Plätze " + ((state.getState("page", int.class) - 1) * entriesPerPage() + 1) + " bis " + ((state.getState("page", int.class) - 1) * entriesPerPage() + context.entries().size()))
 				.build();
 	}
 
