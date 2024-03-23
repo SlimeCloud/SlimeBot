@@ -218,8 +218,10 @@ public class CardRenderer extends Graphic {
 
 				int width = (int) (img.getWidth() * ((double) height / img.getHeight()));
 
-				graphics.setClip(null);
-				graphics.drawRoundRect(x, offset, width, height, data.getBadgeStyle().getArc(height), data.getBadgeStyle().getArc(height));
+				if(data.getBadgeBorderWidth() > 0) {
+					graphics.setClip(null);
+					graphics.drawRoundRect(x, offset, width, height, data.getBadgeStyle().getArc(height), data.getBadgeStyle().getArc(height));
+				}
 
 				graphics.setClip(data.getBadgeStyle().getShape(x, offset, width, height));
 				graphics.drawImage(img, x, offset, width, height, null);
