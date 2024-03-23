@@ -1,17 +1,18 @@
 package de.slimecloud.slimeball.features.birthday;
 
+import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayEndEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayStartEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.TimeUtil;
+import net.dv8tion.jda.api.entities.Member;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 
 public class BirthdayAlert {
-
 	private final SlimeBot bot;
 
 	public BirthdayAlert(@NotNull SlimeBot bot) {
@@ -19,26 +20,16 @@ public class BirthdayAlert {
 		bot.scheduleDaily(6, this::check);
 	}
 
-
 	private void check() {
-		List<Birthday> all = bot.getBirthdays().getAll();
+		bot.getJda().getGuilds().forEach(g -> {
+			GuildConfig config = bot.loadGuild(g);
+			List<Member> members = config.getBirthday().flatMap(BirthdayConfig::getBirthdayRole).map(g::getMembersWithRoles).orElse(Collections.emptyList());
 
-		getYesterday(all).forEach(b -> new BirthdayEndEvent(b).callEvent());
-		getToday(all).forEach(b -> new BirthdayStartEvent(b).callEvent());
-	}
+			bot.getBirthdays().getAll(g, members).stream()
+					.filter(b -> !TimeUtil.isSameDay(b.getTime(), Instant.now()))
+					.forEach(b -> new BirthdayEndEvent(b).callEvent());
+		});
 
-
-	private List<Birthday> getToday(List<Birthday> all) {
-		Instant now = Instant.now();
-		return all.stream()
-				.filter(b -> TimeUtil.isSameDay(b.getTime(), now, true))
-				.toList();
-	}
-
-	private List<Birthday> getYesterday(List<Birthday> all) {
-		Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
-		return all.stream()
-				.filter(b -> TimeUtil.isSameDay(b.getTime(), yesterday, true))
-				.toList();
+		bot.getBirthdays().getToday().forEach(b -> new BirthdayStartEvent(b).callEvent());
 	}
 }

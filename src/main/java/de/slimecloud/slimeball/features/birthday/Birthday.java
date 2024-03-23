@@ -9,6 +9,7 @@ import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.utils.TimeFormat;
@@ -18,6 +19,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 
 @Getter
+@ToString
 @AllArgsConstructor
 public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birthday> {
 	private final SlimeBot bot;
@@ -48,30 +50,25 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 	@NotNull
 	@Override
 	public String build(int index, @NotNull ListContext<? extends ListEntry> context) {
-		return String.format("%s %s", getFormat(), user.getAsMention());
+		return String.format("%s %s", formatNext(), user.getAsMention());
 	}
 
 
 	@NotNull
 	public ZonedDateTime getNextBirthday() {
 		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
-		ZonedDateTime date = time.atZone(Main.timezone).withYear(now.getYear());
-		ZonedDateTime end = date.withHour(23).withMinute(59).withSecond(59);
+		ZonedDateTime bd = time.atZone(Main.timezone).withYear(now.getYear());
+		ZonedDateTime end = bd.withHour(23).withMinute(59).withSecond(59);
 
-		return date.withYear(now.isAfter(end) ? now.getYear() + 1 : now.getYear());
+		return now.isAfter(end) ? bd.withYear(now.getYear() + 1) : bd;
 	}
 
 	@NotNull
-	public String getFormat() {
-		ZonedDateTime zdt = getNextBirthday();
-		ZonedDateTime now = ZonedDateTime.now();
-		boolean today = zdt.getYear() == now.getYear() && zdt.getMonth() == now.getMonth() && zdt.getDayOfMonth() == now.getDayOfMonth();
-		return today ? "`Heute`" : TimeFormat.RELATIVE.format(zdt);
-	}
+	public String formatNext() {
+		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
+		ZonedDateTime bd = getNextBirthday();
 
-	@Override
-	public String toString() {
-		ZonedDateTime date = time.atZone(Main.timezone);
-		return TimeFormat.DATE_LONG.format(date);
+		if (bd.getYear() == now.getYear() && bd.getDayOfYear() == now.getDayOfYear()) return "`Heute`";
+		return TimeFormat.RELATIVE.format(bd);
 	}
 }

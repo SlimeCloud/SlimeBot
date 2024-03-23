@@ -10,6 +10,7 @@ import de.slimecloud.slimeball.features.birthday.event.BirthdayRemoveEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdaySetEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,8 +31,8 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	@NotNull
 	default Birthday save(@NotNull Member member, @NotNull Instant date) {
 		Birthday birthday = new Birthday(getManager().getData("bot"), member.getGuild(), member, date);
-		if (new BirthdaySetEvent(member, birthday).callEvent()) return birthday;
 
+		if (new BirthdaySetEvent(member, birthday).callEvent()) return birthday;
 		return upsert(birthday);
 	}
 
@@ -44,8 +45,16 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	}
 
 	@NotNull
-	default List<Birthday> getAll() {
-		return selectAll();
+	default List<Birthday> getAll(@NotNull Guild guild, @NotNull List<Member> members) {
+		return selectMany(Where.allOf(
+				Where.equals("guild", guild),
+				Where.in("user", members)
+		));
+	}
+
+	@NotNull
+	default List<Birthday> getToday() {
+		return selectMany(Where.unsafe("to_char(time, 'dd.MM') = to_char(current_date, 'dd.MM')"));
 	}
 
 	/*
@@ -73,8 +82,6 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	@NotNull
 	@Override
 	default List<Birthday> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Birthday> context) {
-		return selectAll().stream()
-				.sorted()
-				.toList();
+		return selectAll().stream().sorted().toList();
 	}
 }

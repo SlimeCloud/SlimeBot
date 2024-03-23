@@ -21,30 +21,41 @@ public class BirthdayListener {
 
 	@EventHandler
 	public void onBirthdaySet(@NotNull BirthdaySetEvent event) {
-		if (TimeUtil.isSameDay(event.getNewBirthday().getTime(), Instant.now(), true)) new BirthdayStartEvent(event.getNewBirthday()).callEvent();
+		if (TimeUtil.isSameDay(event.getNewBirthday().getTime(), Instant.now())) {
+			new BirthdayStartEvent(event.getNewBirthday()).callEvent();
+		}
 	}
 
 	@EventHandler
 	public void onBirthdayRemove(@NotNull BirthdayRemoveEvent event) {
-		//Call the method instead of the event, as it will be called in any case, even if the user does not have a birthday and has just removed their birthday.
-		//But in the onBirthdayEnd method it does not matter, as it only tries to remove the birthday role.
-		onBirthdayEnd(new BirthdayEndEvent(event.getMember()));
+		bot.loadGuild(event.getMember().getGuild()).getBirthday()
+				.flatMap(BirthdayConfig::getBirthdayRole)
+				.ifPresent(role -> {
+					if (event.getMember().getRoles().contains(role)) {
+						new BirthdayEndEvent(event.getMember()).callEvent();
+					}
+				});
 	}
 
 
 	@EventHandler
 	public void onBirthdayEnd(@NotNull BirthdayEndEvent event) {
-		bot.loadGuild(event.getGuild()).getBirthday().flatMap(BirthdayConfig::getBirthdayRole).ifPresent(role -> event.getGuild().removeRoleFromMember(event.getMember(), role).queue());
+		bot.loadGuild(event.getGuild()).getBirthday()
+				.flatMap(BirthdayConfig::getBirthdayRole)
+				.ifPresent(role -> event.getGuild().removeRoleFromMember(event.getMember(), role).queue());
 	}
 
 	@EventHandler
 	public void onBirthdayStart(@NotNull BirthdayStartEvent event) {
-		GuildConfig guildConfig = bot.loadGuild(event.getGuild());
+		GuildConfig config = bot.loadGuild(event.getGuild());
 
-		guildConfig.getBirthday().flatMap(BirthdayConfig::getBirthdayRole).ifPresent(role -> event.getGuild().addRoleToMember(event.getMember(), role).queue());
+		config.getBirthday()
+				.flatMap(BirthdayConfig::getBirthdayRole)
+				.ifPresent(role -> event.getGuild().addRoleToMember(event.getMember(), role).queue());
 
-		guildConfig.getGreetingsChannel().ifPresent(channel -> {
-			channel.sendMessage(event.getMember().getAsMention() + " hat heute Geburtstag! :birthday: :partying_face:").queue();
-		});
+		config.getGreetingsChannel().ifPresent(channel -> channel
+				.sendMessage(event.getMember().getAsMention() + " hat heute Geburtstag! :birthday: :partying_face:")
+				.queue()
+		);
 	}
 }
