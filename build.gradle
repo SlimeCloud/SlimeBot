@@ -31,6 +31,8 @@ dependencies {
     implementation 'de.cyklon:ReflectionUtils:fa134db'
     implementation 'de.cyklon:JEvent:879a575'
 
+    implementation 'com.squareup.okhttp3:okhttp:3.2.0'
+
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.3.4'
     implementation 'com.github.minndevelopment:emoji-java:master-SNAPSHOT'
     implementation 'org.kohsuke:github-api:1.318'
