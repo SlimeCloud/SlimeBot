@@ -3,11 +3,7 @@ package de.slimecloud.slimeball.features.youtube;
 import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
-import de.slimecloud.slimeball.config.engine.Info;
 import lombok.Getter;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Getter
 public class GuildYoutubeConfig extends ConfigCategory {
