@@ -1,6 +1,7 @@
 package de.slimecloud.slimeball.config;
 
 import de.slimecloud.slimeball.config.engine.Required;
+import de.slimecloud.slimeball.features.youtube.YoutubeConfig;
 import de.slimecloud.slimeball.main.Main;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,8 @@ public class Config {
 
 	private LevelConfig level;
 
+	private YoutubeConfig youtube;
+
 	private final List<Long> timeoutIgnore = Collections.emptyList();
 
 	private String githubRepository;
@@ -43,6 +46,11 @@ public class Config {
 	@NotNull
 	public Optional<LevelConfig> getLevel() {
 		return Optional.ofNullable(level);
+	}
+
+	@NotNull
+	public Optional<YoutubeConfig> getYoutube() {
+		return Optional.ofNullable(youtube);
 	}
 
 	@NotNull
