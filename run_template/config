@@ -51,6 +51,11 @@
     "maxUserProfiles": 3
   },
 
+  "youtube": {
+    "youtubeChannelId": "UCqQ7G13ePHxSlmesNgse_bA",
+    "updateRate": 900
+  },
+
   "timeoutIgnore": [
     458302301187342336
   ],
