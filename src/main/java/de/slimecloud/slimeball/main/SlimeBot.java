@@ -39,6 +39,7 @@ import de.slimecloud.slimeball.features.moderation.MessageListener;
 import de.slimecloud.slimeball.features.moderation.TimeoutListener;
 import de.slimecloud.slimeball.features.poll.Poll;
 import de.slimecloud.slimeball.features.poll.PollCommand;
+import de.slimecloud.slimeball.features.poll.PollEditCommand;
 import de.slimecloud.slimeball.features.poll.PollTable;
 import de.slimecloud.slimeball.features.quote.QuoteCommand;
 import de.slimecloud.slimeball.features.quote.QuoteMessageCommand;
@@ -289,6 +290,7 @@ public class SlimeBot extends ListenerAdapter {
 					//Register poll commands
 					if (polls != null) {
 						manager.registerCommand(PollCommand.class);
+						manager.registerCommand(PollEditCommand.class);
 					} else logger.warn("Poll system disabled due to missing database");
 
 					//Register leveling commands

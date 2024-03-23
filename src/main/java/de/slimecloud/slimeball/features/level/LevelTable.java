@@ -40,7 +40,7 @@ public interface LevelTable extends Table<Level> {
 
 	@NotNull
 	default List<Level> getLevels(@NotNull Guild guild) {
-		return selectMany(Where.equals("guild", guild), Order.descendingBy("level"));
+		return selectMany(Where.equals("guild", guild), Order.descendingBy("level").andDescendingBy("xp"));
 	}
 
 	@NotNull
