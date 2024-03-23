@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.features.level.card;
 
+import de.slimecloud.slimeball.features.level.Leaderboard;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
@@ -37,7 +38,7 @@ public class CardRenderer extends Graphic {
 	private final Integer maxLevel;
 
 	public CardRenderer(@NotNull SlimeBot bot, @NotNull CardProfileData data, @NotNull Member member, Integer maxLevel) {
-		super(width, maxLevel == null ? 400 : 200);
+		super(width, maxLevel == null ? 400 : Leaderboard.height);
 
 		this.bot = bot;
 		this.data = data;

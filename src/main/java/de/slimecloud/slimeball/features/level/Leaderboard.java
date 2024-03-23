@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class Leaderboard extends Graphic {
-	private final static int gap = 25;
-	private final static int height = 200;
+	public final static int gap = 40;
+	public final static int height = 250;
 
 	private final SlimeBot bot;
 	private final DataState<?> state;
