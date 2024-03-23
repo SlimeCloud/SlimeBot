@@ -3,8 +3,10 @@ package de.slimecloud.slimeball.features.youtube;
 import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
+import de.slimecloud.slimeball.config.engine.Info;
 import lombok.Getter;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
@@ -21,8 +23,4 @@ public class GuildYoutubeConfig extends ConfigCategory {
 
 	@ConfigField(name = "Video Nachricht", command = "video-msg", description = "Die nachricht die bei neuen Videos gesendet wird", type = ConfigFieldType.STRING)
 	private String videoMessage;
-
-	@ConfigField(name = "Youtube Kanäle", command = "youtube-channels", description = "Youtube kanäle deren Livestreams und Videos gepostet werden", type = ConfigFieldType.STRING)
-	private Map<String, String> youtubeChannels;
-
 }
