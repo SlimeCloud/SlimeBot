@@ -12,4 +12,8 @@ public class YoutubeVideoEvent extends Event {
 	public YoutubeVideoEvent(Video video) {
 		this.video = video;
 	}
+
+	public boolean isLive() {
+		return video.isLive();
+	}
 }
