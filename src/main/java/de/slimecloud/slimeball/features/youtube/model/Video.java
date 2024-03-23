@@ -14,4 +14,9 @@ public record Video(String id, VideoSnippet snippet) {
 		return new Channel(snippet.channelId(), new ChannelSnippet(snippet.channelTitle()));
 	}
 
+	public static Video ofSearch(SearchResult sr) {
+		SearchResultSnippet snippet = sr.snippet();
+		return new Video(sr.id().videoId(), new VideoSnippet(snippet.description(), snippet.title(), snippet.channelId(), snippet.channelTitle(), snippet.liveBroadcastContent()));
+	}
+
 }
