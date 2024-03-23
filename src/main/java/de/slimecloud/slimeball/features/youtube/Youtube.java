@@ -8,6 +8,10 @@ import de.slimecloud.slimeball.features.youtube.model.Video;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -20,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 public class Youtube {
+
+	private final OkHttpClient client = new OkHttpClient().newBuilder().build();
 
 	private final String API_KEY;
 	private final SlimeBot bot;
@@ -45,17 +51,20 @@ public class Youtube {
 	@Nullable
 	public Video getLastVideo() {
 		try {
-			URL requestURL = new URI(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", API_KEY, bot.getConfig().getYoutube().get().getYoutubeChannelId())).toURL();
-			HttpURLConnection urlConnection = (HttpURLConnection) requestURL.openConnection();
-			urlConnection.setRequestMethod("GET");
+			Request request = new Request.Builder()
+					.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", API_KEY, bot.getConfig().getYoutube().get().getYoutubeChannelId()))
+					.get()
+					.build();
 
-			JsonObject response = JsonParser.parseReader(new InputStreamReader(urlConnection.getInputStream())).getAsJsonObject();
-			JsonArray videos = response.getAsJsonArray("items");
+			try (Response response = client.newCall(request).execute()) {
+				JsonObject json = JsonParser.parseString(response.body().string()).getAsJsonObject();
+				JsonArray videos = json.getAsJsonArray("items");
 
-			if(videos.size() <= 0) return null;
+				if(videos.size() <= 0) return null;
 
-			return Video.ofSearch(Main.json.fromJson(videos.get(0), SearchResult.class));
-		} catch (URISyntaxException | IOException e) {
+				return Video.ofSearch(Main.json.fromJson(videos.get(0), SearchResult.class));
+			}
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
