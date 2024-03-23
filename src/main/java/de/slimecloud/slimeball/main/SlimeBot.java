@@ -342,6 +342,8 @@ public class SlimeBot extends ListenerAdapter {
 		new BirthdayAlert(this);
 		new BirthdayListener(this);
 
+		if (youtube != null) youtube.init();
+
 		JEvent.getDefaultManager().registerListenerPackage(botPackage);
 	}
 
