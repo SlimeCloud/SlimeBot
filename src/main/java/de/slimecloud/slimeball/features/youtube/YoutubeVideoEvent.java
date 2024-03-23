@@ -1,16 +1,15 @@
 package de.slimecloud.slimeball.features.youtube;
 
 import de.cyklon.jevent.Event;
+import de.slimecloud.slimeball.features.youtube.model.Video;
 import lombok.Getter;
 
 @Getter
 public class YoutubeVideoEvent extends Event {
 
-	private final String videoID;
-	private final String videoUrl;
+	private final Video video;
 
-	public YoutubeVideoEvent(String videoID) {
-		this.videoID = videoID;
-		this.videoUrl = "https://www.youtube.com/watch?v=" + videoID;
+	public YoutubeVideoEvent(Video video) {
+		this.video = video;
 	}
 }
