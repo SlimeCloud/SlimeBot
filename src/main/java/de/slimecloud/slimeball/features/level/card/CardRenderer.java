@@ -246,7 +246,7 @@ public class CardRenderer extends Graphic {
 
 	private Color getColor(int rank) {
 		return switch (rank) {
-			case 1 -> new Color(232, 187, 65);
+			case 1 -> new Color(255,215,0);
 			case 2 -> new Color(192, 192, 192);
 			case 3 -> new Color(205, 115, 50);
 			default -> data.getFontColor();
