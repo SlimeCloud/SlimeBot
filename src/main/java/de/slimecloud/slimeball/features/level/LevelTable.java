@@ -161,7 +161,9 @@ public interface LevelTable extends Table<Level>, Listable<Level> {
 	@NotNull
 	@Override
 	default List<Level> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Level> context) {
-		return getLevels(state.getEvent().getGuild());
+		return getLevels(state.getEvent().getGuild()).stream()
+				.filter(l -> state.getEvent().getGuild().getMember(l.getUser()) != null)
+				.toList();
 	}
 
 	@NotNull
