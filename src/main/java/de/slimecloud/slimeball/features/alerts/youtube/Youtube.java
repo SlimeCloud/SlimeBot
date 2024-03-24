@@ -3,6 +3,7 @@ package de.slimecloud.slimeball.features.alerts.youtube;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import de.slimecloud.slimeball.config.YoutubeConfig;
 import de.slimecloud.slimeball.features.alerts.youtube.model.SearchResult;
 import de.slimecloud.slimeball.features.alerts.youtube.model.Video;
 import de.slimecloud.slimeball.main.Main;
