@@ -67,7 +67,7 @@ public class CardCommand {
 	public static class InfoCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) throws Exception {
-			CardProfileData profile = bot.getCardProfiles().getProfile(event.getMember()).getData().render(event.getMember());
+			CardProfileData profile = bot.getCardProfiles().getProfile(event.getMember()).getData();
 
 			EmbedBuilder embed = new EmbedBuilder()
 					.setTitle("RankCard Einstellungen")
@@ -91,7 +91,7 @@ public class CardCommand {
 
 			if (embed.getFields().isEmpty()) embed.setDescription("*Keine Konfiguration, es werden die Standardwerte verwendet*");
 
-			event.getHook().editOriginalEmbeds(embed.build()).setFiles(profile.getFile()).queue();
+			event.getHook().editOriginalEmbeds(embed.build()).setFiles(profile.render(event.getMember()).getFile()).queue();
 		}
 	}
 

@@ -1,6 +1,11 @@
 package de.slimecloud.slimeball.features.level;
 
 import de.cyklon.jevent.CancellableEvent;
+import de.mineking.discordutils.list.ListContext;
+import de.mineking.discordutils.list.Listable;
+import de.mineking.discordutils.ui.MessageMenu;
+import de.mineking.discordutils.ui.MessageRenderer;
+import de.mineking.discordutils.ui.state.DataState;
 import de.mineking.javautils.database.Order;
 import de.mineking.javautils.database.Table;
 import de.mineking.javautils.database.Where;
@@ -9,6 +14,7 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.MathUtil;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,8 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public interface LevelTable extends Table<Level> {
-	static int calculateRequiredXP(int level) {
+public interface LevelTable extends Table<Level>, Listable<Level> {
+	static int getRequiredXp(int level) {
 		return (5 * level * level + 50 * level + 100);
 	}
 
@@ -29,7 +35,6 @@ public interface LevelTable extends Table<Level> {
 
 		Stream<Level> temp = getLevels(guild).stream()
 				.filter(l -> guild.getMember(l.getUser()) != null) //Ignore members who left the server
-				.filter(l -> l.getLevel() > 0) //Ignore members with level 0
 				.skip(offset);
 
 		//Limit and offset according to parameters. We cannot limit and offset via SQL because we have to filter first
@@ -94,7 +99,7 @@ public interface LevelTable extends Table<Level> {
 		int level = current.getLevel();
 
 		while (true) {
-			int requiredXp = calculateRequiredXP(level + 1);
+			int requiredXp = getRequiredXp(level + 1);
 			if (xp < requiredXp) break;
 
 			xp -= requiredXp;
@@ -146,5 +151,42 @@ public interface LevelTable extends Table<Level> {
 
 		//Add xp
 		addXp(user, MathUtil.randomDouble(config.get().getMinVoiceXP(), config.get().getMaxVoiceXP()), UserGainXPEvent.Type.VOICE);
+	}
+
+
+	/*
+	Listable implementation
+	 */
+
+	@NotNull
+	@Override
+	default List<Level> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Level> context) {
+		return getLevels(state.getEvent().getGuild()).stream()
+				.filter(l -> state.getEvent().getGuild().getMember(l.getUser()) != null)
+				.toList();
+	}
+
+	@NotNull
+	@Override
+	default MessageEmbed buildEmbed(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Level> context) {
+		return createEmbed(state, context)
+				.setTitle("Leaderboard")
+				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.getEvent().getGuild()))
+				.setImage("attachment://leaderboard.png")
+				.setFooter("Plätze " + ((state.getState("page", int.class) - 1) * entriesPerPage() + 1) + " bis " + ((state.getState("page", int.class) - 1) * entriesPerPage() + context.entries().size()))
+				.build();
+	}
+
+	@NotNull
+	@Override
+	default MessageRenderer render(@NotNull ListContext<Level> context) {
+		return MessageRenderer
+				.embed(s -> buildEmbed(s, context))
+				.withFile(s -> new Leaderboard(getManager().getData("bot"), s, context.entries()).getFile("leaderboard.png"));
+	}
+
+	@Override
+	default int entriesPerPage() {
+		return 5;
 	}
 }

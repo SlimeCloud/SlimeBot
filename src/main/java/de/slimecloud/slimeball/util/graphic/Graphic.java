@@ -54,4 +54,9 @@ public abstract class Graphic {
 	public FileUpload getFile() {
 		return getFile("image.png");
 	}
+
+	@NotNull
+	public BufferedImage getImage() {
+		return image;
+	}
 }
