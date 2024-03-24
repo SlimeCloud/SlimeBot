@@ -24,6 +24,7 @@ public class YoutubeListener {
 							.replace("%role%", config.getRole().map(IMentionable::getAsMention).orElse(""))
 							.replace("%uploader%", event.getVideo().getChannel().getTitle())
 							.replace("%url%", event.getVideo().getUrl())
+							.replace("%title%", event.getVideo().snippet().title())
 					).queue();
 				}, () -> logger.warn("Cannot send Youtube Notification because channel %s not found".formatted(config.getChannelId())))
 		));
