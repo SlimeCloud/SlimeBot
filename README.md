@@ -24,12 +24,12 @@ Der SlimeBall Bot ist in der Programmiersprache Java geschrieben. Du benötigst 
 Zum Starten benötigst du 3 Dateien:
 
 - `SlimeBot.jar`
-- `config`
+- `config.json`
 - `credentials`
 
 Für jeden Commit wird automatisch eine JAR Datei erstellt. Du kannst diese
 also [hier](https://github.com/SlimeCloud/java-SlimeBot/actions) herunterladen.
-Beispieldateien für `config` und `credentials` befinden sich im Ordner `run_template`. Die `config` Datei kann
+Beispieldateien für `config.json` und `credentials` befinden sich im Ordner `run_template`. Die `config.json` Datei kann
 unverändert bleiben, in `credentials` musst du dein Discord Bot Token sowie optional einige andere Daten eintragen.
 
 Anschließend kannst du die JAR Datei ausführen und der Bot sollte starten.

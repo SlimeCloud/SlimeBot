@@ -21,6 +21,6 @@ public class Main {
 			.create();
 
 	public static void main(String[] args) throws Exception {
-		new SlimeBot(Config.readFromFile("config"), Dotenv.configure().filename("credentials").load());
+		new SlimeBot(Config.readFromFile("config.json"), Dotenv.configure().filename("credentials").load());
 	}
 }
