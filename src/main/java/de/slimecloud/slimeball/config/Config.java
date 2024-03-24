@@ -31,6 +31,8 @@ public class Config {
 
 	private LevelConfig level;
 
+	private YoutubeConfig youtube;
+
 	private final List<Long> timeoutIgnore = Collections.emptyList();
 
 	private String githubRepository;
@@ -43,6 +45,11 @@ public class Config {
 	@NotNull
 	public Optional<LevelConfig> getLevel() {
 		return Optional.ofNullable(level);
+	}
+
+	@NotNull
+	public Optional<YoutubeConfig> getYoutube() {
+		return Optional.ofNullable(youtube);
 	}
 
 	@NotNull

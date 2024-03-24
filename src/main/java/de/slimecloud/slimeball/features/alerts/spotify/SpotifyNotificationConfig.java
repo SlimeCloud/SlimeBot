@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.features.alerts;
+package de.slimecloud.slimeball.features.alerts.spotify;
 
 import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;

@@ -11,8 +11,8 @@ import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.LogForwarding;
 import de.slimecloud.slimeball.config.commands.ConfigCommand;
 import de.slimecloud.slimeball.features.alerts.HolidayAlert;
-import de.slimecloud.slimeball.features.alerts.Spotify;
-import de.slimecloud.slimeball.features.alerts.SpotifyAlert;
+import de.slimecloud.slimeball.features.alerts.spotify.Spotify;
+import de.slimecloud.slimeball.features.alerts.spotify.SpotifyAlert;
 import de.slimecloud.slimeball.features.birthday.Birthday;
 import de.slimecloud.slimeball.features.birthday.BirthdayAlert;
 import de.slimecloud.slimeball.features.birthday.BirthdayListener;
@@ -55,6 +55,7 @@ import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
+import de.slimecloud.slimeball.features.alerts.youtube.Youtube;
 import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
 import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
 import de.slimecloud.slimeball.main.extensions.IDOptionParser;
@@ -125,6 +126,7 @@ public class SlimeBot extends ListenerAdapter {
 
 	private final GitHubAPI github;
 	private final Spotify spotify;
+	private final Youtube youtube;
 
 	private final MemberCount memberCount;
 	private final RoleMemberCount roleMemberCount;
@@ -194,6 +196,18 @@ public class SlimeBot extends ListenerAdapter {
 		else {
 			logger.warn("Spotify api disabled due to missing credentials");
 			spotify = null;
+		}
+
+		//Initalize Youtube API
+		if (config.getYoutube().isPresent()) {
+			if (credentials.get("YOUTUBE_API_KEY") != null) youtube = new Youtube(credentials.get("YOUTUBE_API_KEY"), this, config.getYoutube().get());
+			else {
+				logger.warn("Youtube api disabled due to missing credentials");
+				youtube = null;
+			}
+		} else {
+			logger.warn("Youtube api disabled due to missing config");
+			youtube = null;
 		}
 
 
@@ -322,6 +336,8 @@ public class SlimeBot extends ListenerAdapter {
 		new HolidayAlert(this);
 		new BirthdayAlert(this);
 		new BirthdayListener(this);
+
+		if (youtube != null) youtube.startListener();
 
 		JEvent.getDefaultManager().registerListenerPackage(botPackage);
 	}

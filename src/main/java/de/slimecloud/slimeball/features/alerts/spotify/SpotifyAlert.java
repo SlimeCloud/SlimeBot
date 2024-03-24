@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.features.alerts;
+package de.slimecloud.slimeball.features.alerts.spotify;
 
 import com.neovisionaries.i18n.CountryCode;
 import de.slimecloud.slimeball.config.SpotifyConfig;

@@ -4,7 +4,7 @@ import de.slimecloud.slimeball.config.engine.CategoryInfo;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import de.slimecloud.slimeball.config.engine.Info;
-import de.slimecloud.slimeball.features.alerts.SpotifyNotificationConfig;
+import de.slimecloud.slimeball.features.alerts.spotify.SpotifyNotificationConfig;
 import de.slimecloud.slimeball.features.birthday.BirthdayConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
@@ -12,6 +12,7 @@ import de.slimecloud.slimeball.features.moderation.AutoDeleteFlag;
 import de.slimecloud.slimeball.features.staff.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
 import de.slimecloud.slimeball.features.statistic.StatisticConfig;
+import de.slimecloud.slimeball.features.alerts.youtube.GuildYoutubeConfig;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
@@ -130,6 +131,10 @@ public class GuildConfig {
 	@CategoryInfo(name = "Statistic", command = "statistic", description = "Konfiguration für die Statistic Channels")
 	private StatisticConfig statistic;
 
+	@Setter
+	@CategoryInfo(name = "Youtube", command = "youtube", description = "Konfiguration für die Youtube Notification")
+	private GuildYoutubeConfig youtube;
+
 	@NotNull
 	private GuildConfig configure(@NotNull SlimeBot bot, @NotNull String path, long guild) {
 		this.bot = bot;
@@ -143,6 +148,7 @@ public class GuildConfig {
 		if (meeting != null) meeting.bot = bot;
 		if (birthday != null) birthday.bot = bot;
 		if (statistic != null) statistic.bot = bot;
+		if (youtube != null) youtube.bot = bot;
 
 		return this;
 	}
@@ -195,6 +201,11 @@ public class GuildConfig {
 	@NotNull
 	public Optional<StatisticConfig> getStatistic() {
 		return Optional.ofNullable(statistic);
+	}
+
+	@NotNull
+	public Optional<GuildYoutubeConfig> getYoutube() {
+		return Optional.ofNullable(youtube);
 	}
 
 
