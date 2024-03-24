@@ -17,10 +17,10 @@ public class YoutubeListener {
 	@EventHandler
 	public void onUpload(YoutubeVideoEvent event) {
 		bot.getJda().getGuilds().forEach(g -> bot.loadGuild(g).getYoutube().ifPresent(c -> {
-			TextChannel channel = bot.getJda().getTextChannelById(c.getChannel());
+			TextChannel channel = c.getChannel();
 
 			if (channel != null) {
-				Role role = bot.getJda().getRoleById(c.getRole());
+				Role role = c.getRole();
 				String msg = event.isLive() ? c.getLiveMessage() : c.getVideoMessage();
 
 				channel.sendMessage(msg
