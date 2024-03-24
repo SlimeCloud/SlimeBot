@@ -6,7 +6,7 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 @Slf4j
 @Listener
@@ -17,7 +17,7 @@ public class YoutubeListener {
 	@EventHandler
 	public void onUpload(YoutubeVideoEvent event) {
 		bot.getJda().getGuilds().forEach(g -> bot.loadGuild(g).getYoutube().ifPresent(c -> {
-			TextChannel channel = c.getChannel();
+			MessageChannel channel = c.getChannel();
 
 			if (channel != null) {
 				Role role = c.getRole();
