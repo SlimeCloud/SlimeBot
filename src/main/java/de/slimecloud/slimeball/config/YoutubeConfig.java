@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.features.alerts.youtube;
+package de.slimecloud.slimeball.config;
 
 import de.slimecloud.slimeball.config.engine.Required;
 import lombok.Getter;

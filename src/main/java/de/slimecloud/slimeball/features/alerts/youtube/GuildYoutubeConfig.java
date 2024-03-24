@@ -4,6 +4,8 @@ import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import lombok.Getter;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 @Getter
 public class GuildYoutubeConfig extends ConfigCategory {
@@ -18,4 +20,12 @@ public class GuildYoutubeConfig extends ConfigCategory {
 
 	@ConfigField(name = "Video Nachricht", command = "video-msg", description = "Die Nachricht, die bei neuen Videos gesendet wird", type = ConfigFieldType.STRING)
 	private String videoMessage;
+
+	public TextChannel getChannel() {
+		return bot.getJda().getTextChannelById(channel);
+	}
+
+	public Role getRole() {
+		return bot.getJda().getRoleById(role);
+	}
 }
