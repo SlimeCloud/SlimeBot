@@ -25,6 +25,7 @@ public class YoutubeListener {
 
 				channel.sendMessage(msg
 						.replace("%role%", role == null ? "" : role.getAsMention())
+						.replace("%uploader%", event.getVideo().getChannel().getTitle())
 						.replace("%url%", event.getVideo().getUrl())
 				).queue();
 			} else logger.warn("Cannot send Youtube Notification because channel %s not found".formatted(c.getChannel()));
