@@ -19,4 +19,8 @@ public record Video(String id, VideoSnippet snippet) {
 		return new Video(sr.id().videoId(), new VideoSnippet(snippet.description(), snippet.title(), snippet.channelId(), snippet.channelTitle(), snippet.liveBroadcastContent()));
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Video v && v.id.equals(id);
+	}
 }
