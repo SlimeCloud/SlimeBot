@@ -7,7 +7,6 @@ import lombok.Getter;
 
 @Getter
 public class GuildYoutubeConfig extends ConfigCategory {
-
 	@ConfigField(name = "Kanal", command = "channel", description = "Der Text Kanal in den neue Videos gesendet werden", type = ConfigFieldType.MESSAGE_CHANNEL)
 	private Long channel;
 

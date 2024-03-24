@@ -18,14 +18,12 @@ import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 public class Youtube {
-
 	private final OkHttpClient client = new OkHttpClient().newBuilder().build();
 
 	private final String API_KEY;
 	private final SlimeBot bot;
 
 	private Video lastVideo;
-
 
 	public void init() {
 		int delay = bot.getConfig().getYoutube().get().getUpdateRate();
@@ -54,7 +52,7 @@ public class Youtube {
 				JsonObject json = JsonParser.parseString(response.body().string()).getAsJsonObject();
 				JsonArray videos = json.getAsJsonArray("items");
 
-				if(videos.size() <= 0) return null;
+				if (videos.size() <= 0) return null;
 
 				return Video.ofSearch(Main.json.fromJson(videos.get(0), SearchResult.class));
 			}
@@ -62,5 +60,4 @@ public class Youtube {
 			throw new RuntimeException(e);
 		}
 	}
-
 }
