@@ -20,7 +20,9 @@ import java.util.Collection;
 
 @Slf4j
 public class CardRenderer extends Graphic {
-	public final static int width = 2000;
+	public final static int WIDTH = 2000;
+	public final static int HEIGHT = 400;
+
 	public final static Font font;
 
 	static {
@@ -38,7 +40,7 @@ public class CardRenderer extends Graphic {
 	private final Integer maxXp;
 
 	public CardRenderer(@NotNull SlimeBot bot, @NotNull CardProfileData data, @NotNull Member member, Integer maxXp) {
-		super(width, maxXp == null ? 400 : Leaderboard.height);
+		super(maxXp == null ? WIDTH : Leaderboard.WIDTH, maxXp == null ? HEIGHT : Leaderboard.HEIGHT);
 
 		this.bot = bot;
 		this.data = data;
@@ -236,11 +238,11 @@ public class CardRenderer extends Graphic {
 		}
 	}
 
-	public static int adjustBorderWith(int value) {
+	private int adjustBorderWith(int value) {
 		return (int) (0.8 * (value * width) / 1e3);
 	}
 
-	public static float getFontSize(int base) {
+	private float getFontSize(int base) {
 		return (float) ((0.8 * base * width) / 1e3);
 	}
 
