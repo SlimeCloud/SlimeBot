@@ -16,6 +16,7 @@ public class YoutubeListener {
 
 	@EventHandler
 	public void onUpload(YoutubeVideoEvent event) {
+		logger.info("Video Uploaded: " + event.getVideo());
 		bot.getJda().getGuilds().forEach(g -> bot.loadGuild(g).getYoutube().ifPresent(c -> {
 			MessageChannel channel = c.getChannel();
 
