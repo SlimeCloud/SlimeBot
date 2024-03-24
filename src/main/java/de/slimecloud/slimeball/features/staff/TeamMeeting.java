@@ -77,7 +77,7 @@ public class TeamMeeting extends ListenerAdapter {
 					n.remove(mention);
 				})).queue();
 
-				case "maybe" -> event.editMessage(config.buildMessage(event.getGuild(), current.getTimestamp().toInstant(), current, (y, m, n, a) -> {
+				case "late" -> event.editMessage(config.buildMessage(event.getGuild(), current.getTimestamp().toInstant(), current, (y, m, n, a) -> {
 					String mention = event.getUser().getAsMention();
 					y.remove(mention);
 					m.add(mention);
