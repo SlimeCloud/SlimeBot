@@ -12,8 +12,8 @@ import java.util.Optional;
 @Getter
 public class BirthdayConfig extends ConfigCategory {
 
-	@ConfigField(name = "Geburtstags-Rolle", command = "role", description = "Die rolle die an nutzer vergeben wird wenn sie geburtstag haben", type = ConfigFieldType.ROLE)
-	public Long birthdayRole;
+	@ConfigField(name = "Geburtstags-Rolle", command = "role", description = "Die rolle die an nutzer vergeben wird wenn sie geburtstag haben", type = ConfigFieldType.ROLE, required = true)
+	private Long birthdayRole;
 
 	@NotNull
 	public Optional<Role> getBirthdayRole() {
