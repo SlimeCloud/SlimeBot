@@ -21,6 +21,6 @@ public record Video(String id, VideoSnippet snippet) {
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof Video v && v.id.equals(id);
+		return obj instanceof Video v && id.equals(v.id);
 	}
 }
