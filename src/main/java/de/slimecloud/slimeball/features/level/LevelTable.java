@@ -187,6 +187,6 @@ public interface LevelTable extends Table<Level>, Listable<Level> {
 
 	@Override
 	default int entriesPerPage() {
-		return 7;
+		return 5;
 	}
 }
