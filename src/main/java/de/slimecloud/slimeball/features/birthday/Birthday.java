@@ -55,12 +55,29 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 
 
 	@NotNull
+	public ZonedDateTime getStart() {
+		return time.atZone(Main.timezone).withYear(ZonedDateTime.now(Main.timezone).getYear())
+				.withHour(0)
+				.withMinute(0)
+				.withSecond(0);
+	}
+
+	@NotNull
+	public ZonedDateTime getEnd() {
+		return time.atZone(Main.timezone).withYear(ZonedDateTime.now(Main.timezone).getYear())
+				.withHour(23)
+				.withMinute(59)
+				.withSecond(59);
+	}
+
+	public boolean isBirthday(@NotNull ZonedDateTime time) {
+		return time.isAfter(getStart()) && time.isBefore(getEnd());
+	}
+
+	@NotNull
 	public ZonedDateTime getNextBirthday() {
 		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
-		ZonedDateTime bd = time.atZone(Main.timezone).withYear(now.getYear());
-		ZonedDateTime end = bd.withHour(23).withMinute(59).withSecond(59);
-
-		return now.isAfter(end) ? bd.withYear(now.getYear() + 1) : bd;
+		return now.isAfter(getEnd()) ? getStart().withYear(now.getYear() + 1) : getStart();
 	}
 
 	@NotNull

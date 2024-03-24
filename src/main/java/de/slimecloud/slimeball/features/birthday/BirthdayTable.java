@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.List;
@@ -45,16 +46,11 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	}
 
 	@NotNull
-	default List<Birthday> getAll(@NotNull Guild guild, @NotNull List<Member> members) {
+	default List<Birthday> getAll(@NotNull Guild guild, @Nullable List<Long> members) {
 		return selectMany(Where.allOf(
 				Where.equals("guild", guild),
-				Where.in("user", members)
+				members == null ? Where.TRUE() : Where.in("user", members)
 		));
-	}
-
-	@NotNull
-	default List<Birthday> getToday() {
-		return selectMany(Where.unsafe("to_char(time, 'dd.MM') = to_char(current_date, 'dd.MM')"));
 	}
 
 	/*
