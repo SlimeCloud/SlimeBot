@@ -201,6 +201,18 @@ public class SlimeBot extends ListenerAdapter {
 			spotify = null;
 		}
 
+		//Initalize Youtube API
+		if (config.getYoutube().isPresent()) {
+			if (credentials.get("YOUTUBE_API_KEY") != null) youtube = new Youtube(credentials.get("YOUTUBE_API_KEY"), this, config.getYoutube().get());
+			else {
+				logger.warn("Youtube api disabled due to missing credentials");
+				youtube = null;
+			}
+		} else {
+			logger.warn("Youtube api disabled due to missing config");
+			youtube = null;
+		}
+
 
 		//Setup JDA
 		JDABuilder builder = JDABuilder.createDefault(credentials.get("DISCORD_TOKEN"))
@@ -309,20 +321,6 @@ public class SlimeBot extends ListenerAdapter {
 				.build();
 
 		jda = discordUtils.getJDA();
-
-		//Initalize Youtube API
-		if (config.getYoutube().isPresent()) {
-			if (credentials.get("YOUTUBE_API_KEY") != null) youtube = new Youtube(credentials.get("YOUTUBE_API_KEY"), this, config.getYoutube().get());
-			else {
-				logger.warn("Youtube api disabled due to missing credentials");
-				youtube = null;
-			}
-		} else {
-			logger.warn("Youtube api disabled due to missing config");
-			youtube = null;
-		}
-
-		if (youtube != null) youtube.startListener();
 	}
 
 	@NotNull
@@ -349,6 +347,8 @@ public class SlimeBot extends ListenerAdapter {
 		new HolidayAlert(this);
 		new BirthdayAlert(this);
 		new BirthdayListener(this);
+
+		if (youtube != null) youtube.startListener();
 
 		JEvent.getDefaultManager().registerListenerPackage(botPackage);
 	}
