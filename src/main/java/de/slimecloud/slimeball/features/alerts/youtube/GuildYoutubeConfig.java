@@ -6,7 +6,9 @@ import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
 
 @Getter
 public class GuildYoutubeConfig extends ConfigCategory {
@@ -22,13 +24,18 @@ public class GuildYoutubeConfig extends ConfigCategory {
 	@ConfigField(name = "Video Nachricht", command = "video-msg", description = "Die Nachricht, die bei neuen Videos gesendet wird", type = ConfigFieldType.STRING)
 	private String videoMessage;
 
-	@Nullable
-	public MessageChannel getChannel() {
-		return bot.getJda().getChannelById(MessageChannel.class, channel);
+	@NotNull
+	public Long getChannelId() {
+		return channel;
 	}
 
-	@Nullable
-	public Role getRole() {
-		return bot.getJda().getRoleById(role);
+	@NotNull
+	public Optional<MessageChannel> getChannel() {
+		return Optional.ofNullable(bot.getJda().getChannelById(MessageChannel.class, channel));
+	}
+
+	@NotNull
+	public Optional<Role> getRole() {
+		return Optional.ofNullable(bot.getJda().getRoleById(role));
 	}
 }
