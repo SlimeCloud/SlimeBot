@@ -28,7 +28,7 @@ public class CalculateCommand {
 				.setTitle("Benötigte XP für Level")
 				.setThumbnail(event.getGuild().getIconUrl())
 				.setDescription(IntStream.range(level, level + limit)
-						.mapToObj(l -> "- **Level " + l + "** benötigt **" + LevelTable.calculateRequiredXP(l) + " XP**")
+						.mapToObj(l -> "- **Level " + l + "** benötigt **" + LevelTable.getRequiredXp(l) + " XP**")
 						.collect(Collectors.joining("\n"))
 				)
 				.build()

@@ -52,6 +52,12 @@ public class Level implements DataClass<Level>, Comparable<Level>, ListEntry {
 		return DataClass.super.update();
 	}
 
+	public int getTotalXp() {
+		int result = 0;
+		for(int i = 1; i <= level; i++) result += LevelTable.getRequiredXp(i);
+		return result + xp;
+	}
+
 	@NotNull
 	public Level withLevel(int level) {
 		return new Level(bot, guild, user, level, xp, messages);

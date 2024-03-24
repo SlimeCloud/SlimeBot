@@ -181,7 +181,7 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 	}
 
 	@NotNull
-	public CardRenderer renderPreview(@NotNull Member member, int maxLevel) {
-		return new CardRenderer(bot, this, member, maxLevel);
+	public CardRenderer renderPreview(@NotNull Member member, int maxXp) {
+		return new CardRenderer(bot, this, member, maxXp);
 	}
 }

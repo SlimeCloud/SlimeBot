@@ -34,7 +34,7 @@ public class Leaderboard extends Graphic {
 	@Override
 	protected void drawGraphic(@NotNull Graphics2D graphics) throws IOException {
 		Guild guild = state.getEvent().getGuild();
-		int maxLevel = data.stream().mapToInt(Level::getLevel).max().orElse(0);
+		int maxLevel = data.stream().mapToInt(Level::getTotalXp).max().orElse(0);
 
 		for (int i = 0; i < data.size(); i++) {
 			Level level = data.get(i);

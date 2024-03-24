@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface LevelTable extends Table<Level>, Listable<Level> {
-	static int calculateRequiredXP(int level) {
+	static int getRequiredXp(int level) {
 		return (5 * level * level + 50 * level + 100);
 	}
 
@@ -99,7 +99,7 @@ public interface LevelTable extends Table<Level>, Listable<Level> {
 		int level = current.getLevel();
 
 		while (true) {
-			int requiredXp = calculateRequiredXP(level + 1);
+			int requiredXp = getRequiredXp(level + 1);
 			if (xp < requiredXp) break;
 
 			xp -= requiredXp;

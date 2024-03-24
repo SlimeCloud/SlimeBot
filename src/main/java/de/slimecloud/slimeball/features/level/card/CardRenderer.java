@@ -35,15 +35,15 @@ public class CardRenderer extends Graphic {
 	private final CardProfileData data;
 
 	private final Member member;
-	private final Integer maxLevel;
+	private final Integer maxXp;
 
-	public CardRenderer(@NotNull SlimeBot bot, @NotNull CardProfileData data, @NotNull Member member, Integer maxLevel) {
-		super(width, maxLevel == null ? 400 : Leaderboard.height);
+	public CardRenderer(@NotNull SlimeBot bot, @NotNull CardProfileData data, @NotNull Member member, Integer maxXp) {
+		super(width, maxXp == null ? 400 : Leaderboard.height);
 
 		this.bot = bot;
 		this.data = data;
 		this.member = member;
-		this.maxLevel = maxLevel;
+		this.maxXp = maxXp;
 
 		finish();
 	}
@@ -56,10 +56,10 @@ public class CardRenderer extends Graphic {
 		//Render
 		applyBackground(graphics);
 		applyAvatar(graphics, member);
-		applyProgressBar(graphics, maxLevel == null ? (double) level.getXp() / LevelTable.calculateRequiredXP(level.getLevel() + 1) : (double) level.getLevel() / maxLevel);
+		applyProgressBar(graphics, maxXp == null ? (double) level.getXp() / LevelTable.getRequiredXp(level.getLevel() + 1) : (double) level.getTotalXp() / maxXp);
 
 		applyText(graphics, level, member);
-		if (maxLevel == null) applyBadges(graphics, member);
+		if (maxXp == null) applyBadges(graphics, member);
 	}
 
 	private void applyBackground(@NotNull Graphics2D graphics) {
@@ -179,13 +179,13 @@ public class CardRenderer extends Graphic {
 		int rankNameWidth = graphics.getFontMetrics().stringWidth(levelName);
 		graphics.drawString(rankName, width - offset - rankWidth - rankNameWidth - width / 25 - levelWidth - levelNameWidth, offset + nameSize);
 
-		if (maxLevel != null) return;
+		if (maxXp != null) return;
 
 		//Required XP
 		graphics.setFont(CustomFont.getFont(font, getFontSize(30)));
 		graphics.setColor(data.getFontSecondaryColor());
 
-		String required = " / " + LevelTable.calculateRequiredXP(level.getLevel() + 1) + " XP";
+		String required = " / " + LevelTable.getRequiredXp(level.getLevel() + 1) + " XP";
 		int requiredWidth = graphics.getFontMetrics().stringWidth(required);
 
 		graphics.drawString(required, width - offset - requiredWidth, verticalOffset);
