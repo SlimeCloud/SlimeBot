@@ -131,10 +131,7 @@ public class MeetingConfig extends ConfigCategory {
 
 			//Load agenda
 			a.addAll(TeamMeeting.extractAgenda(current));
-		} else bot.loadGuild(guild).getTeamRole().ifPresent(role -> m.addAll(guild.getMembersWithRoles(role).stream()
-				.map(Member::getAsMention)
-				.toList()
-		));
+		}
 
 		if (handler != null) handler.handle(y, m, n, a);
 
@@ -162,7 +159,7 @@ public class MeetingConfig extends ConfigCategory {
 						.setThumbnail(guild.getIconUrl())
 						.addField("Agenda", agenda.toString(), false)
 						.addField("Anwesend", String.join("\n", y), true)
-						.addField("Vielleicht", String.join("\n", m), true)
+						.addField("Zu Spät", String.join("\n", m), true)
 						.addField("Abwesend", String.join("\n", n), true)
 						.setTimestamp(timestamp)
 						.build()
@@ -170,7 +167,7 @@ public class MeetingConfig extends ConfigCategory {
 				.setComponents(
 						ActionRow.of(
 								Button.success("meeting:yes", "Ich kann"),
-								Button.secondary("meeting:maybe", "Ich kann vielleicht"),
+								Button.secondary("meeting:late", "Ich komme Später"),
 								Button.danger("meeting:no", "Ich kann nicht"),
 								Button.primary("meeting:agenda", "Agenda-Punkt hinzufügen")
 						),
