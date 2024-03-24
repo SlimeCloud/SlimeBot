@@ -1,7 +1,7 @@
 package de.slimecloud.slimeball.config;
 
 import de.slimecloud.slimeball.config.engine.Required;
-import de.slimecloud.slimeball.features.youtube.YoutubeConfig;
+import de.slimecloud.slimeball.features.alerts.youtube.YoutubeConfig;
 import de.slimecloud.slimeball.main.Main;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

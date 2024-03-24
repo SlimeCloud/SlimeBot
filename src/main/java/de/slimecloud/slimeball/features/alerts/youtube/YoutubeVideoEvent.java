@@ -1,7 +1,7 @@
-package de.slimecloud.slimeball.features.youtube;
+package de.slimecloud.slimeball.features.alerts.youtube;
 
 import de.cyklon.jevent.Event;
-import de.slimecloud.slimeball.features.youtube.model.Video;
+import de.slimecloud.slimeball.features.alerts.youtube.model.Video;
 import lombok.Getter;
 
 @Getter

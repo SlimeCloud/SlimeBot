@@ -58,7 +58,7 @@ import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
-import de.slimecloud.slimeball.features.youtube.Youtube;
+import de.slimecloud.slimeball.features.alerts.youtube.Youtube;
 import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
 import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
 import de.slimecloud.slimeball.main.extensions.IDOptionParser;

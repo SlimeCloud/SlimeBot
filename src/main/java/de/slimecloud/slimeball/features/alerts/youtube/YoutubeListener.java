@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.features.youtube;
+package de.slimecloud.slimeball.features.alerts.youtube;
 
 import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.Listener;

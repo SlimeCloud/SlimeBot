@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.features.youtube.model;
+package de.slimecloud.slimeball.features.alerts.youtube.model;
 
 public record Video(String id, VideoSnippet snippet) {
 

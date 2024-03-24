@@ -12,7 +12,7 @@ import de.slimecloud.slimeball.features.moderation.AutoDeleteFlag;
 import de.slimecloud.slimeball.features.staff.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
 import de.slimecloud.slimeball.features.statistic.StatisticConfig;
-import de.slimecloud.slimeball.features.youtube.GuildYoutubeConfig;
+import de.slimecloud.slimeball.features.alerts.youtube.GuildYoutubeConfig;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;

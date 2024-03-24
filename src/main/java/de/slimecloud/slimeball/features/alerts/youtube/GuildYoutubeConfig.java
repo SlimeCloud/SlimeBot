@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.features.youtube;
+package de.slimecloud.slimeball.features.alerts.youtube;
 
 import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;
