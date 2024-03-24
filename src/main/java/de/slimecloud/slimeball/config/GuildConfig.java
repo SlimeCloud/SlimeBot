@@ -4,7 +4,7 @@ import de.slimecloud.slimeball.config.engine.CategoryInfo;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import de.slimecloud.slimeball.config.engine.Info;
-import de.slimecloud.slimeball.features.alerts.SpotifyNotificationConfig;
+import de.slimecloud.slimeball.features.alerts.spotify.SpotifyNotificationConfig;
 import de.slimecloud.slimeball.features.birthday.BirthdayConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
