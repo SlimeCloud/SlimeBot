@@ -20,13 +20,13 @@ import java.util.concurrent.TimeUnit;
 public class Youtube {
 	private final OkHttpClient client = new OkHttpClient().newBuilder().build();
 
-	private final String API_KEY;
+	private final String authentication;
 	private final SlimeBot bot;
 	private final YoutubeConfig config;
 
 	private Video lastVideo;
 
-	public void init() {
+	public void startListener() {
 		int delay = config.getUpdateRate();
 		bot.getExecutor().scheduleAtFixedRate(this::check, 0, delay, TimeUnit.SECONDS);
 	}
@@ -44,7 +44,7 @@ public class Youtube {
 	public Video getLastVideo() {
 		try {
 			Request request = new Request.Builder()
-					.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", API_KEY, config.getYoutubeChannelId()))
+					.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", authentication, config.getYoutubeChannelId()))
 					.get()
 					.build();
 
