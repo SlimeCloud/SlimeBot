@@ -45,7 +45,7 @@ public class Youtube {
 		Video lastCheckedVideo = getLastVideo();
 
 		if (lastCheckedVideo != null && !lastCheckedVideo.equals(lastVideo)) {
-			if(lastVideo != null) new YoutubeVideoEvent(lastCheckedVideo).callEvent();
+			if (lastVideo != null) new YoutubeVideoEvent(lastCheckedVideo).callEvent();
 			this.lastVideo = lastCheckedVideo;
 		}
 	}
