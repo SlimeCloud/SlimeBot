@@ -6,9 +6,6 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.IMentionable;
-import net.dv8tion.jda.api.entities.Role;
-
-import java.util.Optional;
 
 @Slf4j
 @Listener
@@ -19,17 +16,16 @@ public class YoutubeListener {
 	@EventHandler
 	public void onUpload(YoutubeVideoEvent event) {
 		logger.info("Video Uploaded: " + event.getVideo());
-		bot.getJda().getGuilds().forEach(g -> bot.loadGuild(g).getYoutube().ifPresent(c -> {
-			c.getChannel().ifPresentOrElse(channel -> {
-				Optional<Role> role = c.getRole();
-				String msg = event.isLive() ? c.getLiveMessage() : c.getVideoMessage();
+		bot.getJda().getGuilds().forEach(g -> bot.loadGuild(g).getYoutube().ifPresent(config ->
+				config.getChannel().ifPresentOrElse(channel -> {
+					String msg = event.isLive() ? config.getLiveMessage() : config.getVideoMessage();
 
-				channel.sendMessage(msg
-						.replace("%role%", role.map(IMentionable::getAsMention).orElse(""))
-						.replace("%uploader%", event.getVideo().getChannel().getTitle())
-						.replace("%url%", event.getVideo().getUrl())
-				).queue();
-			}, () -> logger.warn("Cannot send Youtube Notification because channel %s not found".formatted(c.getChannelId())));
-		}));
+					channel.sendMessage(msg
+							.replace("%role%", config.getRole().map(IMentionable::getAsMention).orElse(""))
+							.replace("%uploader%", event.getVideo().getChannel().getTitle())
+							.replace("%url%", event.getVideo().getUrl())
+					).queue();
+				}, () -> logger.warn("Cannot send Youtube Notification because channel %s not found".formatted(config.getChannelId())))
+		));
 	}
 }
