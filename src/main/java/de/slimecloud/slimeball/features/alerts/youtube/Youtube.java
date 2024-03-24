@@ -31,6 +31,7 @@ public class Youtube {
 
 	public void startListener() {
 		int delay = config.getUpdateRate();
+
 		bot.getExecutor().scheduleAtFixedRate(() -> {
 			try {
 				check();
@@ -42,8 +43,9 @@ public class Youtube {
 
 	private void check() throws IOException {
 		Video lastCheckedVideo = getLastVideo();
+
 		if (lastCheckedVideo != null && !lastCheckedVideo.equals(lastVideo)) {
-			new YoutubeVideoEvent(lastCheckedVideo).callEvent();
+			if(lastVideo != null) new YoutubeVideoEvent(lastCheckedVideo).callEvent();
 			this.lastVideo = lastCheckedVideo;
 		}
 	}
