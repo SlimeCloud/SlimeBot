@@ -1,5 +1,7 @@
 package de.slimecloud.slimeball.features.level;
 
+import de.mineking.discordutils.list.ListContext;
+import de.mineking.discordutils.list.ListEntry;
 import de.mineking.javautils.database.Column;
 import de.mineking.javautils.database.DataClass;
 import de.mineking.javautils.database.Table;
@@ -12,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 @AllArgsConstructor
-public class Level implements DataClass<Level>, Comparable<Level> {
+public class Level implements DataClass<Level>, Comparable<Level>, ListEntry {
 	private final SlimeBot bot;
 
 	@Column(key = true)
@@ -50,6 +52,12 @@ public class Level implements DataClass<Level>, Comparable<Level> {
 		return DataClass.super.update();
 	}
 
+	public int getTotalXp() {
+		int result = 0;
+		for (int i = 1; i <= level; i++) result += LevelTable.getRequiredXp(i);
+		return result + xp;
+	}
+
 	@NotNull
 	public Level withLevel(int level) {
 		return new Level(bot, guild, user, level, xp, messages);
@@ -80,5 +88,11 @@ public class Level implements DataClass<Level>, Comparable<Level> {
 		if (xpCompare != 0) return xpCompare;
 
 		return Integer.compare(this.getMessages(), o.getMessages());
+	}
+
+	@NotNull
+	@Override
+	public String build(int index, @NotNull ListContext<? extends ListEntry> context) {
+		return null;
 	}
 }
