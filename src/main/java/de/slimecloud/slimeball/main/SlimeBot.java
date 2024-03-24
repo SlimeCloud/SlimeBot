@@ -201,10 +201,9 @@ public class SlimeBot extends ListenerAdapter {
 			spotify = null;
 		}
 
-
 		//Initalize Youtube API
 		if (config.getYoutube().isPresent()) {
-			if (credentials.get("YOUTUBE_API_KEY") != null) youtube = new Youtube(credentials.get("YOUTUBE_API_KEY"), this);
+			if (credentials.get("YOUTUBE_API_KEY") != null) youtube = new Youtube(credentials.get("YOUTUBE_API_KEY"), this, config.getYoutube().get());
 			else {
 				logger.warn("Youtube api disabled due to missing credentials");
 				youtube = null;
@@ -349,7 +348,7 @@ public class SlimeBot extends ListenerAdapter {
 		new BirthdayAlert(this);
 		new BirthdayListener(this);
 
-		if (youtube != null) youtube.init();
+		if (youtube != null) youtube.startListener();
 
 		JEvent.getDefaultManager().registerListenerPackage(botPackage);
 	}
