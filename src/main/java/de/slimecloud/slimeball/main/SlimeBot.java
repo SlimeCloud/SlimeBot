@@ -4,8 +4,6 @@ import de.cyklon.jevent.JEvent;
 import de.cyklon.reflection.entities.OfflinePackage;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.Cache;
-import de.mineking.discordutils.commands.Command;
-import de.mineking.discordutils.commands.context.ICommandContext;
 import de.mineking.javautils.database.DatabaseManager;
 import de.slimecloud.slimeball.config.ActivityConfig;
 import de.slimecloud.slimeball.config.Config;
@@ -232,13 +230,6 @@ public class SlimeBot extends ListenerAdapter {
 				.useCommandManager(e -> () -> e, e -> () -> e, manager -> {
 					manager.registerOptionParser(new ColorOptionParser());
 					manager.registerOptionParser(new IDOptionParser());
-
-					manager.registerCommand(new Command<>(manager, "test") {
-						@Override
-						public void performCommand(@NotNull ICommandContext context) throws Exception {
-							throw new IOException();
-						}
-					});
 
 					manager.registerCommand(ConfigCommand.class);
 
