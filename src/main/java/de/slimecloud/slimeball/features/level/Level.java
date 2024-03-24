@@ -54,7 +54,7 @@ public class Level implements DataClass<Level>, Comparable<Level>, ListEntry {
 
 	public int getTotalXp() {
 		int result = 0;
-		for(int i = 1; i <= level; i++) result += LevelTable.getRequiredXp(i);
+		for (int i = 1; i <= level; i++) result += LevelTable.getRequiredXp(i);
 		return result + xp;
 	}
 
