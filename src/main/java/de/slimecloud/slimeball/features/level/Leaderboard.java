@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Leaderboard extends Graphic {
 	public final static int gap = 40;
-	public final static int height = 250;
+	public final static int height = 300;
 
 	private final SlimeBot bot;
 	private final DataState<?> state;
