@@ -5,11 +5,9 @@ import lombok.Getter;
 
 @Getter
 public class YoutubeConfig {
-
 	@Required
 	private String youtubeChannelId;
 
 	@Required
 	private int updateRate; // seconds
-
 }
