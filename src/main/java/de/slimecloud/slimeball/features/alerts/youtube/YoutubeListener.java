@@ -5,6 +5,7 @@ import de.cyklon.jevent.Listener;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 @Slf4j
@@ -19,10 +20,11 @@ public class YoutubeListener {
 			TextChannel channel = bot.getJda().getTextChannelById(c.getChannel());
 
 			if (channel != null) {
+				Role role = bot.getJda().getRoleById(c.getRole());
 				String msg = event.isLive() ? c.getLiveMessage() : c.getVideoMessage();
 
 				channel.sendMessage(msg
-						.replace("%role%", String.format("<@&%s>", c.getRole()))
+						.replace("%role%", role == null ? "" : role.getAsMention())
 						.replace("%url%", event.getVideo().getUrl())
 				).queue();
 			} else logger.warn("Cannot send Youtube Notification because channel %s not found".formatted(c.getChannel()));
