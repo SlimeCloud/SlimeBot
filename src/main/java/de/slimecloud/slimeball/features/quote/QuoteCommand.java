@@ -49,6 +49,11 @@ public class QuoteCommand {
 	                         @Nullable Message message,
 	                         @Nullable TemporalAccessor timestamp
 	) {
+		if(author == null || author.getUser().isBot()) {
+			event.getHook().sendMessage(":x: Du kannst diese Nachricht nicht zitieren!").setEphemeral(true).queue();
+			return;
+		}
+
 		//Check author
 		if (author.equals(event.getMember())) {
 			event.getHook().editOriginal(":x: Du kannst dich nicht selbst zitieren!").queue();

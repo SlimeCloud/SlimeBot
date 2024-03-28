@@ -11,6 +11,8 @@ public enum SlimeEmoji {
 	UP("slimesymvup"),
 	DOWN("slimesymvdw"),
 
+	SUS("slimeSUS"),
+
 	NUMBER_0("slime0"),
 	NUMBER_1("slime1"),
 	NUMBER_2("slime2"),

@@ -76,7 +76,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.internal.requests.CompletedRestAction;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -436,5 +438,10 @@ public class SlimeBot extends ListenerAdapter {
 		else if (obj instanceof Member m) return m.getGuild();
 
 		throw new RuntimeException();
+	}
+
+	@NotNull
+	public <T> RestAction<T> wrap(@NotNull T value) {
+		return new CompletedRestAction<>(jda, value);
 	}
 }

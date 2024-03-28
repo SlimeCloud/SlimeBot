@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.internal.requests.CompletedRestAction;
 import org.jetbrains.annotations.NotNull;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHRepository;
@@ -190,7 +189,7 @@ public class TeamMeeting extends ListenerAdapter {
 	}
 
 	public RestAction<List<GHIssue>> createTodos(@NotNull MeetingConfig config, @NotNull List<String> entries) {
-		if (entries.isEmpty() || bot.getGithub() == null || config.getRepository() == null) return new CompletedRestAction<>(bot.getJda(), Collections.emptyList());
+		if (entries.isEmpty() || bot.getGithub() == null || config.getRepository() == null) return bot.wrap(Collections.emptyList());
 
 		//Get repository and project
 		try {
