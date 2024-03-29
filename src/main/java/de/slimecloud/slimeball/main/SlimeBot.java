@@ -456,21 +456,11 @@ public class SlimeBot extends ListenerAdapter {
 	public String[] getCredentialsArray(String name) {
 		return credentials.entries().stream()
 				.filter(e -> e.getKey().matches(name + "_\\d+"))
-				.map(e -> Map.entry(getArrayIndex(e.getKey()), e.getValue()))
+				.map(e -> Map.entry(Integer.parseInt(e.getKey().split("_(?=[^_]*)")[1]), e.getValue()))
 				.filter(e -> e.getKey() != -1)
 				.sorted(Comparator.comparingInt(Map.Entry::getKey))
 				.map(Map.Entry::getValue)
 				.toArray(String[]::new);
 
-	}
-
-	private int getArrayIndex(String name) {
-		int i = name.lastIndexOf('_');
-		if (i == -1 || i+1 >= name.length()) return -1;
-		try {
-			return Integer.parseInt(name.substring(i+1));
-		} catch (NumberFormatException e) {
-			return -1;
-		}
 	}
 }
