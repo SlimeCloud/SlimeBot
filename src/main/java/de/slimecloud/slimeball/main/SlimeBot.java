@@ -13,6 +13,7 @@ import de.slimecloud.slimeball.config.commands.ConfigCommand;
 import de.slimecloud.slimeball.features.alerts.HolidayAlert;
 import de.slimecloud.slimeball.features.alerts.spotify.Spotify;
 import de.slimecloud.slimeball.features.alerts.spotify.SpotifyAlert;
+import de.slimecloud.slimeball.features.alerts.youtube.Youtube;
 import de.slimecloud.slimeball.features.birthday.Birthday;
 import de.slimecloud.slimeball.features.birthday.BirthdayAlert;
 import de.slimecloud.slimeball.features.birthday.BirthdayListener;
@@ -55,7 +56,6 @@ import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
-import de.slimecloud.slimeball.features.alerts.youtube.Youtube;
 import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
 import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
 import de.slimecloud.slimeball.main.extensions.IDOptionParser;
@@ -89,9 +89,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -202,7 +201,8 @@ public class SlimeBot extends ListenerAdapter {
 
 		//Initalize Youtube API
 		if (config.getYoutube().isPresent()) {
-			if (credentials.get("YOUTUBE_API_KEY") != null) youtube = new Youtube(credentials.get("YOUTUBE_API_KEY"), this, config.getYoutube().get());
+			String[] keys = getCredentialsArray("YOUTUBE_API_KEY");
+			if (keys.length > 0) youtube = new Youtube(keys, this, config.getYoutube().get());
 			else {
 				logger.warn("Youtube api disabled due to missing credentials");
 				youtube = null;
@@ -450,5 +450,17 @@ public class SlimeBot extends ListenerAdapter {
 	@NotNull
 	public <T> RestAction<T> wrap(@NotNull T value) {
 		return new CompletedRestAction<>(jda, value);
+	}
+
+	@NotNull
+	public String[] getCredentialsArray(String name) {
+		return credentials.entries().stream()
+				.filter(e -> e.getKey().matches(name + "_\\d+"))
+				.map(e -> Map.entry(Integer.parseInt(e.getKey().split("_(?=\\d+$)")[1]), e.getValue()))
+				.filter(e -> e.getKey() != -1)
+				.sorted(Comparator.comparingInt(Map.Entry::getKey))
+				.map(Map.Entry::getValue)
+				.toArray(String[]::new);
+
 	}
 }

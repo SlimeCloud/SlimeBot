@@ -8,7 +8,7 @@ import de.slimecloud.slimeball.features.alerts.youtube.model.SearchResult;
 import de.slimecloud.slimeball.features.alerts.youtube.model.Video;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
-import lombok.RequiredArgsConstructor;
+import de.slimecloud.slimeball.util.MathUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -19,15 +19,23 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@RequiredArgsConstructor
 public class Youtube {
+
 	private final OkHttpClient client = new OkHttpClient().newBuilder().build();
 
-	private final String authentication;
+	private final String[] keys;
 	private final SlimeBot bot;
 	private final YoutubeConfig config;
 
+	private int currentKey;
 	private Video lastVideo;
+
+	public Youtube(String[] keys, SlimeBot bot, YoutubeConfig config) {
+		this.keys = keys;
+		this.bot = bot;
+		this.config = config;
+		this.currentKey = MathUtil.randomInt(0, keys.length - 1);
+	}
 
 	public void startListener() {
 		int delay = config.getUpdateRate();
@@ -50,11 +58,15 @@ public class Youtube {
 		}
 	}
 
+	private String getNextKey() {
+		return keys[currentKey++ % keys.length];
+	}
+
 	//returns null if no videos found on the channel
 	@Nullable
 	public Video getLastVideo() throws IOException {
 		Request request = new Request.Builder()
-				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", authentication, config.getYoutubeChannelId()))
+				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", getNextKey(), config.getYoutubeChannelId()))
 				.get()
 				.build();
 
