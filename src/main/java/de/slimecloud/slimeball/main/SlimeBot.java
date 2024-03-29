@@ -89,9 +89,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.EnumSet;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -450,5 +449,27 @@ public class SlimeBot extends ListenerAdapter {
 	@NotNull
 	public <T> RestAction<T> wrap(@NotNull T value) {
 		return new CompletedRestAction<>(jda, value);
+	}
+
+	@NotNull
+	public String[] getCredentialsArray(String name) {
+		return credentials.entries().stream()
+				.filter(e -> e.getKey().startsWith(name))
+				.map(e -> Map.entry(getArrayIndex(e.getKey()), e.getValue()))
+				.filter(e -> e.getKey() != -1)
+				.sorted(Comparator.comparingInt(Map.Entry::getKey))
+				.map(Map.Entry::getValue)
+				.toArray(String[]::new);
+
+	}
+
+	private int getArrayIndex(String name) {
+		int i = name.lastIndexOf('_');
+		if (i == -1 || i+1 >= name.length()) return -1;
+		try {
+			return Integer.parseInt(name.substring(i+1));
+		} catch (NumberFormatException e) {
+			return -1;
+		}
 	}
 }
