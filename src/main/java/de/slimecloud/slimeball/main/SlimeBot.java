@@ -454,7 +454,7 @@ public class SlimeBot extends ListenerAdapter {
 	@NotNull
 	public String[] getCredentialsArray(String name) {
 		return credentials.entries().stream()
-				.filter(e -> e.getKey().startsWith(name))
+				.filter(e -> e.getKey().matches(name + "_\\d+"))
 				.map(e -> Map.entry(getArrayIndex(e.getKey()), e.getValue()))
 				.filter(e -> e.getKey() != -1)
 				.sorted(Comparator.comparingInt(Map.Entry::getKey))
