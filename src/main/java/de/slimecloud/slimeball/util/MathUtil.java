@@ -8,10 +8,10 @@ public class MathUtil {
 	}
 
 	public static int randomInt(int lowerBound, int upperBound) {
-		return lowerBound + Main.random.nextInt(upperBound - lowerBound);
+		return lowerBound==upperBound ? lowerBound : lowerBound + Main.random.nextInt(upperBound - lowerBound);
 	}
 
 	public static double randomDouble(double lowerBound, double upperBound) {
-		return lowerBound + Main.random.nextDouble(upperBound - lowerBound);
+		return lowerBound==upperBound ? lowerBound : lowerBound + Main.random.nextDouble(upperBound - lowerBound);
 	}
 }
