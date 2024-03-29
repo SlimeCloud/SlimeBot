@@ -201,7 +201,8 @@ public class SlimeBot extends ListenerAdapter {
 
 		//Initalize Youtube API
 		if (config.getYoutube().isPresent()) {
-			if (credentials.get("YOUTUBE_API_KEY") != null) youtube = new Youtube(credentials.get("YOUTUBE_API_KEY"), this, config.getYoutube().get());
+			String[] keys = getCredentialsArray("YOUTUBE_API_KEY");
+			if (keys.length > 0) youtube = new Youtube(keys, this, config.getYoutube().get());
 			else {
 				logger.warn("Youtube api disabled due to missing credentials");
 				youtube = null;
