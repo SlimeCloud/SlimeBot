@@ -49,7 +49,7 @@ public class QuoteCommand {
 	                         @Nullable Message message,
 	                         @Nullable TemporalAccessor timestamp
 	) {
-		if(author == null || author.getUser().isBot()) {
+		if (author == null || author.getUser().isBot()) {
 			event.getHook().sendMessage(":x: Du kannst diese Nachricht nicht zitieren!").setEphemeral(true).queue();
 			return;
 		}
