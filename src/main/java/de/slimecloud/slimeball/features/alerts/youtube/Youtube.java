@@ -32,7 +32,7 @@ public class Youtube {
 		this.keys = keys;
 		this.bot = bot;
 		this.config = config;
-		this.currentKey = (int) Math.round(Math.random() * (keys.length-1));
+		this.currentKey = MathUtil.randomInt(0, keys.length - 1);
 	}
 
 	public void startListener() {
