@@ -1,6 +1,7 @@
 package de.slimecloud.slimeball.util;
 
 import de.slimecloud.slimeball.config.engine.ValidationException;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -8,9 +9,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
+@UtilityClass
 public class ColorUtil {
 	@NotNull
-	public static String extract(@NotNull OptionMapping value) {
+	public String extract(@NotNull OptionMapping value) {
 		try {
 			if (parseColor(value.getAsString()) != null) value.getAsString();
 			throw new ValidationException(null);
@@ -20,7 +22,7 @@ public class ColorUtil {
 	}
 
 	@NotNull
-	public static String toString(@Nullable Color color) {
+	public String toString(@Nullable Color color) {
 		if (color == null) return "*null*";
 		if (color.getAlpha() == 0) return "*transparent*";
 
@@ -28,12 +30,12 @@ public class ColorUtil {
 	}
 
 	@NotNull
-	public static Color ofCode(int code) {
+	public Color ofCode(int code) {
 		return new Color(code, true);
 	}
 
 	@NotNull
-	public static String toHex(@Nullable Color color) {
+	public String toHex(@Nullable Color color) {
 		if (color == null) return "*null*";
 
 		String hex = color.getAlpha() == 255
@@ -47,7 +49,7 @@ public class ColorUtil {
 
 	@Contract("null -> null")
 	@Nullable
-	public static Color parseColor(@Nullable String color) {
+	public Color parseColor(@Nullable String color) {
 		if (color == null) return null;
 
 		try {
@@ -65,7 +67,7 @@ public class ColorUtil {
 
 	@Contract("null -> null")
 	@Nullable
-	public static Color parseRGBA(@Nullable String rgba) {
+	public Color parseRGBA(@Nullable String rgba) {
 		if (rgba == null) return null;
 
 		String[] values = rgba.split(",");
@@ -81,13 +83,13 @@ public class ColorUtil {
 
 	@Contract("null -> null")
 	@Nullable
-	public static Color parseRGBACode(@Nullable String code) {
+	public Color parseRGBACode(@Nullable String code) {
 		if (code == null) return null;
 		return new Color(Integer.parseInt(code), true);
 	}
 
 	@Nullable
-	public static Color parseColorName(@NotNull String name) {
+	public Color parseColorName(@NotNull String name) {
 		try {
 			return (Color) Color.class.getField(String.join("_", StringUtil.parseCamelCase(name)).toUpperCase()).get(null);
 		} catch (IllegalAccessException | NoSuchFieldException ignored) {
@@ -97,7 +99,7 @@ public class ColorUtil {
 
 	@Contract("null -> null")
 	@Nullable
-	public static Color parseHex(@Nullable String hex) {
+	public Color parseHex(@Nullable String hex) {
 		if (hex == null) return null;
 		if (hex.startsWith("#")) hex = hex.substring(1);
 
