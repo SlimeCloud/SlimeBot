@@ -14,6 +14,7 @@ public class ActivityConfig {
 	public List<ActivityEntry> activities;
 
 	public record ActivityEntry(@NotNull Activity.ActivityType type, @NotNull String text) {
+		@NotNull
 		public Activity build() {
 			return Activity.of(type, text);
 		}

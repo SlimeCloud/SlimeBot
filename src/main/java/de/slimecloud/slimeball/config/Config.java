@@ -62,7 +62,7 @@ public class Config {
 		return config;
 	}
 
-	private static void check(Object instance) throws IllegalAccessException {
+	private static void check(@NotNull Object instance) throws IllegalAccessException {
 		for (Field f : instance.getClass().getDeclaredFields()) {
 			f.setAccessible(true);
 			Object value = f.get(instance);

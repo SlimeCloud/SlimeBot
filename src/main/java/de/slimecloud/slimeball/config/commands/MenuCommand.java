@@ -160,6 +160,7 @@ public class MenuCommand {
 		throw new IllegalArgumentException();
 	}
 
+	@NotNull
 	@SuppressWarnings("unchecked")
 	private static <E extends Enum<E>> EnumSet<E> emptyEnumSet(@NotNull Class<?> type) {
 		return EnumSet.noneOf((Class<E>) type);
@@ -187,6 +188,8 @@ public class MenuCommand {
 		config.save();
 	}
 
+
+	@Nullable
 	@SuppressWarnings("unchecked")
 	private static <T> T get(@NotNull SlimeBot bot, @NotNull DataState<?> state, @NotNull Getter getter) {
 		return (T) getter.get(state, bot.loadGuild(state.getEvent().getGuild()));
