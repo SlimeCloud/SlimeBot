@@ -141,6 +141,7 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 		return (index + 1) + ". ID: **" + id + "**, von " + owner.getAsMention();
 	}
 
+	@NotNull
 	public CardProfileData set(@NotNull String name, @NotNull String value) {
 		try {
 			Field field = getClass().getDeclaredField(name);

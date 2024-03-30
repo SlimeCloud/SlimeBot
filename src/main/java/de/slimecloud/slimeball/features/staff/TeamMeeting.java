@@ -188,6 +188,7 @@ public class TeamMeeting extends ListenerAdapter {
 		});
 	}
 
+	@NotNull
 	public RestAction<List<GHIssue>> createTodos(@NotNull MeetingConfig config, @NotNull List<String> entries) {
 		if (entries.isEmpty() || bot.getGithub() == null || config.getRepository() == null) return bot.wrap(Collections.emptyList());
 
