@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -59,6 +60,7 @@ public class Youtube {
 		}
 	}
 
+	@NotNull
 	private String getNextKey() {
 		return keys[currentKey++ % keys.length];
 	}
