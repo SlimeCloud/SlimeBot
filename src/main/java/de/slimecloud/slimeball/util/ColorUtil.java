@@ -14,7 +14,7 @@ public class ColorUtil {
 	@NotNull
 	public String extract(@NotNull OptionMapping value) {
 		try {
-			if (parseColor(value.getAsString()) != null) value.getAsString();
+			if (parseColor(value.getAsString()) != null) return value.getAsString();
 			throw new ValidationException(null);
 		} catch (Exception e) {
 			throw new ValidationException(e);

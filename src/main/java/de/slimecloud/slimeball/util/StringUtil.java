@@ -84,7 +84,7 @@ public class StringUtil {
 	@NotNull
 	public String extractUrl(@NotNull OptionMapping value) {
 		try {
-			if (isValidURL(value.getAsString())) value.getAsString();
+			if (isValidURL(value.getAsString())) return value.getAsString();
 			throw new ValidationException(null);
 		} catch (Exception e) {
 			throw new ValidationException(e);
