@@ -33,6 +33,7 @@ public class ColorOptionParser extends OptionParser {
 		});
 	}
 
+	@NotNull
 	@Override
 	public OptionData configure(@NotNull Command<?> command, @NotNull OptionData option, @NotNull Parameter param, @NotNull Type type) {
 		//#fff, 255,255,255,255
