@@ -48,12 +48,16 @@ public interface LevelTable extends Table<Level>, Listable<Level> {
 		return selectMany(Where.equals("guild", guild), Order.descendingBy("level").andDescendingBy("xp"));
 	}
 
-	@NotNull
-	default Level getLevel(@NotNull Guild guild, @NotNull UserSnowflake user) {
+	default Optional<Level> getOptionalLevel(@NotNull Guild guild, @NotNull UserSnowflake user) {
 		return selectOne(Where.allOf(
 				Where.equals("user", user),
 				Where.equals("guild", guild)
-		)).orElseGet(() -> Level.empty(getManager().getData("bot"), guild, user));
+		));
+	}
+
+	@NotNull
+	default Level getLevel(@NotNull Guild guild, @NotNull UserSnowflake user) {
+		return getOptionalLevel(guild, user).orElseGet(() -> Level.empty(getManager().getData("bot"), guild, user));
 	}
 
 	@NotNull
@@ -62,7 +66,7 @@ public interface LevelTable extends Table<Level>, Listable<Level> {
 	}
 
 	default void reset(@NotNull Guild guild, @NotNull UserSnowflake user) {
-		getLevel(guild, user).withXp(0).withLevel(0).update();
+		getOptionalLevel(guild, user).ifPresent(level -> level.withXp(0).withLevel(0).update());
 	}
 
 
