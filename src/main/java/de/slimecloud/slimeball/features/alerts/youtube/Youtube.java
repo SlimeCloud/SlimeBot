@@ -9,6 +9,7 @@ import de.slimecloud.slimeball.features.alerts.youtube.model.Video;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.MathUtil;
+import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -70,13 +71,13 @@ public class Youtube {
 				.get()
 				.build();
 
-		try (Response response = client.newCall(request).execute()) {
-			JsonObject json = JsonParser.parseString(response.body().string()).getAsJsonObject();
-			JsonArray videos = json.getAsJsonArray("items");
+		@Cleanup
+		Response response = client.newCall(request).execute();
+		JsonObject json = JsonParser.parseString(response.body().string()).getAsJsonObject();
+		JsonArray videos = json.getAsJsonArray("items");
 
-			if (videos.size() <= 0) return null;
+		if (videos.size() <= 0) return null;
 
-			return Video.ofSearch(Main.json.fromJson(videos.get(0), SearchResult.class));
-		}
+		return Video.ofSearch(Main.json.fromJson(videos.get(0), SearchResult.class));
 	}
 }
