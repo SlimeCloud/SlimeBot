@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
-import java.io.IOException;
 import java.util.List;
 
 public class Leaderboard extends Graphic {
@@ -33,7 +32,7 @@ public class Leaderboard extends Graphic {
 	}
 
 	@Override
-	protected void drawGraphic(@NotNull Graphics2D graphics) throws IOException {
+	protected void drawGraphic(@NotNull Graphics2D graphics) {
 		Guild guild = state.getEvent().getGuild();
 		int maxLevel = data.stream().mapToInt(Level::getTotalXp).max().orElse(0);
 
