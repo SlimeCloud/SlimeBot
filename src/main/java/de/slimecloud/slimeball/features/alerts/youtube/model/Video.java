@@ -2,7 +2,7 @@ package de.slimecloud.slimeball.features.alerts.youtube.model;
 
 import org.jetbrains.annotations.NotNull;
 
-public record Video(String id, VideoSnippet snippet) {
+public record Video(String id, @NotNull VideoSnippet snippet) {
 
 	@NotNull
 	public String getUrl() {

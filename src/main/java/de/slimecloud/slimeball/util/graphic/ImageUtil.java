@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.util.graphic;
 
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,9 +11,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+@UtilityClass
 public class ImageUtil {
 	@Nullable
-	public static BufferedImage readFromUrl(@Nullable String imageUrl) {
+	public BufferedImage readFromUrl(@Nullable String imageUrl) {
 		if (imageUrl == null || imageUrl.isBlank()) return null;
 		try {
 			URL url = new URL(imageUrl);
@@ -30,7 +32,7 @@ public class ImageUtil {
 	}
 
 	@NotNull
-	public static BufferedImage resize(@NotNull BufferedImage image, int width, int height) {
+	public BufferedImage resize(@NotNull BufferedImage image, int width, int height) {
 		Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 
 		BufferedImage result = new BufferedImage(width, height, image.getType());

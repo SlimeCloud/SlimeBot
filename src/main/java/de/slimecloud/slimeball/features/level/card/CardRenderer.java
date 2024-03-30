@@ -246,6 +246,7 @@ public class CardRenderer extends Graphic {
 		return (float) ((0.8 * base * width) / 1e3);
 	}
 
+	@NotNull
 	private Color getColor(int rank) {
 		return switch (rank) {
 			case 1 -> new Color(255, 215, 0);

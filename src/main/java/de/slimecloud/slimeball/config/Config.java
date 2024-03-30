@@ -2,6 +2,7 @@ package de.slimecloud.slimeball.config;
 
 import de.slimecloud.slimeball.config.engine.Required;
 import de.slimecloud.slimeball.main.Main;
+import lombok.Cleanup;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,14 +55,14 @@ public class Config {
 
 	@NotNull
 	public static Config readFromFile(@NotNull String path) throws Exception {
-		try (FileReader reader = new FileReader(path)) {
-			Config config = Main.json.fromJson(reader, Config.class);
-			check(config);
-			return config;
-		}
+		@Cleanup
+		FileReader reader = new FileReader(path);
+		Config config = Main.json.fromJson(reader, Config.class);
+		check(config);
+		return config;
 	}
 
-	private static void check(Object instance) throws IllegalAccessException {
+	private static void check(@NotNull Object instance) throws IllegalAccessException {
 		for (Field f : instance.getClass().getDeclaredFields()) {
 			f.setAccessible(true);
 			Object value = f.get(instance);

@@ -38,6 +38,7 @@ public class GitHubAPI {
 
 	}
 
+	@NotNull
 	public <T> RestAction<T> execute(@NotNull String query, @Nullable Function<JsonObject, T> handler) {
 		return host.request(route,
 				(request, response) -> handler == null ? null : handler.apply(JsonParser.parseString(response.body().string()).getAsJsonObject().getAsJsonObject("data")),

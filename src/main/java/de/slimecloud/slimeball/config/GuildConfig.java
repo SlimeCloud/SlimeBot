@@ -16,6 +16,7 @@ import de.slimecloud.slimeball.features.statistic.StatisticConfig;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -48,9 +49,9 @@ public class GuildConfig {
 
 			if (!file.exists()) return new GuildConfig().configure(bot, path, guild);
 
-			try (FileReader reader = new FileReader(file)) {
-				return Main.json.fromJson(reader, GuildConfig.class).configure(bot, path, guild);
-			}
+			@Cleanup
+			FileReader reader = new FileReader(file);
+			return Main.json.fromJson(reader, GuildConfig.class).configure(bot, path, guild);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -258,9 +259,9 @@ public class GuildConfig {
 				file.createNewFile();
 			}
 
-			try (FileWriter writer = new FileWriter(file)) {
-				Main.formattedJson.toJson(this, writer);
-			}
+			@Cleanup
+			FileWriter writer = new FileWriter(file);
+			Main.formattedJson.toJson(this, writer);
 		} catch (IOException e) {
 			logger.error("Failed to write guild config", e);
 		}

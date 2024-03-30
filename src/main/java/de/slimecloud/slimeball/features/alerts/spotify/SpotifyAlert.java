@@ -76,7 +76,8 @@ public class SpotifyAlert {
 		});
 	}
 
-	private <T, R extends AbstractDataPagingRequest.Builder<T, ?>> List<T> getLatestEntries(String id, Function<String, R> request) {
+	@NotNull
+	private <T, R extends AbstractDataPagingRequest.Builder<T, ?>> List<T> getLatestEntries(String id, @NotNull Function<String, R> request) {
 		try {
 			Paging<T> albumSimplifiedPaging = request.apply(id).setQueryParameter("market", CountryCode.DE).limit(20).build().execute();
 
@@ -94,7 +95,7 @@ public class SpotifyAlert {
 		}
 	}
 
-	private void broadcast(String format, Function<SpotifyNotificationConfig, Optional<GuildMessageChannel>> channel, Function<SpotifyNotificationConfig, Optional<Role>> role, String name, String url) {
+	private void broadcast(@NotNull String format, @NotNull Function<SpotifyNotificationConfig, Optional<GuildMessageChannel>> channel, @NotNull Function<SpotifyNotificationConfig, Optional<Role>> role, String name, String url) {
 		for (Guild guild : bot.getJda().getGuilds()) {
 			bot.loadGuild(guild).getSpotify().ifPresent(spotify ->
 					channel.apply(spotify).ifPresent(ch -> {

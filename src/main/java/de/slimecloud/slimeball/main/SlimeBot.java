@@ -311,6 +311,7 @@ public class SlimeBot extends ListenerAdapter {
 				})
 				.build();
 
+
 		jda = discordUtils.getJDA();
 	}
 
