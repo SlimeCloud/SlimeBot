@@ -359,7 +359,7 @@ public class MenuCommand {
 
 	@NotNull
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private static MessageMenu createMapValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Info info, @NotNull Class<?> type, @NotNull Type generic, @NotNull Function<GuildConfig, Object> categoryInstance, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field, @Nullable ConfigFieldType keyType) {
+	private static MessageMenu createMapValueMenu(@NotNull SlimeBot bot, @NotNull UIManager manager, @NotNull Info info, @NotNull Class<?> type, @NotNull Type generic, @NotNull Function<GuildConfig, Object> categoryInstance, @NotNull Getter getter, @NotNull Setter setter, @NotNull Function<DataState<?>, String> display, @NotNull CategoryInfo category, @NotNull ConfigField field, @Nullable ConfigFieldType keyType) throws UnsupportedOperationException {
 		Class<?> keyClass = getClass(getGenericType(generic, 0));
 
 		Type valueType = getGenericType(generic, 1);
