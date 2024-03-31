@@ -1,6 +1,7 @@
 package de.slimecloud.slimeball.features.staff;
 
 import de.slimecloud.slimeball.config.GuildConfig;
+import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -118,10 +119,10 @@ public class TeamMeeting extends ListenerAdapter {
 							)).complete(); //We have to use complete to ensure the order of messages. We can not use the queue callback because of the complete usage in createNewMeeting
 
 					//Delete event
-					event.getGuild().retrieveScheduledEventById(config.getEvent()).flatMap(ScheduledEvent::delete).queue();
+					if(config.getEvent() != 0) event.getGuild().retrieveScheduledEventById(config.getEvent()).flatMap(ScheduledEvent::delete).queue();
 
 					//This will send a new message
-					config.createNewMeeting(current.getTimestamp().toInstant().plus(Duration.ofDays(14)));
+					config.createNewMeeting(current.getTimestamp().toLocalDateTime().plus(Duration.ofDays(14)).toInstant(Main.timezone));
 					guildConfig.save();
 				}
 			}

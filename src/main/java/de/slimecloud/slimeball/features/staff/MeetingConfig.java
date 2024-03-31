@@ -6,6 +6,7 @@ import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeEmoji;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
@@ -23,15 +24,14 @@ import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Getter
 public class MeetingConfig extends ConfigCategory {
 	@ConfigField(name = "Kanal", command = "channel", description = "Kanal, in dem Team-Meetings organisiert werden", type = ConfigFieldType.MESSAGE_CHANNEL, required = true)
@@ -55,7 +55,8 @@ public class MeetingConfig extends ConfigCategory {
 
 	@Override
 	public void enable(@NotNull Guild guild) {
-		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(Main.timezone));
+		//createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(Main.timezone));
+		createNewMeeting(LocalDateTime.of(2024, 3, 24, 20, 0).toInstant(Main.timezone));
 	}
 
 	public void setupNotification() {
@@ -84,10 +85,15 @@ public class MeetingConfig extends ConfigCategory {
 					.complete();
 			this.message = message.getIdLong();
 
-			//Create event
-			this.event = channel.getGuild().createScheduledEvent("Teamsitzung", getVoiceChannel().orElseThrow(), timestamp.atOffset(Main.timezone))
-					.setDescription("Weitere Informationen: " + message.getJumpUrl())
-					.complete().getIdLong();
+			try {
+				//Create event
+				this.event = channel.getGuild().createScheduledEvent("Teamsitzung", getVoiceChannel().orElseThrow(), timestamp.atOffset(Main.timezone))
+						.setDescription("Weitere Informationen: " + message.getJumpUrl())
+						.complete().getIdLong();
+			} catch (Exception e) {
+				logger.error("Failed to schedule meeting event", e);
+				this.event = 0L;
+			}
 		});
 
 		setupNotification();
@@ -98,7 +104,7 @@ public class MeetingConfig extends ConfigCategory {
 		if (message == null) return;
 		getChannel().ifPresent(channel -> {
 			channel.deleteMessageById(message).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
-			channel.getGuild().retrieveScheduledEventById(event).flatMap(ScheduledEvent::delete).queue(null, new ErrorHandler().ignore(ErrorResponse.SCHEDULED_EVENT));
+			if(event != 0) channel.getGuild().retrieveScheduledEventById(event).flatMap(ScheduledEvent::delete).queue(null, new ErrorHandler().ignore(ErrorResponse.SCHEDULED_EVENT));
 		});
 
 		futures.forEach(f -> f.cancel(false));
