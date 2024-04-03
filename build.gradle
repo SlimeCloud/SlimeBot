@@ -26,7 +26,7 @@ String lombokDependency = 'org.projectlombok:lombok:1.18.30'
 dependencies {
     implementation 'net.dv8tion:JDA:5.0.0-beta.21'
 
-    implementation 'de.mineking:DiscordUtils:8fd1948'
+    implementation 'de.mineking:DiscordUtils:69865f0'
     implementation 'de.mineking:JavaUtils:3ffa11e'
     implementation 'de.cyklon:ReflectionUtils:fa134db'
     implementation 'de.cyklon:JEvent:879a575'
