@@ -24,9 +24,11 @@ import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -55,8 +57,7 @@ public class MeetingConfig extends ConfigCategory {
 
 	@Override
 	public void enable(@NotNull Guild guild) {
-		//createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(Main.timezone));
-		createNewMeeting(LocalDateTime.of(2024, 3, 24, 20, 0).toInstant(Main.timezone));
+		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(Main.timezone));
 	}
 
 	public void setupNotification() {
