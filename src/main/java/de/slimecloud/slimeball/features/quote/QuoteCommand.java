@@ -6,6 +6,7 @@ import de.mineking.discordutils.commands.ApplicationCommandMethod;
 import de.mineking.discordutils.commands.Setup;
 import de.mineking.discordutils.commands.condition.IRegistrationCondition;
 import de.mineking.discordutils.commands.condition.cooldown.Cooldown;
+import de.mineking.discordutils.commands.condition.cooldown.CooldownIncrement;
 import de.mineking.discordutils.commands.context.ICommandContext;
 import de.mineking.discordutils.commands.option.Option;
 import de.mineking.discordutils.events.Listener;
@@ -37,7 +38,7 @@ public class QuoteCommand {
 		manager.getJDA().addEventListener(new QuoteDeleteListener(bot));
 	}
 
-	@Cooldown(interval = 1, unit = TimeUnit.DAYS, uses = 2, identifier = "quote")
+	@Cooldown(interval = 1, unit = TimeUnit.DAYS, uses = 2, auto = false, identifier = "quote")
 	public void handleCooldown(@NotNull ICommandContext context) {
 		context.getEvent().reply(":timer: :x: Du kannst nur 2 mal pro Tag zitieren!").setEphemeral(true).queue();
 	}
@@ -47,7 +48,8 @@ public class QuoteCommand {
 	                         @Option(description = "Das Mitglied, das du zitieren möchtest") Member author,
 	                         @Option(name = "message", description = "Die Aussage des Mitglieds") String content,
 	                         @Nullable Message message,
-	                         @Nullable TemporalAccessor timestamp
+	                         @Nullable TemporalAccessor timestamp,
+                             @CooldownIncrement Runnable cooldown
 	) {
 		if (author == null || author.getUser().isBot()) {
 			event.getHook().sendMessage(":x: Du kannst diese Nachricht nicht zitieren!").setEphemeral(true).queue();
@@ -69,6 +71,8 @@ public class QuoteCommand {
 
 			//Call event
 			if (new UserQuotedEvent(event.getUser(), author, content, message).callEvent()) return;
+
+			cooldown.run();
 
 			//Send quotation
 			channel.sendMessage(author.getAsMention()).addEmbeds(new EmbedBuilder()
