@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.main;
 
+import de.cyklon.jevent.EventManager;
 import de.cyklon.jevent.JEvent;
 import de.cyklon.reflection.entities.OfflinePackage;
 import de.mineking.discordutils.DiscordUtils;
@@ -14,6 +15,7 @@ import de.slimecloud.slimeball.features.alerts.HolidayAlert;
 import de.slimecloud.slimeball.features.alerts.spotify.Spotify;
 import de.slimecloud.slimeball.features.alerts.spotify.SpotifyAlert;
 import de.slimecloud.slimeball.features.alerts.youtube.Youtube;
+import de.slimecloud.slimeball.features.alerts.youtube.YoutubeListener;
 import de.slimecloud.slimeball.features.birthday.Birthday;
 import de.slimecloud.slimeball.features.birthday.BirthdayAlert;
 import de.slimecloud.slimeball.features.birthday.BirthdayListener;
@@ -27,6 +29,7 @@ import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.features.github.GitHubAPI;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
+import de.slimecloud.slimeball.features.level.LevelUpListener;
 import de.slimecloud.slimeball.features.level.card.*;
 import de.slimecloud.slimeball.features.level.card.badge.BadgeCommand;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
@@ -342,7 +345,14 @@ public class SlimeBot extends ListenerAdapter {
 
 		if (youtube != null) youtube.startListener();
 
-		JEvent.getDefaultManager().registerListenerPackage(botPackage);
+		//JEvent.getDefaultManager().registerListenerPackage(botPackage);
+		EventManager manager = JEvent.getDefaultManager();
+		manager.registerListener(DataListener.class);
+		manager.registerListener(LevelUpListener.class);
+		manager.registerListener(YoutubeListener.class);
+		manager.registerListener(TimeoutListener.class);
+		manager.registerListener(BirthdayListener.class);
+		manager.registerListener(MessageListener.class);
 	}
 
 	private void startActivity() {
