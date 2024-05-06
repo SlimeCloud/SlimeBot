@@ -57,7 +57,7 @@ public class MeetingConfig extends ConfigCategory {
 
 	@Override
 	public void enable(@NotNull Guild guild) {
-		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(Main.timezone));
+		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).atZone(Main.timezone).toInstant());
 	}
 
 	public void setupNotification() {
@@ -88,7 +88,7 @@ public class MeetingConfig extends ConfigCategory {
 
 			try {
 				//Create event
-				this.event = channel.getGuild().createScheduledEvent("Teamsitzung", getVoiceChannel().orElseThrow(), timestamp.atOffset(Main.timezone))
+				this.event = channel.getGuild().createScheduledEvent("Teamsitzung", getVoiceChannel().orElseThrow(), timestamp.atZone(Main.timezone).toOffsetDateTime())
 						.setDescription("Weitere Informationen: " + message.getJumpUrl())
 						.complete().getIdLong();
 			} catch (Exception e) {
