@@ -2,7 +2,7 @@ package de.slimecloud.slimeball.features.report;
 
 import de.mineking.discordutils.list.ListContext;
 import de.mineking.discordutils.list.ListEntry;
-import de.mineking.javautils.database.Column;
+import de.mineking.databaseutils.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

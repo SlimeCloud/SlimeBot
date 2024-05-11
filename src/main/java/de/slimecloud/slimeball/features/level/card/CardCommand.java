@@ -22,7 +22,7 @@ import de.mineking.discordutils.ui.modal.ModalMenu;
 import de.mineking.discordutils.ui.modal.TextComponent;
 import de.mineking.discordutils.ui.state.UpdateState;
 import de.mineking.javautils.ID;
-import de.mineking.javautils.database.Where;
+import de.mineking.databaseutils.Where;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.config.engine.ValidationException;

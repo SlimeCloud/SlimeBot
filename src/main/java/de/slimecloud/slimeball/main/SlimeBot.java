@@ -5,7 +5,7 @@ import de.cyklon.jevent.JEvent;
 import de.cyklon.reflection.entities.OfflinePackage;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.Cache;
-import de.mineking.javautils.database.DatabaseManager;
+import de.mineking.databaseutils.DatabaseManager;
 import de.slimecloud.slimeball.config.ActivityConfig;
 import de.slimecloud.slimeball.config.Config;
 import de.slimecloud.slimeball.config.GuildConfig;
