@@ -1,10 +1,10 @@
 package de.slimecloud.slimeball.features.level;
 
-import de.mineking.discordutils.list.ListContext;
-import de.mineking.discordutils.list.ListEntry;
 import de.mineking.databaseutils.Column;
 import de.mineking.databaseutils.DataClass;
 import de.mineking.databaseutils.Table;
+import de.mineking.discordutils.list.ListContext;
+import de.mineking.discordutils.list.ListEntry;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

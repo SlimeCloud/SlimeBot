@@ -1,9 +1,9 @@
 package de.slimecloud.slimeball.features.level.card;
 
-import de.mineking.javautils.ID;
 import de.mineking.databaseutils.Column;
 import de.mineking.databaseutils.DataClass;
 import de.mineking.databaseutils.Table;
+import de.mineking.javautils.ID;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
