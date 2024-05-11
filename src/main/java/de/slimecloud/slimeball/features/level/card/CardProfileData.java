@@ -1,11 +1,11 @@
 package de.slimecloud.slimeball.features.level.card;
 
+import de.mineking.databaseutils.Column;
+import de.mineking.databaseutils.DataClass;
+import de.mineking.databaseutils.Table;
 import de.mineking.discordutils.list.ListContext;
 import de.mineking.discordutils.list.ListEntry;
 import de.mineking.javautils.ID;
-import de.mineking.javautils.database.Column;
-import de.mineking.javautils.database.DataClass;
-import de.mineking.javautils.database.Table;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.config.engine.ValidationException;
@@ -43,64 +43,64 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color progressbarColor = new Color(105, 227, 73, 240);
+	private final Color progressbarColor = new Color(105, 227, 73, 240);
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color progressbarBGColor = new Color(150, 150, 150, 50);
+	private final Color progressbarBGColor = new Color(150, 150, 150, 50);
 	@Column
 	@Info(keyType = ConfigFieldType.ENUM)
-	private Style progressbarStyle = Style.ROUND_SQUARE;
+	private final Style progressbarStyle = Style.ROUND_SQUARE;
 
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color progressbarBorderColor = new Color(68, 140, 41, 255);
+	private final Color progressbarBorderColor = new Color(68, 140, 41, 255);
 	@Column
 	@Info(keyType = ConfigFieldType.INTEGER)
-	private int progressbarBorderWidth = 5;
-
-	@Column
-	@Info(keyType = ConfigFieldType.ENUM)
-	private Style avatarStyle = Style.ROUND_SQUARE;
-	@Column
-	@Info(keyType = ConfigFieldType.COLOR)
-	private Color avatarBorderColor = TRANSPARENT;
-	@Column
-	@Info(keyType = ConfigFieldType.INTEGER)
-	private int avatarBorderWidth = 10;
+	private final int progressbarBorderWidth = 5;
 
 	@Column
 	@Info(keyType = ConfigFieldType.ENUM)
-	private Style badgeStyle = Style.ROUND_SQUARE;
+	private final Style avatarStyle = Style.ROUND_SQUARE;
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color badgeBorderColor = new Color(68, 140, 41, 255);
+	private final Color avatarBorderColor = TRANSPARENT;
 	@Column
 	@Info(keyType = ConfigFieldType.INTEGER)
-	private int badgeBorderWidth = 0;
+	private final int avatarBorderWidth = 10;
+
+	@Column
+	@Info(keyType = ConfigFieldType.ENUM)
+	private final Style badgeStyle = Style.ROUND_SQUARE;
+	@Column
+	@Info(keyType = ConfigFieldType.COLOR)
+	private final Color badgeBorderColor = new Color(68, 140, 41, 255);
+	@Column
+	@Info(keyType = ConfigFieldType.INTEGER)
+	private final int badgeBorderWidth = 0;
 
 
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color backgroundColor = new Color(30, 30, 30, 200);
+	private final Color backgroundColor = new Color(30, 30, 30, 200);
 	@Column
 	@Info(keyType = ConfigFieldType.URL)
-	private String backgroundImageURL = "";
+	private final String backgroundImageURL = "";
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color backgroundBorderColor = new Color(68, 140, 41, 255);
+	private final Color backgroundBorderColor = new Color(68, 140, 41, 255);
 	@Column
 	@Info(keyType = ConfigFieldType.INTEGER)
-	private int backgroundBorderWidth = 10;
+	private final int backgroundBorderWidth = 10;
 
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color fontColor = Color.WHITE;
+	private final Color fontColor = Color.WHITE;
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color fontSecondaryColor = Color.GRAY;
+	private final Color fontSecondaryColor = Color.GRAY;
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color fontLevelColor = new Color(97, 180, 237);
+	private final Color fontLevelColor = new Color(97, 180, 237);
 
 
 	public CardProfileData(@NotNull SlimeBot bot, @NotNull UserSnowflake owner) {

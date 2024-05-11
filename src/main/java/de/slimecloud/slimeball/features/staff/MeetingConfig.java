@@ -105,7 +105,7 @@ public class MeetingConfig extends ConfigCategory {
 		if (message == null) return;
 		getChannel().ifPresent(channel -> {
 			channel.deleteMessageById(message).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
-			if(event != 0) channel.getGuild().retrieveScheduledEventById(event).flatMap(ScheduledEvent::delete).queue(null, new ErrorHandler().ignore(ErrorResponse.SCHEDULED_EVENT));
+			if (event != 0) channel.getGuild().retrieveScheduledEventById(event).flatMap(ScheduledEvent::delete).queue(null, new ErrorHandler().ignore(ErrorResponse.SCHEDULED_EVENT));
 		});
 
 		futures.forEach(f -> f.cancel(false));

@@ -1,11 +1,11 @@
 package de.slimecloud.slimeball.features.birthday;
 
+import de.mineking.databaseutils.Table;
+import de.mineking.databaseutils.Where;
 import de.mineking.discordutils.list.ListContext;
 import de.mineking.discordutils.list.Listable;
 import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
-import de.mineking.javautils.database.Table;
-import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayRemoveEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdaySetEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
@@ -49,7 +49,7 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	default List<Birthday> getAll(@NotNull Guild guild, @Nullable List<Long> members) {
 		return selectMany(Where.allOf(
 				Where.equals("guild", guild),
-				members == null ? Where.TRUE() : Where.in("user", members)
+				members == null ? Where.TRUE() : Where.valueContainsField("user", members)
 		));
 	}
 

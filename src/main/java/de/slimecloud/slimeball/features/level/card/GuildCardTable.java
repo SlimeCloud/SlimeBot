@@ -1,7 +1,7 @@
 package de.slimecloud.slimeball.features.level.card;
 
-import de.mineking.javautils.database.Table;
-import de.mineking.javautils.database.Where;
+import de.mineking.databaseutils.Table;
+import de.mineking.databaseutils.Where;
 import net.dv8tion.jda.api.entities.Member;
 import org.jetbrains.annotations.NotNull;
 
