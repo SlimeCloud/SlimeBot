@@ -1,9 +1,9 @@
 package de.slimecloud.slimeball.features.wrapped;
 
-import de.mineking.javautils.database.Column;
-import de.mineking.javautils.database.DataClass;
-import de.mineking.javautils.database.Json;
-import de.mineking.javautils.database.Table;
+import de.mineking.databaseutils.Column;
+import de.mineking.databaseutils.DataClass;
+import de.mineking.databaseutils.Json;
+import de.mineking.databaseutils.Table;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

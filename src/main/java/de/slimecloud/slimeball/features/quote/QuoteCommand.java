@@ -49,7 +49,7 @@ public class QuoteCommand {
 	                         @Option(name = "message", description = "Die Aussage des Mitglieds") String content,
 	                         @Nullable Message message,
 	                         @Nullable TemporalAccessor timestamp,
-                             @CooldownIncrement Runnable cooldown
+	                         @CooldownIncrement Runnable cooldown
 	) {
 		if (author == null || author.getUser().isBot()) {
 			event.getHook().sendMessage(":x: Du kannst diese Nachricht nicht zitieren!").setEphemeral(true).queue();

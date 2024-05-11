@@ -1,12 +1,12 @@
 package de.slimecloud.slimeball.features.level.card.badge;
 
+import de.mineking.databaseutils.Table;
+import de.mineking.databaseutils.Where;
 import de.mineking.discordutils.list.ListContext;
 import de.mineking.discordutils.list.Listable;
 import de.mineking.discordutils.list.StringEntry;
 import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
-import de.mineking.javautils.database.Table;
-import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.StringUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -85,7 +85,7 @@ public interface CardBadgeTable extends Table<CardBadgeData>, Listable<StringEnt
 	default List<StringEntry> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<StringEntry> context) {
 		SlimeBot bot = getManager().getData("bot");
 
-		if (state.asMap().containsKey("badge")) return selectMany(Where.contains("badges", state.getState("badge", String.class))).stream()
+		if (state.asMap().containsKey("badge")) return selectMany(Where.fieldContainsValue("badges", state.getState("badge", String.class))).stream()
 				.map(d -> d.getTarget().getAsMention())
 				.map(StringEntry::new)
 				.toList();

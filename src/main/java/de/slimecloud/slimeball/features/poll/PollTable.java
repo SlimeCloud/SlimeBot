@@ -1,7 +1,7 @@
 package de.slimecloud.slimeball.features.poll;
 
-import de.mineking.javautils.database.Table;
-import de.mineking.javautils.database.Where;
+import de.mineking.databaseutils.Table;
+import de.mineking.databaseutils.Where;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
