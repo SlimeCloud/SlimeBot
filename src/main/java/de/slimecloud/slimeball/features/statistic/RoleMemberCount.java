@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -24,27 +26,22 @@ public class RoleMemberCount extends ListenerAdapter {
 
 	@Override
 	public void onGuildReady(@NotNull GuildReadyEvent event) {
-		update(event.getGuild());
-	}
-
-	@Override
-	public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
-		update(event.getGuild());
+		update(event.getGuild(), event.getGuild().getRoles());
 	}
 
 	@Override
 	public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
-		update(event.getGuild());
+		update(event.getGuild(), event.getMember().getRoles());
 	}
 
 	@Override
 	public void onGuildMemberRoleAdd(@NotNull GuildMemberRoleAddEvent event) {
-		update(event.getGuild());
+		update(event.getGuild(), event.getRoles());
 	}
 
 	@Override
 	public void onGuildMemberRoleRemove(@NotNull GuildMemberRoleRemoveEvent event) {
-		update(event.getGuild());
+		update(event.getGuild(), event.getRoles());
 	}
 
 	@Override
@@ -67,8 +64,15 @@ public class RoleMemberCount extends ListenerAdapter {
 		config.save();
 	}
 
-	public void update(@NotNull Guild guild) {
-		bot.loadGuild(guild.getIdLong()).getStatistic().ifPresent(c -> update(c, guild));
+	public void update(@NotNull Guild guild, @NotNull List<Role> roles) {
+		bot.loadGuild(guild.getIdLong()).getStatistic().ifPresent(c -> {
+			for (Role role : roles) {
+				if (c.getRoleMemberCountChannel().containsValue(role.getIdLong())) {
+					update(c, guild);
+					return;
+				}
+			}
+		});
 	}
 
 	public void update(@NotNull StatisticConfig config, @NotNull Guild guild) {

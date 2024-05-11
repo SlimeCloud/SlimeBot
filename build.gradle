@@ -28,7 +28,7 @@ dependencies {
 
     implementation 'de.mineking:DiscordUtils:3.9.0'
     implementation 'de.mineking:JavaUtils:3ffa11e'
-    implementation 'de.cyklon:ReflectionUtils:fa134db'
+    implementation 'de.cyklon:ReflectionUtils:192873e'
     implementation 'de.cyklon:JEvent:879a575'
 
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.3.4'
