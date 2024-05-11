@@ -270,7 +270,7 @@ public class CardCommand {
 			event.replyChoices(
 					bot.getProfileData().selectAll().stream()
 							.filter(d -> d.getPermission(event.getUser()).canRead())
-							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()))
+							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()) || d.getName().contains(event.getFocusedOption().getValue()))
 							.map(d -> {
 								String id = d.getId().asString();
 								String name = d.getName();
@@ -278,6 +278,7 @@ public class CardCommand {
 
 								return new Choice(name + " (" + id + " von " + (m != null ? m.getEffectiveName() : "Unbekannt") + ")", id);
 							})
+							.limit(OptionData.MAX_CHOICES)
 							.toList()
 			).queue();
 		}
