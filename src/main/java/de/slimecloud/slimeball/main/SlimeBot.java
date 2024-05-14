@@ -7,7 +7,6 @@ import de.mineking.databaseutils.DatabaseManager;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.Cache;
 import de.mineking.discordutils.console.RedirectTarget;
-import de.mineking.javautils.database.DatabaseManager;
 import de.slimecloud.slimeball.config.ActivityConfig;
 import de.slimecloud.slimeball.config.Config;
 import de.slimecloud.slimeball.config.GuildConfig;
