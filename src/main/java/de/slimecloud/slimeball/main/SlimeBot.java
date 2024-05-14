@@ -6,6 +6,7 @@ import de.cyklon.reflection.entities.OfflinePackage;
 import de.mineking.databaseutils.DatabaseManager;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.Cache;
+import de.mineking.discordutils.console.RedirectTarget;
 import de.slimecloud.slimeball.config.ActivityConfig;
 import de.slimecloud.slimeball.config.Config;
 import de.slimecloud.slimeball.config.GuildConfig;
@@ -97,6 +98,7 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Getter
@@ -241,9 +243,16 @@ public class SlimeBot extends ListenerAdapter {
 				.addEventListeners(memberCount = new MemberCount(this))
 				.addEventListeners(roleMemberCount = new RoleMemberCount(this));
 
+		List<RedirectTarget<SlimeBot>> redirect = config.getLogForwarding().stream().map(LogForwarding::build).collect(Collectors.toList());
+		redirect.add((du, msg) -> {
+			if (!msg.getContent().contains("Youtube")) return;
+			RedirectTarget<SlimeBot> rt = RedirectTarget.pingRoleOnError(RedirectTarget.webhook("https://discord.com/api/webhooks/1226591226120372304/GjuTHBgFSUzffz9qxsrqnz5Ies095l8gsLR9f6cwQFw5snpkqNgBvot1QzrBHE0-GLOB?thread_id=1239139434767716393"), b -> Optional.ofNullable(b.getJda().getRoleById(1080118753292976238L)));
+			rt.sendMessage(du, msg);
+		});
+
 		//Configure DiscordUtils
 		discordUtils = DiscordUtils.create(builder, this)
-				.mirrorConsole(config.getLogForwarding().stream().map(LogForwarding::build).toList())
+				.mirrorConsole(redirect)
 				.useEventManager(null)
 				.useUIManager(null)
 				.useCommandManager(e -> () -> e, e -> () -> e, manager -> {
