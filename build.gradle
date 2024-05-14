@@ -11,7 +11,7 @@ plugins {
 mainClassName = "de.slimecloud.slimeball.main.Main"
 
 group 'com.slimebot'
-version '3.6.1'
+version '3.6.2'
 
 repositories {
     mavenCentral()
@@ -21,28 +21,30 @@ repositories {
     maven { url 'https://jitpack.io/' }
 }
 
-String lombokDependency = 'org.projectlombok:lombok:1.18.30'
+String lombokDependency = 'org.projectlombok:lombok:1.18.32'
 
 dependencies {
-    implementation 'net.dv8tion:JDA:5.0.0-beta.21'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.23'
 
     implementation 'de.mineking:DiscordUtils:3.9.0'
-    implementation 'de.mineking:JavaUtils:3ffa11e'
-    implementation 'de.cyklon:ReflectionUtils:fa134db'
+
+    implementation 'de.mineking:JavaUtils:1.9.0'
+    implementation 'de.mineking:DatabaseUtils:1.1.0'
+    implementation 'de.cyklon:ReflectionUtils:192873e'
     implementation 'de.cyklon:JEvent:879a575'
 
-    implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.3.4'
+    implementation 'se.michaelthelin.spotify:spotify-web-api-java:9.0.0-RC1'
     implementation 'com.github.minndevelopment:emoji-java:master-SNAPSHOT'
-    implementation 'org.kohsuke:github-api:1.318'
+    implementation 'org.kohsuke:github-api:1.321'
 
     implementation 'io.github.cdimascio:java-dotenv:5.2.2'
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation 'org.sejda.imageio:webp-imageio:0.1.6'
-    implementation 'ch.qos.logback:logback-classic:1.4.8'
+    implementation 'ch.qos.logback:logback-classic:1.5.6'
 
-    implementation 'org.postgresql:postgresql:42.7.1'
-    implementation 'org.jdbi:jdbi3-postgres:3.42.0'
+    implementation 'org.postgresql:postgresql:42.7.3'
+    implementation 'org.jdbi:jdbi3-postgres:3.45.1'
 
     compileOnly 'org.jetbrains:annotations:24.1.0'
 
@@ -52,8 +54,8 @@ dependencies {
     testCompileOnly lombokDependency
     testAnnotationProcessor lombokDependency
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0-M1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
 }
 
 String getVersion() {

@@ -1,5 +1,6 @@
 package de.slimecloud.slimeball.features.level.card;
 
+import de.mineking.databaseutils.Where;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
@@ -22,7 +23,6 @@ import de.mineking.discordutils.ui.modal.ModalMenu;
 import de.mineking.discordutils.ui.modal.TextComponent;
 import de.mineking.discordutils.ui.state.UpdateState;
 import de.mineking.javautils.ID;
-import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.config.engine.ValidationException;
@@ -131,7 +131,9 @@ public class CardCommand {
 				if (!field.isAnnotationPresent(Info.class)) continue;
 				field.setAccessible(true);
 
-				String category = StringUtil.parseCamelCase(field.getName())[0];
+				String[] name = StringUtil.parseCamelCase(field.getName());
+				String category = name.length > 1 ? name[0] : "font";
+
 				if (!category.equals(last) && !temp.isEmpty()) {
 					components.add(ComponentRow.of(temp));
 					temp = new ArrayList<>();
@@ -140,7 +142,7 @@ public class CardCommand {
 				last = category;
 
 				if (field.getType().isAssignableFrom(Style.class)) temp.add(new StyleComponent(field));
-				else temp.add(0, new ButtonComponent(field.getName(), ButtonColor.GRAY, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s ->
+				else temp.add(0, new ButtonComponent(field.getName(), name.length > 1 ? ButtonColor.GRAY : ButtonColor.BLUE, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s ->
 						input.createState()
 								.setState("field", field.getName())
 								.display((IModalCallback) s.getEvent())
@@ -153,7 +155,7 @@ public class CardCommand {
 			this.menu = manager.createMenu(
 					"card.edit",
 					MessageRenderer.embed(s -> new EmbedBuilder()
-							.setTitle("Aktuelle RankCard (ID: **" + s.<CardProfileData>getCache("profile").getId() + "**)")
+							.setTitle("Aktuelle RankCard (**" + s.<CardProfileData>getCache("profile").getName() + "**, " + s.<CardProfileData>getCache("profile").getId() + ")")
 							.setColor(bot.getColor(s.getEvent().getGuild()))
 							.setImage("attachment://image.png")
 							.build()
@@ -268,13 +270,15 @@ public class CardCommand {
 			event.replyChoices(
 					bot.getProfileData().selectAll().stream()
 							.filter(d -> d.getPermission(event.getUser()).canRead())
-							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()))
+							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()) || d.getName().contains(event.getFocusedOption().getValue()))
 							.map(d -> {
 								String id = d.getId().asString();
+								String name = d.getName();
 								Member m = event.getGuild().getMember(d.getOwner());
 
-								return new Choice(id + " (von " + (m != null ? m.getEffectiveName() : "Unbekannt") + ")", id);
+								return new Choice(name + " (" + id + " von " + (m != null ? m.getEffectiveName() : "Unbekannt") + ")", id);
 							})
+							.limit(OptionData.MAX_CHOICES)
 							.toList()
 			).queue();
 		}
