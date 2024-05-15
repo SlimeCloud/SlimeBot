@@ -1,6 +1,6 @@
 package de.slimecloud.slimeball.features.level.card;
 
-import de.mineking.javautils.database.Where;
+import de.mineking.databaseutils.Where;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.UserSnowflake;

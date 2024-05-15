@@ -1,7 +1,7 @@
 package de.slimecloud.slimeball.features.wrapped;
 
-import de.mineking.javautils.database.Table;
-import de.mineking.javautils.database.Where;
+import de.mineking.databaseutils.Table;
+import de.mineking.databaseutils.Where;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;

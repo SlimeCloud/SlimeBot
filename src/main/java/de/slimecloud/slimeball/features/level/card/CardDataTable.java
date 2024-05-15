@@ -1,12 +1,12 @@
 package de.slimecloud.slimeball.features.level.card;
 
+import de.mineking.databaseutils.Table;
+import de.mineking.databaseutils.Where;
 import de.mineking.discordutils.list.ListContext;
 import de.mineking.discordutils.list.Listable;
 import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
 import de.mineking.javautils.ID;
-import de.mineking.javautils.database.Table;
-import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.UserSnowflake;
