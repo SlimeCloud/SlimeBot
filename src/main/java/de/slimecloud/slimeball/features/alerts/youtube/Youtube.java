@@ -37,12 +37,10 @@ public class Youtube {
 		this.bot = bot;
 		this.config = config;
 		this.currentKey = MathUtil.randomInt(0, keys.length - 1);
-		logger.info("Initialize Youtube with " + keys.length + " keys and start index of " + currentKey);
 	}
 
 	public void startListener() {
 		int delay = config.getUpdateRate();
-		logger.info("start listener with delay of " + delay + "s");
 
 		bot.getExecutor().scheduleAtFixedRate(() -> {
 			try {
@@ -55,51 +53,33 @@ public class Youtube {
 
 	private void check() throws IOException {
 		Video lastCheckedVideo = getLastVideo();
-		logger.info("checking for new video");
-		logger.info("previousCheckedVideo: " + lastVideo);
-		logger.info("lastCheckedVideo: " + lastCheckedVideo);
 
 		if (lastCheckedVideo != null && !lastCheckedVideo.equals(lastVideo)) {
-			logger.info("previous and last checked are not equal");
-			if (lastVideo != null) {
-				logger.info("previous is not null -> new video uploaded");
-				new YoutubeVideoEvent(lastCheckedVideo).callEvent();
-			} else logger.info("previous is null -> no video checked before -> lastVideo = lastCheckedVideo");
+			if (lastVideo != null) new YoutubeVideoEvent(lastCheckedVideo).callEvent();
 			this.lastVideo = lastCheckedVideo;
 		}
 	}
 
 	@NotNull
 	private String getNextKey() {
-		logger.info("getNextKey -> current index is " + currentKey);
 		return keys[currentKey++ % keys.length];
 	}
 
 	//returns null if no videos found on the channel
 	@Nullable
 	public Video getLastVideo() throws IOException {
-		logger.info("fetch last video");
 		Request request = new Request.Builder()
 				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", getNextKey(), config.getYoutubeChannelId()))
 				.get()
-				.build();;
+				.build();
 
 		@Cleanup
 		Response response = client.newCall(request).execute();
-		logger.info("api response: " + response);
 		JsonObject json = JsonParser.parseString(response.body().string()).getAsJsonObject();
-		logger.info("api json: " + json);
 		JsonArray videos = json.getAsJsonArray("items");
-		logger.info("api json array: " + videos);;
 
 		if (videos.size() <= 0) return null;
 
-		SearchResult sr = Main.json.fromJson(videos.get(0), SearchResult.class);
-		logger.info("SearchResult of json: " + sr);
-
-		Video video = Video.ofSearch(sr);
-		logger.info("Fetch Video result: " + video);
-
-		return video;
+		return Video.ofSearch(Main.json.fromJson(videos.get(0), SearchResult.class));
 	}
 }
