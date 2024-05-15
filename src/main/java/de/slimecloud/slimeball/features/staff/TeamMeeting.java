@@ -122,7 +122,7 @@ public class TeamMeeting extends ListenerAdapter {
 					if (config.getEvent() != 0) event.getGuild().retrieveScheduledEventById(config.getEvent()).flatMap(ScheduledEvent::delete).queue();
 
 					//This will send a new message
-					config.createNewMeeting(current.getTimestamp().toLocalDateTime().plus(Duration.ofDays(14)).atZone(Main.timezone).toInstant());
+					config.createNewMeeting(current.getTimestamp().atZoneSameInstant(Main.timezone).plus(Duration.ofDays(14)).withHour(20).toInstant());
 					guildConfig.save();
 				}
 			}
