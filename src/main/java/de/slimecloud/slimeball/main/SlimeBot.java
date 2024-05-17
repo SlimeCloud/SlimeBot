@@ -200,7 +200,7 @@ public class SlimeBot extends ListenerAdapter {
 			spotify = null;
 		}
 
-		//Initalize Youtube API
+		//Initialize Youtube API
 		if (config.getYoutube().isPresent()) {
 			String[] keys = getCredentialsArray("YOUTUBE_API_KEY");
 			if (keys.length > 0) youtube = new Youtube(keys, this, config.getYoutube().get());
