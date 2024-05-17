@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.features.staff;
+package de.slimecloud.slimeball.features.staff.meeting;
 
 import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;
