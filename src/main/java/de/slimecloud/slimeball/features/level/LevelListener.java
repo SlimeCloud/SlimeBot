@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -49,6 +50,12 @@ public class LevelListener extends ListenerAdapter {
 	@Override
 	public void onGuildBan(@NotNull GuildBanEvent event) {
 		bot.getLevel().reset(event.getGuild(), event.getUser());
+	}
+
+	@Override
+	public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+		Level level = bot.getLevel().getLevel(event.getMember());
+		LevelUpListener.updateLevelRoles(bot, event.getMember(), level.getLevel());
 	}
 
 	@Override
