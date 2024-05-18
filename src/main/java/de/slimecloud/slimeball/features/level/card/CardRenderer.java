@@ -248,6 +248,7 @@ public class CardRenderer extends Graphic {
 
 	@NotNull
 	private Color getColor(int rank) {
+		if (data.getFontRankColor() == RankColor.FONT) return data.getFontColor();
 		return switch (rank) {
 			case 1 -> new Color(255, 215, 0);
 			case 2 -> new Color(192, 192, 192);
