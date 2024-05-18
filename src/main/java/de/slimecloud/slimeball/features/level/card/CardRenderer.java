@@ -5,6 +5,7 @@ import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
 import de.slimecloud.slimeball.features.level.LevelUpListener;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
+import de.slimecloud.slimeball.features.level.card.component.RankColor;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.graphic.CustomFont;
 import de.slimecloud.slimeball.util.graphic.Graphic;
