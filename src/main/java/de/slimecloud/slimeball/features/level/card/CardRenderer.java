@@ -3,6 +3,7 @@ package de.slimecloud.slimeball.features.level.card;
 import de.slimecloud.slimeball.features.level.Leaderboard;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
+import de.slimecloud.slimeball.features.level.LevelUpListener;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.graphic.CustomFont;
@@ -10,6 +11,7 @@ import de.slimecloud.slimeball.util.graphic.Graphic;
 import de.slimecloud.slimeball.util.graphic.ImageUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -170,7 +172,7 @@ public class CardRenderer extends Graphic {
 		String rankString = "#" + rank;
 		String rankName = "RANK ";
 
-		graphics.setColor(getColor(rank));
+		graphics.setColor(getColor(rank, level.getLevel()));
 
 		graphics.setFont(CustomFont.getFont(font, nameSize));
 		int rankWidth = graphics.getFontMetrics().stringWidth(rankString);
@@ -247,13 +249,17 @@ public class CardRenderer extends Graphic {
 	}
 
 	@NotNull
-	private Color getColor(int rank) {
+	private Color getColor(int rank, int level) {
 		if (data.getFontRankColor() == RankColor.FONT) return data.getFontColor();
+
 		return switch (rank) {
 			case 1 -> new Color(255, 215, 0);
 			case 2 -> new Color(192, 192, 192);
 			case 3 -> new Color(205, 115, 50);
-			default -> data.getFontColor();
+			default -> LevelUpListener.getLevelRole(bot, member.getGuild(), level)
+					.map(member.getGuild()::getRoleById)
+					.map(Role::getColor)
+					.orElse(data.getFontColor());
 		};
 	}
 }

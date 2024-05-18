@@ -5,6 +5,7 @@ import de.cyklon.jevent.Listener;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
@@ -36,10 +37,7 @@ public class LevelUpListener {
 
 		bot.loadGuild(guild).getLevel().map(GuildLevelConfig::getLevelRoles).ifPresent(roles -> {
 			//Find highest role
-			Optional<Long> levelRoleId = roles.entrySet().stream()
-					.filter(e -> event.getNewLevel() >= e.getKey())
-					.max(Comparator.comparingInt(Map.Entry::getKey))
-					.map(Map.Entry::getValue);
+			Optional<Long> levelRoleId = getLevelRole(bot, guild, event.getNewLevel());
 
 			guild.modifyMemberRoles(
 					event.getUser(),
@@ -50,5 +48,16 @@ public class LevelUpListener {
 							.toList()
 			).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MEMBER));
 		});
+	}
+
+	@NotNull
+	public static Optional<Long> getLevelRole(@NotNull SlimeBot bot, @NotNull Guild guild, int level) {
+		return bot.loadGuild(guild).getLevel()
+				.map(GuildLevelConfig::getLevelRoles)
+				.flatMap(roles -> roles.entrySet().stream()
+						.filter(e -> level >= e.getKey())
+						.max(Comparator.comparingInt(Map.Entry::getKey))
+						.map(Map.Entry::getValue)
+				);
 	}
 }
