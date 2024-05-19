@@ -58,7 +58,7 @@ public class BadgeCommand {
 					state.setState(target instanceof Role ? "role" : "user", target.getIdLong());
 				},
 				state -> bot.getCardBadges()
-		).withName("list_badges").withDescription("Zeigt alle Badges einer Rolle / eines Mitglieds").addOption(new OptionData(OptionType.MENTIONABLE, "target", "Die Rolle / das Mitglied", true)));
+		).withCondition(CommandPermission.EVERYONE).withName("list_badges").withDescription("Zeigt alle Badges einer Rolle / eines Mitglieds").addOption(new OptionData(OptionType.MENTIONABLE, "target", "Die Rolle / das Mitglied", true)));
 	}
 
 	@ApplicationCommand(name = "grant", description = "Gibt einem Mitglied / einer Rolle ein Badge")
