@@ -38,10 +38,6 @@ import de.slimecloud.slimeball.features.level.commands.LevelCommand;
 import de.slimecloud.slimeball.features.moderation.MemberJoinListener;
 import de.slimecloud.slimeball.features.moderation.MessageListener;
 import de.slimecloud.slimeball.features.moderation.TimeoutListener;
-import de.slimecloud.slimeball.features.poll.Poll;
-import de.slimecloud.slimeball.features.poll.PollCommand;
-import de.slimecloud.slimeball.features.poll.PollEditCommand;
-import de.slimecloud.slimeball.features.poll.PollTable;
 import de.slimecloud.slimeball.features.quote.QuoteCommand;
 import de.slimecloud.slimeball.features.quote.QuoteMessageCommand;
 import de.slimecloud.slimeball.features.report.Report;
@@ -117,8 +113,6 @@ public class SlimeBot extends ListenerAdapter {
 	private final ReportTable reports;
 	private final ReportBlockTable reportBlocks;
 
-	private final PollTable polls;
-
 	private final LevelTable level;
 	private final CardDataTable profileData;
 	private final GuildCardTable cardProfiles;
@@ -163,8 +157,6 @@ public class SlimeBot extends ListenerAdapter {
 			reports = (ReportTable) database.getTable(ReportTable.class, Report.class, () -> new Report(this), "reports").createTable();
 			reportBlocks = (ReportBlockTable) database.getTable(ReportBlockTable.class, ReportBlock.class, ReportBlock::new, "report_blocks").createTable();
 
-			polls = (PollTable) database.getTable(PollTable.class, Poll.class, () -> new Poll(this), "polls").createTable();
-
 			level = (LevelTable) database.getTable(LevelTable.class, Level.class, () -> new Level(this), "levels").createTable();
 			profileData = (CardDataTable) database.getTable(CardDataTable.class, CardProfileData.class, () -> new CardProfileData(this), "card_data").createTable();
 			cardProfiles = (GuildCardTable) database.getTable(GuildCardTable.class, GuildCardProfile.class, () -> new GuildCardProfile(this), "guild_card_profiles").createTable();
@@ -179,7 +171,6 @@ public class SlimeBot extends ListenerAdapter {
 			database = null;
 			reports = null;
 			reportBlocks = null;
-			polls = null;
 			level = null;
 			profileData = null;
 			cardProfiles = null;
@@ -280,12 +271,6 @@ public class SlimeBot extends ListenerAdapter {
 						manager.registerCommand(BugContextCommand.class);
 						manager.registerCommand(ContributorCommand.class);
 					} else logger.warn("Bug reporting disabled due to missing github api");
-
-					//Register poll commands
-					if (polls != null) {
-						manager.registerCommand(PollCommand.class);
-						manager.registerCommand(PollEditCommand.class);
-					} else logger.warn("Poll system disabled due to missing database");
 
 					//Register leveling commands
 					if (database != null && config.getLevel().isPresent()) {
