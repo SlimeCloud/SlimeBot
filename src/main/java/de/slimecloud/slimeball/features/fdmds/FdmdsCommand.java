@@ -94,6 +94,11 @@ public class FdmdsCommand {
 		//Convert to string
 		StringBuilder choices = new StringBuilder();
 		for (int i = 0; i < temp.length; i++) {
+			if (temp[i].length() >= 55) {
+				event.reply("Eine Antwort darf **maximal 55** Zeichen lang sein!").setEphemeral(true).queue();
+				return;
+			}
+
 			choices.append(SlimeEmoji.number(i + 1).getEmoji(event.getGuild()).getFormatted())
 					.append(" -> ")
 					.append(temp[i].strip())
