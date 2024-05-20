@@ -24,9 +24,12 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
+import net.dv8tion.jda.api.utils.messages.MessagePollData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.stream.Collectors;
 
 @ApplicationCommand(name = "fdmds", description = "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!", scope = Scope.GUILD)
@@ -149,26 +152,21 @@ public class FdmdsCommand {
 
 			String question = embed.getDescription();
 			String title = embed.getTitle() == null ? "Umfrage" : embed.getTitle(); //TODO Backward compatibility, remove the fallback as soon as all old submissions are gone
-			String choices = embed.getFields().get(0).getValue();
+			String[] choices = embed.getFields().get(0).getValue().split("\n");
 
 			//Call event
 			new FdmdsCreateEvent(SlimeBot.getUser(embed), event.getMember(), question).callEvent();
 
-			//Create and send embed
-			EmbedBuilder builder = new EmbedBuilder()
-					.setTitle(title)
-					.setColor(bot.getColor(event.getGuild()))
-					.setAuthor(embed.getAuthor().getName(), embed.getAuthor().getUrl(), embed.getAuthor().getIconUrl())
-					.setDescription(question)
-					.addField("Auswahlmöglichkeiten", choices, false);
+			MessagePollBuilder builder = MessagePollData.builder(title)
+					.setMultiAnswer(true)
+					.setDuration(Duration.ofDays(7));
 
-			fdmds.getChannel().sendMessageEmbeds(builder.build())
+			for (int i = 0; i < choices.length; i++) builder.addAnswer(choices[i].split(" -> ", 2)[1], SlimeEmoji.number(i + 1).getEmoji(event.getGuild()));
+
+			fdmds.getChannel().sendMessagePoll(builder.build())
 					.setContent(fdmds.getRole().map(Role::getAsMention).orElse(null))
 					.addActionRow(Button.secondary("fdmds:create", "Selbst eine Frage einreichen"))
 					.queue(m -> {
-						//Add reactions
-						for (int i = 0; i < choices.lines().count(); i++) m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
-
 						//Create thread
 						m.createThreadChannel(title).queue();
 
