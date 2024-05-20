@@ -155,7 +155,7 @@ public class CardRenderer extends Graphic {
 		String levelString = String.valueOf(level.getLevel());
 		String levelName = "LEVEL ";
 
-		graphics.setColor(data.getFontLevelColor());
+		graphics.setColor(getLevelColor(level.getLevel()));
 
 		graphics.setFont(CustomFont.getFont(font, nameSize));
 		int levelWidth = graphics.getFontMetrics().stringWidth(levelString);
@@ -173,7 +173,7 @@ public class CardRenderer extends Graphic {
 		String rankString = "#" + rank;
 		String rankName = "RANK ";
 
-		graphics.setColor(getColor(rank, level.getLevel()));
+		graphics.setColor(getRankColor(rank));
 
 		graphics.setFont(CustomFont.getFont(font, nameSize));
 		int rankWidth = graphics.getFontMetrics().stringWidth(rankString);
@@ -250,17 +250,23 @@ public class CardRenderer extends Graphic {
 	}
 
 	@NotNull
-	private Color getColor(int rank, int level) {
+	private Color getRankColor(int rank) {
 		if (data.getFontRankColor() == RankColor.FONT) return data.getFontColor();
 
 		return switch (rank) {
 			case 1 -> new Color(255, 215, 0);
 			case 2 -> new Color(192, 192, 192);
 			case 3 -> new Color(205, 115, 50);
-			default -> LevelUpListener.getLevelRole(bot, member.getGuild(), level)
-					.map(member.getGuild()::getRoleById)
-					.map(Role::getColor)
-					.orElse(data.getFontColor());
+			default -> data.getFontColor();
 		};
+	}
+
+	@NotNull
+	private Color getLevelColor(int level) {
+		if (data.getFontRankColor() == RankColor.FONT) return data.getFontColor();
+		return LevelUpListener.getLevelRole(bot, member.getGuild(), level)
+				.map(member.getGuild()::getRoleById)
+				.map(Role::getColor)
+				.orElse(data.getFontColor());
 	}
 }
