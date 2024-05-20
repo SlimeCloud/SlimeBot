@@ -17,6 +17,9 @@ public class Config {
 	@Required
 	private String defaultColor;
 
+	@Required
+	private List<String> countryCodes;
+
 	private Long developerRole;
 
 	@Required
