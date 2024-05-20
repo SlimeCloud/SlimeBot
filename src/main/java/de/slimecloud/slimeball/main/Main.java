@@ -5,12 +5,8 @@ import com.google.gson.GsonBuilder;
 import de.slimecloud.slimeball.config.Config;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.internal.requests.RestActionImpl;
-import net.dv8tion.jda.internal.utils.Helpers;
 
-import java.lang.reflect.Array;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Random;
 
 @Slf4j

@@ -110,12 +110,12 @@ public class HolidayAlert {
 	@SuppressWarnings("unchecked")
 	private RestAction<List<SchoolHoliday>> retrieveHolidays(@NotNull String country, @NotNull String date) {
 		return host.request(HOLIDAYS.compile().withQueryParams(
-				"countryIsoCode", country,
-				"validFrom", date,
-				"validTo", date
-		), (request, response) -> ((List<SchoolHoliday>) Main.json.fromJson(response.body().string(), new TypeToken<List<SchoolHoliday>>() {}.getType())).stream()
-				.filter(h -> h.getStartDate().equals(date))
-				.toList()
+						"countryIsoCode", country,
+						"validFrom", date,
+						"validTo", date
+				), (request, response) -> ((List<SchoolHoliday>) Main.json.fromJson(response.body().string(), new TypeToken<List<SchoolHoliday>>() {}.getType())).stream()
+						.filter(h -> h.getStartDate().equals(date))
+						.toList()
 		);
 	}
 }
