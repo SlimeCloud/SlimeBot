@@ -15,6 +15,7 @@ import de.slimecloud.slimeball.main.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.messages.MessagePoll;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -46,7 +47,7 @@ public class FdmdsCommand {
 						.setPlaceholder("Eissorten")
 						.setValue(title)
 						.setMinLength(10)
-						.setMaxLength(100)
+						.setMaxLength(ThreadChannel.MAX_NAME_LENGTH)
 						.setRequired(true)
 						.build()
 				)
