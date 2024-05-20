@@ -6,7 +6,6 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +39,7 @@ public class LevelUpListener {
 	public static void updateLevelRoles(@NotNull SlimeBot bot, @NotNull Member member, int level) {
 		bot.loadGuild(member.getGuild()).getLevel().map(GuildLevelConfig::getLevelRoles).ifPresent(roles -> {
 			//Find highest role
-			Optional<Long> levelRoleId = getLevelRole(bot, guild, event.getNewLevel());
+			Optional<Long> levelRoleId = getLevelRole(bot, member.getGuild(), level);
 
 			member.getGuild().modifyMemberRoles(
 					member,
