@@ -162,7 +162,7 @@ public class FdmdsCommand {
 			//Call event
 			new FdmdsCreateEvent(SlimeBot.getUser(embed), event.getMember(), question).callEvent();
 
-			MessagePollBuilder builder = MessagePollData.builder(title)
+			MessagePollBuilder builder = MessagePollData.builder(question)
 					.setMultiAnswer(true)
 					.setDuration(Duration.ofDays(7));
 
