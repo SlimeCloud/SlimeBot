@@ -12,7 +12,7 @@ public class RankStyleComponent extends ButtonComponent {
 	public RankStyleComponent(@NotNull Field field) {
 		super(field.getName(), ButtonColor.BLUE, (TextLabel) state -> {
 			try {
-				return "Rank Farbe: " + field.get(state.getCache("profile")).toString();
+				return "Level Farbe: " + field.get(state.getCache("profile")).toString();
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
