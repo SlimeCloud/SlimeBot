@@ -156,7 +156,7 @@ public class FdmdsCommand {
 			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 
 			String question = embed.getDescription();
-			String title = embed.getTitle() == null ? "Umfrage" : embed.getTitle(); //TODO Backward compatibility, remove the fallback as soon as all old submissions are gone
+			String title = embed.getTitle();
 			String[] choices = embed.getFields().get(0).getValue().split("\n");
 
 			//Call event
