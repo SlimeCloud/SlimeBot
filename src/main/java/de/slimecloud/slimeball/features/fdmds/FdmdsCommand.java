@@ -169,8 +169,18 @@ public class FdmdsCommand {
 
 			for (int i = 0; i < choices.length; i++) builder.addAnswer(choices[i].split(" -> ", 2)[1], SlimeEmoji.number(i + 1).getEmoji(event.getGuild()));
 
+			String user;
+
+			try {
+				user = SlimeBot.getUser(embed).getAsMention();
+			} catch (Exception e) {
+				user = embed.getAuthor().getName();
+			}
+
 			fdmds.getChannel().sendMessagePoll(builder.build())
 					.setContent(fdmds.getRole().map(Role::getAsMention).orElse(null))
+					.addContent("\n# " + title)
+					.addContent("\n" + user + " fragt")
 					.addActionRow(Button.secondary("fdmds:create", "Selbst eine Frage einreichen"))
 					.queue(m -> {
 						//Create thread
