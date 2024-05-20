@@ -11,7 +11,7 @@ import de.slimecloud.slimeball.config.Config;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.LogForwarding;
 import de.slimecloud.slimeball.config.commands.ConfigCommand;
-import de.slimecloud.slimeball.features.alerts.HolidayAlert;
+import de.slimecloud.slimeball.features.alerts.holiday.HolidayAlert;
 import de.slimecloud.slimeball.features.alerts.spotify.Spotify;
 import de.slimecloud.slimeball.features.alerts.spotify.SpotifyAlert;
 import de.slimecloud.slimeball.features.alerts.youtube.Youtube;

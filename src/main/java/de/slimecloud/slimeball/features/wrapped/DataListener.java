@@ -3,7 +3,7 @@ package de.slimecloud.slimeball.features.wrapped;
 import com.vdurmont.emoji.EmojiParser;
 import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.Listener;
-import de.slimecloud.slimeball.features.alerts.HolidayAlert;
+import de.slimecloud.slimeball.features.alerts.holiday.HolidayAlert;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsCreateEvent;
 import de.slimecloud.slimeball.features.fdmds.FdmdsSubmitedEvent;
