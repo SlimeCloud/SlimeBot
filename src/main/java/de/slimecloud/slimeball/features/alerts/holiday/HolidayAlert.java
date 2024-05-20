@@ -54,7 +54,7 @@ public class HolidayAlert {
 	public void check() {
 		if (countries.isEmpty()) return;
 
-		String date = "2024-05-21";//formatter.format(LocalDateTime.now());
+		String date = formatter.format(LocalDateTime.now());
 
 		//Retrieve holidays for all configured countries
 		RestAction.allOf(bot.getConfig().getCountryCodes().stream().map(c -> retrieveHolidays(c, date)).toList()).queue(temp -> {
