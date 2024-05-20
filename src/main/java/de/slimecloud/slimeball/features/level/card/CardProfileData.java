@@ -9,6 +9,8 @@ import de.mineking.javautils.ID;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.config.engine.ValidationException;
+import de.slimecloud.slimeball.features.level.card.component.RankColor;
+import de.slimecloud.slimeball.features.level.card.component.Style;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
 import lombok.Getter;
@@ -101,6 +103,10 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
 	private Color fontLevelColor = new Color(97, 180, 237);
+
+	@Column
+	@Info(keyType = ConfigFieldType.ENUM)
+	private RankColor fontRankColor = RankColor.ROLE;
 
 	@Column
 	@Info(keyType = ConfigFieldType.STRING)

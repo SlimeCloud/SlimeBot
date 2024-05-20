@@ -1,4 +1,4 @@
-package de.slimecloud.slimeball.features.level.card;
+package de.slimecloud.slimeball.features.level.card.component;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -26,6 +26,10 @@ import de.mineking.javautils.ID;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.config.engine.ValidationException;
+import de.slimecloud.slimeball.features.level.card.component.RankColor;
+import de.slimecloud.slimeball.features.level.card.component.RankStyleComponent;
+import de.slimecloud.slimeball.features.level.card.component.Style;
+import de.slimecloud.slimeball.features.level.card.component.StyleComponent;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
 import de.slimecloud.slimeball.util.StringUtil;
@@ -142,6 +146,7 @@ public class CardCommand {
 				last = category;
 
 				if (field.getType().isAssignableFrom(Style.class)) temp.add(new StyleComponent(field));
+				else if (field.getType().isAssignableFrom(RankColor.class)) temp.add(new RankStyleComponent(field));
 				else temp.add(0, new ButtonComponent(field.getName(), name.length > 1 ? ButtonColor.GRAY : ButtonColor.BLUE, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s ->
 						input.createState()
 								.setState("field", field.getName())
