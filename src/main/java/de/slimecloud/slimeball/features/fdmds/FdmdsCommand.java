@@ -15,6 +15,7 @@ import de.slimecloud.slimeball.main.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.messages.MessagePoll;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
@@ -94,8 +95,8 @@ public class FdmdsCommand {
 		//Convert to string
 		StringBuilder choices = new StringBuilder();
 		for (int i = 0; i < temp.length; i++) {
-			if (temp[i].length() >= 55) {
-				event.reply("Eine Antwort darf **maximal 55** Zeichen lang sein!").setEphemeral(true).queue();
+			if (temp[i].length() >= MessagePoll.MAX_ANSWER_TEXT_LENGTH) {
+				event.reply("Eine Antwort darf **maximal " + MessagePoll.MAX_ANSWER_TEXT_LENGTH + "** Zeichen lang sein!").setEphemeral(true).queue();
 				return;
 			}
 
