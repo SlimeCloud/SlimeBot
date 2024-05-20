@@ -100,8 +100,15 @@ public interface CardBadgeTable extends Table<CardBadgeData>, Listable<StringEnt
 				.map(StringEntry::new)
 				.toList();
 
-		return CardBadgeData.getBadges(bot).stream()
-				.map(StringEntry::new)
+		return Stream.concat(CardBadgeData.getBadges(bot).stream().map(s -> "Custom: **" + s + "**"),
+				state.getEvent().getGuild().getRoles().stream()
+						.map(this::get)
+						.flatMap(Optional::stream)
+						.flatMap(d -> d.getBadges().stream())
+						.filter(StringUtil::isNumeric)
+						.map(s -> "Rolle: **<@&" + s + ">**")
+				)
+				.map(s -> new StringEntry("- " + s))
 				.toList();
 	}
 }
