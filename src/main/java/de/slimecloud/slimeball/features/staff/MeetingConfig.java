@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -150,7 +151,7 @@ public class MeetingConfig extends ConfigCategory {
 			String entry = a.get(i);
 
 			agenda.append(i + 1).append(". ").append(entry).append("\n");
-			options.add(SelectOption.of(entry.split(": ", 2)[1], String.valueOf(i))
+			options.add(SelectOption.of(StringUtils.abbreviate(entry.split(": ", 2)[1], SelectOption.LABEL_MAX_LENGTH), String.valueOf(i))
 					.withEmoji(SlimeEmoji.number((i % 9) + 1).getEmoji(guild))
 			);
 		}
