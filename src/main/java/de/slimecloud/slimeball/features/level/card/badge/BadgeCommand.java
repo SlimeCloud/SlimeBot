@@ -40,7 +40,7 @@ public class BadgeCommand {
 
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull ListManager<ICommandContext> manager, @NotNull AnnotatedCommand<?, ICommandContext, ?> cmd) {
-		cmd.addSubcommand(manager.createCommand(state -> bot.getCardBadges()).withDescription("Zeigt alle Badges an").withCondition(CommandPermission.EVERYONE));
+		cmd.addSubcommand(manager.createCommand(state -> bot.getCardBadges()).withDescription("Zeigt alle Badges an"));
 
 		cmd.addSubcommand(manager.createCommand(
 				(ctx, state) -> state.setState("badge", ctx.getEvent().getOption("badge").getAsString()),
