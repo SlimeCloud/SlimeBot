@@ -251,7 +251,7 @@ public class CardRenderer extends Graphic {
 
 	@NotNull
 	private Color getRankColor(int rank) {
-		if (data.getFontRankColor() == RankColor.FONT) return data.getFontColor();
+		if (data.getFontLevelStyle() == RankColor.FONT) return data.getFontColor();
 
 		return switch (rank) {
 			case 1 -> new Color(255, 215, 0);
@@ -263,7 +263,7 @@ public class CardRenderer extends Graphic {
 
 	@NotNull
 	private Color getLevelColor(int level) {
-		if (data.getFontRankColor() == RankColor.FONT) return data.getFontLevelColor();
+		if (data.getFontLevelStyle() == RankColor.FONT) return data.getFontLevelColor();
 		return LevelUpListener.getLevelRole(bot, member.getGuild(), level)
 				.map(member.getGuild()::getRoleById)
 				.map(Role::getColor)

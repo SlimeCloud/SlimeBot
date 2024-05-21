@@ -106,7 +106,7 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 
 	@Column
 	@Info(keyType = ConfigFieldType.ENUM)
-	private RankColor fontRankColor = RankColor.ROLE;
+	private RankColor fontLevelStyle = RankColor.ROLE;
 
 	@Column
 	@Info(keyType = ConfigFieldType.STRING)

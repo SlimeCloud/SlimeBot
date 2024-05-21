@@ -6,7 +6,7 @@ public enum RankColor {
 	FONT {
 		@Override
 		public String toString() {
-			return "Schriftfarbe";
+			return "Eigene Farbe";
 		}
 	},
 	ROLE {
