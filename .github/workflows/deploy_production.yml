@@ -2,7 +2,7 @@ name: Deploy to production
 
 on:
   push:
-    branches: [ "new-workflow" ]
+    branches: [ "master" ]
 
 jobs:
   build:
@@ -29,6 +29,6 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
       - name: upload compiled jar
-        run: scp ./build/libs/*-all.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}/slimebot.jar
+        run: scp ./build/libs/*-all.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.PRODUCTION_WORK_DIR }}/slimebot.jar
       - name: rebuild Dockercontainer and start Bot
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && ./rebuild.sh"
