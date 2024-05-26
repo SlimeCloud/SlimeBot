@@ -5,10 +5,7 @@ import net.dv8tion.jda.api.audio.UserAudio;
 
 import javax.sound.sampled.AudioInputStream;
 import java.io.ByteArrayInputStream;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AudioReceiver implements AudioReceiveHandler
 {
@@ -25,8 +22,8 @@ public class AudioReceiver implements AudioReceiveHandler
 		received.computeIfAbsent(userAudio.getUser().getIdLong(), id -> new LinkedList<>()).add(userAudio.getAudioData(VOLUME));
 	}
 
-	public Long[] getUsers() {
-		return received.keySet().toArray(Long[]::new);
+	public Set<Long> getUsers() {
+		return received.keySet();
 	}
 
 	public byte[] getBytes(Long id) {
