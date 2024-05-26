@@ -129,6 +129,7 @@ public class SlimeBot extends ListenerAdapter {
 	private final GitHubAPI github;
 	private final Spotify spotify;
 	private final Youtube youtube;
+	private final MeetingProtocol meetingProtocol;
 
 	private final MemberCount memberCount;
 	private final RoleMemberCount roleMemberCount;
@@ -211,6 +212,13 @@ public class SlimeBot extends ListenerAdapter {
 		} else {
 			logger.warn("Youtube api disabled due to missing config");
 			youtube = null;
+		}
+
+		//Initialize Meeting Protocol
+		if (credentials.get("PICOVOICE_ACCESS_KEY") != null) meetingProtocol = new MeetingProtocol(credentials.get("PICOVOICE_ACCESS_KEY"));
+		else {
+			logger.warn("Meeting Protocol disabled due to missing picovoice credentials");
+			meetingProtocol = null;
 		}
 
 
