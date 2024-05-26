@@ -22,14 +22,7 @@ public class AudioReceiver implements AudioReceiveHandler
 
 	@Override
 	public void handleUserAudio(UserAudio userAudio) {
-		getList(userAudio.getUser().getIdLong()).add(userAudio.getAudioData(VOLUME));
-	}
-
-	private List<byte[]> getList(Long id) {
-		if (received.containsKey(id)) return received.get(id);
-		List<byte[]> list = new LinkedList<>();
-		received.put(id, list);
-		return list;
+		received.computeIfAbsent(userAudio.getUser().getIdLong(), id -> new LinkedList<>()).add(userAudio.getAudioData(VOLUME));
 	}
 
 	public Long[] getUsers() {
