@@ -25,7 +25,6 @@ public class SpotifyAlert {
 
 	public SpotifyAlert(@NotNull SlimeBot bot) {
 		this.bot = bot;
-		bot.getDatabase().getDriver().useHandle(handle -> handle.createUpdate("create table if not exists spotify_known(id text)").execute());
 
 		bot.getExecutor().scheduleAtFixedRate(() -> {
 			try {
@@ -40,7 +39,7 @@ public class SpotifyAlert {
 
 	public void check() {
 		//Read releases that were already published
-		List<String> known = bot.getDatabase().getDriver().withHandle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list());
+		Collection<String> known = bot.getIdMemory().getMemory("spotify");
 		List<String> newIds = new ArrayList<>();
 
 		//Check for podcast episodes
@@ -69,11 +68,7 @@ public class SpotifyAlert {
 		logger.info("Found {} new entries", newIds.size());
 
 		//Mark newly published releases
-		bot.getDatabase().getDriver().useHandle(handle -> {
-			PreparedBatch update = handle.prepareBatch("insert into spotify_known values(:id)");
-			newIds.forEach(id -> update.bind("id", id).add());
-			update.execute();
-		});
+		bot.getIdMemory().rememberIds("spotify", newIds);
 	}
 
 	@NotNull
