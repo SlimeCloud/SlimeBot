@@ -39,14 +39,15 @@ public class MeetingProtocol {
 	}
 
 	private final String picovoice_access_key;
-	private final URL leopard_model;
+	private final File leopard_model;
 	@Getter
 	private AudioReceiver receiver;
 
 	public MeetingProtocol(String picovoice_access_key) {
 		this.picovoice_access_key = picovoice_access_key;
-		this.leopard_model = MeetingProtocol.class.getClassLoader().getResource("leopard_params_de.pv");
-		if (leopard_model == null || leopard_model.getPath().isBlank()) throw new RuntimeException("Leopard model not found");
+		URL url = MeetingProtocol.class.getClassLoader().getResource("leopard_params_de.pv");
+		if (url == null || url.getPath().isBlank()) throw new RuntimeException("Leopard model not found");
+		this.leopard_model = new File(url.getPath());
 	}
 
 	private void start(VoiceChannel vc) {
@@ -74,7 +75,7 @@ public class MeetingProtocol {
 
 		Leopard leopard = new Leopard.Builder()
 				.setAccessKey(picovoice_access_key)
-				.setModelPath(leopard_model.getPath())
+				.setModelPath(leopard_model.getAbsolutePath())
 				.build();
 
 		for (User user : users) {
