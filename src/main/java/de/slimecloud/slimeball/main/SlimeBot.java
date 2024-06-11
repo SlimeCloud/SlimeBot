@@ -228,6 +228,7 @@ public class SlimeBot extends ListenerAdapter {
 				.addEventListeners(new TeamMeeting(this))
 
 				.addEventListeners(new DataListener(this))
+				.addEventListeners(new PingListener())
 
 				.addEventListeners(memberCount = new MemberCount(this))
 				.addEventListeners(roleMemberCount = new RoleMemberCount(this));
