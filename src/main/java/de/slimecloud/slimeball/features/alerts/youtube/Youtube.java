@@ -18,9 +18,7 @@ import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -56,16 +54,17 @@ public class Youtube {
 	private void check() throws IOException {
 		Set<Video> videos = getLastVideo(5);
 
-		Collection<String> ids = bot.getIdMemory().getMemory("youtube");
+		Collection<String> known = bot.getIdMemory().getMemory("youtube");
+		List<String> newIds = new ArrayList<>();
 
 		for (Video video : videos) {
-			if (!ids.contains(video.id())) {
+			if (!known.contains(video.id())) {
 				new YoutubeVideoEvent(video).callEvent();
-				ids.add(video.id());
+				newIds.add(video.id());
 			}
 		}
 
-		bot.getIdMemory().rememberIds("youtube", ids);
+		bot.getIdMemory().rememberIds("youtube", newIds);
 	}
 
 	@NotNull
