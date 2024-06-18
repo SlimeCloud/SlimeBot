@@ -20,6 +20,7 @@ public class SocialsCommand {
 						"- **YouTube:** [@gamingguidesde](https://www.youtube.com/@gamingguidesde)\n" +
 								"- **Twitch:** [/gamingguidesde](https://twitch.tv/gamingguidesde)\n" +
 								"- **Instagram:** [@gamingguidesde](https://www.instagram.com/gamingguidesde/)\n" +
+								"- **Instagram 2:** [@derschleimi](https://www.instagram.com/derschleimi/)\n" +
 								"- **TikTok:** [@sirggde](https://www.tiktok.com/@sirggde)\n" +
 								"- **X (Twitter):** [@gamingguidesde](https://x.com/gamingguidesde)\n" +
 								"- **Labymod:** [@gamingguidesde](https://laby.net/@gamingguidesde)\n",
