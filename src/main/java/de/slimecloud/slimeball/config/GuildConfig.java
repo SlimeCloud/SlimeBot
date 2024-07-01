@@ -71,6 +71,10 @@ public class GuildConfig {
 	@ConfigField(name = "Team", command = "team", description = "Die Team-Rolle", type = ConfigFieldType.ROLE)
 	private Long teamRole;
 
+	@Setter
+	@ConfigField(name = "Abwesenheits-Rolle", command = "absence", description = "Die rolle für Abwesende Teammembers", type = ConfigFieldType.ROLE)
+	private Long absenceRole;
+
 	@Getter
 	@ConfigField(name = "Beitritts Rollen", command = "autorole", description = "Rollen, die Mitgliedern beim Beitreten gegeben werden", type = ConfigFieldType.ROLE)
 	private final List<Long> joinRoles = new ArrayList<>();
@@ -213,6 +217,11 @@ public class GuildConfig {
 	@NotNull
 	public Optional<Role> getTeamRole() {
 		return Optional.ofNullable(teamRole).map(bot.getJda()::getRoleById);
+	}
+
+	@NotNull
+	public Optional<Role> getAbsenceRole() {
+		return Optional.ofNullable(absenceRole).map(bot.getJda()::getRoleById);
 	}
 
 	@NotNull
