@@ -50,6 +50,7 @@ import de.slimecloud.slimeball.features.report.commands.MessageReportCommand;
 import de.slimecloud.slimeball.features.report.commands.ReportCommand;
 import de.slimecloud.slimeball.features.report.commands.UserReportCommand;
 import de.slimecloud.slimeball.features.report.commands.UserReportSlashCommand;
+import de.slimecloud.slimeball.features.staff.AbsenceCommand;
 import de.slimecloud.slimeball.features.staff.StaffMessage;
 import de.slimecloud.slimeball.features.staff.TeamMeeting;
 import de.slimecloud.slimeball.features.statistic.MemberCount;
@@ -257,6 +258,8 @@ public class SlimeBot extends ListenerAdapter {
 					manager.registerCommand(QuoteMessageCommand.class);
 
 					manager.registerCommand(FdmdsCommand.class);
+
+					manager.registerCommand(AbsenceCommand.class);
 
 					//old mee6 custom commands
 					manager.registerCommand(SocialsCommand.class);
