@@ -33,7 +33,7 @@ public class AbsenceCommand {
 					.setColor(bot.getColor(event.getGuild()))
 					.setDescription("Du bist nun " + (absent ? "Abwesend!" : "wieder Anwesend!"))
 					.setTimestamp(Instant.now())
-					.build()).setEphemeral(true).queue();
+					.build()).queue();
 
 			config.getLogChannel().ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
 					.setTitle("Abwesenheit update!")
