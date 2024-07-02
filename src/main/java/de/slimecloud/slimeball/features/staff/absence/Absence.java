@@ -10,6 +10,7 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +55,12 @@ public class Absence implements DataClass<Absence>, ListEntry {
 		absences.forEach(absence -> {
 			bot.loadGuild(absence.getGuild()).getAbsenceRole().ifPresent(role -> absence.getGuild().removeRoleFromMember(absence.getTeamMember(), role).queue());
 			bot.getAbsences().remove(absence);
+			bot.loadGuild(absence.getGuild()).getLogChannel().ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
+					.setTitle(":information_source:  Abwesenheit geupdatet")
+					.setColor(bot.getColor(absence.getGuild()))
+					.setDescription(absence.getTeamMember().getAsMention() + " ist nun wieder Anwesend!")
+					.setTimestamp(Instant.now())
+					.build()).queue());
 		});
 		return null;
 	}
