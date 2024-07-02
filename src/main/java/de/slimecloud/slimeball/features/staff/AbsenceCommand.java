@@ -19,7 +19,7 @@ public class AbsenceCommand {
 
 	@ApplicationCommandMethod
 	public void performCommand(@NotNull SlashCommandInteractionEvent event,
-	                           @Option(description = "Bist du Abwesend") Boolean absent
+	                           @Option(description = "Bist du Abwesend") boolean absent
 	) {
 		GuildConfig config = bot.loadGuild(event.getGuild());
 		config.getAbsenceRole().ifPresentOrElse(role -> {
