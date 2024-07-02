@@ -4,6 +4,7 @@ import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
 import de.mineking.discordutils.commands.option.Option;
 import de.slimecloud.slimeball.config.GuildConfig;
+import de.slimecloud.slimeball.main.CommandPermission;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -16,6 +17,7 @@ import java.time.Instant;
 @ApplicationCommand(name = "absence", description = "Abwesenheit an/abmelden")
 public class AbsenceCommand {
 	private final SlimeBot bot;
+	public final CommandPermission permission = CommandPermission.ROLE_MANAGE;
 
 	@ApplicationCommandMethod
 	public void performCommand(@NotNull SlashCommandInteractionEvent event,
