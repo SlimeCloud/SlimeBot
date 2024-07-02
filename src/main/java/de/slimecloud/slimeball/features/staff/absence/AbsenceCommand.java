@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.*;
-import java.util.List;
 
 @RequiredArgsConstructor
 @ApplicationCommand(name = "absence", description = "Abwesenheit an/abmelden")
@@ -32,9 +31,9 @@ public class AbsenceCommand {
 	public void performCommand(@NotNull SlashCommandInteractionEvent event,
 	                           @Option(description = "Bist du Abwesend") boolean absent,
 	                           @Option(description = "Der Grund warum du weg bist", required = false) String reason,
-                               @Option(description = "Der Tag, an dem du zurück bist", required = false,minValue = 1, maxValue = 31) Integer day,
-                               @Option(description = "Der Monat, an dem du zurück bist", required = false) Month month,
-                               @Option(description = "Das Jahr, an dem du zurück bist", required = false, minValue = 2024) Integer year
+	                           @Option(description = "Der Tag, an dem du zurück bist", required = false, minValue = 1, maxValue = 31) Integer day,
+	                           @Option(description = "Der Monat, an dem du zurück bist", required = false) Month month,
+	                           @Option(description = "Das Jahr, an dem du zurück bist", required = false, minValue = 2024) Integer year
 
 	) {
 		GuildConfig config = bot.loadGuild(event.getGuild());
@@ -51,12 +50,12 @@ public class AbsenceCommand {
 					event.getGuild().addRoleToMember(event.getUser(), role).queue();
 
 					bot.getAbsences().getByUser(event.getUser()).ifPresentOrElse(absence ->
-							event.replyEmbeds(new EmbedBuilder()
-							.setTitle(":x: Fehler")
-							.setColor(bot.getColor(event.getGuild()))
-							.setDescription("Du bist bereits Abwesend!")
-							.setTimestamp(Instant.now())
-							.build()).setEphemeral(true).queue(),
+									event.replyEmbeds(new EmbedBuilder()
+											.setTitle(":x: Fehler")
+											.setColor(bot.getColor(event.getGuild()))
+											.setDescription("Du bist bereits Abwesend!")
+											.setTimestamp(Instant.now())
+											.build()).setEphemeral(true).queue(),
 							() -> {
 								bot.getAbsences().addAbsence(new Absence(bot, event.getUser(), event.getGuild(), timestamp));
 
@@ -85,12 +84,12 @@ public class AbsenceCommand {
 											.build()).queue();
 								},
 								() -> event.replyEmbeds(new EmbedBuilder()
-											.setTitle(":x: Fehler")
-											.setColor(bot.getColor(event.getGuild()))
-											.setDescription("Du bist bereits Anwesend!")
-											.setTimestamp(Instant.now())
-											.build()).setEphemeral(true).queue()
-								);
+										.setTitle(":x: Fehler")
+										.setColor(bot.getColor(event.getGuild()))
+										.setDescription("Du bist bereits Anwesend!")
+										.setTimestamp(Instant.now())
+										.build()).setEphemeral(true).queue()
+						);
 					},
 					() -> event.reply("Es ist keine Rolle für Abwesenheit eingestellt!").setEphemeral(true).queue());
 		}
