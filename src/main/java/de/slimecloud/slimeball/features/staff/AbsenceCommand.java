@@ -21,7 +21,8 @@ public class AbsenceCommand {
 
 	@ApplicationCommandMethod
 	public void performCommand(@NotNull SlashCommandInteractionEvent event,
-	                           @Option(description = "Bist du Abwesend") boolean absent
+	                           @Option(description = "Bist du Abwesend") boolean absent,
+                               @Option(description = "Bis wann bist du Abwesend?", required = false) String duration
 	) {
 		GuildConfig config = bot.loadGuild(event.getGuild());
 		config.getAbsenceRole().ifPresentOrElse(role -> {
@@ -31,7 +32,7 @@ public class AbsenceCommand {
 			event.replyEmbeds(new EmbedBuilder()
 					.setTitle(":white_check_mark: Abwesenheit geupdatet")
 					.setColor(bot.getColor(event.getGuild()))
-					.setDescription("Du bist nun " + (absent ? "Abwesend!" : "wieder Anwesend!"))
+					.setDescription("Du bist nun " + (absent ? "Abwesend" + (duration == null ? "" : " bis " + duration) : "wieder Anwesend") + "!")
 					.setTimestamp(Instant.now())
 					.build()).queue();
 
