@@ -20,7 +20,7 @@ import java.time.*;
 @ApplicationCommand(name = "absence", description = "Abwesenheit an/abmelden")
 public class AbsenceCommand {
 	private final SlimeBot bot;
-	public final CommandPermission permission = CommandPermission.ROLE_MANAGE;
+	public final CommandPermission permission = CommandPermission.TEAM;
 
 	@Setup
 	public static void setup(@NotNull SlimeBot bot) {
