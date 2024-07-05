@@ -26,10 +26,10 @@ public class AbsenceSchedule {
 		logger.info("found {} expired absence", absences.size());
 
 		absences.forEach(absence -> {
-			bot.loadGuild(absence.getGuild()).getAbsenceRole().ifPresent(role -> absence.getGuild().removeRoleFromMember(absence.getTeamMember(), role).queue());
+			bot.loadGuild(absence.getGuild()).getAbsence().map(AbsenceConfig::getRole).ifPresent(role -> absence.getGuild().removeRoleFromMember(absence.getTeamMember(), role).queue());
 			bot.getAbsences().remove(absence);
 
-			bot.loadGuild(absence.getGuild()).getLogChannel().ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
+			bot.loadGuild(absence.getGuild()).getAbsence().flatMap(AbsenceConfig::getChannel).ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
 					.setTitle(":information_source:  Abwesenheit geupdatet")
 					.setColor(bot.getColor(absence.getGuild()))
 					.setDescription(absence.getTeamMember().getAsMention() + " ist nun wieder Anwesend!")

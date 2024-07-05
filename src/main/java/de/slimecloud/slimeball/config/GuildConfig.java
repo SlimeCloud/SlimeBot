@@ -12,6 +12,7 @@ import de.slimecloud.slimeball.features.level.GuildLevelConfig;
 import de.slimecloud.slimeball.features.moderation.AutoDeleteFlag;
 import de.slimecloud.slimeball.features.staff.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
+import de.slimecloud.slimeball.features.staff.absence.AbsenceConfig;
 import de.slimecloud.slimeball.features.statistic.StatisticConfig;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
@@ -70,10 +71,6 @@ public class GuildConfig {
 	@Setter
 	@ConfigField(name = "Team", command = "team", description = "Die Team-Rolle", type = ConfigFieldType.ROLE)
 	private Long teamRole;
-
-	@Setter
-	@ConfigField(name = "Abwesenheits-Rolle", command = "absence", description = "Die rolle für Abwesende Teammembers", type = ConfigFieldType.ROLE)
-	private Long absenceRole;
 
 	@Getter
 	@ConfigField(name = "Beitritts Rollen", command = "autorole", description = "Rollen, die Mitgliedern beim Beitreten gegeben werden", type = ConfigFieldType.ROLE)
@@ -140,6 +137,10 @@ public class GuildConfig {
 	@CategoryInfo(name = "Youtube", command = "youtube", description = "Konfiguration für die Youtube Notification")
 	private GuildYoutubeConfig youtube;
 
+	@Setter
+	@CategoryInfo(name = "Abwesenheit", command = "absence", description = "Konfiguration für die Abwesenheits-Orga")
+	private AbsenceConfig absence;
+
 	@NotNull
 	private GuildConfig configure(@NotNull SlimeBot bot, @NotNull String path, long guild) {
 		this.bot = bot;
@@ -154,6 +155,7 @@ public class GuildConfig {
 		if (birthday != null) birthday.bot = bot;
 		if (statistic != null) statistic.bot = bot;
 		if (youtube != null) youtube.bot = bot;
+		if (absence != null) absence.bot = bot;
 
 		return this;
 	}
@@ -213,15 +215,15 @@ public class GuildConfig {
 		return Optional.ofNullable(youtube);
 	}
 
+	@NotNull
+	public Optional<AbsenceConfig> getAbsence() {
+		return Optional.ofNullable(absence);
+	}
+
 
 	@NotNull
 	public Optional<Role> getTeamRole() {
 		return Optional.ofNullable(teamRole).map(bot.getJda()::getRoleById);
-	}
-
-	@NotNull
-	public Optional<Role> getAbsenceRole() {
-		return Optional.ofNullable(absenceRole).map(bot.getJda()::getRoleById);
 	}
 
 	@NotNull
