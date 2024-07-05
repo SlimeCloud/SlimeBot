@@ -24,7 +24,7 @@ public class AbsenceCommand {
 
 	@Setup
 	public static void setup(@NotNull SlimeBot bot) {
-		bot.scheduleDaily(12, new Absence(bot).check());
+		new AbsenceSchedule(bot);
 	}
 
 	@ApplicationCommandMethod
