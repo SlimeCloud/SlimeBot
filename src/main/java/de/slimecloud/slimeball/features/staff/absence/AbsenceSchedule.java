@@ -13,8 +13,9 @@ import java.util.List;
 @Slf4j
 public class AbsenceSchedule {
 	SlimeBot bot;
+
 	public AbsenceSchedule(@NotNull SlimeBot bot) {
-		bot.scheduleDaily(12, this::check );
+		bot.scheduleDaily(12, this::check);
 	}
 
 	private void check() {
@@ -37,6 +38,5 @@ public class AbsenceSchedule {
 					.build()).queue()
 			);
 		});
-		return;
 	}
 }

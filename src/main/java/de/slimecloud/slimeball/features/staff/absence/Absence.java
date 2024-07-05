@@ -3,19 +3,15 @@ package de.slimecloud.slimeball.features.staff.absence;
 import de.mineking.databaseutils.Column;
 import de.mineking.databaseutils.DataClass;
 import de.mineking.databaseutils.Table;
-import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
