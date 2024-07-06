@@ -4,7 +4,6 @@ import de.mineking.databaseutils.Table;
 import de.mineking.databaseutils.Where;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
@@ -22,7 +21,7 @@ public interface AbsenceTable extends Table<Absence> {
 		delete(Where.allOf(
 				Where.equals("teamMember", member),
 				Where.equals("guild", member.getGuild())
-				));
+		));
 	}
 
 	@NotNull

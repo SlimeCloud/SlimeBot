@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.*;
 
 @RequiredArgsConstructor
-@ApplicationCommand(name = "absence", description = "Abwesenheit an/abmelden")
+@ApplicationCommand(name = "absence", description = "Abwesenheit an/abmelden" )
 public class AbsenceCommand {
 	private final SlimeBot bot;
 	public final CommandPermission permission = CommandPermission.TEAM;
@@ -29,7 +29,7 @@ public class AbsenceCommand {
 
 	@ApplicationCommandMethod
 	public void performCommand(@NotNull SlashCommandInteractionEvent event,
-	                           @Option(description = "Bist du Abwesend") boolean absent,
+	                           @Option(description = "Bist du Abwesend" ) boolean absent,
 	                           @Option(description = "Der Grund warum du weg bist", required = false) String reason,
 	                           @Option(description = "Der Tag, an dem du zurück bist", required = false, minValue = 1, maxValue = 31) Integer day,
 	                           @Option(description = "Der Monat, an dem du zurück bist", required = false) Month month,
@@ -51,22 +51,22 @@ public class AbsenceCommand {
 
 					bot.getAbsences().getByUser(event.getMember()).ifPresentOrElse(absence ->
 									event.replyEmbeds(new EmbedBuilder()
-											.setTitle(":x: Fehler")
+											.setTitle(":x: Fehler" )
 											.setColor(bot.getColor(event.getGuild()))
-											.setDescription("Du bist bereits Abwesend!")
+											.setDescription("Du bist bereits Abwesend!" )
 											.setTimestamp(Instant.now())
 											.build()).setEphemeral(true).queue(),
 							() -> {
 								bot.getAbsences().addMember(bot, event.getMember(), timestamp);
 
 								event.replyEmbeds(new EmbedBuilder()
-										.setTitle(":white_check_mark: Abwesenheit geupdatet")
+										.setTitle(":white_check_mark: Abwesenheit geupdatet" )
 										.setColor(bot.getColor(event.getGuild()))
 										.setDescription("Du bist nun Abwesend" + (timestamp == null ? "" : " bis " + TimeFormat.DATE_SHORT.format(timestamp)) + "!" + (reason == null ? "" : "\n\n**Grund:**\n" + reason))
 										.setTimestamp(Instant.now())
 										.build()).queue();
 							});
-				}, () -> event.reply("Es ist keine Rolle für Abwesenheit eingestellt!").setEphemeral(true).queue());
+				}, () -> event.reply("Es ist keine Rolle für Abwesenheit eingestellt!" ).setEphemeral(true).queue());
 			} catch (DateTimeException e) {
 				event.reply(":x: " + e.getMessage()).setEphemeral(true).queue();
 			}
@@ -77,21 +77,21 @@ public class AbsenceCommand {
 						bot.getAbsences().getByUser(event.getMember()).ifPresentOrElse(absence -> {
 									bot.getAbsences().remove(event.getMember());
 									event.replyEmbeds(new EmbedBuilder()
-											.setTitle(":white_check_mark: Abwesenheit geupdatet")
+											.setTitle(":white_check_mark: Abwesenheit geupdatet" )
 											.setColor(bot.getColor(event.getGuild()))
-											.setDescription("Du bist nun wieder Anwesend!")
+											.setDescription("Du bist nun wieder Anwesend!" )
 											.setTimestamp(Instant.now())
 											.build()).queue();
 								},
 								() -> event.replyEmbeds(new EmbedBuilder()
-										.setTitle(":x: Fehler")
+										.setTitle(":x: Fehler" )
 										.setColor(bot.getColor(event.getGuild()))
-										.setDescription("Du bist bereits Anwesend!")
+										.setDescription("Du bist bereits Anwesend!" )
 										.setTimestamp(Instant.now())
 										.build()).setEphemeral(true).queue()
 						);
 					},
-					() -> event.reply("Es ist keine Rolle für Abwesenheit eingestellt!").setEphemeral(true).queue());
+					() -> event.reply("Es ist keine Rolle für Abwesenheit eingestellt!" ).setEphemeral(true).queue());
 		}
 	}
 }
