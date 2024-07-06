@@ -49,7 +49,7 @@ public class AbsenceCommand {
 				config.getAbsence().map(AbsenceConfig::getRole).ifPresentOrElse(role -> {
 					event.getGuild().addRoleToMember(event.getUser(), role).queue();
 
-					bot.getAbsences().getByUser(event.getUser()).ifPresentOrElse(absence ->
+					bot.getAbsences().getByUser(event.getMember()).ifPresentOrElse(absence ->
 									event.replyEmbeds(new EmbedBuilder()
 											.setTitle(":x: Fehler")
 											.setColor(bot.getColor(event.getGuild()))
@@ -57,7 +57,7 @@ public class AbsenceCommand {
 											.setTimestamp(Instant.now())
 											.build()).setEphemeral(true).queue(),
 							() -> {
-								bot.getAbsences().addAbsence(new Absence(bot, event.getUser(), event.getGuild(), timestamp));
+								bot.getAbsences().addMember(bot, event.getMember(), timestamp);
 
 								event.replyEmbeds(new EmbedBuilder()
 										.setTitle(":white_check_mark: Abwesenheit geupdatet")
@@ -74,8 +74,8 @@ public class AbsenceCommand {
 			config.getAbsence().map(AbsenceConfig::getRole).ifPresentOrElse(role -> {
 						event.getGuild().removeRoleFromMember(event.getUser(), role).queue();
 
-						bot.getAbsences().getByUser(event.getUser()).ifPresentOrElse(absence -> {
-									bot.getAbsences().remove(absence);
+						bot.getAbsences().getByUser(event.getMember()).ifPresentOrElse(absence -> {
+									bot.getAbsences().remove(event.getMember());
 									event.replyEmbeds(new EmbedBuilder()
 											.setTitle(":white_check_mark: Abwesenheit geupdatet")
 											.setColor(bot.getColor(event.getGuild()))

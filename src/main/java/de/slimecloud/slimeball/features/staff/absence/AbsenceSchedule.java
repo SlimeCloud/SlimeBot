@@ -28,7 +28,7 @@ public class AbsenceSchedule {
 
 		absences.forEach(absence -> {
 			bot.loadGuild(absence.getGuild()).getAbsence().map(AbsenceConfig::getRole).ifPresent(role -> absence.getGuild().removeRoleFromMember(absence.getTeamMember(), role).queue());
-			bot.getAbsences().remove(absence);
+			bot.getAbsences().remove(bot.getJda().getGuildById(absence.getGuild().getId()).getMember(absence.getTeamMember()));
 
 			bot.loadGuild(absence.getGuild()).getAbsence().flatMap(AbsenceConfig::getChannel).ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
 					.setTitle(":information_source:  Abwesenheit geupdatet")

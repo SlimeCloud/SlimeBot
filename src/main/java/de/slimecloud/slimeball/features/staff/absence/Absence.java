@@ -22,15 +22,11 @@ public class Absence implements DataClass<Absence> {
 	@Column(key = true)
 	private UserSnowflake teamMember;
 
-	@Column
-	private final Guild guild;
+	@Column(key = true)
+	private Guild guild;
 
 	@Column
 	private Instant time;
-
-	public Absence(SlimeBot bot) {
-		this(bot, null, null, null);
-	}
 
 	@NotNull
 	@Override
