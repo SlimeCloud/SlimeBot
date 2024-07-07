@@ -12,14 +12,15 @@ import java.util.List;
 
 @Slf4j
 public class AbsenceSchedule {
-	SlimeBot bot;
+	private final SlimeBot bot;
 
 	public AbsenceSchedule(@NotNull SlimeBot bot) {
+		this.bot = bot;
 		bot.scheduleDaily(12, this::check);
 	}
 
 	private void check() {
-		logger.info("Check for expired absence" );
+		logger.info("Check for expired absence");
 
 		List<Absence> absences = bot.getAbsences().getExpiredAbsence(ZonedDateTime.now(Main.timezone).toInstant());
 
@@ -31,9 +32,9 @@ public class AbsenceSchedule {
 			bot.getAbsences().remove(bot.getJda().getGuildById(absence.getGuild().getId()).getMember(absence.getTeamMember()));
 
 			bot.loadGuild(absence.getGuild()).getAbsence().flatMap(AbsenceConfig::getChannel).ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
-					.setTitle(":information_source:  Abwesenheit geupdatet" )
+					.setTitle(":information_source:  Abwesenheit geupdatet")
 					.setColor(bot.getColor(absence.getGuild()))
-					.setDescription(absence.getTeamMember().getAsMention() + " ist nun wieder Anwesend!" )
+					.setDescription(absence.getTeamMember().getAsMention() + " ist nun wieder Anwesend!")
 					.setTimestamp(Instant.now())
 					.build()).queue()
 			);
