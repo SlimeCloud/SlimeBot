@@ -12,6 +12,7 @@ import de.slimecloud.slimeball.features.level.GuildLevelConfig;
 import de.slimecloud.slimeball.features.moderation.AutoDeleteFlag;
 import de.slimecloud.slimeball.features.staff.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
+import de.slimecloud.slimeball.features.staff.absence.AbsenceConfig;
 import de.slimecloud.slimeball.features.statistic.StatisticConfig;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
@@ -136,6 +137,10 @@ public class GuildConfig {
 	@CategoryInfo(name = "Youtube", command = "youtube", description = "Konfiguration für die Youtube Notification")
 	private GuildYoutubeConfig youtube;
 
+	@Setter
+	@CategoryInfo(name = "Abwesenheit", command = "absence", description = "Konfiguration für die Abwesenheits-Orga")
+	private AbsenceConfig absence;
+
 	@NotNull
 	private GuildConfig configure(@NotNull SlimeBot bot, @NotNull String path, long guild) {
 		this.bot = bot;
@@ -150,6 +155,7 @@ public class GuildConfig {
 		if (birthday != null) birthday.bot = bot;
 		if (statistic != null) statistic.bot = bot;
 		if (youtube != null) youtube.bot = bot;
+		if (absence != null) absence.bot = bot;
 
 		return this;
 	}
@@ -207,6 +213,11 @@ public class GuildConfig {
 	@NotNull
 	public Optional<GuildYoutubeConfig> getYoutube() {
 		return Optional.ofNullable(youtube);
+	}
+
+	@NotNull
+	public Optional<AbsenceConfig> getAbsence() {
+		return Optional.ofNullable(absence);
 	}
 
 

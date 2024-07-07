@@ -148,9 +148,9 @@ public class CardCommand {
 				if (field.getType().isAssignableFrom(Style.class)) temp.add(new StyleComponent(field));
 				else if (field.getType().isAssignableFrom(RankColor.class)) temp.add(new RankStyleComponent(field));
 				else temp.add(0, new ButtonComponent(field.getName(), name.length > 1 ? ButtonColor.GRAY : ButtonColor.BLUE, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s -> input.createState()
-						.setState("field", field.getName())
-						.display((IModalCallback) s.getEvent())
-				));
+							.setState("field", field.getName())
+							.display((IModalCallback) s.getEvent())
+					));
 			}
 
 			if (!temp.isEmpty()) components.add(ComponentRow.of(temp));
