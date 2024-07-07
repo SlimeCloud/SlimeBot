@@ -65,7 +65,8 @@ public class AbsenceCommand {
 										.setTimestamp(Instant.now())
 										.build()).queue();
 							});
-				}, () -> event.reply("Es ist keine Rolle für Abwesenheit eingestellt!").setEphemeral(true).queue());
+				}, () -> event.reply("Es ist keine Rolle für Abwesenheit eingestellt!").setEphemeral(true).queue()
+				);
 			} catch (DateTimeException e) {
 				event.reply(":x: " + e.getMessage()).setEphemeral(true).queue();
 			}
@@ -90,7 +91,8 @@ public class AbsenceCommand {
 										.build()).setEphemeral(true).queue()
 						);
 					},
-					() -> event.reply("Es ist keine Rolle für Abwesenheit eingestellt!").setEphemeral(true).queue());
+					() -> event.reply("Es ist keine Rolle für Abwesenheit eingestellt!").setEphemeral(true).queue()
+			);
 		}
 	}
 }
