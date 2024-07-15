@@ -18,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -30,7 +32,7 @@ public class Youtube {
 	private final YoutubeConfig config;
 
 	private int currentKey;
-	private Video lastVideo;
+	private Map<String, Video> lastVideo = new HashMap<>();
 
 	public Youtube(String[] keys, SlimeBot bot, YoutubeConfig config) {
 		this.keys = keys;
@@ -40,23 +42,25 @@ public class Youtube {
 	}
 
 	public void startListener() {
-		int delay = config.getUpdateRate();
+		Map<String, Integer> channels = config.getYoutubeChannels();
 
-		bot.getExecutor().scheduleAtFixedRate(() -> {
-			try {
-				check();
-			} catch (Exception e) {
-				logger.error("Failed to check for new video", e);
-			}
-		}, 0, delay, TimeUnit.SECONDS);
+		channels.forEach((channel, delay) -> {
+			bot.getExecutor().scheduleAtFixedRate(() -> {
+				try {
+					check(channel);
+				} catch (Exception e) {
+					logger.error("Failed to check for new video for channel " + channel, e);
+				}
+			}, 0, delay, TimeUnit.SECONDS);
+		});
 	}
 
-	private void check() throws IOException {
-		Video lastCheckedVideo = getLastVideo();
+	private void check(String youtubeChannelId) throws IOException {
+		Video lastCheckedVideo = getLastVideo(youtubeChannelId);
 
-		if (lastCheckedVideo != null && !lastCheckedVideo.equals(lastVideo)) {
-			if (lastVideo != null) new YoutubeVideoEvent(lastCheckedVideo).callEvent();
-			this.lastVideo = lastCheckedVideo;
+		if (lastCheckedVideo != null && !lastCheckedVideo.equals(lastVideo.get(youtubeChannelId))) {
+			if (lastVideo.get(youtubeChannelId) != null) new YoutubeVideoEvent(youtubeChannelId, lastCheckedVideo).callEvent();
+			this.lastVideo.put(youtubeChannelId, lastCheckedVideo);
 		}
 	}
 
@@ -67,9 +71,9 @@ public class Youtube {
 
 	//returns null if no videos found on the channel
 	@Nullable
-	public Video getLastVideo() throws IOException {
+	public Video getLastVideo(String youtubeChannelId) throws IOException {
 		Request request = new Request.Builder()
-				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", getNextKey(), config.getYoutubeChannelId()))
+				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", getNextKey(), youtubeChannelId))
 				.get()
 				.build();
 
