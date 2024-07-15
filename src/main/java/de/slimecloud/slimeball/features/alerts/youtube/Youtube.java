@@ -1,6 +1,7 @@
 package de.slimecloud.slimeball.features.alerts.youtube;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.slimecloud.slimeball.config.YoutubeConfig;
@@ -15,11 +16,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -56,12 +55,19 @@ public class Youtube {
 	}
 
 	private void check(String youtubeChannelId) throws IOException {
-		Video lastCheckedVideo = getLastVideo(youtubeChannelId);
+		Set<Video> videos = getLastVideo(youtubeChannelId, 5);
 
-		if (lastCheckedVideo != null && !lastCheckedVideo.equals(lastVideo.get(youtubeChannelId))) {
-			if (lastVideo.get(youtubeChannelId) != null) new YoutubeVideoEvent(youtubeChannelId, lastCheckedVideo).callEvent();
-			this.lastVideo.put(youtubeChannelId, lastCheckedVideo);
+		Collection<String> known = bot.getIdMemory().getMemory("youtube-" + youtubeChannelId);
+		List<String> newIds = new ArrayList<>();
+
+		for (Video video : videos) {
+			if (!known.contains(video.id())) {
+				new YoutubeVideoEvent(youtubeChannelId, video).callEvent();
+				newIds.add(video.id());
+			}
 		}
+
+		bot.getIdMemory().rememberIds("youtube-" + youtubeChannelId, newIds);
 	}
 
 	@NotNull
@@ -69,11 +75,10 @@ public class Youtube {
 		return keys[currentKey++ % keys.length];
 	}
 
-	//returns null if no videos found on the channel
-	@Nullable
-	public Video getLastVideo(String youtubeChannelId) throws IOException {
+	@NotNull
+	public Set<Video> getLastVideo(String youtubeChannelId, int limit) throws IOException {
 		Request request = new Request.Builder()
-				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", getNextKey(), youtubeChannelId))
+				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=" + limit, getNextKey(), youtubeChannelId))
 				.get()
 				.build();
 
@@ -82,8 +87,12 @@ public class Youtube {
 		JsonObject json = JsonParser.parseString(response.body().string()).getAsJsonObject();
 		JsonArray videos = json.getAsJsonArray("items");
 
-		if (videos.size() <= 0) return null;
+		Set<Video> result = new HashSet<>();
 
-		return Video.ofSearch(Main.json.fromJson(videos.get(0), SearchResult.class));
+		for (JsonElement video : videos) {
+			result.add(Video.ofSearch(Main.json.fromJson(video, SearchResult.class)));
+		}
+
+		return result;
 	}
 }

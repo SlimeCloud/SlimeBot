@@ -15,7 +15,7 @@ public class YoutubeListener {
 
 	@EventHandler
 	public void onUpload(YoutubeVideoEvent event) {
-		logger.info("Video Uploaded: " + event.getVideo());
+		logger.info("Video Uploaded: {}", event.getVideo());
 		bot.getJda().getGuilds().forEach(g -> bot.loadGuild(g).getYoutube().ifPresent(config ->
 				config.getChannel(event.getYoutubeChannelId()).ifPresentOrElse(channel -> {
 					String msg = event.isLive() ? config.getLiveMessage().get(event.getYoutubeChannelId()) : config.getVideoMessage().get(event.getYoutubeChannelId());
@@ -26,7 +26,7 @@ public class YoutubeListener {
 							.replace("%url%", event.getVideo().getUrl())
 							.replace("%title%", event.getVideo().snippet().title())
 					).queue();
-				}, () -> logger.warn("Cannot send Youtube Notification because channel %s not found".formatted(config.getChannelId(event.getYoutubeChannelId()))))
+				}, () -> logger.warn("Cannot send Youtube Notification because channel {} not found", config.getChannelId(event.getYoutubeChannelId())))
 		));
 	}
 }

@@ -11,6 +11,8 @@ import de.slimecloud.slimeball.config.Config;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.LogForwarding;
 import de.slimecloud.slimeball.config.commands.ConfigCommand;
+import de.slimecloud.slimeball.features.StoredId;
+import de.slimecloud.slimeball.features.alerts.IdMemory;
 import de.slimecloud.slimeball.features.alerts.holiday.HolidayAlert;
 import de.slimecloud.slimeball.features.alerts.spotify.Spotify;
 import de.slimecloud.slimeball.features.alerts.spotify.SpotifyAlert;
@@ -50,6 +52,9 @@ import de.slimecloud.slimeball.features.report.commands.UserReportCommand;
 import de.slimecloud.slimeball.features.report.commands.UserReportSlashCommand;
 import de.slimecloud.slimeball.features.staff.StaffMessage;
 import de.slimecloud.slimeball.features.staff.TeamMeeting;
+import de.slimecloud.slimeball.features.staff.absence.Absence;
+import de.slimecloud.slimeball.features.staff.absence.AbsenceCommand;
+import de.slimecloud.slimeball.features.staff.absence.AbsenceTable;
 import de.slimecloud.slimeball.features.statistic.MemberCount;
 import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
@@ -119,8 +124,10 @@ public class SlimeBot extends ListenerAdapter {
 	private final CardBadgeTable cardBadges;
 
 	private final WrappedDataTable wrappedData;
-
 	private final BirthdayTable birthdays;
+	private final IdMemory idMemory;
+
+	private final AbsenceTable absences;
 
 	private final GitHubAPI github;
 	private final Spotify spotify;
@@ -163,8 +170,10 @@ public class SlimeBot extends ListenerAdapter {
 			cardBadges = (CardBadgeTable) database.getTable(CardBadgeTable.class, CardBadgeData.class, () -> new CardBadgeData(this), "guild_card_badges").createTable();
 
 			wrappedData = (WrappedDataTable) database.getTable(WrappedDataTable.class, WrappedData.class, () -> new WrappedData(this), "wrapped_data").createTable();
-
 			birthdays = (BirthdayTable) database.getTable(BirthdayTable.class, Birthday.class, () -> new Birthday(this), "birthdays").createTable();
+			idMemory = (IdMemory) database.getTable(IdMemory.class, StoredId.class, () -> new StoredId("", ""), "id_memory").createTable();
+
+			absences = (AbsenceTable) database.getTable(AbsenceTable.class, Absence.class, () -> new Absence(this), "absences").createTable();
 		} else {
 			logger.warn("Database credentials missing! Some features will be disabled!");
 
@@ -177,6 +186,8 @@ public class SlimeBot extends ListenerAdapter {
 			cardBadges = null;
 			wrappedData = null;
 			birthdays = null;
+			idMemory = null;
+			absences = null;
 		}
 
 		//Initialize GitHub API
@@ -228,6 +239,7 @@ public class SlimeBot extends ListenerAdapter {
 				.addEventListeners(new TeamMeeting(this))
 
 				.addEventListeners(new DataListener(this))
+				.addEventListeners(new PingListener())
 
 				.addEventListeners(memberCount = new MemberCount(this))
 				.addEventListeners(roleMemberCount = new RoleMemberCount(this));
@@ -253,6 +265,8 @@ public class SlimeBot extends ListenerAdapter {
 					manager.registerCommand(QuoteMessageCommand.class);
 
 					manager.registerCommand(FdmdsCommand.class);
+
+					manager.registerCommand(AbsenceCommand.class);
 
 					//old mee6 custom commands
 					manager.registerCommand(SocialsCommand.class);
