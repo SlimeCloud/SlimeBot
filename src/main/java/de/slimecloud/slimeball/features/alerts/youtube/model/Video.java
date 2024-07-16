@@ -1,6 +1,7 @@
 package de.slimecloud.slimeball.features.alerts.youtube.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public record Video(String id, @NotNull VideoSnippet snippet) {
 
@@ -18,8 +19,9 @@ public record Video(String id, @NotNull VideoSnippet snippet) {
 		return new Channel(snippet.channelId(), new ChannelSnippet(snippet.channelTitle()));
 	}
 
-	@NotNull
+	@Nullable
 	public static Video ofSearch(SearchResult sr) {
+		if ("youtube#channel".equals(sr.id().kind())) return null;
 		SearchResultSnippet snippet = sr.snippet();
 		return new Video(sr.id().videoId(), new VideoSnippet(snippet.description(), snippet.title(), snippet.channelId(), snippet.channelTitle(), snippet.liveBroadcastContent()));
 	}
