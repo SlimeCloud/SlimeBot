@@ -90,7 +90,8 @@ public class Youtube {
 		Set<Video> result = new HashSet<>();
 
 		for (JsonElement video : videos) {
-			result.add(Video.ofSearch(Main.json.fromJson(video, SearchResult.class)));
+			Video videoResult = Video.ofSearch(Main.json.fromJson(video, SearchResult.class));
+			if (videoResult != null) result.add(videoResult);
 		}
 
 		return result;
