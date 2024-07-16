@@ -5,6 +5,7 @@ import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
 import de.mineking.discordutils.commands.Setup;
 import de.mineking.discordutils.commands.condition.IRegistrationCondition;
+import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.condition.cooldown.Cooldown;
 import de.mineking.discordutils.commands.condition.cooldown.CooldownIncrement;
 import de.mineking.discordutils.commands.context.ICommandContext;
@@ -29,7 +30,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@ApplicationCommand(name = "quote", description = "Zitiere jemanden", defer = true)
+@ApplicationCommand(name = "quote", description = "Zitiere jemanden", defer = true, scope = Scope.GUILD)
 public class QuoteCommand {
 	public final IRegistrationCondition<ICommandContext> condition = (manager, guild, cache) -> cache.<GuildConfig>getState("config").getQuoteChannel().isPresent();
 
