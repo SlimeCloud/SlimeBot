@@ -82,24 +82,29 @@ public class Absence implements DataClass<Absence>, ListEntry {
 
 		started = true;
 		update();
+
+		bot.loadGuild(guild).getTeamMessage().ifPresent(config -> config.update(guild));
 	}
 
 	@Override
 	public boolean delete() {
 		boolean value = DataClass.super.delete();
 
-		if (started) bot.loadGuild(guild).getAbsence().ifPresent(config -> {
-			config.getRole().ifPresent(role -> guild.removeRoleFromMember(member, role).queue());
-			config.getChannel().ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
-					.setAuthor(guild.getMember(member).getEffectiveName(), null, guild.getMember(member).getEffectiveAvatarUrl())
-					.setTitle("Abwesenheit endet")
-					.setColor(bot.getColor(guild))
-					.appendDescription("Die Abwesenheit von " + member.getAsMention() + " von " + TimeFormat.RELATIVE.format(toInstant(start)) + " hat geendet.\n")
-					.appendDescription(member.getAsMention() + " kann ab sofort wieder Aufgaben im Team übernehmen.")
-					.addField("Grund für die Abwesenheit", reason, false)
-					.build()
-			).queue());
-		});
+		if (started) {
+			bot.loadGuild(guild).getAbsence().ifPresent(config -> {
+				config.getRole().ifPresent(role -> guild.removeRoleFromMember(member, role).queue());
+				config.getChannel().ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
+						.setAuthor(guild.getMember(member).getEffectiveName(), null, guild.getMember(member).getEffectiveAvatarUrl())
+						.setTitle("Abwesenheit endet")
+						.setColor(bot.getColor(guild))
+						.appendDescription("Die Abwesenheit von " + member.getAsMention() + " von " + TimeFormat.RELATIVE.format(toInstant(start)) + " hat geendet.\n")
+						.appendDescription(member.getAsMention() + " kann ab sofort wieder Aufgaben im Team übernehmen.")
+						.addField("Grund für die Abwesenheit", reason, false)
+						.build()
+				).queue());
+			});
+			bot.loadGuild(guild).getTeamMessage().ifPresent(config -> config.update(guild));
+		}
 
 		return value;
 	}
