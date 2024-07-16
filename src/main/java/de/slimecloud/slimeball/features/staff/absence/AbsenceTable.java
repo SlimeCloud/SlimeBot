@@ -1,36 +1,70 @@
 package de.slimecloud.slimeball.features.staff.absence;
 
+import de.mineking.databaseutils.Order;
 import de.mineking.databaseutils.Table;
 import de.mineking.databaseutils.Where;
+import de.mineking.discordutils.list.ListContext;
+import de.mineking.discordutils.list.Listable;
+import de.mineking.discordutils.ui.MessageMenu;
+import de.mineking.discordutils.ui.state.DataState;
 import de.slimecloud.slimeball.main.SlimeBot;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.sql.Date;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-public interface AbsenceTable extends Table<Absence> {
-
-	@NotNull
-	default Absence addMember(@NotNull SlimeBot bot, @NotNull Member member, @NotNull Instant time) {
-		return insert(new Absence(bot, member.getUser(), member.getGuild(), time));
+public interface AbsenceTable extends Table<Absence>, Listable<Absence> {
+	default Absence create(@NotNull Member member, @NotNull String reason, @NotNull Date start, @Nullable Date end) {
+		return insert(new Absence(getManager().getData("bot"), member.getUser(), member.getGuild(), reason, false, start, end));
 	}
 
-	default void remove(@NotNull Member member) {
-		delete(Where.allOf(
-				Where.equals("teamMember", member),
-				Where.equals("guild", member.getGuild())
+	@NotNull
+	default List<Absence> getExpiredAbsences() {
+		return selectMany(Where.lowerOrEqual("end", new Date(System.currentTimeMillis())));
+	}
+
+	@NotNull
+	default List<Absence> getStartingAbsences() {
+		return selectMany(Where.allOf(
+				Where.greaterOrEqual("start", new Date(System.currentTimeMillis())),
+				Where.equals("started", false)
 		));
 	}
 
 	@NotNull
-	default List<Absence> getExpiredAbsence(@NotNull Instant now) {
-		return selectMany(Where.lowerOrEqual("time", now));
+	default Optional<Absence> getAbsence(@NotNull Member member) {
+		return selectOne(Where.allOf(
+				Where.equals("member", member),
+				Where.equals("guild", member.getGuild())
+		));
+	}
+
+	/*
+	Listable implementation
+	 */
+
+	@NotNull
+	@Override
+	default EmbedBuilder createEmbed(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Absence> context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.setTitle("Abwesenheiten auf **" + context.event().getGuild().getName() + "**")
+				.setColor(getManager().<SlimeBot>getData("bot").getColor(state.getEvent().getGuild()))
+				.setTimestamp(Instant.now());
+
+		if (context.entries().isEmpty()) builder.setDescription("*Keine Einträge*");
+		else builder.setFooter("Insgesamt " + context.entries().size() + " Abwesenheiten");
+
+		return builder;
 	}
 
 	@NotNull
-	default Optional<Absence> getByUser(@NotNull Member member) {
-		return selectOne(Where.equals("teammember", member.getUser()));
+	@Override
+	default List<Absence> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Absence> context) {
+		return selectMany(Where.equals("guild", context.event().getGuild()), Order.ascendingBy("start"));
 	}
 }
