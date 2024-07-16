@@ -31,7 +31,6 @@ public class Youtube {
 	private final YoutubeConfig config;
 
 	private int currentKey;
-	private Map<String, Video> lastVideo = new HashMap<>();
 
 	public Youtube(String[] keys, SlimeBot bot, YoutubeConfig config) {
 		this.keys = keys;
