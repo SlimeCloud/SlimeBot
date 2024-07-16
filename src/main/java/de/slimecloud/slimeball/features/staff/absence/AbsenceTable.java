@@ -9,6 +9,7 @@ import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,6 +45,11 @@ public interface AbsenceTable extends Table<Absence>, Listable<Absence> {
 		));
 	}
 
+	@NotNull
+	default List<Absence> getAbsences(@NotNull Guild guild) {
+		return selectMany(Where.equals("guild", guild), Order.ascendingBy("start"));
+	}
+
 	/*
 	Listable implementation
 	 */
@@ -65,6 +71,6 @@ public interface AbsenceTable extends Table<Absence>, Listable<Absence> {
 	@NotNull
 	@Override
 	default List<Absence> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<Absence> context) {
-		return selectMany(Where.equals("guild", context.event().getGuild()), Order.ascendingBy("start"));
+		return getAbsences(context.event().getGuild());
 	}
 }

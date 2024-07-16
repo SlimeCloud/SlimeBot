@@ -68,6 +68,18 @@ public class Absence implements DataClass<Absence>, ListEntry {
 			).queue());
 		});
 
+		bot.loadGuild(guild).getMeeting().ifPresent(config -> {
+			if (start.after(new Date(config.getNextMeeting()))) return;
+			if (end.before(new Date(config.getNextMeeting()))) return;
+
+			config.updateMessage(guild, (y, m, n, x) -> {
+				String mention = member.getAsMention();
+				y.remove(mention);
+				m.remove(mention);
+				n.add(mention);
+			});
+		});
+
 		started = true;
 		update();
 	}
