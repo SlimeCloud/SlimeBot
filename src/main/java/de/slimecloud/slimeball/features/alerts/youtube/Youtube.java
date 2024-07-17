@@ -56,7 +56,7 @@ public class Youtube {
 	private void check(String youtubeChannelId) throws IOException {
 		Set<Video> videos = getLastVideo(youtubeChannelId, 5);
 
-		Collection<String> known = bot.getIdMemory().getMemory("youtube-" + youtubeChannelId);
+		Collection<String> known = bot.getIdMemory().getMemory("youtube");
 		List<String> newIds = new ArrayList<>();
 
 		for (Video video : videos) {
@@ -66,7 +66,7 @@ public class Youtube {
 			}
 		}
 
-		bot.getIdMemory().rememberIds("youtube-" + youtubeChannelId, newIds);
+		bot.getIdMemory().rememberIds("youtube", newIds);
 	}
 
 	@NotNull
