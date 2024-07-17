@@ -88,8 +88,8 @@ public class Youtube {
 
 		JsonObject json = JsonParser.parseString(response.body().string()).getAsJsonObject();
 
-		if (code == HttpStatus.SC_FORBIDDEN) {
-			YoutubeRateLimitEvent event = new YoutubeRateLimitEvent(response, json, new HashSet<>());
+		if (code != HttpStatus.SC_OK) {
+			YoutubeApiErrorEvent event = new YoutubeApiErrorEvent(response, json, new HashSet<>());
 			event.callEvent();
 			return event.getVideos();
 		}

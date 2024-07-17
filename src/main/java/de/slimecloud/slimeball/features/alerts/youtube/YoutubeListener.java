@@ -31,7 +31,7 @@ public class YoutubeListener {
 	}
 
 	@EventHandler
-	public void onRateLimit(YoutubeRateLimitEvent event) {
-		logger.warn("Youtube API rate limit reached '{}'", event.getJsonResponse().getAsJsonObject("error").get("message").getAsString());
+	public void onApiError(YoutubeApiErrorEvent event) {
+		logger.warn("Youtube API error {} '{}'", event.getCode(), event.getJsonResponse().getAsJsonObject("error").get("message").getAsString());
 	}
 }
