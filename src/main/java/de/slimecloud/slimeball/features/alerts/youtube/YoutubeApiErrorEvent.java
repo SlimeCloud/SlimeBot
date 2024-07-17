@@ -17,4 +17,8 @@ public class YoutubeApiErrorEvent extends Event {
 	private final JsonObject jsonResponse;
 	private final Set<Video> videos;
 
+	public int getCode() {
+		return response.code();
+	}
+
 }
