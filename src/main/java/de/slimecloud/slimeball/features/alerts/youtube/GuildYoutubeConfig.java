@@ -38,7 +38,7 @@ public class GuildYoutubeConfig extends ConfigCategory {
 
 	@NotNull
 	public Optional<MessageChannel> getChannel(@NotNull String youtubeChannelId) {
-		return Optional.ofNullable(bot.getJda().getChannelById(MessageChannel.class, channel.get(youtubeChannelId)));
+		return getChannelId(youtubeChannelId).flatMap(id -> Optional.ofNullable(bot.getJda().getChannelById(MessageChannel.class, id)));
 	}
 
 	@NotNull
