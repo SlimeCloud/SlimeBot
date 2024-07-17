@@ -32,8 +32,8 @@ public class GuildYoutubeConfig extends ConfigCategory {
 	private Map<String, String> videoMessage = new HashMap<>();
 
 	@NotNull
-	public Long getChannelId(String youtubeChannelId) {
-		return channel.get(youtubeChannelId);
+	public Optional<Long> getChannelId(@NotNull String youtubeChannelId) {
+		return Optional.ofNullable(channel.get(youtubeChannelId));
 	}
 
 	@NotNull

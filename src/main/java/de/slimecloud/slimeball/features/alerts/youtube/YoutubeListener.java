@@ -26,7 +26,7 @@ public class YoutubeListener {
 							.replace("%url%", event.getVideo().getUrl())
 							.replace("%title%", event.getVideo().snippet().title())
 					).queue();
-				}, () -> logger.warn("Cannot send Youtube Notification because channel {} not found", config.getChannelId(event.getYoutubeChannelId())))
+				}, () -> logger.warn("Cannot send Youtube Notification because channel {} not found", config.getChannelId(event.getYoutubeChannelId()).orElse(null)))
 		));
 	}
 }
