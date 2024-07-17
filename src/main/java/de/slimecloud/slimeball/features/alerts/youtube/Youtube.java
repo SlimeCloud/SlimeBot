@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -83,7 +84,16 @@ public class Youtube {
 
 		@Cleanup
 		Response response = client.newCall(request).execute();
+		int code = response.code();
+
 		JsonObject json = JsonParser.parseString(response.body().string()).getAsJsonObject();
+
+		if (code == HttpStatus.SC_FORBIDDEN) {
+			YoutubeRateLimitEvent event = new YoutubeRateLimitEvent(response, json, new HashSet<>());
+			event.callEvent();
+			return event.getVideos();
+		}
+
 		JsonArray videos = json.getAsJsonArray("items");
 
 		Set<Video> result = new HashSet<>();
