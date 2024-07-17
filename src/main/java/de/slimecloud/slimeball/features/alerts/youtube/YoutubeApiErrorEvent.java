@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor
-public class YoutubeRateLimitEvent extends Event {
+public class YoutubeApiErrorEvent extends Event {
 
 	private final Response response;
 	private final JsonObject jsonResponse;
