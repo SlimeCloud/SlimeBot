@@ -29,4 +29,9 @@ public class YoutubeListener {
 				}, () -> logger.warn("Cannot send Youtube Notification because channel {} not found", config.getChannelId(event.getYoutubeChannelId()).orElse(null)))
 		));
 	}
+
+	@EventHandler
+	public void onRateLimit(YoutubeRateLimitEvent event) {
+		logger.warn("Youtube API rate limit reached '{}'", event.getJsonResponse().getAsJsonObject("error").get("message").getAsString());
+	}
 }
