@@ -48,6 +48,6 @@ public class GuildYoutubeConfig extends ConfigCategory {
 
 	@NotNull
 	public Optional<Role> getRole(@NotNull String youtubeChannelId) {
-		return Optional.ofNullable(bot.getJda().getRoleById(role.get(youtubeChannelId)));
+		return getRoleId(youtubeChannelId).flatMap(id -> Optional.ofNullable(bot.getJda().getRoleById(id)));
 	}
 }
