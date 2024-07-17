@@ -118,6 +118,6 @@ public class AbsenceCommand {
 	@SuppressWarnings("deprecation")
 	public static Date getTimestamp(@Nullable Integer day, @Nullable Month month, @Nullable Integer year) {
 		if (day == null) return null;
-		return new Date(year == null ? ZonedDateTime.now(Main.timezone).getYear() : year, month == null ? ZonedDateTime.now(Main.timezone).getMonthValue() : month.getValue(), day);
+		return new Date((year == null ? ZonedDateTime.now(Main.timezone).getYear() : year) - 1900, (month == null ? ZonedDateTime.now(Main.timezone).getMonthValue() : month.getValue()) - 1, day);
 	}
 }
