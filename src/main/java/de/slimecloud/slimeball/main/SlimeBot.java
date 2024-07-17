@@ -54,6 +54,7 @@ import de.slimecloud.slimeball.features.staff.StaffMessage;
 import de.slimecloud.slimeball.features.staff.TeamMeeting;
 import de.slimecloud.slimeball.features.staff.absence.Absence;
 import de.slimecloud.slimeball.features.staff.absence.AbsenceCommand;
+import de.slimecloud.slimeball.features.staff.absence.AbsenceScheduler;
 import de.slimecloud.slimeball.features.staff.absence.AbsenceTable;
 import de.slimecloud.slimeball.features.statistic.MemberCount;
 import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
@@ -339,6 +340,8 @@ public class SlimeBot extends ListenerAdapter {
 		new HolidayAlert(this);
 		new BirthdayAlert(this);
 		new BirthdayListener(this);
+
+		new AbsenceScheduler(this);
 
 		if (youtube != null) youtube.startListener();
 

@@ -32,7 +32,6 @@ public class AbsenceCommand {
 
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull Command<ICommandContext> command, @NotNull ListManager<ICommandContext> list) {
-		new AbsenceScheduler(bot);
 
 		command.addSubcommand(list.createCommand(state -> bot.getAbsences()).withDescription("Zeigt alle Abwesenheiten an"));
 	}
