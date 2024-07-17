@@ -75,7 +75,7 @@ public class Youtube {
 	}
 
 	@NotNull
-	public Set<Video> getLastVideo(String youtubeChannelId, int limit) throws IOException {
+	public Set<Video> getLastVideo(@NotNull String youtubeChannelId, int limit) throws IOException {
 		Request request = new Request.Builder()
 				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=" + limit, getNextKey(), youtubeChannelId))
 				.get()
