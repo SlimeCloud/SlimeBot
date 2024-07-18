@@ -15,18 +15,23 @@ public class YoutubeListener {
 
 	@EventHandler
 	public void onUpload(YoutubeVideoEvent event) {
-		logger.info("Video Uploaded: " + event.getVideo());
+		logger.info("Video Uploaded: {}", event.getVideo());
 		bot.getJda().getGuilds().forEach(g -> bot.loadGuild(g).getYoutube().ifPresent(config ->
-				config.getChannel().ifPresentOrElse(channel -> {
-					String msg = event.isLive() ? config.getLiveMessage() : config.getVideoMessage();
+				config.getChannel(event.getYoutubeChannelId()).ifPresentOrElse(channel -> {
+					String msg = event.isLive() ? config.getLiveMessage().get(event.getYoutubeChannelId()) : config.getVideoMessage().get(event.getYoutubeChannelId());
 
 					channel.sendMessage(msg
-							.replace("%role%", config.getRole().map(IMentionable::getAsMention).orElse(""))
+							.replace("%role%", config.getRole(event.getYoutubeChannelId()).map(IMentionable::getAsMention).orElse(""))
 							.replace("%uploader%", event.getVideo().getChannel().getTitle())
 							.replace("%url%", event.getVideo().getUrl())
 							.replace("%title%", event.getVideo().snippet().title())
 					).queue();
-				}, () -> logger.warn("Cannot send Youtube Notification because channel %s not found".formatted(config.getChannelId())))
+				}, () -> logger.warn("Cannot send Youtube Notification because channel {} not found", config.getChannelId(event.getYoutubeChannelId()).orElse(null)))
 		));
+	}
+
+	@EventHandler
+	public void onApiError(YoutubeApiErrorEvent event) {
+		logger.warn("Youtube API error {} '{}'", event.getCode(), event.getJsonResponse().getAsJsonObject("error").get("message").getAsString());
 	}
 }
