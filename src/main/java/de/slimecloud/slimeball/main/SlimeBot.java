@@ -90,7 +90,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -387,11 +387,11 @@ public class SlimeBot extends ListenerAdapter {
 
 	public void scheduleDaily(int hour, @NotNull Runnable task) {
 		long day = TimeUnit.DAYS.toSeconds(1);
-		long initialDelay = Instant.now().atOffset(ZoneOffset.UTC)
+		long initialDelay = ZonedDateTime.now(Main.timezone)
 				.withHour(hour)
 				.withMinute(0)
 				.withSecond(0)
-				.toEpochSecond();
+				.toEpochSecond() - (System.currentTimeMillis() / 1000);
 
 		if (initialDelay < 0) initialDelay += day;
 
