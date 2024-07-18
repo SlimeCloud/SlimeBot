@@ -83,7 +83,7 @@ public class MeetingConfig extends ConfigCategory {
 		getChannel().ifPresent(channel -> {
 			//Send and save message
 			Message message = channel
-					.sendMessage(MessageCreateData.fromEditData(buildMessage(channel.getGuild(), timestamp, null, null)))
+					.sendMessage(MessageCreateData.fromEditData(buildMessage(channel.getGuild(), timestamp, null, (y, m, n, x) -> n.addAll(bot.getAbsences().getAbsences(channel.getGuild()).stream().map(a -> a.getMember().getAsMention()).toList()))))
 					.complete();
 			this.message = message.getIdLong();
 
@@ -121,6 +121,13 @@ public class MeetingConfig extends ConfigCategory {
 	@NotNull
 	public Optional<GuildChannel> getVoiceChannel() {
 		return Optional.ofNullable(voice).map(id -> bot.getJda().getChannelById(GuildChannel.class, id));
+	}
+
+	public void updateMessage(@NotNull Guild guild, @NotNull MeetingHandler handler) {
+		getChannel().ifPresent(channel -> channel.retrieveMessageById(message).flatMap(message -> {
+			MessageEmbed embed = message.getEmbeds().get(0);
+			return message.editMessage(buildMessage(guild, embed.getTimestamp().toInstant(), embed, handler));
+		}).queue());
 	}
 
 	@NotNull

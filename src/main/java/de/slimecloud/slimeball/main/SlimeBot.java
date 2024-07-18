@@ -54,16 +54,14 @@ import de.slimecloud.slimeball.features.staff.StaffMessage;
 import de.slimecloud.slimeball.features.staff.TeamMeeting;
 import de.slimecloud.slimeball.features.staff.absence.Absence;
 import de.slimecloud.slimeball.features.staff.absence.AbsenceCommand;
+import de.slimecloud.slimeball.features.staff.absence.AbsenceScheduler;
 import de.slimecloud.slimeball.features.staff.absence.AbsenceTable;
 import de.slimecloud.slimeball.features.statistic.MemberCount;
 import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
-import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
-import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
-import de.slimecloud.slimeball.main.extensions.IDOptionParser;
-import de.slimecloud.slimeball.main.extensions.SnowflakeTypeMapper;
+import de.slimecloud.slimeball.main.extensions.*;
 import de.slimecloud.slimeball.util.ColorUtil;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
@@ -92,7 +90,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -159,6 +157,7 @@ public class SlimeBot extends ListenerAdapter {
 			database.putData("bot", this);
 			database.addMapper(new SnowflakeTypeMapper());
 			database.addMapper(new ColorTypeMapper());
+			database.addMapper(new DateTypeMapper());
 
 			//Initialize tables
 			reports = (ReportTable) database.getTable(ReportTable.class, Report.class, () -> new Report(this), "reports").createTable();
@@ -342,6 +341,8 @@ public class SlimeBot extends ListenerAdapter {
 		new BirthdayAlert(this);
 		new BirthdayListener(this);
 
+		new AbsenceScheduler(this);
+
 		if (youtube != null) youtube.startListener();
 
 		//JEvent.getDefaultManager().registerListenerPackage(botPackage);
@@ -386,11 +387,11 @@ public class SlimeBot extends ListenerAdapter {
 
 	public void scheduleDaily(int hour, @NotNull Runnable task) {
 		long day = TimeUnit.DAYS.toSeconds(1);
-		long initialDelay = Instant.now().atOffset(ZoneOffset.UTC)
+		long initialDelay = ZonedDateTime.now(Main.timezone)
 				.withHour(hour)
 				.withMinute(0)
 				.withSecond(0)
-				.toEpochSecond();
+				.toEpochSecond() - (System.currentTimeMillis() / 1000);
 
 		if (initialDelay < 0) initialDelay += day;
 

@@ -4,6 +4,7 @@ import de.slimecloud.slimeball.config.ConfigCategory;
 import de.slimecloud.slimeball.config.engine.ConfigField;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import de.slimecloud.slimeball.config.engine.Info;
+import de.slimecloud.slimeball.features.staff.absence.Absence;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -55,6 +56,11 @@ public class StaffConfig extends ConfigCategory {
 	public MessageEditData buildMessage(@NotNull Guild guild) {
 		StringBuilder builder = new StringBuilder();
 
+		List<Long> absent = bot.getAbsences().getAbsences(guild).stream()
+				.filter(Absence::isStarted)
+				.map(a -> a.getMember().getIdLong())
+				.toList();
+
 		roles.forEach((roleId, description) -> {
 			try {
 				Role role = guild.getRoleById(roleId);
@@ -66,7 +72,11 @@ public class StaffConfig extends ConfigCategory {
 				if (members.isEmpty()) builder.append("*Keine Mitglieder*").append("\n");
 				else {
 					for (Member member : members) {
-						builder.append("> ").append(member.getAsMention()).append("\n");
+						builder.append("> ").append(member.getAsMention());
+
+						if (absent.contains(member.getIdLong())) builder.append(" *(Abwesend)*");
+
+						builder.append("\n");
 					}
 				}
 

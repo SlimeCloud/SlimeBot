@@ -28,7 +28,7 @@ public class AbsenceConfig extends ConfigCategory {
 	}
 
 	@NotNull
-	public Role getRole() {
-		return bot.getJda().getRoleById(absenceRole);
+	public Optional<Role> getRole() {
+		return Optional.ofNullable(bot.getJda().getRoleById(absenceRole));
 	}
 }
