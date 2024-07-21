@@ -52,6 +52,20 @@ public class Absence implements DataClass<Absence>, ListEntry {
 		return (index + 1) + ". " + member.getAsMention() + ": von " + TimeFormat.DATE_SHORT.format(toInstant(start)) + " bis " + (end == null ? "*`Unbekannt`*" : TimeFormat.RELATIVE.format(toInstant(end))) + "\n " + reason;
 	}
 
+	public void sendSchedule() {
+		bot.loadGuild(guild).getAbsence().ifPresent(config -> {
+			config.getChannel().ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
+					.setAuthor(guild.getMember(member).getEffectiveName(), null, guild.getMember(member).getEffectiveAvatarUrl())
+					.setTitle(":calendar: Abwesenheit Vorgemerkt")
+					.setColor(bot.getColor(guild))
+					.setDescription(member.getAsMention() + " ist voraussichtlich von " + TimeFormat.RELATIVE.format(toInstant(start)) + " bis " + (end == null ? "*`Unbekannt`*" : TimeFormat.RELATIVE.format(toInstant(end))) + " abwesend.\n")
+					.addField("Grund für die Abwesenheit", reason, false)
+					.setTimestamp(Instant.now())
+					.build()
+			).queue());
+		});
+	}
+
 	public void start() {
 		if (started) return;
 
@@ -59,7 +73,7 @@ public class Absence implements DataClass<Absence>, ListEntry {
 			config.getRole().ifPresent(role -> guild.addRoleToMember(member, role).queue());
 			config.getChannel().ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
 					.setAuthor(guild.getMember(member).getEffectiveName(), null, guild.getMember(member).getEffectiveAvatarUrl())
-					.setTitle("Abwesenheit Beginnt")
+					.setTitle(":no_entry: Abwesenheit Beginnt")
 					.setColor(bot.getColor(guild))
 					.setDescription(member.getAsMention() + " ist voraussichtlich bis " + (end == null ? "*`Unbekannt`*" : TimeFormat.RELATIVE.format(toInstant(end))) + " abwesend.\n")
 					.addField("Grund für die Abwesenheit", reason, false)
@@ -95,7 +109,7 @@ public class Absence implements DataClass<Absence>, ListEntry {
 				config.getRole().ifPresent(role -> guild.removeRoleFromMember(member, role).queue());
 				config.getChannel().ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
 						.setAuthor(guild.getMember(member).getEffectiveName(), null, guild.getMember(member).getEffectiveAvatarUrl())
-						.setTitle("Abwesenheit endet")
+						.setTitle(":white_check_mark: Abwesenheit endet")
 						.setColor(bot.getColor(guild))
 						.setDescription("Die Abwesenheit von " + member.getAsMention() + " von " + TimeFormat.RELATIVE.format(toInstant(start)) + " hat geendet.\n")
 						.addField("Grund für die Abwesenheit", reason, false)
