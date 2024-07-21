@@ -90,7 +90,7 @@ public class AbsenceCommand {
 			}
 
 			try {
-				bot.getAbsences().create(event.getMember(), reason, start, expiry);
+				bot.getAbsences().create(event.getMember(), reason, start, expiry).sendSchedule();
 
 				event.reply(":white_check_mark: Du wirst " + TimeFormat.RELATIVE.format(Absence.toInstant(start)) + " als abwesend gemeldet").setEphemeral(true).queue();
 			} catch (ConflictException e) {
