@@ -61,9 +61,9 @@ public class Absence implements DataClass<Absence>, ListEntry {
 					.setAuthor(guild.getMember(member).getEffectiveName(), null, guild.getMember(member).getEffectiveAvatarUrl())
 					.setTitle("Abwesenheit Beginnt")
 					.setColor(bot.getColor(guild))
-					.appendDescription(member.getAsMention() + " ist voraussichtlich bis " + (end == null ? "*`Unbekannt`*" : TimeFormat.RELATIVE.format(toInstant(end))) + " abwesend.\n")
-					.appendDescription(member.getAsMention() + " kann ab sofort keine Aufgaben im Team mehr übernehmen.")
+					.setDescription(member.getAsMention() + " ist voraussichtlich bis " + (end == null ? "*`Unbekannt`*" : TimeFormat.RELATIVE.format(toInstant(end))) + " abwesend.\n")
 					.addField("Grund für die Abwesenheit", reason, false)
+					.setTimestamp(Instant.now())
 					.build()
 			).queue());
 		});
@@ -97,9 +97,9 @@ public class Absence implements DataClass<Absence>, ListEntry {
 						.setAuthor(guild.getMember(member).getEffectiveName(), null, guild.getMember(member).getEffectiveAvatarUrl())
 						.setTitle("Abwesenheit endet")
 						.setColor(bot.getColor(guild))
-						.appendDescription("Die Abwesenheit von " + member.getAsMention() + " von " + TimeFormat.RELATIVE.format(toInstant(start)) + " hat geendet.\n")
-						.appendDescription(member.getAsMention() + " kann ab sofort wieder Aufgaben im Team übernehmen.")
+						.setDescription("Die Abwesenheit von " + member.getAsMention() + " von " + TimeFormat.RELATIVE.format(toInstant(start)) + " hat geendet.\n")
 						.addField("Grund für die Abwesenheit", reason, false)
+						.setTimestamp(Instant.now())
 						.build()
 				).queue());
 			});
