@@ -1,7 +1,7 @@
 #!/bin/bash
 
-CONTAINER_NAME="slimetest"
-IMAGE_NAME="slimetest"
+CONTAINER_NAME="$1"
+IMAGE_NAME="$2"
 
 if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
     echo "Stopping container: $CONTAINER_NAME"

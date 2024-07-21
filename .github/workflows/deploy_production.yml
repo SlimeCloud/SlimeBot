@@ -31,4 +31,4 @@ jobs:
       - name: upload compiled jar
         run: scp ./build/libs/*-all.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.PRODUCTION_WORK_DIR }}/slimebot.jar
       - name: rebuild Dockercontainer and start Bot
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && ./rebuild.sh"
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && ./rebuild.sh slimebot slimebot"
