@@ -2,7 +2,7 @@ name: Deploy to Beta Bot
 
 on:
   push:
-    branches: [ "new-workflow" ]
+    branches: [ "development" ]
 
 jobs:
   build:
