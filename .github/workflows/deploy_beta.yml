@@ -27,6 +27,11 @@ jobs:
       - name: rename file
         run: mv ./build/libs/*-all.jar slimebot.jar
 
+      - name: test
+        run: ls
+      - name: debug
+        run: pwd
+
       - name: Upload Bot to Server
         uses: appleboy/scp-action@v0.1.7
         with:
