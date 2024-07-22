@@ -27,10 +27,13 @@ jobs:
       - name: rename file
         run: mv ./build/libs/*-all.jar slimebot.jar
 
-      - name: test
-        run: ls
-      - name: debug
-        run: pwd
+      - name: rebuild Dockercontainer and start Bot
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          username: ${{ secrets.SSH_USER }}
+          script: 'ls ${{ secrets.BETA_WORK_DIR }}'
 
       - name: Upload Bot to Server
         uses: appleboy/scp-action@v0.1.7
