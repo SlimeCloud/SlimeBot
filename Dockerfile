@@ -5,5 +5,4 @@ WORKDIR ./bot
 COPY slimebot.jar ./slimebot.jar
 ADD ./run/* ./
 
-
 ENTRYPOINT ["java", "-jar", "slimebot.jar"]
