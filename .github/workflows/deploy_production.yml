@@ -33,7 +33,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           username: ${{ secrets.SSH_USER }}
           source: './build/libs/*-all.jar'
-          target: ${{ secrets.BETA_WORK_DIR }}/slimebot.jar
+          target: ${{ secrets.BETA_WORK_DIR }}slimebot.jar
           strip_components: 1
 
       - name: rebuild Dockercontainer and start Bot
@@ -42,4 +42,4 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           username: ${{ secrets.SSH_USER }}
-          script: ${{ secrets.PRODUCTION_WORK_DIR }}/rebuild.sh slimebot slimebot
+          script: ${{ secrets.PRODUCTION_WORK_DIR }}rebuild.sh slimebot slimebot
