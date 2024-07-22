@@ -6,4 +6,4 @@ COPY slimebot.jar ./slimebot.jar
 ADD ./run/* ./
 
 
-ENTRYPOINT ["java", "-jar", "SlimeBot.jar"]
+ENTRYPOINT ["java", "-jar", "slimebot.jar"]
