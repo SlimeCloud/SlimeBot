@@ -25,12 +25,16 @@ jobs:
         with:
           name: Package
           path: build/libs
-      - name: install ssh keys
-        run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-      - name: upload compiled jar
-        run: scp ./build/libs/*-all.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.PRODUCTION_WORK_DIR }}/slimebot.jar
+
+      - name: Upload Bot to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          key: ${{ secrets.SSH_KEY }}
+          username: ${{ secrets.SSH_USER }}
+          source: './build/libs/*-all.jar'
+          target: ${{ secrets.BETA_WORK_DIR }}/slimebot.jar
+          strip_components: 1
+
       - name: rebuild Dockercontainer and start Bot
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.PRODUCTION_WORK_DIR }} && ./rebuild.sh slimebot slimebot"
