@@ -10,6 +10,11 @@ if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
     docker rm $CONTAINER_NAME
 else
     echo "Container $CONTAINER_NAME is not running."
+    # Check if the container exists but is not running
+    if [ $(docker ps -aq -f name=$CONTAINER_NAME) ]; then
+        echo "Removing stopped container: $CONTAINER_NAME"
+        docker rm $CONTAINER_NAME
+    fi
 fi
 
 if [ $(docker images -q $IMAGE_NAME) ]; then
