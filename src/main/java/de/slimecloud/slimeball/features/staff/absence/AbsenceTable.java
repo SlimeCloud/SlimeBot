@@ -32,7 +32,7 @@ public interface AbsenceTable extends Table<Absence>, Listable<Absence> {
 	@NotNull
 	default List<Absence> getStartingAbsences() {
 		return selectMany(Where.allOf(
-				Where.greaterOrEqual("start", new Date(System.currentTimeMillis())),
+				Where.lowerOrEqual("start", new Date(System.currentTimeMillis())),
 				Where.equals("started", false)
 		));
 	}
