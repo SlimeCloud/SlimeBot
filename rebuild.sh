@@ -6,11 +6,11 @@ IMAGE_NAME="$2"
 status=$(docker container inspect -f "{{.State.Status}}" "$CONTAINER_NAME" 2>/dev/null)
 
 if [ $? -eq 0 ]; then
-  echo "Container running... Stopping $CONTAINER_NAME"
-  docker stop "$CONTAINER_NAME"
-fi
+  if [ "$status" != "exited" ] && [ "$status" != "created" ]; then
+    echo "Container running... Stopping $CONTAINER_NAME"
+    docker stop "$CONTAINER_NAME"
+  fi
 
-if [ "$status" != "exited" ] && [ "$status" != "created" ]; then
   echo "Container exists... Removing $CONTAINER_NAME"
   docker rm "$CONTAINER_NAME"
 fi
