@@ -17,14 +17,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Build with Gradle
+
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: build shadowJar
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Package
-          path: build/libs
+
+      - name: Build with Gradle
+        run: chmod +x gradlew && ./gradlew shadowJar
 
       - name: rename file
         run: mv build/libs/*-all.jar slimebot.jar
