@@ -107,6 +107,9 @@ jar {
     }
 }
 
+shadowJar {
+    archiveName = "SlimeBot.jar"
+}
 
 test {
     useJUnitPlatform()

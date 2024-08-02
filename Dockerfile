@@ -1,8 +1,8 @@
 FROM eclipse-temurin:17-jdk-jammy
 
-WORKDIR ./bot
+WORKDIR /bot
 
-COPY slimebot.jar ./slimebot.jar
+COPY SlimeBot.jar ./SlimeBot.jar
 ADD ./run/* ./
 
-ENTRYPOINT ["java", "-jar", "slimebot.jar"]
+ENTRYPOINT ["java", "-jar", "SlimeBot.jar"]

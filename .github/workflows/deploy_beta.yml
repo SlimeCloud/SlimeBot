@@ -26,20 +26,17 @@ jobs:
       - name: Build with Gradle
         run: chmod +x gradlew && ./gradlew shadowJar
 
-      - name: rename file
-        run: mv build/libs/*-all.jar slimebot.jar
-
       - name: Upload Bot to Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           username: ${{ secrets.SSH_USER }}
-          source: './slimebot.jar'
+          source: 'build/libs/SlimeBot.jar'
           target: '${{ secrets.BETA_WORK_DIR }}'
           strip_components: 1
 
-      - name: rebuild Dockercontainer and start Bot
+      - name: Recreate Docker Container
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
