@@ -69,6 +69,9 @@ public class Absence implements DataClass<Absence>, ListEntry {
 	public void start() {
 		if (started) return;
 
+		started = true;
+		update();
+
 		bot.loadGuild(guild).getAbsence().ifPresent(config -> {
 			config.getRole().ifPresent(role -> guild.addRoleToMember(member, role).queue());
 			config.getChannel().ifPresent(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
@@ -84,7 +87,7 @@ public class Absence implements DataClass<Absence>, ListEntry {
 
 		bot.loadGuild(guild).getMeeting().ifPresent(config -> {
 			if (start.after(new Date(config.getNextMeeting()))) return;
-			if (end.before(new Date(config.getNextMeeting()))) return;
+			if (end != null && end.before(new Date(config.getNextMeeting()))) return;
 
 			config.updateMessage(guild, (y, m, n, x) -> {
 				String mention = member.getAsMention();
@@ -93,9 +96,6 @@ public class Absence implements DataClass<Absence>, ListEntry {
 				n.add(mention);
 			});
 		});
-
-		started = true;
-		update();
 
 		bot.loadGuild(guild).getTeamMessage().ifPresent(config -> config.update(guild));
 	}
