@@ -1,8 +1,8 @@
 #!/bin/bash
 
-CONTAINER_NAME="$1"
-IMAGE_NAME="$2"
-DOCKERFILE_DIR="$3"
+DOCKERFILE_DIR="$1"
+CONTAINER_NAME="$2"
+IMAGE_NAME="$3"
 
 status=$(docker container inspect -f "{{.State.Status}}" "$CONTAINER_NAME" 2>/dev/null)
 
@@ -25,4 +25,4 @@ echo "Building image $IMAGE_NAME"
 docker build -t "$IMAGE_NAME" "$DOCKERFILE_DIR"
 
 echo "Starting container: $CONTAINER_NAME"
-docker run -d --name "$CONTAINER_NAME" "$IMAGE_NAME"
+docker run -d -v "$DOCKERFILE_DIR/run:/bot/run" --name "$CONTAINER_NAME" "$IMAGE_NAME" - v ""

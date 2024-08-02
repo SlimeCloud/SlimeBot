@@ -34,7 +34,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           source: 'build/libs/SlimeBot.jar'
           target: '${{ secrets.BETA_WORK_DIR }}'
-          strip_components: 1
+          strip_components: 2
 
       - name: Recreate Docker Container
         uses: appleboy/ssh-action@v1.0.3
@@ -42,4 +42,4 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           username: ${{ secrets.SSH_USER }}
-          script: cd ${{ secrets.WORK_DIR }} && ./rebuild.sh SlimeBotTest slimebot-test ${{ secrets.BETA_WORK_DIR }}
+          script: cd ${{ secrets.WORK_DIR }} && ./rebuild.sh ${{ secrets.BETA_WORK_DIR }} SlimeBot-Test slimebot-test
