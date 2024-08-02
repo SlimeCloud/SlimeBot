@@ -2,6 +2,7 @@
 
 CONTAINER_NAME="$1"
 IMAGE_NAME="$2"
+DOCKERFILE_DIR="$3"
 
 status=$(docker container inspect -f "{{.State.Status}}" "$CONTAINER_NAME" 2>/dev/null)
 
@@ -21,7 +22,7 @@ if [ "$(docker images -q "$IMAGE_NAME")" ]; then
 fi
 
 echo "Building image $IMAGE_NAME"
-docker build -t "$IMAGE_NAME" .
+docker build -t "$IMAGE_NAME" "$DOCKERFILE_DIR"
 
 echo "Starting container: $CONTAINER_NAME"
 docker run -d --name "$CONTAINER_NAME" "$IMAGE_NAME"

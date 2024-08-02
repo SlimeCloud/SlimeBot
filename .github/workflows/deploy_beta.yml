@@ -42,4 +42,4 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           username: ${{ secrets.SSH_USER }}
-          script: cd ${{ secrets.BETA_WORK_DIR }} && ./rebuild.sh SlimeBotTest slimebot-test
+          script: cd ${{ secrets.WORK_DIR }} && ./rebuild.sh SlimeBotTest slimebot-test ${{ secrets.BETA_WORK_DIR }}
