@@ -5,7 +5,6 @@ import de.slimecloud.slimeball.features.birthday.event.BirthdayEndEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayStartEvent;
 import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,12 +21,9 @@ public class BirthdayAlert {
 	}
 
 	private void check() {
-
 		bot.getJda().getGuilds().forEach(g -> {
 			GuildConfig config = bot.loadGuild(g);
-			List<UserSnowflake> members = config.getBirthday().flatMap(BirthdayConfig::getBirthdayRole).map(g::getMembersWithRoles).orElse(Collections.emptyList()).stream()
-					.map(m -> (UserSnowflake) m)
-					.toList();
+			List<? extends UserSnowflake> members = config.getBirthday().flatMap(BirthdayConfig::getBirthdayRole).map(g::getMembersWithRoles).orElse(Collections.emptyList());
 
 			bot.getBirthdays().getAll(g, members).stream()
 					.filter(b -> !b.isBirthday(ZonedDateTime.now(Main.timezone)))

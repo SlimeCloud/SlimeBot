@@ -47,7 +47,7 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	}
 
 	@NotNull
-	default List<Birthday> getAll(@NotNull Guild guild, @Nullable List<UserSnowflake> members) {
+	default List<Birthday> getAll(@NotNull Guild guild, @Nullable List<? extends UserSnowflake> members) {
 		return selectMany(Where.allOf(
 				Where.equals("guild", guild),
 				members == null ? Where.TRUE() : Where.valueContainsField("user", members)
