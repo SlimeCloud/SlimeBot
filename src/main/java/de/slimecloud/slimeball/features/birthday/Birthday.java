@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Instant;
+import java.sql.Date;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -30,7 +30,7 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 	private final UserSnowflake user;
 
 	@Column
-	private final Instant time;
+	private final Date date;
 
 	public Birthday(@NotNull SlimeBot bot) {
 		this(bot, null, null, null);
@@ -53,37 +53,35 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 		return String.format("%s %s", formatNext(), user.getAsMention());
 	}
 
-
-	@NotNull
-	public ZonedDateTime getStart() {
-		return time.atZone(Main.timezone).withYear(ZonedDateTime.now(Main.timezone).getYear())
-				.withHour(0)
-				.withMinute(0)
-				.withSecond(0);
-	}
-
-	@NotNull
-	public ZonedDateTime getEnd() {
-		return time.atZone(Main.timezone).withYear(ZonedDateTime.now(Main.timezone).getYear())
-				.withHour(23)
-				.withMinute(59)
-				.withSecond(59);
-	}
-
-	public boolean isBirthday(@NotNull ZonedDateTime time) {
-		return time.isAfter(getStart()) && time.isBefore(getEnd());
-	}
-
-	@NotNull
-	public ZonedDateTime getNextBirthday() {
+	@SuppressWarnings("deprecation")
+	public boolean isBirthday() {
 		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
-		return now.isAfter(getEnd()) ? getStart().withYear(now.getYear() + 1) : getStart();
+		Date today = new Date((now.toEpochSecond() + now.getOffset().getTotalSeconds()) * 1000);
+
+		Date current = (Date) date.clone();
+		current.setYear(today.getYear());
+
+		return current.equals(today);
+	}
+
+	@NotNull
+	@SuppressWarnings("deprecation")
+	public Date getNextBirthday() {
+		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
+		Date today = new Date((now.toEpochSecond() + now.getOffset().getTotalSeconds()) * 1000);
+
+		Date current = (Date) date.clone();
+		current.setYear(today.getYear());
+
+		if (today.after(current)) current.setYear(current.getYear() + 1);
+
+		return current;
 	}
 
 	@NotNull
 	public String formatNext() {
 		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
-		ZonedDateTime bd = getNextBirthday();
+		ZonedDateTime bd = getNextBirthday().toInstant().atZone(Main.timezone);
 
 		if (bd.getYear() == now.getYear() && bd.getDayOfYear() == now.getDayOfYear()) return "`Heute`";
 		return TimeFormat.RELATIVE.format(bd);

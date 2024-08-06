@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.Date;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +32,7 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	}
 
 	@NotNull
-	default Birthday save(@NotNull Member member, @NotNull Instant date) {
+	default Birthday save(@NotNull Member member, @NotNull Date date) {
 		Birthday birthday = new Birthday(getManager().getData("bot"), member.getGuild(), member, date);
 
 		if (new BirthdaySetEvent(member, birthday).callEvent()) return birthday;
@@ -47,10 +48,18 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	}
 
 	@NotNull
-	default List<Birthday> getAll(@NotNull Guild guild, @Nullable List<? extends UserSnowflake> members) {
+	default List<Birthday> getAll(@NotNull Guild guild, @NotNull List<? extends UserSnowflake> members) {
 		return selectMany(Where.allOf(
 				Where.equals("guild", guild),
-				members == null ? Where.TRUE() : Where.valueContainsField("user", members)
+				Where.valueContainsField("user", members)
+		));
+	}
+
+	@NotNull
+	default List<Birthday> getToday(@NotNull Guild guild) {
+		return selectMany(Where.allOf(
+				Where.equals("guild", guild),
+				Where.equals("date", new Date(System.currentTimeMillis()))
 		));
 	}
 

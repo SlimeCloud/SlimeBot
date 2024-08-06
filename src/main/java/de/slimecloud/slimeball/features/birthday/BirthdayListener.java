@@ -7,12 +7,9 @@ import de.slimecloud.slimeball.features.birthday.event.BirthdayEndEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayRemoveEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdaySetEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayStartEvent;
-import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-
-import java.time.ZonedDateTime;
 
 @Listener
 @RequiredArgsConstructor
@@ -21,7 +18,7 @@ public class BirthdayListener {
 
 	@EventHandler
 	public void onBirthdaySet(@NotNull BirthdaySetEvent event) {
-		if (event.getNewBirthday().isBirthday(ZonedDateTime.now(Main.timezone))) {
+		if (event.getNewBirthday().isBirthday()) {
 			new BirthdayStartEvent(event.getNewBirthday()).callEvent();
 		}
 	}
