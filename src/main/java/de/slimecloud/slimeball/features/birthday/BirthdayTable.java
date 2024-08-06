@@ -12,6 +12,7 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +47,7 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	}
 
 	@NotNull
-	default List<Birthday> getAll(@NotNull Guild guild, @Nullable List<Long> members) {
+	default List<Birthday> getAll(@NotNull Guild guild, @Nullable List<UserSnowflake> members) {
 		return selectMany(Where.allOf(
 				Where.equals("guild", guild),
 				members == null ? Where.TRUE() : Where.valueContainsField("user", members)
