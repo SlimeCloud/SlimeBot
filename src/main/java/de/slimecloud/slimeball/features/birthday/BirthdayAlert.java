@@ -15,7 +15,7 @@ public class BirthdayAlert {
 
 	public BirthdayAlert(@NotNull SlimeBot bot) {
 		this.bot = bot;
-		bot.scheduleDaily(6, this::check);
+		bot.scheduleDaily(0, this::check);
 	}
 
 	private void check() {
