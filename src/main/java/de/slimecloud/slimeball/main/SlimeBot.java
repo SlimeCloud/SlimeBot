@@ -339,7 +339,6 @@ public class SlimeBot extends ListenerAdapter {
 
 		new HolidayAlert(this);
 		new BirthdayAlert(this);
-		new BirthdayListener(this);
 
 		new AbsenceScheduler(this);
 

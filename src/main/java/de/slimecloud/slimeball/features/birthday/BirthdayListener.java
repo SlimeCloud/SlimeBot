@@ -39,7 +39,7 @@ public class BirthdayListener {
 	public void onBirthdayEnd(@NotNull BirthdayEndEvent event) {
 		bot.loadGuild(event.getGuild()).getBirthday()
 				.flatMap(BirthdayConfig::getBirthdayRole)
-				.ifPresent(role -> event.getGuild().removeRoleFromMember(event.getMember(), role).queue());
+				.ifPresent(role -> event.getGuild().removeRoleFromMember(event.getMember(), role).reason("Birthday end").queue());
 	}
 
 	@EventHandler
@@ -48,7 +48,7 @@ public class BirthdayListener {
 
 		config.getBirthday()
 				.flatMap(BirthdayConfig::getBirthdayRole)
-				.ifPresent(role -> event.getGuild().addRoleToMember(event.getMember(), role).queue());
+				.ifPresent(role -> event.getGuild().addRoleToMember(event.getMember(), role).reason("Birthday start").queue());
 
 		config.getGreetingsChannel().ifPresent(channel -> channel
 				.sendMessage(event.getMember().getAsMention() + " hat heute Geburtstag! :birthday: :partying_face:")
