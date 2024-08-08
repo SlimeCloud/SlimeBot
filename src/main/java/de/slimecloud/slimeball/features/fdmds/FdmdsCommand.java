@@ -88,8 +88,8 @@ public class FdmdsCommand {
 			return;
 		}
 
-		if (temp.length > 9) {
-			event.reply("Du kannst **maximal 9** Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
+		if (temp.length > MessagePoll.MAX_ANSWERS) {
+			event.reply("Du kannst **maximal 10** Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
 			return;
 		}
 
