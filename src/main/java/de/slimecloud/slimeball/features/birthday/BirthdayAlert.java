@@ -1,6 +1,5 @@
 package de.slimecloud.slimeball.features.birthday;
 
-import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayEndEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayStartEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
@@ -19,17 +18,16 @@ public class BirthdayAlert {
 	}
 
 	private void check() {
-		bot.getJda().getGuilds().forEach(g -> {
-			GuildConfig config = bot.loadGuild(g);
-			List<? extends UserSnowflake> members = config.getBirthday().flatMap(BirthdayConfig::getBirthdayRole).map(g::getMembersWithRoles).orElse(Collections.emptyList());
+		bot.getJda().getGuilds().forEach(guild -> bot.loadGuild(guild).getBirthday().ifPresent(config -> {
+			List<? extends UserSnowflake> members = config.getBirthdayRole().map(guild::getMembersWithRoles).orElse(Collections.emptyList());
 
-			bot.getBirthdays().getAll(g, members).stream()
+			bot.getBirthdays().getAll(guild, members).stream()
 					.filter(b -> !b.isBirthday())
 					.forEach(b -> new BirthdayEndEvent(b).callEvent());
 
-			bot.getBirthdays().getToday(g).stream()
+			bot.getBirthdays().getToday(guild).stream()
 					.filter(b -> !members.contains(b.getUser()))
 					.forEach(b -> new BirthdayStartEvent(b).callEvent());
-		});
+		}));
 	}
 }
