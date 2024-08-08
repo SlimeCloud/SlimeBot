@@ -56,7 +56,7 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 	@SuppressWarnings("deprecation")
 	public boolean isBirthday() {
 		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
-		Date today = new Date((now.toEpochSecond() + now.getOffset().getTotalSeconds()) * 1000);
+		Date today = new Date(now.getYear() - 1900, now.getMonthValue() - 1, now.getDayOfMonth());
 
 		Date current = (Date) date.clone();
 		current.setYear(today.getYear());
@@ -68,7 +68,7 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 	@SuppressWarnings("deprecation")
 	public Date getNextBirthday() {
 		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
-		Date today = new Date((now.toEpochSecond() + now.getOffset().getTotalSeconds()) * 1000);
+		Date today = new Date(now.getYear() - 1900, now.getMonthValue() - 1, now.getDayOfMonth());
 
 		Date current = (Date) date.clone();
 		current.setYear(today.getYear());
@@ -81,7 +81,7 @@ public class Birthday implements DataClass<Birthday>, ListEntry, Comparable<Birt
 	@NotNull
 	public String formatNext() {
 		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
-		ZonedDateTime bd = getNextBirthday().toInstant().atZone(Main.timezone);
+		ZonedDateTime bd = getNextBirthday().toLocalDate().atStartOfDay(Main.timezone);
 
 		if (bd.getYear() == now.getYear() && bd.getDayOfYear() == now.getDayOfYear()) return "`Heute`";
 		return TimeFormat.RELATIVE.format(bd);
