@@ -8,16 +8,17 @@ import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayRemoveEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdaySetEvent;
+import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.sql.Date;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,10 +57,14 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 	}
 
 	@NotNull
+	@SuppressWarnings("deprecation")
 	default List<Birthday> getToday(@NotNull Guild guild) {
+		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
+		Date today = new Date((now.toEpochSecond() + now.getOffset().getTotalSeconds()) * 1000);
+
 		return selectMany(Where.allOf(
 				Where.equals("guild", guild),
-				Where.equals("date", new Date(System.currentTimeMillis()))
+				Where.equals("date", new Date(2000 - 1900, today.getMonth(), today.getDay()))
 		));
 	}
 
