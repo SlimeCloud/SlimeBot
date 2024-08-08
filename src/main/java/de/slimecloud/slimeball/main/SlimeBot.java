@@ -337,13 +337,7 @@ public class SlimeBot extends ListenerAdapter {
 			} else logger.warn("Spotify alerts disabled due to missing configuration");
 		}
 
-		new HolidayAlert(this);
-		new BirthdayAlert(this);
-
-		new AbsenceScheduler(this);
-
-		if (youtube != null) youtube.startListener();
-
+		//Register Listeners
 		//JEvent.getDefaultManager().registerListenerPackage(botPackage);
 		EventManager manager = JEvent.getDefaultManager();
 		manager.registerListener(DataListener.class);
@@ -352,6 +346,14 @@ public class SlimeBot extends ListenerAdapter {
 		manager.registerListener(TimeoutListener.class);
 		manager.registerListener(BirthdayListener.class);
 		manager.registerListener(MessageListener.class);
+
+		//Start handlers
+		new HolidayAlert(this);
+		new BirthdayAlert(this);
+
+		new AbsenceScheduler(this);
+
+		if (youtube != null) youtube.startListener();
 	}
 
 	private void startActivity() {
