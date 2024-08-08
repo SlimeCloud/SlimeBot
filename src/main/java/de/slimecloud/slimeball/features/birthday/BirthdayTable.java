@@ -64,7 +64,7 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 
 		return selectMany(Where.allOf(
 				Where.equals("guild", guild),
-				Where.equals("date", new Date(2000 - 1900, today.getMonth(), today.getDay()))
+				Where.equals("date", new Date(2000 - 1900, today.getMonth(), today.getDate()))
 		));
 	}
 
