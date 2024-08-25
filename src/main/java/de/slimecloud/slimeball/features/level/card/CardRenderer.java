@@ -27,10 +27,12 @@ public class CardRenderer extends Graphic {
 	public final static int HEIGHT = 400;
 
 	public final static Font font;
+	public final static Font symbola;
 
 	static {
 		try {
 			font = CustomFont.getFont("DejaVuSans.ttf", Font.BOLD);
+			symbola = CustomFont.getFont("Symbola.ttf", Font.BOLD);
 		} catch (IOException | FontFormatException e) {
 			throw new RuntimeException(e);
 		}
@@ -147,9 +149,8 @@ public class CardRenderer extends Graphic {
 		//Name
 		float nameSize = getFontSize((int) (Math.sqrt(height) * 2.5));
 		graphics.setColor(data.getFontColor());
-		graphics.setFont(CustomFont.getFont(font, nameSize));
 
-		graphics.drawString(member.getEffectiveName(), offset + (height - 2 * offset) + offset, verticalOffset);
+		drawString(graphics, nameSize, member.getEffectiveName(), offset + (height - 2 * offset) + offset, verticalOffset);
 
 		//Level
 		String levelString = String.valueOf(level.getLevel());
@@ -268,5 +269,16 @@ public class CardRenderer extends Graphic {
 				.map(member.getGuild()::getRoleById)
 				.map(Role::getColor)
 				.orElse(data.getFontLevelColor());
+	}
+
+	public static void drawString(@NotNull Graphics2D graphics, float size, String text, int x, int y) {
+		for (int c : text.codePoints().toArray()) {
+			if (font.canDisplay(c)) graphics.setFont(CustomFont.getFont(font, size));
+			else graphics.setFont(CustomFont.getFont(symbola, size));
+
+			String ch = Character.toString(c);
+			graphics.drawString(ch, x, y);
+			x += graphics.getFontMetrics().stringWidth(ch);
+		}
 	}
 }
