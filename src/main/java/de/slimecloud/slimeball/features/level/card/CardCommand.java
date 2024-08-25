@@ -116,7 +116,16 @@ public class CardCommand {
 					),
 					(state, response) -> {
 						try {
-							bot.getCardProfiles().getProfile(state.getEvent().getMember()).getData().set(state.getState("field", String.class), response.getString("value")).upsert();
+							String name = state.getState("field", String.class);
+							String value = response.getString("value");
+
+							if (name.equals("backgroundImageURL") && value.contains("cdn.discordapp.com")) {
+								manager.getMenu("card.edit").display(state.getEvent());
+								state.getEvent().getHook().sendMessage(":x: Ungültige Eingabe! Aus technischen Gründen können Discord-Links nicht verwendet werden. Bei Fragen melde dich gerne bei den Netrunnern :)").setEphemeral(true).queue();
+								return;
+							}
+
+							bot.getCardProfiles().getProfile(state.getEvent().getMember()).getData().set(name, value).upsert();
 							manager.getMenu("card.edit").display(state.getEvent());
 						} catch (ValidationException e) {
 							manager.getMenu("card.edit").display(state.getEvent());
@@ -148,9 +157,9 @@ public class CardCommand {
 				if (field.getType().isAssignableFrom(Style.class)) temp.add(new StyleComponent(field));
 				else if (field.getType().isAssignableFrom(RankColor.class)) temp.add(new RankStyleComponent(field));
 				else temp.add(0, new ButtonComponent(field.getName(), name.length > 1 ? ButtonColor.GRAY : ButtonColor.BLUE, StringUtil.prettifyCamelCase(field.getName())).appendHandler(s -> input.createState()
-							.setState("field", field.getName())
-							.display((IModalCallback) s.getEvent())
-					));
+						.setState("field", field.getName())
+						.display((IModalCallback) s.getEvent())
+				));
 			}
 
 			if (!temp.isEmpty()) components.add(ComponentRow.of(temp));

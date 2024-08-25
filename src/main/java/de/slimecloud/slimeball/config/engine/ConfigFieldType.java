@@ -311,6 +311,12 @@ public enum ConfigFieldType {
 		public Object parse(@NotNull Class<?> type, @NotNull String value) {
 			return value;
 		}
+
+		@NotNull
+		@Override
+		public String toString(@NotNull Object value) {
+			return value == null ? "" : value.toString();
+		}
 	},
 
 
