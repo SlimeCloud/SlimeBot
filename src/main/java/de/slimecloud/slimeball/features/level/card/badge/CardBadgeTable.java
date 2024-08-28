@@ -1,12 +1,12 @@
 package de.slimecloud.slimeball.features.level.card.badge;
 
+import de.mineking.databaseutils.Table;
+import de.mineking.databaseutils.Where;
 import de.mineking.discordutils.list.ListContext;
 import de.mineking.discordutils.list.Listable;
 import de.mineking.discordutils.list.StringEntry;
 import de.mineking.discordutils.ui.MessageMenu;
 import de.mineking.discordutils.ui.state.DataState;
-import de.mineking.javautils.database.Table;
-import de.mineking.javautils.database.Where;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.StringUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -85,7 +85,7 @@ public interface CardBadgeTable extends Table<CardBadgeData>, Listable<StringEnt
 	default List<StringEntry> getEntries(@NotNull DataState<MessageMenu> state, @NotNull ListContext<StringEntry> context) {
 		SlimeBot bot = getManager().getData("bot");
 
-		if (state.asMap().containsKey("badge")) return selectMany(Where.contains("badges", state.getState("badge", String.class))).stream()
+		if (state.asMap().containsKey("badge")) return selectMany(Where.fieldContainsValue("badges", state.getState("badge", String.class))).stream()
 				.map(d -> d.getTarget().getAsMention())
 				.map(StringEntry::new)
 				.toList();
@@ -100,8 +100,15 @@ public interface CardBadgeTable extends Table<CardBadgeData>, Listable<StringEnt
 				.map(StringEntry::new)
 				.toList();
 
-		return CardBadgeData.getBadges(bot).stream()
-				.map(StringEntry::new)
+		return Stream.concat(CardBadgeData.getBadges(bot).stream().map(s -> "Custom: **" + s + "**"),
+						state.getEvent().getGuild().getRoles().stream()
+								.map(this::get)
+								.flatMap(Optional::stream)
+								.flatMap(d -> d.getBadges().stream())
+								.filter(StringUtil::isNumeric)
+								.map(s -> "Rolle: **<@&" + s + ">**")
+				)
+				.map(s -> new StringEntry("- " + s))
 				.toList();
 	}
 }

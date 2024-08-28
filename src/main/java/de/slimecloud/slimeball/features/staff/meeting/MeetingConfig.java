@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,7 +58,7 @@ public class MeetingConfig extends ConfigCategory {
 
 	@Override
 	public void enable(@NotNull Guild guild) {
-		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).toInstant(Main.timezone));
+		createNewMeeting(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(20, 0).atZone(Main.timezone).toInstant());
 	}
 
 	public void setupNotification() {
@@ -82,13 +83,13 @@ public class MeetingConfig extends ConfigCategory {
 		getChannel().ifPresent(channel -> {
 			//Send and save message
 			Message message = channel
-					.sendMessage(MessageCreateData.fromEditData(buildMessage(channel.getGuild(), timestamp, null, null)))
+					.sendMessage(MessageCreateData.fromEditData(buildMessage(channel.getGuild(), timestamp, null, (y, m, n, x) -> n.addAll(bot.getAbsences().getAbsences(channel.getGuild()).stream().filter(a -> a.getEnd() == null || a.getEnd().after(Date.from(timestamp))).map(a -> a.getMember().getAsMention()).toList()))))
 					.complete();
 			this.message = message.getIdLong();
 
 			try {
 				//Create event
-				this.event = channel.getGuild().createScheduledEvent("Teamsitzung", getVoiceChannel().orElseThrow(), timestamp.atOffset(Main.timezone))
+				this.event = channel.getGuild().createScheduledEvent("Teamsitzung", getVoiceChannel().orElseThrow(), timestamp.atZone(Main.timezone).toOffsetDateTime())
 						.setDescription("Weitere Informationen: " + message.getJumpUrl())
 						.complete().getIdLong();
 			} catch (Exception e) {
@@ -105,7 +106,7 @@ public class MeetingConfig extends ConfigCategory {
 		if (message == null) return;
 		getChannel().ifPresent(channel -> {
 			channel.deleteMessageById(message).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
-			if(event != 0) channel.getGuild().retrieveScheduledEventById(event).flatMap(ScheduledEvent::delete).queue(null, new ErrorHandler().ignore(ErrorResponse.SCHEDULED_EVENT));
+			if (event != 0) channel.getGuild().retrieveScheduledEventById(event).flatMap(ScheduledEvent::delete).queue(null, new ErrorHandler().ignore(ErrorResponse.SCHEDULED_EVENT));
 		});
 
 		futures.forEach(f -> f.cancel(false));
@@ -120,6 +121,13 @@ public class MeetingConfig extends ConfigCategory {
 	@NotNull
 	public Optional<GuildChannel> getVoiceChannel() {
 		return Optional.ofNullable(voice).map(id -> bot.getJda().getChannelById(GuildChannel.class, id));
+	}
+
+	public void updateMessage(@NotNull Guild guild, @NotNull MeetingHandler handler) {
+		getChannel().ifPresent(channel -> channel.retrieveMessageById(message).flatMap(message -> {
+			MessageEmbed embed = message.getEmbeds().get(0);
+			return message.editMessage(buildMessage(guild, embed.getTimestamp().toInstant(), embed, handler));
+		}).queue());
 	}
 
 	@NotNull
@@ -150,7 +158,7 @@ public class MeetingConfig extends ConfigCategory {
 			String entry = a.get(i);
 
 			agenda.append(i + 1).append(". ").append(entry).append("\n");
-			options.add(SelectOption.of(entry.split(": ", 2)[1], String.valueOf(i))
+			options.add(SelectOption.of(StringUtils.abbreviate(entry.split(": ", 2)[1], SelectOption.LABEL_MAX_LENGTH), String.valueOf(i))
 					.withEmoji(SlimeEmoji.number((i % 9) + 1).getEmoji(guild))
 			);
 		}

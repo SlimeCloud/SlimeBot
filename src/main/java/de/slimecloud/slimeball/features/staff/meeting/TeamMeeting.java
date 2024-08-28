@@ -119,10 +119,10 @@ public class TeamMeeting extends ListenerAdapter {
 							)).complete(); //We have to use complete to ensure the order of messages. We can not use the queue callback because of the complete usage in createNewMeeting
 
 					//Delete event
-					if(config.getEvent() != 0) event.getGuild().retrieveScheduledEventById(config.getEvent()).flatMap(ScheduledEvent::delete).queue();
+					if (config.getEvent() != 0) event.getGuild().retrieveScheduledEventById(config.getEvent()).flatMap(ScheduledEvent::delete).queue();
 
 					//This will send a new message
-					config.createNewMeeting(current.getTimestamp().toLocalDateTime().plus(Duration.ofDays(14)).toInstant(Main.timezone));
+					config.createNewMeeting(current.getTimestamp().atZoneSameInstant(Main.timezone).plus(Duration.ofDays(14)).withHour(20).toInstant());
 					guildConfig.save();
 				}
 			}

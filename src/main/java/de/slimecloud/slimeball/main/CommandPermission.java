@@ -12,6 +12,15 @@ import org.jetbrains.annotations.Nullable;
 
 public enum CommandPermission implements ICommandPermission<ICommandContext> {
 	/**
+	 * Befehl kann von jedem ausgeführt werden
+	 */
+	EVERYONE {
+		@Override
+		public boolean isPermitted(@NotNull SlimeBot bot, @NotNull Member m) {
+			return true;
+		}
+	},
+	/**
 	 * Diese Befehle können nur von Teammitgliedern ausgeführt werden, sind aber Standardmäßig für alle Servermitglieder sichtbar.
 	 * Es wird überprüft, ob der Nutzer, der den Befehl verwendet die `Team-Rolle` hat.
 	 * Falls keine Team-Rolle festgelegt wurde, wird überprüft, ob der Nutzer die `MANAGE_SERVER` Berechtigung hat.

@@ -4,12 +4,15 @@ import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class StaffMessage extends ListenerAdapter {
@@ -32,20 +35,27 @@ public class StaffMessage extends ListenerAdapter {
 
 	@Override
 	public void onGuildMemberRoleAdd(@NotNull GuildMemberRoleAddEvent event) {
-		update(event.getGuild());
+		update(event.getGuild(), event.getRoles());
 	}
 
 	@Override
 	public void onGuildMemberRoleRemove(@NotNull GuildMemberRoleRemoveEvent event) {
-		update(event.getGuild());
+		update(event.getGuild(), event.getRoles());
 	}
 
 	@Override
 	public void onGuildReady(@NotNull GuildReadyEvent event) {
-		update(event.getGuild());
+		update(event.getGuild(), event.getGuild().getRoles());
 	}
 
-	public void update(@NotNull Guild guild) {
-		bot.loadGuild(guild).getTeamMessage().ifPresent(s -> s.update(guild));
+	public void update(@NotNull Guild guild, @NotNull List<Role> roles) {
+		bot.loadGuild(guild).getTeamMessage().ifPresent(s -> {
+			for (Role role : roles) {
+				if (s.getRoles().containsKey(role.getId())) {
+					s.update(guild);
+					return;
+				}
+			}
+		});
 	}
 }

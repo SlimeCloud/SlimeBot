@@ -1,9 +1,9 @@
 package de.slimecloud.slimeball.main.extensions;
 
-import de.mineking.javautils.database.DatabaseManager;
-import de.mineking.javautils.database.TypeMapper;
-import de.mineking.javautils.database.type.DataType;
-import de.mineking.javautils.database.type.PostgresType;
+import de.mineking.databaseutils.DatabaseManager;
+import de.mineking.databaseutils.TypeMapper;
+import de.mineking.databaseutils.type.DataType;
+import de.mineking.databaseutils.type.PostgresType;
 import de.mineking.javautils.reflection.ReflectionUtils;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.JDA;
@@ -51,8 +51,9 @@ public class SnowflakeTypeMapper implements TypeMapper<Long, ISnowflake> {
 
 	@Nullable
 	@Override
-	public Long format(@NotNull DatabaseManager manager, @NotNull Type type, @NotNull Field f, @Nullable ISnowflake value) {
-		return value == null ? null : value.getIdLong();
+	public Long format(@NotNull DatabaseManager manager, @NotNull Type type, @NotNull Field f, @Nullable Object value) {
+		if (!(value instanceof ISnowflake snowflake)) return null;
+		return snowflake.getIdLong();
 	}
 
 	@Nullable

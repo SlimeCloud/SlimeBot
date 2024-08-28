@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public enum SlimeEmoji {
 	WAVE("slimewave"),
 	BONK("bonk"),
+	PARTY("slimeemparty"),
 
 	UP("slimesymvup"),
 	DOWN("slimesymvdw"),

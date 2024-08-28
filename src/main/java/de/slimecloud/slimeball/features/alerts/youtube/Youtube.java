@@ -1,6 +1,7 @@
 package de.slimecloud.slimeball.features.alerts.youtube;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.slimecloud.slimeball.config.YoutubeConfig;
@@ -14,10 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -30,7 +32,6 @@ public class Youtube {
 	private final YoutubeConfig config;
 
 	private int currentKey;
-	private Video lastVideo;
 
 	public Youtube(String[] keys, SlimeBot bot, YoutubeConfig config) {
 		this.keys = keys;
@@ -40,24 +41,33 @@ public class Youtube {
 	}
 
 	public void startListener() {
-		int delay = config.getUpdateRate();
+		Map<String, Integer> channels = config.getYoutubeChannels();
 
-		bot.getExecutor().scheduleAtFixedRate(() -> {
-			try {
-				check();
-			} catch (Exception e) {
-				logger.error("Failed to check for new video", e);
-			}
-		}, 0, delay, TimeUnit.SECONDS);
+		channels.forEach((channel, delay) -> {
+			bot.getExecutor().scheduleAtFixedRate(() -> {
+				try {
+					check(channel);
+				} catch (Exception e) {
+					logger.error("Failed to check for new video for channel " + channel, e);
+				}
+			}, 0, delay, TimeUnit.SECONDS);
+		});
 	}
 
-	private void check() throws IOException {
-		Video lastCheckedVideo = getLastVideo();
+	private void check(String youtubeChannelId) throws IOException {
+		Set<Video> videos = getLastVideo(youtubeChannelId, 5);
 
-		if (lastCheckedVideo != null && !lastCheckedVideo.equals(lastVideo)) {
-			if (lastVideo != null) new YoutubeVideoEvent(lastCheckedVideo).callEvent();
-			this.lastVideo = lastCheckedVideo;
+		Collection<String> known = bot.getIdMemory().getMemory("youtube");
+		List<String> newIds = new ArrayList<>();
+
+		for (Video video : videos) {
+			if (!known.contains(video.id())) {
+				new YoutubeVideoEvent(youtubeChannelId, video).callEvent();
+				newIds.add(video.id());
+			}
 		}
+
+		bot.getIdMemory().rememberIds("youtube", newIds);
 	}
 
 	@NotNull
@@ -65,21 +75,34 @@ public class Youtube {
 		return keys[currentKey++ % keys.length];
 	}
 
-	//returns null if no videos found on the channel
-	@Nullable
-	public Video getLastVideo() throws IOException {
+	@NotNull
+	public Set<Video> getLastVideo(@NotNull String youtubeChannelId, int limit) throws IOException {
 		Request request = new Request.Builder()
-				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=1", getNextKey(), config.getYoutubeChannelId()))
+				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=" + limit, getNextKey(), youtubeChannelId))
 				.get()
 				.build();
 
 		@Cleanup
 		Response response = client.newCall(request).execute();
+		int code = response.code();
+
 		JsonObject json = JsonParser.parseString(response.body().string()).getAsJsonObject();
+
+		if (code != HttpStatus.SC_OK) {
+			YoutubeApiErrorEvent event = new YoutubeApiErrorEvent(response, json, new HashSet<>());
+			event.callEvent();
+			return event.getVideos();
+		}
+
 		JsonArray videos = json.getAsJsonArray("items");
 
-		if (videos.size() <= 0) return null;
+		Set<Video> result = new HashSet<>();
 
-		return Video.ofSearch(Main.json.fromJson(videos.get(0), SearchResult.class));
+		for (JsonElement video : videos) {
+			Video videoResult = Video.ofSearch(Main.json.fromJson(video, SearchResult.class));
+			if (videoResult != null) result.add(videoResult);
+		}
+
+		return result;
 	}
 }

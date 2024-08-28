@@ -1,6 +1,6 @@
 package de.slimecloud.slimeball.features.level.card.badge;
 
-import de.mineking.javautils.database.Column;
+import de.mineking.databaseutils.Column;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.StringUtil;
 import lombok.Getter;

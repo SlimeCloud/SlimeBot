@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.apache.commons.lang3.StringUtils;
-import org.jdbi.v3.core.statement.PreparedBatch;
 import org.jetbrains.annotations.NotNull;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.requests.data.AbstractDataPagingRequest;
@@ -25,7 +24,6 @@ public class SpotifyAlert {
 
 	public SpotifyAlert(@NotNull SlimeBot bot) {
 		this.bot = bot;
-		bot.getDatabase().getDriver().useHandle(handle -> handle.createUpdate("create table if not exists spotify_known(id text)").execute());
 
 		bot.getExecutor().scheduleAtFixedRate(() -> {
 			try {
@@ -40,7 +38,7 @@ public class SpotifyAlert {
 
 	public void check() {
 		//Read releases that were already published
-		List<String> known = bot.getDatabase().getDriver().withHandle(handle -> handle.createQuery("select id from spotify_known").mapTo(String.class).list());
+		Collection<String> known = bot.getIdMemory().getMemory("spotify");
 		List<String> newIds = new ArrayList<>();
 
 		//Check for podcast episodes
@@ -69,11 +67,7 @@ public class SpotifyAlert {
 		logger.info("Found {} new entries", newIds.size());
 
 		//Mark newly published releases
-		bot.getDatabase().getDriver().useHandle(handle -> {
-			PreparedBatch update = handle.prepareBatch("insert into spotify_known values(:id)");
-			newIds.forEach(id -> update.bind("id", id).add());
-			update.execute();
-		});
+		bot.getIdMemory().rememberIds("spotify", newIds);
 	}
 
 	@NotNull

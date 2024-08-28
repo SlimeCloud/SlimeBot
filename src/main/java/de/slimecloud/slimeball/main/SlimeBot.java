@@ -1,19 +1,23 @@
 package de.slimecloud.slimeball.main;
 
+import de.cyklon.jevent.EventManager;
 import de.cyklon.jevent.JEvent;
 import de.cyklon.reflection.entities.OfflinePackage;
+import de.mineking.databaseutils.DatabaseManager;
 import de.mineking.discordutils.DiscordUtils;
 import de.mineking.discordutils.commands.Cache;
-import de.mineking.javautils.database.DatabaseManager;
 import de.slimecloud.slimeball.config.ActivityConfig;
 import de.slimecloud.slimeball.config.Config;
 import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.config.LogForwarding;
 import de.slimecloud.slimeball.config.commands.ConfigCommand;
-import de.slimecloud.slimeball.features.alerts.HolidayAlert;
+import de.slimecloud.slimeball.features.StoredId;
+import de.slimecloud.slimeball.features.alerts.IdMemory;
+import de.slimecloud.slimeball.features.alerts.holiday.HolidayAlert;
 import de.slimecloud.slimeball.features.alerts.spotify.Spotify;
 import de.slimecloud.slimeball.features.alerts.spotify.SpotifyAlert;
 import de.slimecloud.slimeball.features.alerts.youtube.Youtube;
+import de.slimecloud.slimeball.features.alerts.youtube.YoutubeListener;
 import de.slimecloud.slimeball.features.birthday.Birthday;
 import de.slimecloud.slimeball.features.birthday.BirthdayAlert;
 import de.slimecloud.slimeball.features.birthday.BirthdayListener;
@@ -27,6 +31,7 @@ import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.features.github.GitHubAPI;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
+import de.slimecloud.slimeball.features.level.LevelUpListener;
 import de.slimecloud.slimeball.features.level.card.*;
 import de.slimecloud.slimeball.features.level.card.badge.BadgeCommand;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
@@ -35,10 +40,6 @@ import de.slimecloud.slimeball.features.level.commands.LevelCommand;
 import de.slimecloud.slimeball.features.moderation.MemberJoinListener;
 import de.slimecloud.slimeball.features.moderation.MessageListener;
 import de.slimecloud.slimeball.features.moderation.TimeoutListener;
-import de.slimecloud.slimeball.features.poll.Poll;
-import de.slimecloud.slimeball.features.poll.PollCommand;
-import de.slimecloud.slimeball.features.poll.PollEditCommand;
-import de.slimecloud.slimeball.features.poll.PollTable;
 import de.slimecloud.slimeball.features.quote.QuoteCommand;
 import de.slimecloud.slimeball.features.quote.QuoteMessageCommand;
 import de.slimecloud.slimeball.features.report.Report;
@@ -52,15 +53,16 @@ import de.slimecloud.slimeball.features.report.commands.UserReportSlashCommand;
 import de.slimecloud.slimeball.features.staff.StaffMessage;
 import de.slimecloud.slimeball.features.staff.meeting.TeamMeeting;
 import de.slimecloud.slimeball.features.staff.meeting.protocol.MeetingProtocol;
+import de.slimecloud.slimeball.features.staff.absence.Absence;
+import de.slimecloud.slimeball.features.staff.absence.AbsenceCommand;
+import de.slimecloud.slimeball.features.staff.absence.AbsenceScheduler;
+import de.slimecloud.slimeball.features.staff.absence.AbsenceTable;
 import de.slimecloud.slimeball.features.statistic.MemberCount;
 import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
-import de.slimecloud.slimeball.main.extensions.ColorOptionParser;
-import de.slimecloud.slimeball.main.extensions.ColorTypeMapper;
-import de.slimecloud.slimeball.main.extensions.IDOptionParser;
-import de.slimecloud.slimeball.main.extensions.SnowflakeTypeMapper;
+import de.slimecloud.slimeball.main.extensions.*;
 import de.slimecloud.slimeball.util.ColorUtil;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
@@ -89,7 +91,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -115,16 +117,16 @@ public class SlimeBot extends ListenerAdapter {
 	private final ReportTable reports;
 	private final ReportBlockTable reportBlocks;
 
-	private final PollTable polls;
-
 	private final LevelTable level;
 	private final CardDataTable profileData;
 	private final GuildCardTable cardProfiles;
 	private final CardBadgeTable cardBadges;
 
 	private final WrappedDataTable wrappedData;
-
 	private final BirthdayTable birthdays;
+	private final IdMemory idMemory;
+
+	private final AbsenceTable absences;
 
 	private final GitHubAPI github;
 	private final Spotify spotify;
@@ -157,34 +159,36 @@ public class SlimeBot extends ListenerAdapter {
 			database.putData("bot", this);
 			database.addMapper(new SnowflakeTypeMapper());
 			database.addMapper(new ColorTypeMapper());
+			database.addMapper(new DateTypeMapper());
 
 			//Initialize tables
-			reports = (ReportTable) database.getTable(ReportTable.class, Report.class, () -> new Report(this), "reports").createTable();
-			reportBlocks = (ReportBlockTable) database.getTable(ReportBlockTable.class, ReportBlock.class, ReportBlock::new, "report_blocks").createTable();
+			reports = database.getTable(Report.class, () -> new Report(this)).name("reports").table(ReportTable.class).create();
+			reportBlocks = database.getTable(ReportBlock.class, ReportBlock::new).name("report_blocks").table(ReportBlockTable.class).create();
 
-			polls = (PollTable) database.getTable(PollTable.class, Poll.class, () -> new Poll(this), "polls").createTable();
+			level = database.getTable(Level.class, () -> new Level(this)).name("levels").table(LevelTable.class).create();
+			profileData = database.getTable(CardProfileData.class, () -> new CardProfileData(this)).name("card_data").table(CardDataTable.class).create();
+			cardProfiles = database.getTable(GuildCardProfile.class, () -> new GuildCardProfile(this)).name("guild_card_profiles").table(GuildCardTable.class).create();
+			cardBadges = database.getTable(CardBadgeData.class, () -> new CardBadgeData(this)).name("guild_card_badges").table(CardBadgeTable.class).create();
 
-			level = (LevelTable) database.getTable(LevelTable.class, Level.class, () -> new Level(this), "levels").createTable();
-			profileData = (CardDataTable) database.getTable(CardDataTable.class, CardProfileData.class, () -> new CardProfileData(this), "card_data").createTable();
-			cardProfiles = (GuildCardTable) database.getTable(GuildCardTable.class, GuildCardProfile.class, () -> new GuildCardProfile(this), "guild_card_profiles").createTable();
-			cardBadges = (CardBadgeTable) database.getTable(CardBadgeTable.class, CardBadgeData.class, () -> new CardBadgeData(this), "guild_card_badges").createTable();
+			wrappedData = database.getTable(WrappedData.class, () -> new WrappedData(this)).name("wrapped_data").table(WrappedDataTable.class).create();
+			birthdays = database.getTable(Birthday.class, () -> new Birthday(this)).name("birthdays").table(BirthdayTable.class).create();
+			idMemory = database.getTable(StoredId.class, () -> new StoredId("", "")).name("id_memory").table(IdMemory.class).create();
 
-			wrappedData = (WrappedDataTable) database.getTable(WrappedDataTable.class, WrappedData.class, () -> new WrappedData(this), "wrapped_data").createTable();
-
-			birthdays = (BirthdayTable) database.getTable(BirthdayTable.class, Birthday.class, () -> new Birthday(this), "birthdays").createTable();
+			absences = database.getTable(Absence.class, () -> new Absence(this)).name("absences").table(AbsenceTable.class).create();
 		} else {
 			logger.warn("Database credentials missing! Some features will be disabled!");
 
 			database = null;
 			reports = null;
 			reportBlocks = null;
-			polls = null;
 			level = null;
 			profileData = null;
 			cardProfiles = null;
 			cardBadges = null;
 			wrappedData = null;
 			birthdays = null;
+			idMemory = null;
+			absences = null;
 		}
 
 		//Initialize GitHub API
@@ -243,6 +247,7 @@ public class SlimeBot extends ListenerAdapter {
 				.addEventListeners(new TeamMeeting(this))
 
 				.addEventListeners(new DataListener(this))
+				.addEventListeners(new PingListener())
 
 				.addEventListeners(memberCount = new MemberCount(this))
 				.addEventListeners(roleMemberCount = new RoleMemberCount(this));
@@ -269,6 +274,8 @@ public class SlimeBot extends ListenerAdapter {
 
 					manager.registerCommand(FdmdsCommand.class);
 
+					manager.registerCommand(AbsenceCommand.class);
+
 					//old mee6 custom commands
 					manager.registerCommand(SocialsCommand.class);
 
@@ -290,12 +297,6 @@ public class SlimeBot extends ListenerAdapter {
 						manager.registerCommand(BugContextCommand.class);
 						manager.registerCommand(ContributorCommand.class);
 					} else logger.warn("Bug reporting disabled due to missing github api");
-
-					//Register poll commands
-					if (polls != null) {
-						manager.registerCommand(PollCommand.class);
-						manager.registerCommand(PollEditCommand.class);
-					} else logger.warn("Poll system disabled due to missing database");
 
 					//Register leveling commands
 					if (database != null && config.getLevel().isPresent()) {
@@ -349,13 +350,23 @@ public class SlimeBot extends ListenerAdapter {
 			} else logger.warn("Spotify alerts disabled due to missing configuration");
 		}
 
+		//Register Listeners
+		//JEvent.getDefaultManager().registerListenerPackage(botPackage);
+		EventManager manager = JEvent.getDefaultManager();
+		manager.registerListener(DataListener.class);
+		manager.registerListener(LevelUpListener.class);
+		manager.registerListener(YoutubeListener.class);
+		manager.registerListener(TimeoutListener.class);
+		manager.registerListener(BirthdayListener.class);
+		manager.registerListener(MessageListener.class);
+
+		//Start handlers
 		new HolidayAlert(this);
 		new BirthdayAlert(this);
-		new BirthdayListener(this);
+
+		new AbsenceScheduler(this);
 
 		if (youtube != null) youtube.startListener();
-
-		JEvent.getDefaultManager().registerListenerPackage(botPackage);
 	}
 
 	private void startActivity() {
@@ -390,11 +401,11 @@ public class SlimeBot extends ListenerAdapter {
 
 	public void scheduleDaily(int hour, @NotNull Runnable task) {
 		long day = TimeUnit.DAYS.toSeconds(1);
-		long initialDelay = Instant.now().atOffset(ZoneOffset.UTC)
+		long initialDelay = ZonedDateTime.now(Main.timezone)
 				.withHour(hour)
 				.withMinute(0)
 				.withSecond(0)
-				.toEpochSecond();
+				.toEpochSecond() - (System.currentTimeMillis() / 1000);
 
 		if (initialDelay < 0) initialDelay += day;
 

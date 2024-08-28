@@ -1,14 +1,16 @@
 package de.slimecloud.slimeball.features.level.card;
 
+import de.mineking.databaseutils.Column;
+import de.mineking.databaseutils.DataClass;
+import de.mineking.databaseutils.Table;
 import de.mineking.discordutils.list.ListContext;
 import de.mineking.discordutils.list.ListEntry;
 import de.mineking.javautils.ID;
-import de.mineking.javautils.database.Column;
-import de.mineking.javautils.database.DataClass;
-import de.mineking.javautils.database.Table;
 import de.slimecloud.slimeball.config.engine.ConfigFieldType;
 import de.slimecloud.slimeball.config.engine.Info;
 import de.slimecloud.slimeball.config.engine.ValidationException;
+import de.slimecloud.slimeball.features.level.card.component.RankColor;
+import de.slimecloud.slimeball.features.level.card.component.Style;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
 import lombok.Getter;
@@ -84,7 +86,7 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 	private Color backgroundColor = new Color(30, 30, 30, 200);
 	@Column
 	@Info(keyType = ConfigFieldType.URL)
-	private String backgroundImageURL = "";
+	private String backgroundImageURL;
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
 	private Color backgroundBorderColor = new Color(68, 140, 41, 255);
@@ -100,7 +102,15 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 	private Color fontSecondaryColor = Color.GRAY;
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color fontLevelColor = new Color(97, 180, 237);
+	private Color fontLevelColor = TRANSPARENT;
+
+	@Column
+	@Info(keyType = ConfigFieldType.ENUM)
+	private RankColor fontLevelStyle = RankColor.ROLE;
+
+	@Column
+	@Info(keyType = ConfigFieldType.STRING)
+	private String name = "*Unbenannt*";
 
 
 	public CardProfileData(@NotNull SlimeBot bot, @NotNull UserSnowflake owner) {
@@ -128,7 +138,7 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 
 	@NotNull
 	public CardProfileData createCopy(@NotNull UserSnowflake owner) {
-		//Setting the id to null will make JavaUtils create a new column
+		//Setting the id to null will make JavaUtils create a new row
 		this.id = null;
 		this.owner = owner;
 
@@ -138,7 +148,7 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 	@NotNull
 	@Override
 	public String build(int index, @NotNull ListContext<? extends ListEntry> context) {
-		return (index + 1) + ". ID: **" + id + "**, von " + owner.getAsMention();
+		return (index + 1) + ". **" + name + "** (" + id + "), von " + owner.getAsMention();
 	}
 
 	@NotNull

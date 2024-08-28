@@ -15,6 +15,8 @@ import de.slimecloud.slimeball.main.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.messages.MessagePoll;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
@@ -24,9 +26,12 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
+import net.dv8tion.jda.api.utils.messages.MessagePollData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.stream.Collectors;
 
 @ApplicationCommand(name = "fdmds", description = "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!", scope = Scope.GUILD)
@@ -42,22 +47,22 @@ public class FdmdsCommand {
 						.setPlaceholder("Eissorten")
 						.setValue(title)
 						.setMinLength(10)
-						.setMaxLength(150)
+						.setMaxLength(ThreadChannel.MAX_NAME_LENGTH)
 						.setRequired(true)
 						.build()
 				)
-				.addActionRow(TextInput.create("question", "Deine Frage", TextInputStyle.SHORT)
+				.addActionRow(TextInput.create("question", "Deine Frage", TextInputStyle.PARAGRAPH)
 						.setPlaceholder("Welche Eissorte mögt ihr am liebsten?")
 						.setValue(question)
 						.setMinLength(10)
-						.setMaxLength(150)
+						.setMaxLength(163)
 						.setRequired(true)
 						.build()
 				)
 				.addActionRow(TextInput.create("choices", "Deine Antwortmöglichkeiten", TextInputStyle.PARAGRAPH)
 						.setPlaceholder("Jede Antwortmöglichkeit in einer neuen Zeile, z.B:\nErdbeere\nCookie\nSchokolade")
 						.setValue(choices)
-						.setMinLength(10)
+						.setMinLength(5)
 						.setMaxLength(800)
 						.setRequired(true)
 						.build()
@@ -91,6 +96,11 @@ public class FdmdsCommand {
 		//Convert to string
 		StringBuilder choices = new StringBuilder();
 		for (int i = 0; i < temp.length; i++) {
+			if (temp[i].length() >= MessagePoll.MAX_ANSWER_TEXT_LENGTH) {
+				event.reply("Eine Antwort darf **maximal " + MessagePoll.MAX_ANSWER_TEXT_LENGTH + "** Zeichen lang sein!").setEphemeral(true).queue();
+				return;
+			}
+
 			choices.append(SlimeEmoji.number(i + 1).getEmoji(event.getGuild()).getFormatted())
 					.append(" -> ")
 					.append(temp[i].strip())
@@ -148,27 +158,32 @@ public class FdmdsCommand {
 			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
 
 			String question = embed.getDescription();
-			String title = embed.getTitle() == null ? "Umfrage" : embed.getTitle(); //TODO Backward compatibility, remove the fallback as soon as all old submissions are gone
-			String choices = embed.getFields().get(0).getValue();
+			String title = embed.getTitle();
+			String[] choices = embed.getFields().get(0).getValue().split("\n");
 
 			//Call event
 			new FdmdsCreateEvent(SlimeBot.getUser(embed), event.getMember(), question).callEvent();
 
-			//Create and send embed
-			EmbedBuilder builder = new EmbedBuilder()
-					.setTitle(title)
-					.setColor(bot.getColor(event.getGuild()))
-					.setAuthor(embed.getAuthor().getName(), embed.getAuthor().getUrl(), embed.getAuthor().getIconUrl())
-					.setDescription(question)
-					.addField("Auswahlmöglichkeiten", choices, false);
+			MessagePollBuilder builder = MessagePollData.builder(question)
+					.setMultiAnswer(true)
+					.setDuration(Duration.ofDays(7));
 
-			fdmds.getChannel().sendMessageEmbeds(builder.build())
+			for (int i = 0; i < choices.length; i++) builder.addAnswer(choices[i].split(" -> ", 2)[1], SlimeEmoji.number(i + 1).getEmoji(event.getGuild()));
+
+			String user;
+
+			try {
+				user = SlimeBot.getUser(embed).getAsMention();
+			} catch (Exception e) {
+				user = embed.getAuthor().getName();
+			}
+
+			fdmds.getChannel().sendMessagePoll(builder.build())
 					.setContent(fdmds.getRole().map(Role::getAsMention).orElse(null))
+					.addContent("\n# " + title)
+					.addContent("\n" + user + " fragt")
 					.addActionRow(Button.secondary("fdmds:create", "Selbst eine Frage einreichen"))
 					.queue(m -> {
-						//Add reactions
-						for (int i = 0; i < choices.lines().count(); i++) m.addReaction(SlimeEmoji.number(i + 1).getEmoji(event.getGuild())).queue();
-
 						//Create thread
 						m.createThreadChannel(title).queue();
 
