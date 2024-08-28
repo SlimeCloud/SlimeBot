@@ -13,6 +13,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class YoutubeApiErrorEvent extends Event {
 
+	private final Youtube youtube;
+	private final String channelId;
+	private final int startKey;
 	private final Response response;
 	private final JsonObject jsonResponse;
 	private final Set<Video> videos;
