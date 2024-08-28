@@ -50,7 +50,7 @@ public class MeetingProtocol {
 		this.leopard_model = new File(url.getPath());
 	}
 
-	private void start(VoiceChannel vc) {
+	public void start(VoiceChannel vc) {
 		receiver = new AudioReceiver();
 		Guild guild = vc.getGuild();
 		AudioManager audioManager = guild.getAudioManager();
@@ -59,7 +59,7 @@ public class MeetingProtocol {
 	}
 
 	@SneakyThrows(LeopardException.class)
-	private void stop(Guild guild) {
+	public void stop(Guild guild) {
 		JDA jda = guild.getJDA();
 
 		List<User> users = new ArrayList<>();
@@ -103,31 +103,5 @@ public class MeetingProtocol {
 		audioManager.setReceivingHandler(null);
 		audioManager.closeAudioConnection();
 		receiver = null;
-	}
-
-	@ApplicationCommand(name = "start-recording", description = "test", defer = true)
-	public static class StartCommand {
-		@ApplicationCommandMethod
-		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
-			if (bot.getMeetingProtocol().getReceiver () != null) event.getHook().sendMessage("stop meeting recording first").queue();
-			GuildVoiceState state = event.getMember().getVoiceState();
-			if (state != null) {
-				AudioChannelUnion union = state.getChannel();
-				if (union != null) {
-					bot.getMeetingProtocol().start(union.asVoiceChannel());
-					event.getHook().sendMessage("meeting recording started").queue();
-				} else event.getHook().sendMessage("connect first to a voice channel").queue();
-			} else event.getHook().sendMessage("connect first to a voice channel").queue();
-		}
-	}
-
-	@ApplicationCommand(name = "stop-recording", description = "test", defer = true)
-	public static class StopCommand {
-		@ApplicationCommandMethod
-		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
-			if (bot.getMeetingProtocol().getReceiver() == null) event.getHook().sendMessage("start meeting recording first").queue();
-			bot.getMeetingProtocol().stop(event.getGuild());
-			event.getHook().sendMessage("meeting recording stopped!").queue();
-		}
 	}
 }
