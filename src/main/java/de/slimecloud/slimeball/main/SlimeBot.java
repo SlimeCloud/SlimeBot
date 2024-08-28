@@ -264,6 +264,7 @@ public class SlimeBot extends ListenerAdapter {
 					manager.registerCommand(QuoteMessageCommand.class);
 
 					manager.registerCommand(FdmdsCommand.class);
+					manager.registerCommand(ContributorCommand.class);
 
 					manager.registerCommand(AbsenceCommand.class);
 
@@ -282,7 +283,6 @@ public class SlimeBot extends ListenerAdapter {
 					if (github != null) {
 						manager.registerCommand(BugCommand.class);
 						manager.registerCommand(BugContextCommand.class);
-						manager.registerCommand(ContributorCommand.class);
 					} else logger.warn("Bug reporting disabled due to missing github api");
 
 					//Register leveling commands
@@ -443,11 +443,6 @@ public class SlimeBot extends ListenerAdapter {
 			logger.error("Regular shutdown failed, forcing shutdown...", e);
 			System.exit(1);
 		}
-	}
-
-	@NotNull
-	public static UserSnowflake getUser(@NotNull MessageEmbed embed) {
-		return UserSnowflake.fromId(embed.getAuthor().getIconUrl().split("/")[4]); //Avatar Pattern: "https://cdn.discordapp.com/avatars/%s/%s.%s"
 	}
 
 	@NotNull

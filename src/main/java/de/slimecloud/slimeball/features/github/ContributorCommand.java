@@ -19,9 +19,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 @Slf4j
-@ApplicationCommand(name = "contributor", description = "Bewerbe dich für die Contributor-Rolle wenn du am unserem Open Source Projekt mitgearbeitet hast", scope = Scope.GUILD_GLOBAL)
+@ApplicationCommand(name = "contributor", description = "Bewerbe dich für die Contributor-Rolle wenn du am unserem Open Source Projekt mitgearbeitet hast", scope = Scope.GUILD)
 public class ContributorCommand {
-	public final IRegistrationCondition<ICommandContext> condition = (manager, guild, cache) -> cache.<GuildConfig>getState("config").getLogChannel().isPresent();
+	public final IRegistrationCondition<ICommandContext> condition = (manager, guild, cache) -> cache.<GuildConfig>getState("config").getLogChannel().isPresent() && cache.<GuildConfig>getState("config").getContributorRole().isPresent();
 
 	@ApplicationCommandMethod
 	public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
@@ -29,13 +29,13 @@ public class ContributorCommand {
 	                           @Option(description = "Der GitHub link zu deinem PR") String link
 	) {
 		bot.loadGuild(event.getGuild()).getLogChannel().ifPresent(channel ->
-				channel.sendMessage(link).addEmbeds(new EmbedBuilder()
+				channel.sendMessageEmbeds(new EmbedBuilder()
 						.setTitle("Neue Contributor Bewerbung")
+						.setColor(bot.getColor(event.getGuild()))
 						.setAuthor(event.getUser().getName(), null, event.getUser().getEffectiveAvatarUrl())
 						.addField("GitHub Name", user, false)
 						.addField("Discord Name", event.getUser().getAsMention(), false)
 						.addField("Referenz", link, false)
-						.setColor(bot.getColor(event.getGuild()))
 						.build()
 				).addActionRow(
 						Button.success("contributor:accept", "Annehmen"),
@@ -46,7 +46,7 @@ public class ContributorCommand {
 
 	@Listener(type = ButtonHandler.class, filter = "contributor:accept")
 	public void handleAccept(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
-		UserSnowflake user = SlimeBot.getUser(event.getMessage().getEmbeds().get(0));
+		UserSnowflake user = UserSnowflake.fromId(event.getMessage().getEmbeds().get(0).getFields().get(1).getValue().replaceAll("\\D", ""));
 
 		bot.loadGuild(event.getGuild()).getContributorRole().ifPresent(role -> {
 			//Call event
@@ -65,7 +65,7 @@ public class ContributorCommand {
 
 	@Listener(type = ButtonHandler.class, filter = "contributor:reject")
 	public void handleDeny(@NotNull ButtonInteractionEvent event) {
-		UserSnowflake user = SlimeBot.getUser(event.getMessage().getEmbeds().get(0));
+		UserSnowflake user = UserSnowflake.fromId(event.getMessage().getEmbeds().get(0).getFields().get(1).getValue().replaceAll("\\D", ""));
 
 		event.getMessage().delete().queue();
 		event.getJDA().openPrivateChannelById(user.getIdLong())
