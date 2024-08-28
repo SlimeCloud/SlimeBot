@@ -102,7 +102,7 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 	private Color fontSecondaryColor = Color.GRAY;
 	@Column
 	@Info(keyType = ConfigFieldType.COLOR)
-	private Color fontLevelColor = new Color(97, 180, 237);
+	private Color fontLevelColor = TRANSPARENT;
 
 	@Column
 	@Info(keyType = ConfigFieldType.ENUM)

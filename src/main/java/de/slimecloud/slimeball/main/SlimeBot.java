@@ -160,19 +160,19 @@ public class SlimeBot extends ListenerAdapter {
 			database.addMapper(new DateTypeMapper());
 
 			//Initialize tables
-			reports = (ReportTable) database.getTable(ReportTable.class, Report.class, () -> new Report(this), "reports").createTable();
-			reportBlocks = (ReportBlockTable) database.getTable(ReportBlockTable.class, ReportBlock.class, ReportBlock::new, "report_blocks").createTable();
+			reports = database.getTable(Report.class, () -> new Report(this)).name("reports").table(ReportTable.class).create();
+			reportBlocks = database.getTable(ReportBlock.class, ReportBlock::new).name("report_blocks").table(ReportBlockTable.class).create();
 
-			level = (LevelTable) database.getTable(LevelTable.class, Level.class, () -> new Level(this), "levels").createTable();
-			profileData = (CardDataTable) database.getTable(CardDataTable.class, CardProfileData.class, () -> new CardProfileData(this), "card_data").createTable();
-			cardProfiles = (GuildCardTable) database.getTable(GuildCardTable.class, GuildCardProfile.class, () -> new GuildCardProfile(this), "guild_card_profiles").createTable();
-			cardBadges = (CardBadgeTable) database.getTable(CardBadgeTable.class, CardBadgeData.class, () -> new CardBadgeData(this), "guild_card_badges").createTable();
+			level = database.getTable(Level.class, () -> new Level(this)).name("levels").table(LevelTable.class).create();
+			profileData = database.getTable(CardProfileData.class, () -> new CardProfileData(this)).name("card_data").table(CardDataTable.class).create();
+			cardProfiles = database.getTable(GuildCardProfile.class, () -> new GuildCardProfile(this)).name("guild_card_profiles").table(GuildCardTable.class).create();
+			cardBadges = database.getTable(CardBadgeData.class, () -> new CardBadgeData(this)).name("guild_card_badges").table(CardBadgeTable.class).create();
 
-			wrappedData = (WrappedDataTable) database.getTable(WrappedDataTable.class, WrappedData.class, () -> new WrappedData(this), "wrapped_data").createTable();
-			birthdays = (BirthdayTable) database.getTable(BirthdayTable.class, Birthday.class, () -> new Birthday(this), "birthdays").createTable();
-			idMemory = (IdMemory) database.getTable(IdMemory.class, StoredId.class, () -> new StoredId("", ""), "id_memory").createTable();
+			wrappedData = database.getTable(WrappedData.class, () -> new WrappedData(this)).name("wrapped_data").table(WrappedDataTable.class).create();
+			birthdays = database.getTable(Birthday.class, () -> new Birthday(this)).name("birthdays").table(BirthdayTable.class).create();
+			idMemory = database.getTable(StoredId.class, () -> new StoredId("", "")).name("id_memory").table(IdMemory.class).create();
 
-			absences = (AbsenceTable) database.getTable(AbsenceTable.class, Absence.class, () -> new Absence(this), "absences").createTable();
+			absences = database.getTable(Absence.class, () -> new Absence(this)).name("absences").table(AbsenceTable.class).create();
 		} else {
 			logger.warn("Database credentials missing! Some features will be disabled!");
 
@@ -337,14 +337,7 @@ public class SlimeBot extends ListenerAdapter {
 			} else logger.warn("Spotify alerts disabled due to missing configuration");
 		}
 
-		new HolidayAlert(this);
-		new BirthdayAlert(this);
-		new BirthdayListener(this);
-
-		new AbsenceScheduler(this);
-
-		if (youtube != null) youtube.startListener();
-
+		//Register Listeners
 		//JEvent.getDefaultManager().registerListenerPackage(botPackage);
 		EventManager manager = JEvent.getDefaultManager();
 		manager.registerListener(DataListener.class);
@@ -353,6 +346,14 @@ public class SlimeBot extends ListenerAdapter {
 		manager.registerListener(TimeoutListener.class);
 		manager.registerListener(BirthdayListener.class);
 		manager.registerListener(MessageListener.class);
+
+		//Start handlers
+		new HolidayAlert(this);
+		new BirthdayAlert(this);
+
+		new AbsenceScheduler(this);
+
+		if (youtube != null) youtube.startListener();
 	}
 
 	private void startActivity() {

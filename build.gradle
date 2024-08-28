@@ -11,7 +11,7 @@ plugins {
 mainClassName = "de.slimecloud.slimeball.main.Main"
 
 group 'com.slimebot'
-version '3.7.5'
+version '3.8.2'
 
 repositories {
     mavenCentral()
@@ -28,7 +28,7 @@ dependencies {
     implementation 'de.mineking:DiscordUtils:3.9.0'
 
     implementation 'de.mineking:JavaUtils:1.9.0'
-    implementation 'de.mineking:DatabaseUtils:1.1.0'
+    implementation 'de.mineking:DatabaseUtils:442b063'
     implementation 'de.cyklon:ReflectionUtils:192873e'
     implementation 'de.cyklon:JEvent:879a575'
 
@@ -107,6 +107,9 @@ jar {
     }
 }
 
+shadowJar {
+    archiveName = "SlimeBot.jar"
+}
 
 test {
     useJUnitPlatform()

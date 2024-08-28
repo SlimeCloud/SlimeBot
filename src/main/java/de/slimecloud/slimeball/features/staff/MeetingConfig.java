@@ -83,7 +83,7 @@ public class MeetingConfig extends ConfigCategory {
 		getChannel().ifPresent(channel -> {
 			//Send and save message
 			Message message = channel
-					.sendMessage(MessageCreateData.fromEditData(buildMessage(channel.getGuild(), timestamp, null, (y, m, n, x) -> n.addAll(bot.getAbsences().getAbsences(channel.getGuild()).stream().map(a -> a.getMember().getAsMention()).toList()))))
+					.sendMessage(MessageCreateData.fromEditData(buildMessage(channel.getGuild(), timestamp, null, (y, m, n, x) -> n.addAll(bot.getAbsences().getAbsences(channel.getGuild()).stream().filter(a -> a.getEnd() == null || a.getEnd().after(Date.from(timestamp))).map(a -> a.getMember().getAsMention()).toList()))))
 					.complete();
 			this.message = message.getIdLong();
 
