@@ -56,6 +56,6 @@ public class GuildCardProfile implements DataClass<GuildCardProfile> {
 
 	@NotNull
 	public CardProfileData getData() {
-		return bot.getProfileData().getData(id, user).orElseThrow();
+		return bot.getProfileData().getData(id, user).orElseGet(() -> new CardProfileData(bot));
 	}
 }
