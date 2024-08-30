@@ -102,7 +102,7 @@ public class FdmdsCommand {
 				return;
 			}
 
-			choices.append(SlimeEmoji.number(i + 1).getEmoji(event.getGuild()).getFormatted())
+			choices.append(SlimeEmoji.number(i).getEmoji(event.getGuild()).getFormatted())
 					.append(" -> ")
 					.append(temp[i].strip())
 					.append("\n");
@@ -171,7 +171,7 @@ public class FdmdsCommand {
 					.setMultiAnswer(true)
 					.setDuration(Duration.ofDays(7));
 
-			for (int i = 0; i < choices.length; i++) builder.addAnswer(choices[i].split(" -> ", 2)[1], SlimeEmoji.number(i + 1).getEmoji(event.getGuild()));
+			for (int i = 0; i < choices.length; i++) builder.addAnswer(choices[i].split(" -> ", 2)[1], SlimeEmoji.number(i).getEmoji(event.getGuild()));
 
 			fdmds.getChannel().sendMessagePoll(builder.build())
 					.setContent(fdmds.getRole().map(Role::getAsMention).orElse(null))
