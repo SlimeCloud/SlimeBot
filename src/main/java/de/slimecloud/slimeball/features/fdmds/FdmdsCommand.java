@@ -15,6 +15,7 @@ import de.slimecloud.slimeball.main.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.messages.MessagePoll;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -88,8 +89,8 @@ public class FdmdsCommand {
 			return;
 		}
 
-		if (temp.length > 9) {
-			event.reply("Du kannst **maximal 9** Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
+		if (temp.length > MessagePoll.MAX_ANSWERS) {
+			event.reply("Du kannst **maximal 10** Antwortmöglichkeiten angeben!").setEphemeral(true).queue();
 			return;
 		}
 
@@ -101,7 +102,7 @@ public class FdmdsCommand {
 				return;
 			}
 
-			choices.append(SlimeEmoji.number(i + 1).getEmoji(event.getGuild()).getFormatted())
+			choices.append(SlimeEmoji.number(i).getEmoji(event.getGuild()).getFormatted())
 					.append(" -> ")
 					.append(temp[i].strip())
 					.append("\n");
@@ -114,10 +115,10 @@ public class FdmdsCommand {
 				.setDescription(question)
 				.addField("Auswahlmöglichkeiten", choices.toString(), false);
 
-		if (event.getModalId().contains("send")) embed.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl());
+		if (event.getModalId().contains("send")) embed.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl()).setFooter("Nutzer ID: " + event.getMember().getId());
 		else {
-			MessageEmbed.AuthorInfo current = event.getMessage().getEmbeds().get(0).getAuthor();
-			embed.setAuthor(current.getName(), current.getUrl(), current.getIconUrl()).setFooter("Bearbeitet von " + event.getUser().getGlobalName());
+			MessageEmbed current = event.getMessage().getEmbeds().get(0);
+			embed.setAuthor(current.getAuthor().getName(), current.getAuthor().getUrl(), current.getAuthor().getIconUrl()).setFooter(current.getFooter().getText());
 		}
 
 
@@ -161,27 +162,21 @@ public class FdmdsCommand {
 			String title = embed.getTitle();
 			String[] choices = embed.getFields().get(0).getValue().split("\n");
 
+			UserSnowflake user = UserSnowflake.fromId(embed.getFooter().getText().substring("Nutzer ID: ".length()));
+
 			//Call event
-			new FdmdsCreateEvent(SlimeBot.getUser(embed), event.getMember(), question).callEvent();
+			new FdmdsCreateEvent(user, event.getMember(), question).callEvent();
 
 			MessagePollBuilder builder = MessagePollData.builder(question)
 					.setMultiAnswer(true)
 					.setDuration(Duration.ofDays(7));
 
-			for (int i = 0; i < choices.length; i++) builder.addAnswer(choices[i].split(" -> ", 2)[1], SlimeEmoji.number(i + 1).getEmoji(event.getGuild()));
-
-			String user;
-
-			try {
-				user = SlimeBot.getUser(embed).getAsMention();
-			} catch (Exception e) {
-				user = embed.getAuthor().getName();
-			}
+			for (int i = 0; i < choices.length; i++) builder.addAnswer(choices[i].split(" -> ", 2)[1], SlimeEmoji.number(i).getEmoji(event.getGuild()));
 
 			fdmds.getChannel().sendMessagePoll(builder.build())
 					.setContent(fdmds.getRole().map(Role::getAsMention).orElse(null))
 					.addContent("\n# " + title)
-					.addContent("\n" + user + " fragt")
+					.addContent("\n" + user.getAsMention() + " fragt")
 					.addActionRow(Button.secondary("fdmds:create", "Selbst eine Frage einreichen"))
 					.queue(m -> {
 						//Create thread
