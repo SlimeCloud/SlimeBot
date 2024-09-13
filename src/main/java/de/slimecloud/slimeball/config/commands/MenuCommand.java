@@ -25,6 +25,7 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -131,7 +132,7 @@ public class MenuCommand {
 						.setColor(bot.getColor(s.getEvent().getGuild()))
 						.appendDescription(category.description())
 						.appendDescription("\n### Aktuelle Konfiguration\n")
-						.appendDescription("```json\n" + Main.formattedJson.toJson(instance.apply(bot.loadGuild(s.getEvent().getGuild()))) + "```")
+						.appendDescription("```json\n" + StringUtils.abbreviate(Main.formattedJson.toJson(instance.apply(bot.loadGuild(s.getEvent().getGuild()))), 4000) + "```")
 						.build()
 				),
 				components
