@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public interface FdmdsQueue extends Table<FdmdsQueueItem> {
@@ -20,7 +21,7 @@ public interface FdmdsQueue extends Table<FdmdsQueueItem> {
 	}
 
 	@NotNull
-	default Optional<FdmdsQueueItem> getNextItem(@NotNull Guild guild) {
-		return selectMany(Where.equals("guild", guild), Order.ascendingBy("timestamp").limit(1)).stream().findFirst();
+	default List<FdmdsQueueItem> getNextItems(@NotNull Guild guild) {
+		return selectMany(Where.equals("guild", guild), Order.ascendingBy("timestamp"));
 	}
 }
