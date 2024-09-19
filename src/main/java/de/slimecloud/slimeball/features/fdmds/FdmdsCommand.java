@@ -120,10 +120,7 @@ public class FdmdsCommand {
 		//Create message
 		MessageEditBuilder message = new MessageEditBuilder()
 				.setEmbeds(embed.build())
-				.setActionRow(
-						Button.secondary("fdmds:edit", "Bearbeiten"),
-						Button.primary("fdmds:add", "Hinzufügen")
-				);
+				.setComponents(getComponents(true));
 
 		//Edit or send
 		if (event.getModalId().contains("edit")) {
@@ -150,10 +147,7 @@ public class FdmdsCommand {
 	@Listener(type = ButtonHandler.class, filter = "fdmds:add")
 	public void addFdmds(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
 		bot.getFdmdsQueue().addItemToQueue(event.getMessage());
-		event.editComponents(ActionRow.of(
-				Button.secondary("fdmds:edit", "Bearbeiten"),
-				Button.danger("fdmds:remove", "Entfernen")
-		)).queue();
+		event.editComponents(getComponents(false)).queue();
 
 		event.getHook().sendMessage("Umfrage zu Queue hinzugefügt").setEphemeral(true).queue();
 	}
@@ -161,11 +155,23 @@ public class FdmdsCommand {
 	@Listener(type = ButtonHandler.class, filter = "fdmds:remove")
 	public void removeFdmds(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
 		bot.getFdmdsQueue().removeItemFromQueue(event.getMessageIdLong());
-		event.editComponents(ActionRow.of(
-				Button.secondary("fdmds:edit", "Bearbeiten"),
-				Button.primary("fdmds:add", "Hinzufügen")
-		)).queue();
+		event.editComponents(getComponents(true)).queue();
 
 		event.getHook().sendMessage("Umfrage aus Queue entfernt").setEphemeral(true).queue();
+	}
+
+	@Listener(type = ButtonHandler.class, filter = "fdmds:send")
+	public void sendFdmds(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
+		bot.loadGuild(event.getGuild()).getFdmds().ifPresent(config -> FdmdsScheduler.sendFdmds(bot, config, event.getMessage()));
+		event.reply("Umfrage gesendet").setEphemeral(true).queue();
+	}
+
+	@NotNull
+	public static ActionRow getComponents(boolean add) {
+		return ActionRow.of(
+				Button.secondary("fdmds:edit", "Bearbeiten"),
+				Button.primary("fdmds:send", "Direkt senden"),
+				add ? Button.success("fdmds:add", "Zu Queue hinzufügen") : Button.danger("fdmds:remove", "Aus Queue entfernen")
+		);
 	}
 }

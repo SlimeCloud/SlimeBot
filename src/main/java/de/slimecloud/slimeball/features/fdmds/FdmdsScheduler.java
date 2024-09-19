@@ -3,7 +3,6 @@ package de.slimecloud.slimeball.features.fdmds;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.main.SlimeEmoji;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
 import net.dv8tion.jda.api.utils.messages.MessagePollData;
@@ -73,10 +72,7 @@ public class FdmdsScheduler {
 			message.reply("Fehler beim senden dieser Umfrage: " + e.getMessage() + "\n-# Einreichung wurde aus Queue entfernt").setSuppressedNotifications(true).queue();
 
 			bot.getFdmdsQueue().removeItemFromQueue(message.getIdLong());
-			message.editMessageComponents(ActionRow.of(
-					Button.secondary("fdmds:edit", "Bearbeiten"),
-					Button.primary("fdmds:add", "Hinzufügen")
-			)).queue();
+			message.editMessageComponents(FdmdsCommand.getComponents(true)).queue();
 
 			return false;
 		}
