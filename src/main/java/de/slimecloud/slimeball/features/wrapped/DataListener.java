@@ -132,7 +132,7 @@ public class DataListener extends ListenerAdapter {
 	@EventHandler
 	public void handleFdmdsCreated(@NotNull FdmdsCreateEvent event) {
 		//Load current data
-		WrappedData data = bot.getWrappedData().getData(event.getTeam().getGuild(), event.getUser());
+		WrappedData data = bot.getWrappedData().getData(event.getGuild(), event.getUser());
 
 		//Update data
 		data.setFdmdsAccepted(data.getFdmdsAccepted() + 1);
