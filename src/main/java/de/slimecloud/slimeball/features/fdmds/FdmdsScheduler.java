@@ -10,7 +10,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class FdmdsScheduler {
 	private final SlimeBot bot;
@@ -18,12 +21,13 @@ public class FdmdsScheduler {
 	public FdmdsScheduler(@NotNull SlimeBot bot) {
 		this.bot = bot;
 		bot.scheduleDaily(9, () -> bot.getJda().getGuilds().forEach(this::send));
+		bot.getJda().getGuilds().forEach(this::send);
 	}
 
 	public void send(@NotNull Guild guild) {
 		bot.loadGuild(guild).getFdmds().ifPresent(config -> {
-			Queue<FdmdsQueueItem> items = new LinkedList<>(bot.getFdmdsQueue().getNextItems(guild));
-			if (items.isEmpty()) config.getLogChannel().sendMessage("Keine Umfragen zum senden").setSuppressedNotifications(true).queue();
+			Queue<FdmdsQueueItem> items = new LinkedList<>(bot.getFdmdsQueue().getNextItems(guild, 3));
+			if (items.isEmpty()) config.getLogChannel().sendMessage(":warning: Keine Umfragen zum senden").setSuppressedNotifications(true).queue();
 			else nextItem(config, items);
 		});
 	}
@@ -34,11 +38,11 @@ public class FdmdsScheduler {
 
 		config.getLogChannel().retrieveMessageById(item.getMessage()).queue(message -> {
 			//Retry with next entry on failure
-			if (!sendFdmds(bot, config, message)) nextItem(config, items);
+			if (!sendFdmds(bot, config, message, true)) nextItem(config, items);
 		});
 	}
 
-	public static boolean sendFdmds(@NotNull SlimeBot bot, @NotNull FdmdsConfig config, @NotNull Message message) {
+	public static boolean sendFdmds(@NotNull SlimeBot bot, @NotNull FdmdsConfig config, @NotNull Message message, boolean automatic) {
 		try {
 			//Load information from embed
 			MessageEmbed embed = message.getEmbeds().get(0);
@@ -63,9 +67,21 @@ public class FdmdsScheduler {
 					.addContent("\n# " + title)
 					.addContent("\n" + user.getAsMention() + " fragt")
 					.addActionRow(Button.secondary("fdmds:create", "Selbst eine Frage einreichen"))
-					.queue(m -> m.createThreadChannel(title).queue());
+					.queue(m -> {
+						m.createThreadChannel(title).queue();
+						bot.getFdmdsQueue().removeItemFromQueue(message.getIdLong());
 
-			message.delete().queue(x -> bot.getFdmdsQueue().removeItemFromQueue(message.getIdLong()));
+						message.editMessage("Gesendet - " + m.getJumpUrl()).setComponents().queue();
+
+						if (automatic) {
+							List<FdmdsQueueItem> queue = bot.getFdmdsQueue().getNextItems(message.getGuild(), 5);
+							AtomicInteger i = new AtomicInteger(1);
+							message.reply("### Umfrage gesendet, " + (queue.isEmpty() ? ":warning: keine" : queue.size()) + " weitere Umfragen in der Queue\n" + queue.stream()
+									.map(element -> i.getAndIncrement() + ". [" + element.getTitle() + "](" + Message.JUMP_URL.formatted(message.getGuild().getIdLong(), message.getChannel().getIdLong(), element.getMessage()) + ")")
+									.collect(Collectors.joining("\n"))
+							).queue();
+						}
+					});
 
 			return true;
 		} catch (Exception e) {

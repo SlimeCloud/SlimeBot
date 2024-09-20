@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 public interface FdmdsQueue extends Table<FdmdsQueueItem> {
 	default boolean removeItemFromQueue(long messageId) {
@@ -17,11 +16,11 @@ public interface FdmdsQueue extends Table<FdmdsQueueItem> {
 	}
 
 	default void addItemToQueue(@NotNull Message message) {
-		insert(new FdmdsQueueItem(getManager().getData("bot"), message.getIdLong(), message.getGuild(), Instant.now()));
+		upsert(new FdmdsQueueItem(getManager().getData("bot"), message.getIdLong(), message.getGuild(), message.getEmbeds().get(0).getTitle(), Instant.now()));
 	}
 
 	@NotNull
-	default List<FdmdsQueueItem> getNextItems(@NotNull Guild guild) {
+	default List<FdmdsQueueItem> getNextItems(@NotNull Guild guild, int limit) {
 		return selectMany(Where.equals("guild", guild), Order.ascendingBy("timestamp"));
 	}
 }

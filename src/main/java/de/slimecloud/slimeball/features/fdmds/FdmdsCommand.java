@@ -148,21 +148,17 @@ public class FdmdsCommand {
 	public void addFdmds(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
 		bot.getFdmdsQueue().addItemToQueue(event.getMessage());
 		event.editComponents(getComponents(false)).queue();
-
-		event.getHook().sendMessage("Umfrage zu Queue hinzugefügt").setEphemeral(true).queue();
 	}
 
 	@Listener(type = ButtonHandler.class, filter = "fdmds:remove")
 	public void removeFdmds(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
 		bot.getFdmdsQueue().removeItemFromQueue(event.getMessageIdLong());
 		event.editComponents(getComponents(true)).queue();
-
-		event.getHook().sendMessage("Umfrage aus Queue entfernt").setEphemeral(true).queue();
 	}
 
 	@Listener(type = ButtonHandler.class, filter = "fdmds:send")
 	public void sendFdmds(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
-		bot.loadGuild(event.getGuild()).getFdmds().ifPresent(config -> FdmdsScheduler.sendFdmds(bot, config, event.getMessage()));
+		bot.loadGuild(event.getGuild()).getFdmds().ifPresent(config -> FdmdsScheduler.sendFdmds(bot, config, event.getMessage(), false));
 		event.reply("Umfrage gesendet").setEphemeral(true).queue();
 	}
 

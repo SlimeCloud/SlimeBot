@@ -21,5 +21,8 @@ public class FdmdsQueueItem {
 	private Guild guild;
 
 	@Column
+	private String title;
+
+	@Column
 	private Instant timestamp;
 }
