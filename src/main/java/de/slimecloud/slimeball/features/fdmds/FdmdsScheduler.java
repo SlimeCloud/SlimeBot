@@ -75,7 +75,7 @@ public class FdmdsScheduler {
 						if (automatic) {
 							List<FdmdsQueueItem> queue = bot.getFdmdsQueue().getNextItems(message.getGuild(), 5);
 							AtomicInteger i = new AtomicInteger(1);
-							message.reply("### Umfrage gesendet, " + (queue.isEmpty() ? ":warning: keine" : queue.size()) + " weitere Umfragen in der Queue\n" + queue.stream()
+							message.reply("### Umfrage gesendet, " + (queue.size() <= 1 ? ":warning: " : "") + queue.size() + " weitere Umfragen in der Queue\n" + queue.stream()
 									.map(element -> i.getAndIncrement() + ". [" + element.getTitle() + "](" + Message.JUMP_URL.formatted(message.getGuild().getIdLong(), message.getChannel().getIdLong(), element.getMessage()) + ")")
 									.collect(Collectors.joining("\n"))
 							).setSuppressedNotifications(true).queue();
