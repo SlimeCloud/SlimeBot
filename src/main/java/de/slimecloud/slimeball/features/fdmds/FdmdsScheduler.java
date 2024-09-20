@@ -21,7 +21,6 @@ public class FdmdsScheduler {
 	public FdmdsScheduler(@NotNull SlimeBot bot) {
 		this.bot = bot;
 		bot.scheduleDaily(9, () -> bot.getJda().getGuilds().forEach(this::send));
-		bot.getJda().getGuilds().forEach(this::send);
 	}
 
 	public void send(@NotNull Guild guild) {
