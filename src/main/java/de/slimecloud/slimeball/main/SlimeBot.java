@@ -24,6 +24,9 @@ import de.slimecloud.slimeball.features.birthday.BirthdayListener;
 import de.slimecloud.slimeball.features.birthday.BirthdayTable;
 import de.slimecloud.slimeball.features.birthday.commands.BirthdayCommand;
 import de.slimecloud.slimeball.features.fdmds.FdmdsCommand;
+import de.slimecloud.slimeball.features.fdmds.FdmdsQueue;
+import de.slimecloud.slimeball.features.fdmds.FdmdsQueueItem;
+import de.slimecloud.slimeball.features.fdmds.FdmdsScheduler;
 import de.slimecloud.slimeball.features.general.*;
 import de.slimecloud.slimeball.features.github.BugCommand;
 import de.slimecloud.slimeball.features.github.BugContextCommand;
@@ -115,6 +118,7 @@ public class SlimeBot extends ListenerAdapter {
 
 	private final ReportTable reports;
 	private final ReportBlockTable reportBlocks;
+	private final FdmdsQueue fdmdsQueue;
 
 	private final LevelTable level;
 	private final CardDataTable profileData;
@@ -162,6 +166,7 @@ public class SlimeBot extends ListenerAdapter {
 			//Initialize tables
 			reports = database.getTable(Report.class, () -> new Report(this)).name("reports").table(ReportTable.class).create();
 			reportBlocks = database.getTable(ReportBlock.class, ReportBlock::new).name("report_blocks").table(ReportBlockTable.class).create();
+			fdmdsQueue = database.getTable(FdmdsQueueItem.class, () -> new FdmdsQueueItem(this)).name("fdmds_queue").table(FdmdsQueue.class).create();
 
 			level = database.getTable(Level.class, () -> new Level(this)).name("levels").table(LevelTable.class).create();
 			profileData = database.getTable(CardProfileData.class, () -> new CardProfileData(this)).name("card_data").table(CardDataTable.class).create();
@@ -179,6 +184,7 @@ public class SlimeBot extends ListenerAdapter {
 			database = null;
 			reports = null;
 			reportBlocks = null;
+			fdmdsQueue = null;
 			level = null;
 			profileData = null;
 			cardProfiles = null;
@@ -350,6 +356,7 @@ public class SlimeBot extends ListenerAdapter {
 		//Start handlers
 		new HolidayAlert(this);
 		new BirthdayAlert(this);
+		new FdmdsScheduler(this);
 
 		new AbsenceScheduler(this);
 

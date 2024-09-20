@@ -2,7 +2,6 @@ package de.slimecloud.slimeball.features.fdmds;
 
 import de.mineking.discordutils.commands.ApplicationCommand;
 import de.mineking.discordutils.commands.ApplicationCommandMethod;
-import de.mineking.discordutils.commands.CommandManager;
 import de.mineking.discordutils.commands.condition.IRegistrationCondition;
 import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.context.ICommandContext;
@@ -14,25 +13,21 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.main.SlimeEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.messages.MessagePoll;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
-import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
-import net.dv8tion.jda.api.utils.messages.MessagePollData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Duration;
 import java.util.stream.Collectors;
 
 @ApplicationCommand(name = "fdmds", description = "Schlage eine Frage für \"Frag doch mal den Schleim\" vor!", scope = Scope.GUILD)
@@ -125,10 +120,7 @@ public class FdmdsCommand {
 		//Create message
 		MessageEditBuilder message = new MessageEditBuilder()
 				.setEmbeds(embed.build())
-				.setActionRow(
-						Button.secondary("fdmds:edit", "Bearbeiten"),
-						Button.primary("fdmds:send", "Senden")
-				);
+				.setComponents(getComponents(true));
 
 		//Edit or send
 		if (event.getModalId().contains("edit")) {
@@ -152,40 +144,30 @@ public class FdmdsCommand {
 		);
 	}
 
+	@Listener(type = ButtonHandler.class, filter = "fdmds:add")
+	public void addFdmds(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
+		bot.getFdmdsQueue().addItemToQueue(event.getMessage());
+		event.editComponents(getComponents(false)).queue();
+	}
+
+	@Listener(type = ButtonHandler.class, filter = "fdmds:remove")
+	public void removeFdmds(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
+		bot.getFdmdsQueue().removeItemFromQueue(event.getMessageIdLong());
+		event.editComponents(getComponents(true)).queue();
+	}
+
 	@Listener(type = ButtonHandler.class, filter = "fdmds:send")
-	public void sendFdmds(@NotNull SlimeBot bot, @NotNull CommandManager<?, ?> manager, @NotNull ButtonInteractionEvent event) {
-		bot.loadGuild(event.getGuild()).getFdmds().ifPresent(fdmds -> {
-			//Load information from embed
-			MessageEmbed embed = event.getMessage().getEmbeds().get(0);
+	public void sendFdmds(@NotNull SlimeBot bot, @NotNull ButtonInteractionEvent event) {
+		bot.loadGuild(event.getGuild()).getFdmds().ifPresent(config -> FdmdsScheduler.sendFdmds(bot, config, event.getMessage(), false));
+		event.reply("Umfrage gesendet").setEphemeral(true).queue();
+	}
 
-			String question = embed.getDescription();
-			String title = embed.getTitle();
-			String[] choices = embed.getFields().get(0).getValue().split("\n");
-
-			UserSnowflake user = UserSnowflake.fromId(embed.getFooter().getText().substring("Nutzer ID: ".length()));
-
-			//Call event
-			new FdmdsCreateEvent(user, event.getMember(), question).callEvent();
-
-			MessagePollBuilder builder = MessagePollData.builder(question)
-					.setMultiAnswer(true)
-					.setDuration(Duration.ofDays(7));
-
-			for (int i = 0; i < choices.length; i++) builder.addAnswer(choices[i].split(" -> ", 2)[1], SlimeEmoji.number(i).getEmoji(event.getGuild()));
-
-			fdmds.getChannel().sendMessagePoll(builder.build())
-					.setContent(fdmds.getRole().map(Role::getAsMention).orElse(null))
-					.addContent("\n# " + title)
-					.addContent("\n" + user.getAsMention() + " fragt")
-					.addActionRow(Button.secondary("fdmds:create", "Selbst eine Frage einreichen"))
-					.queue(m -> {
-						//Create thread
-						m.createThreadChannel(title).queue();
-
-						event.reply("Frage verschickt!").setEphemeral(true).queue();
-					});
-
-			event.getMessage().delete().queue();
-		});
+	@NotNull
+	public static ActionRow getComponents(boolean add) {
+		return ActionRow.of(
+				Button.secondary("fdmds:edit", "Bearbeiten"),
+				Button.primary("fdmds:send", "Direkt senden"),
+				add ? Button.success("fdmds:add", "Zu Queue hinzufügen") : Button.danger("fdmds:remove", "Aus Queue entfernen")
+		);
 	}
 }
