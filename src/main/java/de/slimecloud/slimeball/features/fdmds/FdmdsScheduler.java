@@ -27,7 +27,7 @@ public class FdmdsScheduler {
 	public void send(@NotNull Guild guild) {
 		bot.loadGuild(guild).getFdmds().ifPresent(config -> {
 			Queue<FdmdsQueueItem> items = new LinkedList<>(bot.getFdmdsQueue().getNextItems(guild, 3));
-			if (items.isEmpty()) config.getLogChannel().sendMessage(":warning: Keine Umfragen zum senden").setSuppressedNotifications(true).queue();
+			if (items.isEmpty()) config.getLogChannel().sendMessage(":warning: Keine Umfragen zum senden").queue();
 			else nextItem(config, items);
 		});
 	}
@@ -79,13 +79,13 @@ public class FdmdsScheduler {
 							message.reply("### Umfrage gesendet, " + (queue.isEmpty() ? ":warning: keine" : queue.size()) + " weitere Umfragen in der Queue\n" + queue.stream()
 									.map(element -> i.getAndIncrement() + ". [" + element.getTitle() + "](" + Message.JUMP_URL.formatted(message.getGuild().getIdLong(), message.getChannel().getIdLong(), element.getMessage()) + ")")
 									.collect(Collectors.joining("\n"))
-							).queue();
+							).setSuppressedNotifications(true).queue();
 						}
 					});
 
 			return true;
 		} catch (Exception e) {
-			message.reply("Fehler beim senden dieser Umfrage: " + e.getMessage() + "\n-# Einreichung wurde aus Queue entfernt").setSuppressedNotifications(true).queue();
+			message.reply(":x: Fehler beim senden dieser Umfrage: " + e.getMessage() + "\n-# Einreichung wurde aus Queue entfernt").queue();
 
 			bot.getFdmdsQueue().removeItemFromQueue(message.getIdLong());
 			message.editMessageComponents(FdmdsCommand.getComponents(true)).queue();
