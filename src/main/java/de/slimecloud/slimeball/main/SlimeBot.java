@@ -54,7 +54,9 @@ import de.slimecloud.slimeball.features.report.commands.ReportCommand;
 import de.slimecloud.slimeball.features.report.commands.UserReportCommand;
 import de.slimecloud.slimeball.features.report.commands.UserReportSlashCommand;
 import de.slimecloud.slimeball.features.staff.StaffMessage;
-import de.slimecloud.slimeball.features.staff.TeamMeeting;
+import de.slimecloud.slimeball.features.staff.meeting.TeamMeeting;
+import de.slimecloud.slimeball.features.staff.meeting.commands.MeetingCommand;
+import de.slimecloud.slimeball.features.staff.meeting.protocol.MeetingProtocol;
 import de.slimecloud.slimeball.features.staff.absence.Absence;
 import de.slimecloud.slimeball.features.staff.absence.AbsenceCommand;
 import de.slimecloud.slimeball.features.staff.absence.AbsenceScheduler;
@@ -134,6 +136,7 @@ public class SlimeBot extends ListenerAdapter {
 	private final GitHubAPI github;
 	private final Spotify spotify;
 	private final Youtube youtube;
+	private final MeetingProtocol meetingProtocol;
 
 	private final MemberCount memberCount;
 	private final RoleMemberCount roleMemberCount;
@@ -209,7 +212,7 @@ public class SlimeBot extends ListenerAdapter {
 			spotify = null;
 		}
 
-		//Initalize Youtube API
+		//Initialize Youtube API
 		if (config.getYoutube().isPresent()) {
 			String[] keys = getCredentialsArray("YOUTUBE_API_KEY");
 			if (keys.length > 0) youtube = new Youtube(keys, this, config.getYoutube().get());
@@ -220,6 +223,13 @@ public class SlimeBot extends ListenerAdapter {
 		} else {
 			logger.warn("Youtube api disabled due to missing config");
 			youtube = null;
+		}
+
+		//Initialize Meeting Protocol
+		if (credentials.get("PICOVOICE_ACCESS_KEY") != null) meetingProtocol = new MeetingProtocol(credentials.get("PICOVOICE_ACCESS_KEY"));
+		else {
+			logger.warn("Meeting Protocol disabled due to missing picovoice credentials");
+			meetingProtocol = null;
 		}
 
 
@@ -276,6 +286,8 @@ public class SlimeBot extends ListenerAdapter {
 
 					//old mee6 custom commands
 					manager.registerCommand(SocialsCommand.class);
+
+					manager.registerCommand(MeetingCommand.class);
 
 					//Register report commands
 					if (reports != null) {
