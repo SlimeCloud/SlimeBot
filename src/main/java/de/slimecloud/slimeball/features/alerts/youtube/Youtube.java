@@ -11,6 +11,7 @@ import de.slimecloud.slimeball.main.Main;
 import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.MathUtil;
 import lombok.Cleanup;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -27,6 +28,7 @@ public class Youtube {
 
 	private final OkHttpClient client = new OkHttpClient().newBuilder().build();
 
+	@Getter
 	private final String[] keys;
 	private final SlimeBot bot;
 	private final YoutubeConfig config;
@@ -46,7 +48,7 @@ public class Youtube {
 		channels.forEach((channel, delay) -> {
 			bot.getExecutor().scheduleAtFixedRate(() -> {
 				try {
-					check(channel);
+					check(channel, currentKey);
 				} catch (Exception e) {
 					logger.error("Failed to check for new video for channel " + channel, e);
 				}
@@ -54,15 +56,15 @@ public class Youtube {
 		});
 	}
 
-	private void check(String youtubeChannelId) throws IOException {
-		Set<Video> videos = getLastVideo(youtubeChannelId, 5);
+	public void check(String youtubeChannelId, int startKey) throws IOException {
+		Set<Video> videos = getLastVideo(youtubeChannelId, 5, startKey);
 
 		Collection<String> known = bot.getIdMemory().getMemory("youtube");
 		List<String> newIds = new ArrayList<>();
 
 		for (Video video : videos) {
 			if (!known.contains(video.id())) {
-				new YoutubeVideoEvent(youtubeChannelId, video).callEvent();
+				new YoutubeVideoEvent(this, youtubeChannelId, video).callEvent();
 				newIds.add(video.id());
 			}
 		}
@@ -76,7 +78,7 @@ public class Youtube {
 	}
 
 	@NotNull
-	public Set<Video> getLastVideo(@NotNull String youtubeChannelId, int limit) throws IOException {
+	public Set<Video> getLastVideo(@NotNull String youtubeChannelId, int limit, int startKey) throws IOException {
 		Request request = new Request.Builder()
 				.url(String.format("https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=" + limit, getNextKey(), youtubeChannelId))
 				.get()
@@ -89,7 +91,7 @@ public class Youtube {
 		JsonObject json = JsonParser.parseString(response.body().string()).getAsJsonObject();
 
 		if (code != HttpStatus.SC_OK) {
-			YoutubeApiErrorEvent event = new YoutubeApiErrorEvent(response, json, new HashSet<>());
+			YoutubeApiErrorEvent event = new YoutubeApiErrorEvent(this, youtubeChannelId, startKey, response, json, new HashSet<>());
 			event.callEvent();
 			return event.getVideos();
 		}

@@ -9,7 +9,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class YoutubeVideoEvent extends Event {
 
-	private final String youtubeChannelId;
+	private final Youtube youtube;
+	private final String channelId;
 	private final Video video;
 
 	public boolean isLive() {
