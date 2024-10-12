@@ -56,8 +56,7 @@ public class TimeoutListener extends ListenerAdapter {
 						.addField("Endet", TimeFormat.RELATIVE.format(event.getEnd()), true)
 						.addField("Grund", event.getReason(), false)
 						.build()
-		)).queue(null, new ErrorHandler()
-				.handle(ErrorResponse.CANNOT_SEND_TO_USER, e -> informed.set(false)));
+		)).queue(null, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> informed.set(false)));
 
 		//Send log for team members
 		bot.loadGuild(event.getTarget().getGuild()).getPunishmentChannel().ifPresent(channel -> channel.sendMessageEmbeds(
