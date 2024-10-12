@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +56,8 @@ public class TimeoutListener extends ListenerAdapter {
 						.addField("Endet", TimeFormat.RELATIVE.format(event.getEnd()), true)
 						.addField("Grund", event.getReason(), false)
 						.build()
-		)).queue(s -> {}, exception -> informed.set(false));
+		)).queue(null, new ErrorHandler()
+				.handle(ErrorResponse.CANNOT_SEND_TO_USER, e -> informed.set(false)));
 
 		//Send log for team members
 		bot.loadGuild(event.getTarget().getGuild()).getPunishmentChannel().ifPresent(channel -> channel.sendMessageEmbeds(
