@@ -9,8 +9,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,9 +48,13 @@ public interface HighlightTable extends Table<Highlight> {
 		return highlight;
 	}
 
-	@NotNull
+	/**
+	 * @return null if the member has no highlight with this phrase
+	 */
+	@Nullable
 	default Highlight remove(@NotNull Member member, @NotNull String phrase) {
 		Set<UserSnowflake> users = getUsers(member.getGuild(), phrase);
+		if (!users.contains(member)) return null;
 		Highlight highlight = build(member.getGuild(), phrase, users);
 		if (users.contains(member) && new HighlightRemoveEvent(highlight, member).callEvent()) {
 			users.remove(member);
@@ -70,5 +76,10 @@ public interface HighlightTable extends Table<Highlight> {
 				Where.equals("guild", guild),
 				Where.equals("phrase", phrase)
 		));
+	}
+
+	@NotNull
+	default List<Highlight> getHighlights(@NotNull UserSnowflake user) {
+		return selectMany(Where.fieldContainsValue("users", user));
 	}
 }
