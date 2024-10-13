@@ -31,6 +31,7 @@ import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.features.github.GitHubAPI;
 import de.slimecloud.slimeball.features.highlights.Highlight;
 import de.slimecloud.slimeball.features.highlights.HighlightTable;
+import de.slimecloud.slimeball.features.highlights.commands.HighlightCommand;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
 import de.slimecloud.slimeball.features.level.LevelUpListener;
@@ -301,6 +302,9 @@ public class SlimeBot extends ListenerAdapter {
 
 					//Register birthday commands
 					manager.registerCommand(BirthdayCommand.class);
+
+
+					manager.registerCommand(HighlightCommand.class);
 
 					/*
 					Automatically update comDiscordWrmands
