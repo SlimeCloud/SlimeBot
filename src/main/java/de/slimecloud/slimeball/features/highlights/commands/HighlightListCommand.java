@@ -21,8 +21,9 @@ public class HighlightListCommand {
 	public void performCommand(@NotNull CommandManager<ICommandContext, IAutocompleteContext> manager, @NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
 		List<Highlight> highlights = bot.getHighlights().getHighlights(event.getMember());
 
-		String description = "Deine Highlights:\n" + highlights.stream()
+		String description = "**Deine Highlights:**\n" + highlights.stream()
 				.map(Highlight::getPhrase)
+				.map(s -> "- `" + s + "`")
 				.collect(Collectors.joining("\n"));
 
 		String mention = manager.getCommand(HighlightAddCommand.class).getAsMention(event.getGuild().getIdLong());
