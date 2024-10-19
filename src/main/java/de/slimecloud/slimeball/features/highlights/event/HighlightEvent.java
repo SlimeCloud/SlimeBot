@@ -5,10 +5,12 @@ import de.slimecloud.slimeball.features.highlights.Highlight;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
+@ToString
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class HighlightEvent extends CancellableEvent {
 

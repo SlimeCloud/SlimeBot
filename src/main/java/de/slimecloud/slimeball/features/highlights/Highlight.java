@@ -37,5 +37,12 @@ public class Highlight implements DataClass<Highlight> {
 		return bot.getHighlights();
 	}
 
-
+	@Override
+	public String toString() {
+		return "Highlight{" +
+				"guild=" + guild.getId() +
+				", phrase='" + phrase + '\'' +
+				", users=" + users.stream().map(UserSnowflake::getId).toList() +
+				'}';
+	}
 }
