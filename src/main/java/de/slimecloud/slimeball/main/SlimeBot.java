@@ -30,6 +30,7 @@ import de.slimecloud.slimeball.features.github.BugContextCommand;
 import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.features.github.GitHubAPI;
 import de.slimecloud.slimeball.features.highlights.Highlight;
+import de.slimecloud.slimeball.features.highlights.HighlightListener;
 import de.slimecloud.slimeball.features.highlights.HighlightTable;
 import de.slimecloud.slimeball.features.highlights.commands.HighlightCommand;
 import de.slimecloud.slimeball.features.level.Level;
@@ -355,6 +356,7 @@ public class SlimeBot extends ListenerAdapter {
 		manager.registerListener(TimeoutListener.class);
 		manager.registerListener(BirthdayListener.class);
 		manager.registerListener(MessageListener.class);
+		manager.registerListener(HighlightListener.class);
 
 		//Start handlers
 		new HolidayAlert(this);
