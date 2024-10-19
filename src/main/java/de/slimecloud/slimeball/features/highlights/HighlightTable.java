@@ -41,7 +41,7 @@ public interface HighlightTable extends Table<Highlight> {
 	default Highlight set(@NotNull Member member, @NotNull String phrase) {
 		Set<UserSnowflake> users = getUsers(member.getGuild(), phrase);
 		Highlight highlight = build(member.getGuild(), phrase, users);
-		if (!users.contains(member) && new HighlightSetEvent(highlight, member).callEvent()) {
+		if (!users.contains(member) && !new HighlightSetEvent(highlight, member).callEvent()) {
 			users.add(member);
 			return save(member.getGuild(), phrase, users);
 		}
@@ -54,10 +54,10 @@ public interface HighlightTable extends Table<Highlight> {
 	@Nullable
 	default Highlight remove(@NotNull Member member, @NotNull String phrase) {
 		Set<UserSnowflake> users = getUsers(member.getGuild(), phrase);
-		if (!users.contains(member)) return null;
+		if (!users.contains(member.getUser())) return null;
 		Highlight highlight = build(member.getGuild(), phrase, users);
-		if (users.contains(member) && new HighlightRemoveEvent(highlight, member).callEvent()) {
-			users.remove(member);
+		if (users.contains(member.getUser()) && !new HighlightRemoveEvent(highlight, member).callEvent()) {
+			users.remove(member.getUser());
 			return save(member.getGuild(), phrase, users);
 		}
 		return highlight;
@@ -76,6 +76,11 @@ public interface HighlightTable extends Table<Highlight> {
 				Where.equals("guild", guild),
 				Where.equals("phrase", phrase)
 		));
+	}
+
+	@NotNull
+	default List<Highlight> get(@NotNull Guild guild) {
+		return selectMany(Where.equals("guild", guild));
 	}
 
 	@NotNull
