@@ -23,6 +23,8 @@ public class HighlightListener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+		if (!event.isFromGuild()) return;
+
 		Set<Highlight> highlights = checkHighlight(event.getGuild(), event.getMessage().getContentDisplay().toLowerCase());
 		highlights.forEach(h -> new HighlightTriggeredEvent(h, event.getMessage()).callEvent());
 	}
