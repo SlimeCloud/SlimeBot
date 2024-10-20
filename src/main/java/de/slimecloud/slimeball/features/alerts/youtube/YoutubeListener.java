@@ -29,7 +29,7 @@ public class YoutubeListener {
 	}
 
 	@EventHandler
-	public void onApiError(YoutubeApiErrorEvent event) {
+	public void onApiError(@NotNull YoutubeApiErrorEvent event) {
 		logger.warn("Youtube API error {} '{}'", event.getCode(), event.getJsonResponse().getAsJsonObject("error").get("message").getAsString());
 	}
 }
