@@ -108,7 +108,7 @@ jar {
 }
 
 shadowJar {
-    archiveName = "SlimeBot.jar"
+    archiveFileName = "SlimeBot.jar"
 }
 
 test {
