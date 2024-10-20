@@ -6,8 +6,6 @@ import de.mineking.discordutils.commands.condition.Scope;
 import de.mineking.discordutils.commands.context.IAutocompleteContext;
 import de.mineking.discordutils.commands.context.ICommandContext;
 import de.mineking.discordutils.commands.option.Option;
-import de.slimecloud.slimeball.features.highlights.Highlight;
-import de.slimecloud.slimeball.features.highlights.HighlightListener;
 import de.slimecloud.slimeball.main.SlimeBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,7 +22,7 @@ public class HighlightCommand {
 	}
 
 
-	@ApplicationCommand(name = "add", description = "Füge ein Highlight auf diesem Server hinzu", defer = true)
+	@ApplicationCommand(name = "add", description = "Füge ein Highlight auf diesem Server hinzu")
 	public static class HighlightAddCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event, @NotNull @Option(minLength = 3, maxLength = 100) String phrase) {
@@ -32,11 +30,11 @@ public class HighlightCommand {
 
 			bot.getHighlights().set(event.getMember(), phrase);
 
-			event.getHook().editOriginal(String.format("Highlight `%s` erfolgreich hinzugefügt", phrase)).queue();
+			event.reply(String.format("Highlight `%s` erfolgreich hinzugefügt", phrase)).queue();
 		}
 	}
 
-	@ApplicationCommand(name = "delete", description = "entferne ein Highlight auf diesem Server", defer = true)
+	@ApplicationCommand(name = "delete", description = "entferne ein Highlight auf diesem Server")
 	public static class HighlightDeleteCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event, @NotNull @Option(minLength = 3, maxLength = 100) String phrase) {
@@ -44,12 +42,12 @@ public class HighlightCommand {
 
 			Highlight highlight = bot.getHighlights().remove(event.getMember(), phrase);
 
-			if (highlight == null) event.getHook().editOriginal("Highlight `%s` wurde nicht gefunden.".formatted(phrase)).queue();
-			else event.getHook().editOriginal("Highlight `%s` wurde erfolgreich entfernt.".formatted(phrase)).queue();
+			if (highlight == null) event.reply("Highlight `%s` wurde nicht gefunden.".formatted(phrase)).queue();
+			else event.reply("Highlight `%s` wurde erfolgreich entfernt.".formatted(phrase)).queue();
 		}
 	}
 
-	@ApplicationCommand(name = "list", description = "zeigt deine Highlights auf diesem Server an", defer = true)
+	@ApplicationCommand(name = "list", description = "zeigt deine Highlights auf diesem Server an")
 	public static class HighlightListCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull CommandManager<ICommandContext, IAutocompleteContext> manager, @NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
@@ -62,7 +60,7 @@ public class HighlightCommand {
 
 			String mention = manager.getCommand(HighlightAddCommand.class).getAsMention();
 
-			event.getHook().editOriginalEmbeds(new EmbedBuilder()
+			event.replyEmbeds(new EmbedBuilder()
 					.setColor(bot.getColor(event.getGuild()))
 					.setTitle("Highlights")
 					.setDescription(highlights.isEmpty() ? "Du hast noch keine Highlights hinzugefügt.\nMit %s kannst du highlights hinzufügen".formatted(mention) : description)
