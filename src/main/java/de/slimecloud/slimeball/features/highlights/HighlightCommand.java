@@ -1,26 +1,26 @@
 package de.slimecloud.slimeball.features.highlights;
 
 import de.mineking.discordutils.DiscordUtils;
-import de.mineking.discordutils.commands.*;
+import de.mineking.discordutils.commands.ApplicationCommand;
+import de.mineking.discordutils.commands.ApplicationCommandMethod;
+import de.mineking.discordutils.commands.Command;
+import de.mineking.discordutils.commands.Setup;
 import de.mineking.discordutils.commands.condition.Scope;
-import de.mineking.discordutils.commands.context.IAutocompleteContext;
 import de.mineking.discordutils.commands.context.ICommandContext;
 import de.mineking.discordutils.commands.option.Option;
+import de.mineking.discordutils.list.ListManager;
 import de.slimecloud.slimeball.main.SlimeBot;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationCommand(name = "highlight", description = "Verwaltet Highlights", scope = Scope.GUILD_GLOBAL)
 public class HighlightCommand {
 	@Setup
-	public static void setup(@NotNull SlimeBot bot, @NotNull DiscordUtils<?> discordUtils, @NotNull Command<ICommandContext> command) {
+	public static void setup(@NotNull SlimeBot bot, @NotNull DiscordUtils<?> discordUtils, @NotNull ListManager<ICommandContext> list, @NotNull Command<ICommandContext> command) {
 		discordUtils.getJDA().addEventListener(new HighlightListener(bot));
-	}
 
+		command.addSubcommand(list.createCommand(state -> bot.getHighlights()).withDescription("Zeigt deine Highlights für diesen Server an"));
+	}
 
 	@ApplicationCommand(name = "add", description = "Füge ein Highlight auf diesem Server hinzu")
 	public static class HighlightAddCommand {
@@ -44,28 +44,6 @@ public class HighlightCommand {
 
 			if (highlight == null) event.reply("Highlight `%s` wurde nicht gefunden.".formatted(phrase)).queue();
 			else event.reply("Highlight `%s` wurde erfolgreich entfernt.".formatted(phrase)).queue();
-		}
-	}
-
-	@ApplicationCommand(name = "list", description = "zeigt deine Highlights auf diesem Server an")
-	public static class HighlightListCommand {
-		@ApplicationCommandMethod
-		public void performCommand(@NotNull CommandManager<ICommandContext, IAutocompleteContext> manager, @NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
-			List<Highlight> highlights = bot.getHighlights().getHighlights(event.getMember());
-
-			String description = "**Deine Highlights:**\n" + highlights.stream()
-					.map(Highlight::getPhrase)
-					.map(s -> "- `" + s + "`")
-					.collect(Collectors.joining("\n"));
-
-			String mention = manager.getCommand(HighlightAddCommand.class).getAsMention();
-
-			event.replyEmbeds(new EmbedBuilder()
-					.setColor(bot.getColor(event.getGuild()))
-					.setTitle("Highlights")
-					.setDescription(highlights.isEmpty() ? "Du hast noch keine Highlights hinzugefügt.\nMit %s kannst du highlights hinzufügen".formatted(mention) : description)
-					.build()).queue();
-
 		}
 	}
 }
