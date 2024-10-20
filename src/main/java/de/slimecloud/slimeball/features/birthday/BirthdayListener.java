@@ -8,13 +8,10 @@ import de.slimecloud.slimeball.features.birthday.event.BirthdayRemoveEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdaySetEvent;
 import de.slimecloud.slimeball.features.birthday.event.BirthdayStartEvent;
 import de.slimecloud.slimeball.main.SlimeBot;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @Listener
-@RequiredArgsConstructor
 public class BirthdayListener {
-	private final SlimeBot bot;
 
 	@EventHandler
 	public void onBirthdaySet(@NotNull BirthdaySetEvent event) {
@@ -24,7 +21,7 @@ public class BirthdayListener {
 	}
 
 	@EventHandler
-	public void onBirthdayRemove(@NotNull BirthdayRemoveEvent event) {
+	public void onBirthdayRemove(@NotNull SlimeBot bot, @NotNull BirthdayRemoveEvent event) {
 		bot.loadGuild(event.getMember().getGuild()).getBirthday()
 				.flatMap(BirthdayConfig::getBirthdayRole)
 				.ifPresent(role -> {
@@ -36,14 +33,14 @@ public class BirthdayListener {
 
 
 	@EventHandler
-	public void onBirthdayEnd(@NotNull BirthdayEndEvent event) {
+	public void onBirthdayEnd(@NotNull SlimeBot bot, @NotNull BirthdayEndEvent event) {
 		bot.loadGuild(event.getGuild()).getBirthday()
 				.flatMap(BirthdayConfig::getBirthdayRole)
 				.ifPresent(role -> event.getGuild().removeRoleFromMember(event.getMember(), role).reason("Birthday end").queue());
 	}
 
 	@EventHandler
-	public void onBirthdayStart(@NotNull BirthdayStartEvent event) {
+	public void onBirthdayStart(@NotNull SlimeBot bot, @NotNull BirthdayStartEvent event) {
 		GuildConfig config = bot.loadGuild(event.getGuild());
 
 		config.getBirthday()
