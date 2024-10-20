@@ -14,12 +14,6 @@ public class HighlightAddCommand {
 	public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event, @NotNull @Option(minLength = 3, maxLength = 100) String phrase) {
 		phrase = phrase.strip().toLowerCase();
 
-		//Theoretically impossible because discord prevents it due to the minimum length. But to be on the safe side
-		if (phrase.isBlank()) {
-			event.getHook().editOriginal("Die Phrase darf nicht leer sein!").queue();
-			return;
-		}
-
 		bot.getHighlights().set(event.getMember(), phrase);
 
 		event.getHook().editOriginal(String.format("Highlight `%s` erfolgreich hinzugefügt", phrase)).queue();
