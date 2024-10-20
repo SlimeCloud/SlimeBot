@@ -32,9 +32,9 @@ public interface HighlightTable extends Table<Highlight> {
 	 */
 	@Nullable
 	default Highlight remove(@NotNull Member member, @NotNull String phrase) {
-		Set<UserSnowflake> users = getUsers(member.getGuild(), phrase);
-		if (!users.contains(member.getUser())) return null;
-		Highlight highlight = new Highlight(getManager().getData("bot"), member.getGuild(), phrase, users);
+		Highlight highlight = get(member.getGuild(), phrase).orElse(null);
+		Set<UserSnowflake> users;
+		if (highlight == null || !(users = highlight.getUsers()).contains(member.getUser())) return null;
 		if (users.contains(member.getUser()) && !new HighlightRemoveEvent(highlight, member).callEvent()) {
 			users.remove(member.getUser());
 			return upsert(new Highlight(getManager().getData("bot"), member.getGuild(), phrase, users));
