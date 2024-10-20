@@ -27,7 +27,7 @@ public class Highlight implements DataClass<Highlight> {
 	@Column
 	private final Set<UserSnowflake> users;
 
-	public Highlight(SlimeBot bot) {
+	public Highlight(@NotNull SlimeBot bot) {
 		this(bot, null, null, null);
 	}
 
