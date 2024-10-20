@@ -10,7 +10,7 @@ import de.slimecloud.slimeball.features.highlights.HighlightListener;
 import de.slimecloud.slimeball.main.SlimeBot;
 import org.jetbrains.annotations.NotNull;
 
-@ApplicationCommand(name = "highlights", description = "Verwaltet Highlights", scope = Scope.GUILD)
+@ApplicationCommand(name = "highlight", description = "Verwaltet Highlights", scope = Scope.GUILD)
 public class HighlightCommand {
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull DiscordUtils<?> discordUtils, @NotNull Command<ICommandContext> command) {
