@@ -21,17 +21,12 @@ public class HighlightCommand {
 	@Setup
 	public static void setup(@NotNull SlimeBot bot, @NotNull DiscordUtils<?> discordUtils, @NotNull Command<ICommandContext> command) {
 		discordUtils.getJDA().addEventListener(new HighlightListener(bot));
-
-		command.addSubcommand(HighlightListCommand.class);
-		command.addSubcommand(HighlightAddCommand.class);
-		command.addSubcommand(HighlightDeleteCommand.class);
 	}
 
 
 	@ApplicationCommand(name = "add", description = "Füge ein Highlight auf diesem Server hinzu", defer = true)
 	public static class HighlightAddCommand {
 		@ApplicationCommandMethod
-		@SuppressWarnings("ConstantConditions")
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event, @NotNull @Option(minLength = 3, maxLength = 100) String phrase) {
 			phrase = phrase.strip().toLowerCase();
 
@@ -44,7 +39,6 @@ public class HighlightCommand {
 	@ApplicationCommand(name = "delete", description = "entferne ein Highlight auf diesem Server", defer = true)
 	public static class HighlightDeleteCommand {
 		@ApplicationCommandMethod
-		@SuppressWarnings("ConstantConditions")
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event, @NotNull @Option(minLength = 3, maxLength = 100) String phrase) {
 			phrase = phrase.strip().toLowerCase();
 
@@ -58,7 +52,6 @@ public class HighlightCommand {
 	@ApplicationCommand(name = "list", description = "zeigt deine Highlights auf diesem Server an", defer = true)
 	public static class HighlightListCommand {
 		@ApplicationCommandMethod
-		@SuppressWarnings("ConstantConditions")
 		public void performCommand(@NotNull CommandManager<ICommandContext, IAutocompleteContext> manager, @NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
 			List<Highlight> highlights = bot.getHighlights().getHighlights(event.getMember());
 
