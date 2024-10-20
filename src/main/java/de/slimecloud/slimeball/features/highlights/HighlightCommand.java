@@ -25,7 +25,9 @@ public class HighlightCommand {
 	@ApplicationCommand(name = "add", description = "Füge ein Highlight auf diesem Server hinzu")
 	public static class HighlightAddCommand {
 		@ApplicationCommandMethod
-		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event, @NotNull @Option(minLength = 3, maxLength = 100) String phrase) {
+		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
+		                           @Option(description = "Die phrase, bei der du benachrichtigt werden möchtest", minLength = 3, maxLength = 100) String phrase
+		) {
 			phrase = phrase.strip().toLowerCase();
 
 			bot.getHighlights().set(event.getMember(), phrase);
@@ -37,7 +39,9 @@ public class HighlightCommand {
 	@ApplicationCommand(name = "delete", description = "entferne ein Highlight auf diesem Server")
 	public static class HighlightDeleteCommand {
 		@ApplicationCommandMethod
-		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event, @NotNull @Option(minLength = 3, maxLength = 100) String phrase) {
+		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
+		                           @Option(description = "Die Phrase, die du entfernen möchtest", minLength = 3, maxLength = 100) String phrase
+		) {
 			phrase = phrase.strip().toLowerCase();
 
 			Highlight highlight = bot.getHighlights().remove(event.getMember(), phrase);
