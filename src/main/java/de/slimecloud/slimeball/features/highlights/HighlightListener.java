@@ -22,12 +22,12 @@ public class HighlightListener extends ListenerAdapter {
 	private final SlimeBot bot;
 
 	@Override
-	public void onMessageReceived(MessageReceivedEvent event) {
+	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 		Set<Highlight> highlights = checkHighlight(event.getGuild(), event.getMessage().getContentDisplay().toLowerCase());
 		highlights.forEach(h -> new HighlightTriggeredEvent(h, event.getMessage()).callEvent());
 	}
 
-	private Set<Highlight> checkHighlight(Guild guild, String msg) {
+	private Set<Highlight> checkHighlight(@NotNull Guild guild, @NotNull String msg) {
 		List<Highlight> highlights = bot.getHighlights().get(guild);
 		Set<Highlight> result = new HashSet<>();
 		for (Highlight highlight : highlights) {
