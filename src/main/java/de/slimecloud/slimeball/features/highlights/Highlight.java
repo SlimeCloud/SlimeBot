@@ -14,22 +14,20 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 @Getter
-@ToString(onlyExplicitlyIncluded = true)
+@ToString
 @AllArgsConstructor
 public class Highlight implements DataClass<Highlight> {
 
+	@ToString.Exclude
 	private final SlimeBot bot;
 
-	@ToString.Include
 	@Column(key = true)
 	private final Guild guild;
 
-	@ToString.Include
 	@Column(key = true)
 	private final String phrase;
 
 	@Column
-	@ToString.Include
 	private final Set<UserSnowflake> users;
 
 	public Highlight(@NotNull SlimeBot bot) {
