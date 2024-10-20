@@ -17,15 +17,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface HighlightTable extends Table<Highlight> {
-	default void delete(@NotNull Member member, String phrase) {
-		if (new BirthdayRemoveEvent(member).callEvent()) return;
-
-		delete(Where.allOf(
-				Where.equals("guild", member.getGuild()),
-				Where.equals("user", member),
-				Where.equals("phrase", phrase)
-		));
-	}
 
 	@NotNull
 	default Highlight build(@NotNull Guild guild, @NotNull String phrase, @NotNull Set<UserSnowflake> users) {
