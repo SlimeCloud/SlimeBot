@@ -3,7 +3,6 @@ package de.slimecloud.slimeball.features.level;
 import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.Listener;
 import de.slimecloud.slimeball.main.SlimeBot;
-import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -16,12 +15,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Listener
-@RequiredArgsConstructor
 public class LevelUpListener {
-	private final SlimeBot bot;
 
 	@EventHandler
-	public void levelUpMessage(@NotNull UserLevelUpEvent event) {
+	public void levelUpMessage(@NotNull SlimeBot bot, @NotNull UserLevelUpEvent event) {
 		bot.loadGuild(event.getUser().getGuild()).getLevel().flatMap(GuildLevelConfig::getChannel).ifPresent(channel -> channel
 				.sendMessage(
 						bot.getConfig().getLevel().get().getLevelUpMessage()
@@ -32,7 +29,7 @@ public class LevelUpListener {
 	}
 
 	@EventHandler
-	public void levelRoles(@NotNull UserLevelUpEvent event) {
+	public void levelRoles(@NotNull SlimeBot bot, @NotNull UserLevelUpEvent event) {
 		updateLevelRoles(bot, event.getUser(), event.getNewLevel());
 	}
 
