@@ -20,9 +20,8 @@ public interface HighlightTable extends Table<Highlight> {
 	@NotNull
 	default Highlight set(@NotNull Member member, @NotNull String phrase) {
 		Highlight highlight = get(member.getGuild(), phrase).orElseGet(() -> new Highlight(getManager().getData("bot"), member.getGuild(), phrase, new HashSet<>()));
-		Set<UserSnowflake> users = highlight.getUsers();
-		if (!users.contains(member) && !new HighlightSetEvent(highlight, member).callEvent()) {
-			users.add(member);
+		if (!highlight.getUsers().contains(member) && !new HighlightSetEvent(highlight, member).callEvent()) {
+			highlight.getUsers().add(member);
 			return highlight.upsert();
 		}
 		return highlight;
