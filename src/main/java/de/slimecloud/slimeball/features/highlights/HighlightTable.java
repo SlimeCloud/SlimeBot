@@ -2,7 +2,6 @@ package de.slimecloud.slimeball.features.highlights;
 
 import de.mineking.databaseutils.Table;
 import de.mineking.databaseutils.Where;
-import de.slimecloud.slimeball.features.birthday.event.BirthdayRemoveEvent;
 import de.slimecloud.slimeball.features.highlights.event.HighlightRemoveEvent;
 import de.slimecloud.slimeball.features.highlights.event.HighlightSetEvent;
 import net.dv8tion.jda.api.entities.Guild;
