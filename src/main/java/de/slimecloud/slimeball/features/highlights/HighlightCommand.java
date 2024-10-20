@@ -67,7 +67,7 @@ public class HighlightCommand {
 					.map(s -> "- `" + s + "`")
 					.collect(Collectors.joining("\n"));
 
-			String mention = manager.getCommand(HighlightAddCommand.class).getAsMention(event.getGuild().getIdLong());
+			String mention = manager.getCommand(HighlightAddCommand.class).getAsMention();
 
 			event.getHook().editOriginalEmbeds(new EmbedBuilder()
 					.setColor(bot.getColor(event.getGuild()))
