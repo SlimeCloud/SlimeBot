@@ -268,7 +268,7 @@ public class CardRenderer extends Graphic {
 		return LevelUpListener.getLevelRole(bot, member.getGuild(), level)
 				.map(member.getGuild()::getRoleById)
 				.map(Role::getColor)
-				.orElse(data.getFontLevelColor());
+				.orElse(data.getFontColor());
 	}
 
 	public static void drawString(@NotNull Graphics2D graphics, float size, String text, int x, int y) {
