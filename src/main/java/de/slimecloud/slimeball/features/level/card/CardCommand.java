@@ -34,7 +34,6 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import de.slimecloud.slimeball.util.ColorUtil;
 import de.slimecloud.slimeball.util.StringUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
@@ -232,65 +231,54 @@ public class CardCommand {
 
 	@ApplicationCommand(name = "delete", description = "Löscht ein gespeichertes Profil")
 	public static class DeleteCommand {
-		@Autocomplete("id")
+		@Autocomplete("profile")
 		public void handleAutocomplete(@NotNull SlimeBot bot, @NotNull CommandAutoCompleteInteractionEvent event) {
 			event.replyChoices(
 					bot.getProfileData().getAll(event.getUser()).stream()
 							.filter(d -> !d.isPublic())
 							.filter(d -> d.getPermission(event.getUser()).canWrite())
-							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()))
-							.map(d -> {
-								String id = d.getId().asString();
-								Member m = event.getGuild().getMember(d.getOwner());
-
-								return new Choice(id + " (von " + (m != null ? m.getEffectiveName() : "Unbekannt") + ")", id);
-							})
+							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()) || d.getName().contains(event.getFocusedOption().getValue()))
+							.map(d -> new Choice(d.toString(null), d.getId().asString()))
 							.toList()
 			).queue();
 		}
 
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-		                           @Option(description = "ID des Profils") ID id
+		                           @Option(description = "ID des Profils") ID profile
 		) {
 			//We can pass null as owner here because it is only used when id = null which is impossible here
-			bot.getProfileData().getData(id, null).ifPresentOrElse(
+			bot.getProfileData().getData(profile, null).ifPresentOrElse(
 					data -> {
-						//Cannot delete public profiles for security reasons
-						if (data.isPublic()) {
-							event.reply(":x: Du kannst kein öffentliches Profil löschen. Stelle es zunächst wieder auf privat!").setEphemeral(true).queue();
-							return;
-						}
-
 						//Check permission
 						if (data.getPermission(event.getMember()).canWrite()) {
+							//Cannot delete public profiles for security reasons
+							if (data.isPublic()) {
+								event.reply(":x: Du kannst kein öffentliches Profil löschen. Stelle es zunächst wieder auf privat!").setEphemeral(true).queue();
+								return;
+							}
+
 							data.delete();
 
 							bot.getCardProfiles().delete(Where.equals("id", data.getId()));
 
-							event.reply("Profil mit ID **" + id + "** gelöscht").setEphemeral(true).queue();
+							event.reply("Das Profil " + data.toString(null) + "** wurde gelöscht").setEphemeral(true).queue();
 						} else event.reply(":no_entry_sign: Du hast keinen Zugriff auf dieses Profil").setEphemeral(true).queue();
 					},
-					() -> event.reply(":x: Kein Profil mit der angegebenen ID gefunden").setEphemeral(true).queue()
+					() -> event.reply(":x: Das angegebene Profil wurde nicht gefunden!").setEphemeral(true).queue()
 			);
 		}
 	}
 
 	@ApplicationCommand(name = "load", description = "Lädt ein bestehendes Profil")
 	public static class LoadCommand {
-		@Autocomplete("id")
+		@Autocomplete("profile")
 		public void handleAutocomplete(@NotNull SlimeBot bot, @NotNull CommandAutoCompleteInteractionEvent event) {
 			event.replyChoices(
 					bot.getProfileData().selectAll().stream()
 							.filter(d -> d.getPermission(event.getUser()).canRead())
 							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()) || d.getName().contains(event.getFocusedOption().getValue()))
-							.map(d -> {
-								String id = d.getId().asString();
-								String name = d.getName();
-								Member m = event.getGuild().getMember(d.getOwner());
-
-								return new Choice(name + " (" + id + " von " + (m != null ? m.getEffectiveName() : "Unbekannt") + ")", id);
-							})
+							.map(d -> new Choice(d.toString(event.getGuild()), d.getId().asString()))
 							.limit(OptionData.MAX_CHOICES)
 							.toList()
 			).queue();
@@ -298,64 +286,59 @@ public class CardCommand {
 
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-		                           @Option(description = "ID des Profils") ID id
+		                           @Option(description = "Das Profil") ID profile
 		) {
 			//We can pass null as owner here because it is only used when id <= 0 which is impossible here
-			bot.getProfileData().getData(id, null).ifPresentOrElse(
+			bot.getProfileData().getData(profile, null).ifPresentOrElse(
 					data -> {
 						//Check permission
 						if (data.getPermission(event.getMember()).canRead()) {
 							//Reference profile in guild table
 							bot.getCardProfiles().getProfile(event.getMember()).setId(data.getId()).upsert();
 
-							event.reply("Profil mit ID **" + id + "** geladen")
+							event.reply("Das Profil **" + data.toString(event.getGuild()) + "** wurde geladen")
 									.setFiles(data.render(event.getMember()).getFile())
 									.setEphemeral(true).queue();
 						} else event.reply(":no_entry_sign: Du hast keinen Zugriff auf dieses Profil").setEphemeral(true).queue();
 					},
-					() -> event.reply(":x: Kein Profil mit der angegebenen ID gefunden").setEphemeral(true).queue()
+					() -> event.reply(":x: Das angegebene Profil wurde nicht gefunden").setEphemeral(true).queue()
 			);
 		}
 	}
 
 	@ApplicationCommand(name = "publish", description = "Macht eines deiner Profile für andere Mitglieder zugänglich")
 	public static class PublishCommand {
-		@Autocomplete("id")
+		@Autocomplete("profile")
 		public void handleAutocomplete(@NotNull SlimeBot bot, @NotNull CommandAutoCompleteInteractionEvent event) {
 			event.replyChoices(
 					bot.getProfileData().getAll(event.getUser()).stream()
 							.filter(d -> d.getPermission(event.getUser()).canWrite())
-							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()))
-							.map(d -> {
-								String id = d.getId().asString();
-								Member m = event.getGuild().getMember(d.getOwner());
-
-								return new Choice(id + " (von " + (m != null ? m.getEffectiveName() : "Unbekannt") + ")", id);
-							})
+							.filter(d -> d.getId().asString().contains(event.getFocusedOption().getValue()) || d.getName().contains(event.getFocusedOption().getValue()))
+							.map(d -> new Choice(d.toString(null), d.getId().asString()))
 							.toList()
 			).queue();
 		}
 
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event,
-		                           @Option(description = "ID des Profils") ID id,
+		                           @Option(description = "Das Profil") ID profile,
 		                           @Option(description = "Ob das Profil öffentlich sein soll", name = "public") boolean isPublic
 		) {
 			//We can pass null as owner here because it is only used when id = null which is impossible here
-			bot.getProfileData().getData(id, null).ifPresentOrElse(
+			bot.getProfileData().getData(profile, null).ifPresentOrElse(
 					data -> {
 						//Check permission
 						if (data.getPermission(event.getMember()).canWrite()) {
 							//Set new state
 							data.setPublic(isPublic).update();
 
-							if (isPublic) event.reply("Profil mit ID **" + id + "** kann jetzt von anderen Mitgliedern verwendet werden")
+							if (isPublic) event.reply("Das Profil **" + data.toString(null) + "** kann jetzt von anderen Mitgliedern verwendet werden")
 									.setFiles(data.render(event.getMember()).getFile())
 									.setEphemeral(true).queue();
 
 								//Remove profile from all users that are not the owner
 							else {
-								event.reply("Profil mit ID **" + id + "** kann nicht mehr von anderen Mitgliedern verwendet werden").setEphemeral(true).queue();
+								event.reply("Das Profil **" + data.toString(null) + "** kann nicht mehr von anderen Mitgliedern verwendet werden").setEphemeral(true).queue();
 
 								bot.getCardProfiles().delete(Where.allOf(
 										Where.equals("id", data.getId()),
@@ -364,7 +347,7 @@ public class CardCommand {
 							}
 						} else event.reply(":no_entry_sign: Du hast keinen Zugriff auf dieses Profil").setEphemeral(true).queue();
 					},
-					() -> event.reply(":x: Kein Profil mit der angegebenen ID gefunden").setEphemeral(true).queue()
+					() -> event.reply(":x: Das angegebene Profil wurde nicht gefunden").setEphemeral(true).queue()
 			);
 		}
 	}

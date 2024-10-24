@@ -17,9 +17,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -184,6 +186,13 @@ public class CardProfileData implements DataClass<CardProfileData>, ListEntry {
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@NotNull
+	public String toString(@Nullable Guild guild) {
+		Member m = guild != null ? guild.getMember(owner) : null;
+
+		return (name.equals("*Unbenannt*") ? "Unbennant" : name) + " " + (guild != null ? (m != null ? "von " + m.getEffectiveName() + " " : "Unbekannt") : "") + "(" + id + ")";
 	}
 
 	@NotNull
