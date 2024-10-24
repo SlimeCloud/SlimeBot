@@ -32,6 +32,10 @@ import de.slimecloud.slimeball.features.github.BugCommand;
 import de.slimecloud.slimeball.features.github.BugContextCommand;
 import de.slimecloud.slimeball.features.github.ContributorCommand;
 import de.slimecloud.slimeball.features.github.GitHubAPI;
+import de.slimecloud.slimeball.features.highlights.Highlight;
+import de.slimecloud.slimeball.features.highlights.HighlightListener;
+import de.slimecloud.slimeball.features.highlights.HighlightTable;
+import de.slimecloud.slimeball.features.highlights.HighlightCommand;
 import de.slimecloud.slimeball.features.level.Level;
 import de.slimecloud.slimeball.features.level.LevelTable;
 import de.slimecloud.slimeball.features.level.LevelUpListener;
@@ -128,6 +132,7 @@ public class SlimeBot extends ListenerAdapter {
 	private final WrappedDataTable wrappedData;
 	private final BirthdayTable birthdays;
 	private final IdMemory idMemory;
+	private final HighlightTable highlights;
 
 	private final AbsenceTable absences;
 
@@ -176,6 +181,7 @@ public class SlimeBot extends ListenerAdapter {
 			wrappedData = database.getTable(WrappedData.class, () -> new WrappedData(this)).name("wrapped_data").table(WrappedDataTable.class).create();
 			birthdays = database.getTable(Birthday.class, () -> new Birthday(this)).name("birthdays").table(BirthdayTable.class).create();
 			idMemory = database.getTable(StoredId.class, () -> new StoredId("", "")).name("id_memory").table(IdMemory.class).create();
+			highlights = database.getTable(Highlight.class, () -> new Highlight(this)).name("highlights").table(HighlightTable.class).create();
 
 			absences = database.getTable(Absence.class, () -> new Absence(this)).name("absences").table(AbsenceTable.class).create();
 		} else {
@@ -192,6 +198,7 @@ public class SlimeBot extends ListenerAdapter {
 			wrappedData = null;
 			birthdays = null;
 			idMemory = null;
+			highlights = null;
 			absences = null;
 		}
 
@@ -303,6 +310,9 @@ public class SlimeBot extends ListenerAdapter {
 					//Register birthday commands
 					manager.registerCommand(BirthdayCommand.class);
 
+
+					manager.registerCommand(HighlightCommand.class);
+
 					/*
 					Automatically update comDiscordWrmands
 					The parameter function loads the guild configuration and provides it as cache to all commands.
@@ -352,6 +362,7 @@ public class SlimeBot extends ListenerAdapter {
 		manager.registerListener(TimeoutListener.class);
 		manager.registerListener(BirthdayListener.class);
 		manager.registerListener(MessageListener.class);
+		manager.registerListener(HighlightListener.class);
 
 		//Start handlers
 		new HolidayAlert(this);
