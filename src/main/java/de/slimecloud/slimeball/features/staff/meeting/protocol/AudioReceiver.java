@@ -1,0 +1,47 @@
+package de.slimecloud.slimeball.features.staff.meeting.protocol;
+
+import net.dv8tion.jda.api.audio.AudioReceiveHandler;
+import net.dv8tion.jda.api.audio.UserAudio;
+
+import javax.sound.sampled.AudioInputStream;
+import java.io.ByteArrayInputStream;
+import java.util.*;
+
+public class AudioReceiver implements AudioReceiveHandler
+{
+	private static final double VOLUME = 1.0;
+	private final Map<Long, List<byte[]>> received = new LinkedHashMap<>();
+
+	@Override
+	public boolean canReceiveUser() {
+		return true;
+	}
+
+	@Override
+	public void handleUserAudio(UserAudio userAudio) {
+		received.computeIfAbsent(userAudio.getUser().getIdLong(), id -> new LinkedList<>()).add(userAudio.getAudioData(VOLUME));
+	}
+
+	public Set<Long> getUsers() {
+		return received.keySet();
+	}
+
+	public byte[] getBytes(Long id) {
+		int size = 0;
+		for (byte[] bytes : received.get(id)) size += bytes.length;
+		byte[] data = new byte[size];
+		int i = 0;
+		for (byte[] bytes : received.get(id)) {
+			for (byte b : bytes) {
+				data[i++] = b;
+			}
+		}
+		return data;
+	}
+
+	public AudioInputStream getAudioStream(Long id) {
+		byte[] data = getBytes(id);
+		return new AudioInputStream(new ByteArrayInputStream(data), OUTPUT_FORMAT, data.length);
+	}
+
+}
