@@ -1,6 +1,5 @@
 package de.slimecloud.slimeball.features.wrapped;
 
-import com.vdurmont.emoji.EmojiParser;
 import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.Listener;
 import de.slimecloud.slimeball.features.alerts.holiday.HolidayAlert;
@@ -21,6 +20,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.fellbaum.jemoji.EmojiManager;
+import net.fellbaum.jemoji.Emojis;
 import org.apache.commons.collections4.Bag;
 import org.jetbrains.annotations.NotNull;
 
@@ -71,7 +72,7 @@ public class DataListener extends ListenerAdapter {
 		Bag<CustomEmoji> emojis = event.getMessage().getMentions().getCustomEmojisBag();
 		emojis.uniqueSet().forEach(emoji -> data.getEmotes().compute(emoji.getAsReactionCode(), (k, v) -> v == null ? emojis.getCount(emoji) : v + emojis.getCount(emoji)));
 
-		EmojiParser.extractEmojis(event.getMessage().getContentRaw()).forEach(e -> data.getEmotes().compute(e, (k, v) -> v == null ? 1 : v + 1));
+		EmojiManager.extractEmojisInOrder(event.getMessage().getContentRaw()).forEach(e -> data.getEmotes().compute(e.getEmoji(), (k, v) -> v == null ? 1 : v + 1));
 
 		//Save attachments
 		data.setMedia(data.getMedia() + event.getMessage().getAttachments().size());
