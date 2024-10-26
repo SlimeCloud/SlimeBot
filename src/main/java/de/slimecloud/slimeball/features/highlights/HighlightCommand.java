@@ -32,7 +32,7 @@ public class HighlightCommand {
 
 			bot.getHighlights().set(event.getMember(), phrase);
 
-			event.reply(String.format("Highlight `%s` erfolgreich hinzugefügt", phrase)).queue();
+			event.reply(String.format("Highlight `%s` erfolgreich hinzugefügt", phrase)).setEphemeral(true).queue();
 		}
 	}
 
@@ -46,8 +46,8 @@ public class HighlightCommand {
 
 			Highlight highlight = bot.getHighlights().remove(event.getMember(), phrase);
 
-			if (highlight == null) event.reply("Highlight `%s` wurde nicht gefunden.".formatted(phrase)).queue();
-			else event.reply("Highlight `%s` wurde erfolgreich entfernt.".formatted(phrase)).queue();
+			if (highlight == null) event.reply("Highlight `%s` wurde nicht gefunden".formatted(phrase)).setEphemeral(true).queue();
+			else event.reply("Highlight `%s` wurde erfolgreich entfernt".formatted(phrase)).setEphemeral(true).queue();
 		}
 	}
 }
