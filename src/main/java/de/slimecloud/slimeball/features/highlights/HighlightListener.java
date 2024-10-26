@@ -7,6 +7,7 @@ import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +51,7 @@ public class HighlightListener extends ListenerAdapter {
 				user.openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
 								.setTitle("Highlight")
 								.setAuthor(author.getName(), null, author.getEffectiveAvatarUrl())
-								.setDescription(String.format("Hey %s\nDein Highlight `%s` wurde von %s in einer [Nachricht](%s) erwähnt", user.getAsMention(), highlight.getPhrase(), author.getAsMention(),msg.getJumpUrl()))
+								.setDescription(String.format("Dein Highlight `%s` wurde von %s in %s in einer **[Nachricht](%s)** erwähnt", highlight.getPhrase(), author.getAsMention(), msg.getChannel().getAsMention(), msg.getJumpUrl()))
 								.setColor(bot.getColor(event.getGuild()))
 								.build()
 				)).queue();
