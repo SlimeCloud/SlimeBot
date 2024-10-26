@@ -49,7 +49,7 @@ public class HighlightListener extends ListenerAdapter {
 			if (user != null && !author.equals(user)) {
 				user.openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
 								.setTitle("Highlight")
-								.setAuthor(author.getName(), String.format("https://discordapp.com/users/%s", author.getId()), author.getEffectiveAvatarUrl())
+								.setAuthor(author.getName(), null, author.getEffectiveAvatarUrl())
 								.setDescription(String.format("Hey %s\nDein Highlight `%s` wurde von %s in einer [Nachricht](%s) erwähnt", user.getAsMention(), highlight.getPhrase(), author.getAsMention(),msg.getJumpUrl()))
 								.setColor(bot.getColor(event.getGuild()))
 								.build()
