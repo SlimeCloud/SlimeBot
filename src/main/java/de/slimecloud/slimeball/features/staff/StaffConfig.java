@@ -67,7 +67,7 @@ public class StaffConfig extends ConfigCategory {
 
 				List<Member> members = guild.getMembersWithRoles(role);
 
-				builder.append(role.getAsMention()).append(" **").append(description).append("**\n");
+				builder.append("## ").append(role.getAsMention()).append(description).append("\n");
 
 				if (members.isEmpty()) builder.append("*Keine Mitglieder*").append("\n");
 				else {
