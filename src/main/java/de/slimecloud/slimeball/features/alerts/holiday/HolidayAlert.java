@@ -48,7 +48,7 @@ public class HolidayAlert {
 
 		//Check every day at 6 AM
 		if (LocalDateTime.now().getHour() >= 6) check();
-		bot.scheduleDaily(6, this::check);
+		bot.getScheduler().scheduleDaily(6, this::check);
 	}
 
 	public void check() {

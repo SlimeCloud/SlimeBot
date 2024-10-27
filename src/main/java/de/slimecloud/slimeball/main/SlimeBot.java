@@ -93,7 +93,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -107,6 +106,7 @@ public class SlimeBot extends ListenerAdapter {
 	public static final OfflinePackage botPackage = OfflinePackage.get("de.slimecloud.slimeball");
 
 	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(0);
+	private final Scheduler scheduler = new Scheduler(executor);
 
 	private final Config config;
 	private final Dotenv credentials;
@@ -391,25 +391,6 @@ public class SlimeBot extends ListenerAdapter {
 								.build()
 				).queue()
 		);
-	}
-
-	public void scheduleDaily(int hour, @NotNull Runnable task) {
-		long day = TimeUnit.DAYS.toSeconds(1);
-		long initialDelay = ZonedDateTime.now(Main.timezone)
-				.withHour(hour)
-				.withMinute(0)
-				.withSecond(0)
-				.toEpochSecond() - (System.currentTimeMillis() / 1000);
-
-		if (initialDelay < 0) initialDelay += day;
-
-		executor.scheduleAtFixedRate(() -> {
-			try {
-				task.run();
-			} catch (Exception e) {
-				logger.error("An error occurred in daily task", e);
-			}
-		}, initialDelay, day, TimeUnit.SECONDS);
 	}
 
 	@NotNull

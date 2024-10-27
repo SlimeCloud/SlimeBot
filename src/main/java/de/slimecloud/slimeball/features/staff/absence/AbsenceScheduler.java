@@ -14,7 +14,7 @@ public class AbsenceScheduler {
 		this.bot = bot;
 
 		check();
-		bot.scheduleDaily(12, this::check);
+		bot.getScheduler().scheduleDaily(12, this::check);
 	}
 
 	private void check() {
