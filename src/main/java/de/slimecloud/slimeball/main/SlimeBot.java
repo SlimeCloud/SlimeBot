@@ -40,6 +40,7 @@ import de.slimecloud.slimeball.features.level.card.badge.BadgeCommand;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeData;
 import de.slimecloud.slimeball.features.level.card.badge.CardBadgeTable;
 import de.slimecloud.slimeball.features.level.commands.LevelCommand;
+import de.slimecloud.slimeball.features.message.MessageCommand;
 import de.slimecloud.slimeball.features.moderation.MemberJoinListener;
 import de.slimecloud.slimeball.features.moderation.MessageListener;
 import de.slimecloud.slimeball.features.moderation.TimeoutListener;
@@ -68,6 +69,7 @@ import de.slimecloud.slimeball.main.extensions.*;
 import de.slimecloud.slimeball.util.ColorUtil;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -81,6 +83,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.utils.IOFunction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.internal.requests.CompletedRestAction;
 import org.jdbi.v3.postgres.PostgresPlugin;
@@ -90,6 +93,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -273,6 +277,7 @@ public class SlimeBot extends ListenerAdapter {
 					manager.registerCommand(ContributorCommand.class);
 
 					manager.registerCommand(AbsenceCommand.class);
+					manager.registerCommand(MessageCommand.class);
 
 					//old mee6 custom commands
 					manager.registerCommand(SocialsCommand.class);
@@ -360,6 +365,8 @@ public class SlimeBot extends ListenerAdapter {
 
 		new AbsenceScheduler(this);
 
+		MessageCommand.startScheduler(this);
+
 		if (youtube != null) youtube.startListener();
 	}
 
@@ -412,6 +419,27 @@ public class SlimeBot extends ListenerAdapter {
 		}, initialDelay, day, TimeUnit.SECONDS);
 	}
 
+	@SneakyThrows
+	public <T> Optional<T> loadGuildResource(long guild, @NotNull String resource, boolean create, @NotNull IOFunction<File, T> handler) {
+		File root = new File(config.getGuildStorage().replace("%guild%", String.valueOf(guild)));
+		if (!root.exists()) if (!root.mkdirs()) throw new IOException("Could not create root folder for " + guild);
+
+		File file = new File(root, resource);
+		if (!file.getCanonicalPath().startsWith(root.getCanonicalPath())) throw new IOException("Invalid resource");
+
+		if (!file.exists()) {
+			if (create) {
+				if (!file.getParentFile().mkdirs() || !file.createNewFile()) throw new IOException("Could not create resource " + resource + " for " + guild);
+			} else return Optional.empty();
+		}
+
+		return Optional.ofNullable(handler.apply(file));
+	}
+
+	public <T> Optional<T> loadGuildResource(@NotNull Guild guild, @NotNull String resource, boolean create, @NotNull IOFunction<File, T> handler) {
+		return loadGuildResource(guild.getIdLong(), resource, create, handler);
+	}
+
 	@NotNull
 	public GuildConfig loadGuild(long guild) {
 		return GuildConfig.readFromFile(this, guild);
@@ -462,7 +490,7 @@ public class SlimeBot extends ListenerAdapter {
 	}
 
 	@NotNull
-	public <T> RestAction<T> wrap(@NotNull T value) {
+	public <T> RestAction<T> wrap(@Nullable T value) {
 		return new CompletedRestAction<>(jda, value);
 	}
 

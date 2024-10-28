@@ -9,6 +9,7 @@ import de.slimecloud.slimeball.features.alerts.youtube.GuildYoutubeConfig;
 import de.slimecloud.slimeball.features.birthday.BirthdayConfig;
 import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
+import de.slimecloud.slimeball.features.message.AutoMessageConfig;
 import de.slimecloud.slimeball.features.moderation.AutoDeleteFlag;
 import de.slimecloud.slimeball.features.staff.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
@@ -43,19 +44,13 @@ import java.util.*;
 public class GuildConfig {
 	@NotNull
 	public static GuildConfig readFromFile(@NotNull SlimeBot bot, long guild) {
-		String path = bot.getConfig().getGuildStorage().replace("%guild%", String.valueOf(guild));
-
-		try {
-			File file = new File(path);
-
-			if (!file.exists()) return new GuildConfig().configure(bot, path, guild);
-
-			@Cleanup
-			FileReader reader = new FileReader(file);
-			return Main.json.fromJson(reader, GuildConfig.class).configure(bot, path, guild);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return bot.loadGuildResource(guild, "config.json", true, file -> {
+			try (FileReader reader = new FileReader(file)) {
+				GuildConfig config = Main.json.fromJson(reader, GuildConfig.class);
+				config.configure(bot, file.getPath(), guild);
+				return config;
+			}
+		}).orElseThrow();
 	}
 
 	@ToString.Exclude
@@ -141,6 +136,10 @@ public class GuildConfig {
 	@CategoryInfo(name = "Abwesenheit", command = "absence", description = "Konfiguration für die Abwesenheits-Orga")
 	private AbsenceConfig absence;
 
+	@Setter
+	@CategoryInfo(name = "Automatische Nachrichten", command = "message", description = "Automatische Nachrichten")
+	private AutoMessageConfig autoMessage;
+
 	@NotNull
 	private GuildConfig configure(@NotNull SlimeBot bot, @NotNull String path, long guild) {
 		this.bot = bot;
@@ -156,6 +155,7 @@ public class GuildConfig {
 		if (statistic != null) statistic.bot = bot;
 		if (youtube != null) youtube.bot = bot;
 		if (absence != null) absence.bot = bot;
+		if (autoMessage != null) autoMessage.bot = bot;
 
 		return this;
 	}
@@ -218,6 +218,11 @@ public class GuildConfig {
 	@NotNull
 	public Optional<AbsenceConfig> getAbsence() {
 		return Optional.ofNullable(absence);
+	}
+
+	@NotNull
+	public Optional<AutoMessageConfig> getAutoMessage() {
+		return Optional.ofNullable(autoMessage);
 	}
 
 
