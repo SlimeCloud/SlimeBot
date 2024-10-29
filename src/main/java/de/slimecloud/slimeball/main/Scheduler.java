@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
@@ -17,7 +18,7 @@ public class Scheduler {
 		LocalDateTime start = now.plusHours(1).truncatedTo(ChronoUnit.HOURS).plusSeconds(10); //We cannot use the pure full hour because that will cause LocalDateTime.now().getHour() to be still the last hour and therefore failing
 
 		executor.scheduleAtFixedRate(
-				() -> dailyActions.getOrDefault(LocalDateTime.now().getHour(), Collections.emptySet()).forEach(Runnable::run),
+				() -> dailyActions.getOrDefault(ZonedDateTime.now(Main.timezone).getHour(), Collections.emptySet()).forEach(Runnable::run),
 				Duration.between(now, start).getSeconds(),
 				TimeUnit.HOURS.toSeconds(1),
 				TimeUnit.SECONDS
