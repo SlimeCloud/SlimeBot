@@ -14,7 +14,7 @@ public class Scheduler {
 
 	public Scheduler(ScheduledExecutorService executor) {
 		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime start = now.plusHours(1).truncatedTo(ChronoUnit.HOURS);
+		LocalDateTime start = now.plusHours(1).truncatedTo(ChronoUnit.HOURS).plusSeconds(10); //We cannot use the pure full hour because that will cause LocalDateTime.now().getHour() to be still the last hour and therefore failing
 
 		executor.scheduleAtFixedRate(
 				() -> dailyActions.getOrDefault(LocalDateTime.now().getHour(), Collections.emptySet()).forEach(Runnable::run),
