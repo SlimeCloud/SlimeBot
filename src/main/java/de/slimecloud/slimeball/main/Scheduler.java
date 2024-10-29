@@ -24,7 +24,12 @@ public class Scheduler {
 		);
 	}
 
-	public void scheduleDaily(int hour, @NotNull Runnable action) {
+	public void scheduleDaily(int hour, boolean run, @NotNull Runnable action) {
+		if (run && LocalDateTime.now().getHour() >= hour) action.run();
 		dailyActions.computeIfAbsent(hour, k -> new HashSet<>()).add(action);
+	}
+
+	public void scheduleDaily(int hour, @NotNull Runnable action) {
+		scheduleDaily(hour, false, action);
 	}
 }
