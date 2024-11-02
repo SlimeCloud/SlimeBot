@@ -88,7 +88,7 @@ public interface HighlightTable extends Table<Highlight>, Listable<Highlight> {
 				.setTimestamp(Instant.now());
 
 		if (context.entries().isEmpty()) builder.setDescription("Du hast noch keine Highlights hinzugefügt.\nMit " + getManager().<SlimeBot>getData("bot").getDiscordUtils().getCommandManager().getCommand(HighlightCommand.HighlightAddCommand.class).getAsMention() + " kannst du highlights hinzufügen");
-		else builder.setFooter("Insgesamt " + context.entries().size() + " Reports, die dem Filter entsprechen");
+		else builder.setFooter("Insgesamt " + context.entries().size() + " Highlights, die dem Filter entsprechen");
 
 		return builder;
 	}
