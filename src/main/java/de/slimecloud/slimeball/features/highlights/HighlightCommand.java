@@ -30,9 +30,9 @@ public class HighlightCommand {
 		) {
 			phrase = phrase.strip().toLowerCase();
 
-			bot.getHighlights().set(event.getMember(), phrase);
+			Highlight highlight = bot.getHighlights().set(event.getMember(), phrase);
 
-			event.reply(String.format("Highlight `%s` erfolgreich hinzugefügt", phrase)).setEphemeral(true).queue();
+			event.reply(String.format(highlight == null ? "Das Highlight `%s` existiert bereits": "Highlight `%s` erfolgreich hinzugefügt", phrase)).setEphemeral(true).queue();
 		}
 	}
 
