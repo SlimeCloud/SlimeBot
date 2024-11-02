@@ -11,6 +11,8 @@ public class PingListener extends ListenerAdapter {
 		if (!event.isFromGuild()) return;
 		if (!event.getMessage().getMentions().isMentioned(event.getGuild().getSelfMember())) return;
 
+		event.getGuild().modifyTextChannelPositions().queue();
+
 		event.getMessage().addReaction(SlimeEmoji.SUS.getEmoji(event.getGuild())).queue();
 	}
 }

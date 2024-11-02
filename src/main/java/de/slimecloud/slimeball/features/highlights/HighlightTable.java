@@ -29,10 +29,12 @@ public interface HighlightTable extends Table<Highlight>, Listable<Highlight> {
 	@Nullable
 	default Highlight set(@NotNull Member member, @NotNull String phrase) {
 		Highlight highlight = get(member.getGuild(), phrase).orElseGet(() -> new Highlight(getManager().getData("bot"), member.getGuild(), phrase, new HashSet<>()));
+
 		if (!highlight.getUsers().contains(member.getUser()) && !new HighlightSetEvent(highlight, member).callEvent()) {
 			highlight.getUsers().add(member);
 			return highlight.upsert();
 		}
+
 		return null;
 	}
 
@@ -43,11 +45,13 @@ public interface HighlightTable extends Table<Highlight>, Listable<Highlight> {
 	default Highlight remove(@NotNull Member member, @NotNull String phrase) {
 		Highlight highlight = get(member.getGuild(), phrase).orElse(null);
 		Set<UserSnowflake> users;
+
 		if (highlight == null || !(users = highlight.getUsers()).contains(member.getUser())) return null;
 		if (users.contains(member.getUser()) && !new HighlightRemoveEvent(highlight, member).callEvent()) {
 			users.remove(member.getUser());
 			return upsert(new Highlight(getManager().getData("bot"), member.getGuild(), phrase, users));
 		}
+
 		return highlight;
 	}
 
