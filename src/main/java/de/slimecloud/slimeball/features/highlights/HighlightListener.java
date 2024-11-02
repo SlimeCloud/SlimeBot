@@ -44,13 +44,14 @@ public class HighlightListener extends ListenerAdapter {
 	public void onHighlight(@NotNull HighlightTriggeredEvent event) {
 		Highlight highlight = event.getHighlight();
 		Message msg = event.getMessage();
-		User author = msg.getAuthor();
+		Guild guild = msg.getGuild();
+		Member author = guild.getMember(msg.getAuthor());
 		for (UserSnowflake snowflake : highlight.getUsers()) {
 			User user = bot.getJda().getUserById(snowflake.getIdLong());
 			if (user != null && !author.equals(user)) {
 				user.openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
 								.setTitle("Highlight - " + highlight.getPhrase())
-								.setAuthor(author.getName(), null, author.getEffectiveAvatarUrl())
+								.setAuthor(author.getEffectiveName(), null, author.getEffectiveAvatarUrl())
 								.setDescription(String.format("Dein Highlight `%s` wurde von %s in %s in einer **[Nachricht](%s)** erwähnt", highlight.getPhrase(), author.getAsMention(), msg.getChannel().getAsMention(), msg.getJumpUrl()))
 								.setColor(bot.getColor(event.getGuild()))
 								.build()
