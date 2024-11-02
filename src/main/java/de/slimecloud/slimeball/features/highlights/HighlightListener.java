@@ -54,6 +54,7 @@ public class HighlightListener extends ListenerAdapter {
 								.setAuthor(author.getEffectiveName(), null, author.getEffectiveAvatarUrl())
 								.setDescription(String.format("Dein Highlight `%s` wurde von %s in %s in einer **[Nachricht](%s)** erwähnt", highlight.getPhrase(), author.getAsMention(), msg.getChannel().getAsMention(), msg.getJumpUrl()))
 								.setColor(bot.getColor(event.getGuild()))
+								.setThumbnail(guild.getIconUrl())
 								.build()
 				)).queue();
 			}
