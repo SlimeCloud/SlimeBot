@@ -23,14 +23,17 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface HighlightTable extends Table<Highlight>, Listable<Highlight> {
-	@NotNull
+	/**
+	 * @return null if the member already has a highlight with this phrase
+	 */
+	@Nullable
 	default Highlight set(@NotNull Member member, @NotNull String phrase) {
 		Highlight highlight = get(member.getGuild(), phrase).orElseGet(() -> new Highlight(getManager().getData("bot"), member.getGuild(), phrase, new HashSet<>()));
 		if (!highlight.getUsers().contains(member) && !new HighlightSetEvent(highlight, member).callEvent()) {
 			highlight.getUsers().add(member);
 			return highlight.upsert();
 		}
-		return highlight;
+		return null;
 	}
 
 	/**
