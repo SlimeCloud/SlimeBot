@@ -29,7 +29,7 @@ public interface HighlightTable extends Table<Highlight>, Listable<Highlight> {
 	@Nullable
 	default Highlight set(@NotNull Member member, @NotNull String phrase) {
 		Highlight highlight = get(member.getGuild(), phrase).orElseGet(() -> new Highlight(getManager().getData("bot"), member.getGuild(), phrase, new HashSet<>()));
-		if (!highlight.getUsers().contains(member) && !new HighlightSetEvent(highlight, member).callEvent()) {
+		if (!highlight.getUsers().contains(member.getUser()) && !new HighlightSetEvent(highlight, member).callEvent()) {
 			highlight.getUsers().add(member);
 			return highlight.upsert();
 		}
