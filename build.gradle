@@ -33,7 +33,7 @@ dependencies {
     implementation 'de.cyklon:JEvent:879a575'
 
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:9.0.0-RC1'
-    implementation 'com.github.minndevelopment:emoji-java:master-SNAPSHOT'
+    implementation 'net.fellbaum:jemoji:1.5.2'
     implementation 'org.kohsuke:github-api:1.321'
 
     implementation 'io.github.cdimascio:java-dotenv:5.2.2'

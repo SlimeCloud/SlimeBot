@@ -47,8 +47,7 @@ public class HolidayAlert {
 				.toList();
 
 		//Check every day at 6 AM
-		if (LocalDateTime.now().getHour() >= 6) check();
-		bot.scheduleDaily(6, this::check);
+		bot.getScheduler().scheduleDaily(6, this::check);
 	}
 
 	public void check() {
@@ -61,7 +60,7 @@ public class HolidayAlert {
 			//accumulate results
 			List<SchoolHoliday> holidays = temp.stream().flatMap(Collection::stream).toList();
 
-			holidays.stream().map(h -> h.getName("DE")).collect(Collectors.toSet()).forEach(name -> {
+			holidays.stream().filter(h -> h.getSubdivisions() != null).map(h -> h.getName("DE")).collect(Collectors.toSet()).forEach(name -> {
 				List<SchoolHoliday> current = holidays.stream().filter(h -> h.getName("DE").equals(name)).toList();
 
 				//Find regions

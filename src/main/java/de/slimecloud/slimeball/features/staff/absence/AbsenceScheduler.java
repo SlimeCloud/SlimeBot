@@ -13,8 +13,7 @@ public class AbsenceScheduler {
 	public AbsenceScheduler(@NotNull SlimeBot bot) {
 		this.bot = bot;
 
-		check();
-		bot.scheduleDaily(12, this::check);
+		bot.getScheduler().scheduleDaily(12, true, this::check);
 	}
 
 	private void check() {
