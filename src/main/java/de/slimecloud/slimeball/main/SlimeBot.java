@@ -410,7 +410,8 @@ public class SlimeBot extends ListenerAdapter {
 
 		if (!file.exists()) {
 			if (create) {
-				if (!file.getParentFile().mkdirs() || !file.createNewFile()) throw new IOException("Could not create resource " + resource + " for " + guild);
+				file.getParentFile().mkdirs();
+				file.createNewFile();
 			} else return Optional.empty();
 		}
 
