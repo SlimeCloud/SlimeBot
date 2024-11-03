@@ -61,7 +61,7 @@ public class HolidayAlert {
 			//accumulate results
 			List<SchoolHoliday> holidays = temp.stream().flatMap(Collection::stream).toList();
 
-			holidays.stream().map(h -> h.getName("DE")).collect(Collectors.toSet()).forEach(name -> {
+			holidays.stream().filter(h -> h.getSubdivisions() != null).map(h -> h.getName("DE")).collect(Collectors.toSet()).forEach(name -> {
 				List<SchoolHoliday> current = holidays.stream().filter(h -> h.getName("DE").equals(name)).toList();
 
 				//Find regions
