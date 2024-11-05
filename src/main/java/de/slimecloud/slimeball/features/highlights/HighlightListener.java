@@ -59,7 +59,7 @@ public class HighlightListener extends ListenerAdapter {
 				user.openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
 						.setTitle("Highlight - " + highlight.getPhrase())
 						.setAuthor(author.getEffectiveName(), null, author.getEffectiveAvatarUrl())
-						.setDescription(String.format("Dein Highlight `%s` wurde von %s in %s in einer **[Nachricht](%s)** erwähnt", highlight.getPhrase(), author.getAsMention(), msg.getChannel().getAsMention(), msg.getJumpUrl()))
+						.setDescription(String.format("Dein Highlight `%s` wurde von %s in [`%s`](%s) erwähnt", highlight.getPhrase(), author.getAsMention(), msg.getContentRaw().substring(Math.max(i - 18, 0), Math.min(i + highlight.getPhrase().length() + 18, msg.getContentRaw().length())), msg.getJumpUrl()))
 						.setColor(bot.getColor(event.getGuild()))
 						.setThumbnail(guild.getIconUrl())
 						.build()
