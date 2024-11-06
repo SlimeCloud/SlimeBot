@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEv
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.requests.restaction.pagination.PaginationAction;
 import net.dv8tion.jda.api.utils.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +28,8 @@ public class TimeoutListener extends ListenerAdapter {
 		if (event.getNewTimeOutEnd() == null) return;
 
 		//Discord doesn't provide the team member to use, so we fetch it from the audit logs
-		event.getGuild().retrieveAuditLogs().type(ActionType.MEMBER_UPDATE).forEachAsync(entry -> {
+		event.getGuild().retrieveAuditLogs().order(PaginationAction.PaginationOrder.BACKWARD).limit(10).forEachAsync(entry -> {
+			if (entry.getType() != ActionType.AUTO_MODERATION_MEMBER_TIMEOUT && entry.getType() != ActionType.MEMBER_UPDATE) return true;
 			if (entry.getTargetIdLong() != event.getUser().getIdLong()) return true; //Continue non-matches
 
 			if (bot.getConfig().getTimeoutIgnore().contains(entry.getUserIdLong())) return false;
