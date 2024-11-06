@@ -443,7 +443,7 @@ public class SlimeBot extends ListenerAdapter {
 	}
 
 	@NotNull
-	public <T> RestAction<T> wrap(@NotNull T value) {
+	public <T> RestAction<T> wrap(@Nullable T value) {
 		return new CompletedRestAction<>(jda, value);
 	}
 
