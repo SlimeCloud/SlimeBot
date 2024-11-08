@@ -64,7 +64,7 @@ public class HighlightListener extends ListenerAdapter {
 						.setColor(bot.getColor(event.getGuild()))
 						.setThumbnail(guild.getIconUrl())
 						.build()
-				)).queue();
+				)).queue(null, new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER);
 			}
 		}
 	}
