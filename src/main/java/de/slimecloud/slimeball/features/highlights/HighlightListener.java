@@ -50,7 +50,7 @@ public class HighlightListener extends ListenerAdapter {
 		Highlight highlight = event.getHighlight();
 		Message msg = event.getMessage();
 		Guild guild = msg.getGuild();
-		Member author = guild.getMember(msg.getAuthor());
+		User author = msg.getAuthor();
 		
 		for (UserSnowflake snowflake : highlight.getUsers()) {
 			User user = bot.getJda().getUserById(snowflake.getIdLong());
