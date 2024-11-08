@@ -10,9 +10,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.UserSnowflake;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -64,7 +65,7 @@ public class HighlightListener extends ListenerAdapter {
 						.setColor(bot.getColor(event.getGuild()))
 						.setThumbnail(guild.getIconUrl())
 						.build()
-				)).queue(null, new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER);
+				)).queue(null, new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER));
 			}
 		}
 	}
