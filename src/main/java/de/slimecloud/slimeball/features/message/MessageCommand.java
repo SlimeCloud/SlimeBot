@@ -37,7 +37,7 @@ public class MessageCommand {
 	}
 
 	@ApplicationCommand(name = "send", description = "Sendet eine gespeicherte Nachricht als Bot")
-	public class SendCommand {
+	public static class SendCommand {
 		@Autocomplete("message")
 		public void autocomplete(@NotNull SlimeBot bot, @NotNull CommandAutoCompleteInteractionEvent event) {
 			event.replyChoices(bot.loadGuildResource(event.getGuild(), "messages", false, File::list)
@@ -58,7 +58,7 @@ public class MessageCommand {
 	}
 
 	@ApplicationCommand(name = "update", description = "Updated alle Nachrichten")
-	public class UpdateCommand {
+	public static class UpdateCommand {
 		@ApplicationCommandMethod
 		public void performCommand(@NotNull SlimeBot bot, @NotNull SlashCommandInteractionEvent event) {
 			updateMessage(bot, event.getGuild());
