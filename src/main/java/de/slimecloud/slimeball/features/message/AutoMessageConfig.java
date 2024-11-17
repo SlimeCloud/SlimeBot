@@ -19,7 +19,7 @@ import java.util.List;
 public class AutoMessageConfig {
 	public transient SlimeBot bot;
 
-	record MessageInfo(long channel, long message, String name) {}
+	public record MessageInfo(long channel, long message, String name) {}
 
 	private List<MessageInfo> messages = new ArrayList<>();
 

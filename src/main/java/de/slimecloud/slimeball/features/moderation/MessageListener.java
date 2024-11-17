@@ -2,6 +2,7 @@ package de.slimecloud.slimeball.features.moderation;
 
 import de.cyklon.jevent.EventHandler;
 import de.cyklon.jevent.Listener;
+import de.slimecloud.slimeball.config.GuildConfig;
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.attribute.IPostContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -30,6 +32,13 @@ import java.util.stream.Collectors;
 public class MessageListener extends ListenerAdapter {
 	public static final Pattern URL_PATTERN = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", Pattern.CASE_INSENSITIVE);
 	private final SlimeBot bot;
+
+	@Override
+	public void onMessageDelete(@NotNull MessageDeleteEvent event) {
+		GuildConfig config = bot.loadGuild(event.getGuild());
+		config.getAutoMessage().ifPresent(am -> am.getMessages().removeIf(mes -> mes.message() == event.getMessageIdLong()));
+		config.save();
+	}
 
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
