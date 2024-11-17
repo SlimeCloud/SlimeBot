@@ -27,10 +27,6 @@ public class MessageCommand {
 	public final CommandPermission permission = CommandPermission.TEAM;
 	public final IRegistrationCondition<ICommandContext> condition = (manager, guild, cache) -> cache.<GuildConfig>getState("config").getAutoMessage().isPresent();
 
-	public static void startScheduler(@NotNull SlimeBot bot) {
-		bot.getExecutor().scheduleAtFixedRate(() -> bot.getJda().getGuilds().forEach(guild -> updateMessage(bot, guild)), 0, 1, TimeUnit.HOURS);
-	}
-
 	public static void updateMessage(@NotNull SlimeBot bot, @NotNull Guild guild) {
 		GuildConfig config = bot.loadGuild(guild);
 		config.getAutoMessage().ifPresent(am -> am.update(guild).queue(x -> config.save()));
