@@ -32,6 +32,8 @@ dependencies {
     implementation 'de.cyklon:ReflectionUtils:192873e'
     implementation 'de.cyklon:JEvent:879a575'
 
+    implementation 'ai.picovoice:leopard-java:2.0.2'
+
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:9.0.0-RC1'
     implementation 'net.fellbaum:jemoji:1.5.2'
     implementation 'org.kohsuke:github-api:1.321'

@@ -11,7 +11,7 @@ import de.slimecloud.slimeball.features.fdmds.FdmdsConfig;
 import de.slimecloud.slimeball.features.level.GuildLevelConfig;
 import de.slimecloud.slimeball.features.message.AutoMessageConfig;
 import de.slimecloud.slimeball.features.moderation.AutoDeleteFlag;
-import de.slimecloud.slimeball.features.staff.MeetingConfig;
+import de.slimecloud.slimeball.features.staff.meeting.MeetingConfig;
 import de.slimecloud.slimeball.features.staff.StaffConfig;
 import de.slimecloud.slimeball.features.staff.absence.AbsenceConfig;
 import de.slimecloud.slimeball.features.statistic.StatisticConfig;
