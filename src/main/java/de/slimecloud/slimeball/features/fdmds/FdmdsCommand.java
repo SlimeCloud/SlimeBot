@@ -131,7 +131,7 @@ public class FdmdsCommand {
 				mes.addReaction(SlimeEmoji.UP.getEmoji(mes.getGuild())).queue();
 				mes.addReaction(SlimeEmoji.DOWN.getEmoji(mes.getGuild())).queue();
 			});
-			event.reply("Frage erfolgreich eingereicht! Das Team wird die Frage kontrollieren und anschließend veröffentlicht.").setEphemeral(true).queue();
+			event.reply("Frage erfolgreich eingereicht! Das Team wird die Frage kontrollieren und anschließend veröffentlichen.").setEphemeral(true).queue();
 		});
 	}
 
