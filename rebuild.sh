@@ -25,4 +25,4 @@ echo "Building image $IMAGE_NAME"
 docker build -t "$IMAGE_NAME" "$DOCKERFILE_DIR"
 
 echo "Starting container: $CONTAINER_NAME"
-docker run -d -v "$DOCKERFILE_DIR/run:/bot/run" --name "$CONTAINER_NAME" "$IMAGE_NAME" - v ""
+docker run -d -v "$DOCKERFILE_DIR/run:/bot/run" --name "$CONTAINER_NAME" -p "3737:3737" "$IMAGE_NAME"

@@ -2,7 +2,7 @@
   "defaultColor": "#569d3c",
   "countryCodes": [ "DE", "AT", "CH" ],
 
-  "port": 1234,
+  "port": 3737,
 
   "developerRole": 1080118753292976238,
   "guildStorage": "guild/%guild%.json",
