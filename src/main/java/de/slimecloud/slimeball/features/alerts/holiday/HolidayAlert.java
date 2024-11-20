@@ -87,7 +87,7 @@ public class HolidayAlert {
 				bot.getJda().getGuilds().forEach(g -> bot.loadGuild(g).getGreetingsChannel().ifPresent(c -> c.sendMessageEmbeds(new EmbedBuilder()
 						.setColor(bot.getColor(g))
 						.appendDescription("## " + name + "\n")
-						.appendDescription("Für alle Schüler aus **" + regionsString + "** haben die **" + name + "** begonnen! Genießt die Schulfreie Zeit, solange ihr könnt " + SlimeEmoji.PARTY.toString(g))
+						.appendDescription("Für alle Schüler aus **" + regionsString + "** haben die **" + name + "** begonnen! Genießt die schulfreie Zeit, solange ihr könnt " + SlimeEmoji.PARTY.toString(g))
 						.setImage("https://cdn.discordapp.com/attachments/1098707158750724186/1125467211847454781/Slimeferien.png")
 						.build()
 				).queue()));
