@@ -18,9 +18,9 @@ public class Level implements DataClass<Level>, Comparable<Level>, ListEntry {
 	private final transient SlimeBot bot;
 
 	@Column(key = true)
-	private transient final Guild guild;
+	private final Guild guild;
 	@Column(key = true)
-	private transient final UserSnowflake user;
+	private final UserSnowflake user;
 
 	@Column
 	private final int level;
