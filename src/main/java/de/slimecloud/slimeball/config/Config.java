@@ -20,6 +20,8 @@ public class Config {
 	@Required
 	private List<String> countryCodes;
 
+	private Integer port;
+
 	private Long developerRole;
 
 	@Required

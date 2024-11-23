@@ -69,6 +69,7 @@ import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
+import de.slimecloud.slimeball.main.api.Server;
 import de.slimecloud.slimeball.main.extensions.*;
 import de.slimecloud.slimeball.util.ColorUtil;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -333,8 +334,9 @@ public class SlimeBot extends ListenerAdapter {
 				})
 				.build();
 
-
 		jda = discordUtils.getJDA();
+
+		if (config.getPort() != null) new Server(this);
 	}
 
 	@NotNull

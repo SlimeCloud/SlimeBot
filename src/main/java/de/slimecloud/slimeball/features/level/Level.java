@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @AllArgsConstructor
 public class Level implements DataClass<Level>, Comparable<Level>, ListEntry {
-	private final SlimeBot bot;
+	private final transient SlimeBot bot;
 
 	@Column(key = true)
 	private final Guild guild;
