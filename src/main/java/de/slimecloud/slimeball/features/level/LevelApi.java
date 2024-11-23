@@ -23,9 +23,12 @@ public class LevelApi implements EndpointGroup {
 		post("/{guild}/{user}", new AddLevelEndpoint());
 	}
 
-	private class GetLevelEndpoint implements Handler {
-		private record LevelData(int level, int xp, int requiredXp) {}
+	private record LevelData(int level, int xp, int requiredXp) {}
+	private static LevelData createLevelData(Level level) {
+		return new LevelData(level.getLevel(), level.getXp(), LevelTable.getRequiredXp(level.getLevel() + 1));
+	}
 
+	private class GetLevelEndpoint implements Handler {
 		@Override
 		public void handle(@NotNull Context ctx) {
 			Long guildId = ctx.pathParamAsClass("guild", Long.class).get();
@@ -37,8 +40,7 @@ public class LevelApi implements EndpointGroup {
 			Member member = guild.getMemberById(userId);
 			if (member == null) throw new ErrorResponse(ErrorResponseType.MEMBER_NOT_FOUND);
 
-			Level level = bot.getLevel().getLevel(member);
-			ctx.json(new LevelData(level.getLevel(), level.getXp(), LevelTable.getRequiredXp(level.getLevel() + 1)));
+			ctx.json(createLevelData(bot.getLevel().getLevel(member)));
 		}
 	}
 
@@ -61,7 +63,7 @@ public class LevelApi implements EndpointGroup {
 			if (request.level != null) bot.getLevel().addLevel(member, request.level);
 			if (request.xp != null) bot.getLevel().addXp(member, request.xp, UserGainXPEvent.Type.MANUAL);
 
-			ctx.json(bot.getLevel().getLevel(member));
+			ctx.json(createLevelData(bot.getLevel().getLevel(member)));
 		}
 	}
 }
