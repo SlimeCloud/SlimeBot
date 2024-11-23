@@ -1,9 +1,9 @@
 #!/bin/bash
 
-const DOCKERFILE_DIR="$1"
-const CONTAINER_NAME="$2"
-const IMAGE_NAME="$3"
-const PORT="$4"
+DOCKERFILE_DIR="$1"
+CONTAINER_NAME="$2"
+IMAGE_NAME="$3"
+PORT="$4"
 
 status=$(docker container inspect -f "{{.State.Status}}" "$CONTAINER_NAME" 2>/dev/null)
 
