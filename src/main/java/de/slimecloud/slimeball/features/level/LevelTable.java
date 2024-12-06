@@ -76,7 +76,7 @@ public interface LevelTable extends Table<Level>, Listable<Level> {
 		Level current = getLevel(user);
 		if (level == 0) return current;
 
-		CancellableEvent event = new UserLevelUpEvent(user, UserGainXPEvent.Type.MANUAL, current.getXp(), current.getXp(), 0, current.getLevel(), level);
+		CancellableEvent event = new UserLevelUpEvent(user, UserGainXPEvent.Type.MANUAL, current.getXp(), current.getXp(), 0, current.getLevel(), current.getLevel() + level);
 
 		//Update state
 		current = current.withLevel(current.getLevel() + level);
