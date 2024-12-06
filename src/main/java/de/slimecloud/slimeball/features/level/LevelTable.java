@@ -69,6 +69,20 @@ public interface LevelTable extends Table<Level>, Listable<Level> {
 		getOptionalLevel(guild, user).ifPresent(level -> level.withXp(0).withLevel(0).update());
 	}
 
+	@NotNull
+	default Level setLevel(@NotNull Member member, @NotNull Level current, int level) {
+		if (current.getLevel() == level) return current;
+
+		CancellableEvent event = new UserLevelUpEvent(member, UserGainXPEvent.Type.MANUAL, current.getXp(), current.getXp(), 0, current.getLevel(), level);
+
+		//Update state
+		current = current.withLevel(level);
+
+		//Call event and save if not canceled
+		if (!event.callEvent()) current.upsert();
+
+		return current;
+	}
 
 	@NotNull
 	default Level addLevel(@NotNull Member user, int level) {
@@ -76,15 +90,7 @@ public interface LevelTable extends Table<Level>, Listable<Level> {
 		Level current = getLevel(user);
 		if (level == 0) return current;
 
-		CancellableEvent event = new UserLevelUpEvent(user, UserGainXPEvent.Type.MANUAL, current.getXp(), current.getXp(), 0, current.getLevel(), current.getLevel() + level);
-
-		//Update state
-		current = current.withLevel(current.getLevel() + level);
-
-		//Call event and save if not canceled
-		if (!event.callEvent()) current.upsert();
-
-		return current;
+		return setLevel(user, current, current.getLevel() + level);
 	}
 
 	@NotNull
