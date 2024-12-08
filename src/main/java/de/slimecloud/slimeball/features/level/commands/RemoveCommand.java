@@ -28,7 +28,7 @@ public class RemoveCommand {
 			}
 
 			//Update level
-			level.withLevel(level.getLevel() - amount).upsert();
+			bot.getLevel().addLevel(target, -amount);
 			event.reply(target.getAsMention() + " hat jetzt **" + level.getLevel() + " Level** und **" + level.getXp() + " Xp**").setEphemeral(true).queue();
 		}
 	}

@@ -19,9 +19,7 @@ public class SetCommand {
 		                           @Option(description = "Die Anzahl an Level", minValue = 1) int amount
 		) {
 			//Load and update level
-			Level level = bot.getLevel().getLevel(target)
-					.withLevel(amount)
-					.upsert();
+			Level level = bot.getLevel().setLevel(target, bot.getLevel().getLevel(target), amount);
 
 			//Send message
 			event.reply(target.getAsMention() + " hat jetzt **" + level.getLevel() + " Level** und **" + level.getXp() + " Xp**").setEphemeral(true).queue();
