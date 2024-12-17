@@ -66,6 +66,8 @@ import de.slimecloud.slimeball.features.staff.absence.AbsenceScheduler;
 import de.slimecloud.slimeball.features.staff.absence.AbsenceTable;
 import de.slimecloud.slimeball.features.statistic.MemberCount;
 import de.slimecloud.slimeball.features.statistic.RoleMemberCount;
+import de.slimecloud.slimeball.features.ticket.Ticket;
+import de.slimecloud.slimeball.features.ticket.TicketTable;
 import de.slimecloud.slimeball.features.wrapped.DataListener;
 import de.slimecloud.slimeball.features.wrapped.WrappedData;
 import de.slimecloud.slimeball.features.wrapped.WrappedDataTable;
@@ -128,6 +130,7 @@ public class SlimeBot extends ListenerAdapter {
 	private final ReportTable reports;
 	private final ReportBlockTable reportBlocks;
 	private final FdmdsQueue fdmdsQueue;
+	private final TicketTable ticket;
 
 	private final LevelTable level;
 	private final CardDataTable profileData;
@@ -177,6 +180,7 @@ public class SlimeBot extends ListenerAdapter {
 			reports = database.getTable(Report.class, () -> new Report(this)).name("reports").table(ReportTable.class).create();
 			reportBlocks = database.getTable(ReportBlock.class, ReportBlock::new).name("report_blocks").table(ReportBlockTable.class).create();
 			fdmdsQueue = database.getTable(FdmdsQueueItem.class, () -> new FdmdsQueueItem(this)).name("fdmds_queue").table(FdmdsQueue.class).create();
+			ticket = database.getTable(Ticket.class, () -> new Ticket(this)).name("tickets").table(TicketTable.class).create();
 
 			level = database.getTable(Level.class, () -> new Level(this)).name("levels").table(LevelTable.class).create();
 			profileData = database.getTable(CardProfileData.class, () -> new CardProfileData(this)).name("card_data").table(CardDataTable.class).create();
@@ -196,6 +200,7 @@ public class SlimeBot extends ListenerAdapter {
 			reports = null;
 			reportBlocks = null;
 			fdmdsQueue = null;
+			ticket = null;
 			level = null;
 			profileData = null;
 			cardProfiles = null;
