@@ -14,18 +14,21 @@ public class BirthdayAlert {
 
 	public BirthdayAlert(@NotNull SlimeBot bot) {
 		this.bot = bot;
-		bot.getScheduler().scheduleDaily(0, true, this::check);
+		bot.getScheduler().scheduleDaily(1, true, this::check);
 	}
 
 	private void check() {
 		bot.getJda().getGuilds().forEach(guild -> bot.loadGuild(guild).getBirthday().ifPresent(config -> {
 			List<Long> members = config.getBirthdayRole().map(guild::getMembersWithRoles).map(m -> m.stream().map(Member::getIdLong).toList()).orElse(Collections.emptyList());
 
-			bot.getBirthdays().getAll(guild, members).stream()
+			List<Birthday> birthdays = bot.getBirthdays().getAll(guild, members);
+
+			birthdays.stream()
 					.filter(b -> !b.isBirthday())
 					.forEach(b -> new BirthdayEndEvent(b).callEvent());
 
-			bot.getBirthdays().getToday(guild).stream()
+			birthdays.stream()
+					.filter(Birthday::isBirthday)
 					.filter(b -> !members.contains(b.getUser().getIdLong()))
 					.forEach(b -> new BirthdayStartEvent(b).callEvent());
 		}));
