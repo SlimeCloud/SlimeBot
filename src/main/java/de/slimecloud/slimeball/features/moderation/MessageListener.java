@@ -109,7 +109,7 @@ public class MessageListener extends ListenerAdapter {
 						false
 				)
 				.build()
-		)).queue();
+		)).queue(null, new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER));
 	}
 
 	@NotNull
