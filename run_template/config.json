@@ -50,7 +50,7 @@
 
     "voiceLevelingInterval": 60,
     "minVoiceXP": 3,
-    "maxVoiceXP": 5,
+    "maxVoiceXP": 4,
 
     "maxUserProfiles": 3
   },
