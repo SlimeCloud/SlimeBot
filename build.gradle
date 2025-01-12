@@ -17,6 +17,8 @@ repositories {
     mavenCentral()
     maven { url 'https://maven.mineking.dev/releases' }
     maven { url 'https://maven.mineking.dev/snapshots' }
+    maven { url 'https://maven.cyklon.dev/snapshots' }
+    maven { url 'https://maven.cyklon.dev/snapshots' }
 
     maven { url 'https://jitpack.io/' }
 }
@@ -29,19 +31,19 @@ dependencies {
 
     implementation 'de.mineking:JavaUtils:1.9.0'
     implementation 'de.mineking:DatabaseUtils:442b063'
-    implementation 'de.cyklon:ReflectionUtils:192873e'
-    implementation 'de.cyklon:JEvent:879a575'
+    implementation 'de.cyklon:ReflectionUtils:7b1e68b'
+    implementation 'de.cyklon:JEvent:c3ccb12'
 
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:9.0.0-RC1'
     implementation 'net.fellbaum:jemoji:1.5.2'
-    implementation 'org.kohsuke:github-api:1.321'
-    implementation 'io.javalin:javalin:6.3.0'
+    implementation 'org.kohsuke:github-api:2.0.0-alpha-2'
+    implementation 'io.javalin:javalin:6.4.0'
 
     implementation 'io.github.cdimascio:java-dotenv:5.2.2'
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation 'org.sejda.imageio:webp-imageio:0.1.6'
-    implementation 'ch.qos.logback:logback-classic:1.5.6'
+    implementation 'ch.qos.logback:logback-classic:1.5.16'
 
     implementation 'org.postgresql:postgresql:42.7.3'
     implementation 'org.jdbi:jdbi3-postgres:3.45.1'
