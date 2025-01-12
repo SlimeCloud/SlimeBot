@@ -31,8 +31,8 @@ dependencies {
 
     implementation 'de.mineking:JavaUtils:1.9.0'
     implementation 'de.mineking:DatabaseUtils:442b063'
-    implementation 'de.cyklon:ReflectionUtils:192873e'
-    implementation 'de.cyklon:JEvent:879a575'
+    implementation 'de.cyklon:ReflectionUtils:7b1e68b'
+    implementation 'de.cyklon:JEvent:c3ccb12'
 
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:9.0.0-RC1'
     implementation 'net.fellbaum:jemoji:1.5.2'
