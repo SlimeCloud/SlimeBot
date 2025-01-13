@@ -37,7 +37,11 @@ public class MessageCommand {
 		@Autocomplete("message")
 		public void autocomplete(@NotNull SlimeBot bot, @NotNull CommandAutoCompleteInteractionEvent event) {
 			event.replyChoices(bot.loadGuildResource(event.getGuild(), "messages", false, File::list)
-					.map(list -> Arrays.stream(list).map(e -> new Command.Choice(e, e)).toList())
+					.map(list -> Arrays.stream(list)
+							.filter(e -> e.startsWith(event.getFocusedOption().getValue()))
+							.map(e -> new Command.Choice(e, e))
+							.toList()
+					)
 					.orElse(Collections.emptyList())
 			).queue();
 		}
