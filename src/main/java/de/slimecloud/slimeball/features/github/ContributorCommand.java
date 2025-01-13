@@ -15,7 +15,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
 @Slf4j
@@ -57,7 +59,7 @@ public class ContributorCommand {
 			event.getMessage().delete().queue();
 			event.getJDA().openPrivateChannelById(user.getIdLong())
 					.flatMap(channel -> channel.sendMessage("Dir wurde die ContributorRolle auf dem SlimeCloud Discord gegeben."))
-					.queue();
+					.queue(null, new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER));
 
 			event.reply(user.getAsMention() + " wurde die Contributor Rolle gegeben.").queue();
 		});
@@ -70,7 +72,7 @@ public class ContributorCommand {
 		event.getMessage().delete().queue();
 		event.getJDA().openPrivateChannelById(user.getIdLong())
 				.flatMap(channel -> channel.sendMessage("Dir wurde die ContributorRolle auf dem SlimeCloud Discord leider **nicht** gegeben."))
-				.queue();
+				.queue(null, new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER));
 
 		event.reply(user.getAsMention() + " wurde die Contributor Rolle nicht gegeben.").queue();
 	}
