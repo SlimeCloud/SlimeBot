@@ -9,8 +9,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -28,7 +26,6 @@ public class LevelListener extends ListenerAdapter {
 	private final LevelConfig config;
 
 	private final Map<Long, Long> messageTimeout = new HashMap<>();
-	private final Map<Long, Long> voiceUsers = new HashMap<>();
 
 	public LevelListener(@NotNull SlimeBot bot) {
 		this.bot = bot;
@@ -37,12 +34,8 @@ public class LevelListener extends ListenerAdapter {
 
 	@Override
 	public void onReady(@NotNull ReadyEvent event) {
-		//Update on startup
-		event.getJDA().getVoiceChannels().forEach(this::updateChannel);
-
-		//Schedule update
 		bot.getExecutor().scheduleAtFixedRate(
-				() -> voiceUsers.forEach((user, guild) -> bot.getLevel().addVoiceXp(event.getJDA().getGuildById(guild).getMemberById(user))),
+				this::updateVoiceXp,
 				0, config.getVoiceLevelingInterval(), TimeUnit.SECONDS
 		);
 	}
@@ -71,19 +64,16 @@ public class LevelListener extends ListenerAdapter {
 		bot.getLevel().addMessageXp(event.getMember(), event.getMessage().getContentRaw());
 	}
 
-	@Override
-	public void onGenericGuildVoice(@NotNull GenericGuildVoiceEvent event) {
-		if (event instanceof GuildVoiceUpdateEvent update) {
-			if (update.getChannelLeft() != null && update.getChannelJoined() == null) voiceUsers.remove(event.getMember().getIdLong());
+	private void updateVoiceXp() {
+		bot.getJda().getVoiceChannels().forEach(channel -> {
+			List<Member> members = getValidChannelMembers(channel);
 
-			//Update channels
-			updateChannel(update.getChannelLeft());
-			updateChannel(update.getChannelJoined());
-		} else updateChannel(event.getVoiceState().getChannel());
+			members.forEach(m -> bot.getLevel().addVoiceXp(m));
+		});
 	}
 
-	private void updateChannel(@Nullable AudioChannel channel) {
-		if (channel == null) return;
+	private List<Member> getValidChannelMembers(@Nullable AudioChannel channel) {
+		if (channel == null || isBlacklisted(channel)) return Collections.emptyList();
 
 		//Find valid members
 		List<Member> validMembers = channel.getMembers().stream()
@@ -91,12 +81,8 @@ public class LevelListener extends ListenerAdapter {
 				.filter(m -> !m.getVoiceState().isMuted()) //Ignore muted members
 				.toList();
 
-		//If channel has 2 valid members and the channel is not blacklisted -> mark channel for leveling
-		if (validMembers.size() >= 2 && !isBlacklisted(channel)) validMembers.forEach(m -> voiceUsers.put(m.getIdLong(), channel.getGuild().getIdLong()));
-
-		channel.getMembers().forEach(m -> {
-			if (!validMembers.contains(m)) voiceUsers.remove(m.getIdLong());
-		});
+		if (validMembers.size() < 2) return Collections.emptyList();
+		return validMembers;
 	}
 
 	private boolean isBlacklisted(@NotNull GuildChannel channel) {
