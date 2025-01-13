@@ -55,18 +55,6 @@ public interface BirthdayTable extends Table<Birthday>, Listable<Birthday> {
 		));
 	}
 
-	@NotNull
-	@SuppressWarnings("deprecation")
-	default List<Birthday> getToday(@NotNull Guild guild) {
-		ZonedDateTime now = ZonedDateTime.now(Main.timezone);
-		Date today = new Date((now.toEpochSecond() + now.getOffset().getTotalSeconds()) * 1000);
-
-		return selectMany(Where.allOf(
-				Where.equals("guild", guild),
-				Where.equals("date", new Date(2000 - 1900, today.getMonth(), today.getDate()))
-		));
-	}
-
 	/*
 	Listable implementation
 	 */
