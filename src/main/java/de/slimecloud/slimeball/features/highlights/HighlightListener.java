@@ -6,6 +6,7 @@ import de.slimecloud.slimeball.features.highlights.event.HighlightTriggeredEvent
 import de.slimecloud.slimeball.main.SlimeBot;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -57,7 +58,11 @@ public class HighlightListener extends ListenerAdapter {
 		for (UserSnowflake snowflake : highlight.getUsers()) {
 			User user = bot.getJda().getUserById(snowflake.getIdLong());
 
-			if (user != null && !author.equals(user)) {
+			if (user != null
+				&& !author.equals(user)
+				&& guild.getMember(user).hasPermission(msg.getGuildChannel(), Permission.VIEW_CHANNEL)
+				&& guild.getMember(user).hasPermission(msg.getGuildChannel(), Permission.MESSAGE_HISTORY)) {
+
 				user.openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
 						.setTitle("Highlight - " + highlight.getPhrase())
 						.setAuthor(author.getEffectiveName(), null, author.getEffectiveAvatarUrl())
